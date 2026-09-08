@@ -25,6 +25,24 @@ Vẫn giữ được "mỗi ngày một lá" vì lá bài **suy ra từ chính n
 
 Ngày tính theo lịch địa phương của máy và đổi lúc 0:00. Nếu app đang mở lúc nửa đêm, lá tự úp lại.
 
+**Hệ quả:** trong cùng một ngày, mở lại bao nhiêu lần cũng ra đúng lá đó. Đó là chủ ý, không phải lỗi.
+
+## Xem thử ngày khác
+
+Thêm `?ngay=YYYY-MM-DD` vào URL để xem lá của một ngày bất kỳ:
+
+```
+http://127.0.0.1:5179/?ngay=2026-12-25
+```
+
+Chỉ dùng để kiểm tra. Ngày sai định dạng hoặc không có thật (31/02 chẳng hạn) thì app bỏ qua và quay về ngày hôm nay.
+
+Xem nhanh nhiều ngày liền bằng dòng lệnh:
+
+```bash
+node -e "const C=require('./assets/core.js'),k=require('./data/cards.json'),i=k.map(c=>c.id),m=new Map(k.map(c=>[c.id,c]));let d=C.ymd();for(let n=0;n<14;n++){console.log(d,m.get(C.cardForDate(i,d)).thong_diep.slice(0,60));d=C.addDays(d,1)}"
+```
+
 ## Cấu trúc
 
 ```

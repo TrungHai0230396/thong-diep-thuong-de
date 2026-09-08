@@ -13,6 +13,17 @@ const prettyDate = (s) => { const [y, m, d] = s.split('-').map(Number); const t 
 
 let CARDS = [], IDS = [], today = null, revealed = false;   // toàn bộ trạng thái, chỉ trong bộ nhớ
 
+/* Xem thử một ngày khác: thêm ?ngay=2026-12-25 vào URL. Chỉ để kiểm tra, không đổi cách app chạy thật. */
+const previewDate = () => {
+  const v = new URLSearchParams(location.search).get('ngay');
+  if (!v || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return null;
+  const [y, m, d] = v.split('-').map(Number);
+  const t = new Date(y, m - 1, d);
+  return (t.getFullYear() === y && t.getMonth() === m - 1 && t.getDate() === d) ? v : null;
+};
+const PREVIEW = previewDate();
+const nowDate = () => PREVIEW || ymd();
+
 const cardOfToday = () => CARDS.find(c => c.id === cardForDate(IDS, today));
 
 let toastT;
@@ -26,7 +37,7 @@ const openSheet = (title, html) => {
 const closeSheet = () => { $('#sheet-wrap').hidden = true; document.body.style.overflow = ''; };
 
 function render() {
-  today = ymd();
+  today = nowDate();
   $('#today-date').textContent = prettyDate(today);
   const c = cardOfToday();
   $('#message').textContent = c.thong_diep;
@@ -46,6 +57,7 @@ function reveal() {
 
 function tick() {
   if (!revealed) return;
+  if (PREVIEW) { $('#countdown').textContent = `Đang xem thử ngày ${PREVIEW}`; return; }
   const now = new Date(), mid = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
   const s = Math.max(0, Math.floor((mid - now) / 1000));
   const p = (n) => String(n).padStart(2, '0');
@@ -112,7 +124,7 @@ async function init() {
 
   setInterval(() => {                       // qua nửa đêm khi app đang mở: úp lá lại
     tick();
-    if (ymd() !== today) { revealed = false; render(); toast('Một ngày mới đã bắt đầu'); }
+    if (!PREVIEW && ymd() !== today) { revealed = false; render(); toast('Một ngày mới đã bắt đầu'); }
   }, 1000);
 
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
