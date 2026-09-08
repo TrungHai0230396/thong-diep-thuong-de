@@ -60,7 +60,10 @@ const toast = (msg) => { const el = $('#toast'); el.textContent = msg; el.hidden
   clearTimeout(toastT); toastT = setTimeout(() => { el.hidden = true; }, 2200); };
 
 const openSheet = (title, html) => {
-  $('#sheet-title').textContent = title; $('#sheet-body').innerHTML = html;
+  const t = $('#sheet-title');
+  t.textContent = title || '';
+  t.hidden = !title;                      // không có tiêu đề thì bỏ luôn dòng đó
+  $('#sheet-body').innerHTML = html;
   $('#sheet-wrap').hidden = false; document.body.style.overflow = 'hidden';
 };
 const closeSheet = () => { $('#sheet-wrap').hidden = true; document.body.style.overflow = ''; };
@@ -137,7 +140,7 @@ function lucky() {
                      : `<div class="ve-ten">${v.ten}</div>`;
     return `<div class="ve">${chu}<div class="balls">${bi}</div></div>`;
   }).join('');
-  openSheet('Số của hôm nay', `
+  openSheet('', `
     ${khoi}
     <p class="canh-bao">Đây là số ngẫu nhiên sinh từ ngày hôm nay, không phải dự đoán. Không ai đoán trước được kết quả xổ số. Xin chơi cho vui và trong khả năng của mình.</p>`);
 }
