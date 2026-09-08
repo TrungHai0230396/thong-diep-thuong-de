@@ -82,7 +82,10 @@ function reveal() {
   revealed = true;
   if (!PREVIEW) writeDay(today);
   render();
-  setTimeout(() => $('#after').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 950);
+  setTimeout(() => {
+    $('#after').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (BAT_DU_DOAN_SO) datNgoiSao();     // bố cục vừa đổi, tìm chỗ trống mới
+  }, 950);
 }
 
 function tick() {
@@ -154,6 +157,73 @@ function about() {
   };
 }
 
+/* Đặt ngôi sao vào một chỗ trống ngẫu nhiên trong màn hình.
+   Ưu tiên tuyệt đối là không chạm chữ; lá bài chỉ nhường khi màn hình quá hẹp. */
+const VUNG_CHU = ['.topbar', '.today-date', '#cta', '#after', '#toast'];   // không bao giờ được đè
+const VUNG_BAI = ['.card-shell'];                                          // tránh nốt nếu còn chỗ
+
+function datNgoiSao() {
+  const el = $('#btn-lucky');
+  if (!el) return;
+  const D = 34, LE = 10;
+
+  const hinh = (list) => list.map(q => $(q))
+    .filter(n => n && !n.hidden && n.offsetParent !== null)
+    .map(n => n.getBoundingClientRect())
+    .filter(r => r.width > 0 && r.height > 0);
+  const chu = hinh(VUNG_CHU), bai = hinh(VUNG_BAI);
+
+  const W = innerWidth, H = innerHeight;
+  const xMin = LE, xMax = W - D - LE, yMin = LE, yMax = H - D - LE;
+  if (xMax <= xMin || yMax <= yMin) return;
+
+  const chong = (x, y, r, dem) =>
+    Math.max(0, Math.min(x + D, r.right + dem) - Math.max(x, r.left - dem)) *
+    Math.max(0, Math.min(y + D, r.bottom + dem) - Math.max(y, r.top - dem));
+  const dinh = (x, y, ds, dem) => ds.some(r => chong(x, y, r, dem) > 0);
+
+  // Thử lần lượt: né cả chữ lẫn bài với khoảng đệm rộng, rồi hẹp dần, rồi chỉ né chữ.
+  const nacThang = [
+    { ds: chu.concat(bai), dem: 12 },
+    { ds: chu.concat(bai), dem: 4 },
+    { ds: chu.concat(bai), dem: 0 },
+    { ds: chu, dem: 8 },
+    { ds: chu, dem: 0 },
+  ];
+  for (const { ds, dem } of nacThang) {
+    for (let i = 0; i < 260; i++) {
+      const x = xMin + Math.random() * (xMax - xMin);
+      const y = yMin + Math.random() * (yMax - yMin);
+      if (!dinh(x, y, ds, dem)) return dat(el, x, y);
+    }
+    const troi = [];
+    for (let y = yMin; y <= yMax; y += 6)
+      for (let x = xMin; x <= xMax; x += 6)
+        if (!dinh(x, y, ds, dem)) troi.push([x, y]);
+    if (troi.length) { const [x, y] = troi[Math.floor(Math.random() * troi.length)]; return dat(el, x, y); }
+  }
+
+  // Hết đường: chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài.
+  let tot = null, reNhat = Infinity;
+  for (let y = yMin; y <= yMax; y += 6)
+    for (let x = xMin; x <= xMax; x += 6) {
+      let gia = 0;
+      for (const r of chu) gia += chong(x, y, r, 0) * 40;
+      for (const r of bai) gia += chong(x, y, r, 0);
+      if (gia < reNhat) { reNhat = gia; tot = [x, y]; }
+    }
+  if (tot) dat(el, tot[0], tot[1]);
+}
+
+function dat(el, x, y) {
+  el.style.left = Math.round(x) + 'px';
+  el.style.top = Math.round(y) + 'px';
+  el.classList.add('is-placed');
+}
+
+let henDatSao;
+const datLaiNgoiSao = () => { clearTimeout(henDatSao); henDatSao = setTimeout(datNgoiSao, 120); };
+
 function stars() {
   const cv = $('#stars'), ctx = cv.getContext('2d'), rndSeed = self.TDTD.mulberry32;
   const draw = () => {
@@ -186,8 +256,14 @@ async function init() {
   $('#card').onclick = reveal;
   $('#card').onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } };
   $('#btn-draw').onclick = reveal;
-  if (BAT_DU_DOAN_SO) $('#btn-lucky').onclick = lucky;
-  else $('.extra').remove();
+  if (BAT_DU_DOAN_SO) {
+    $('#btn-lucky').onclick = lucky;
+    datNgoiSao();
+    addEventListener('resize', datLaiNgoiSao);
+    addEventListener('orientationchange', datLaiNgoiSao);
+  } else {
+    $('#btn-lucky').remove();
+  }
   $('#btn-share').onclick = copyText;
   $('#btn-about').onclick = about;
   $$('[data-close]').forEach(el => el.onclick = closeSheet);

@@ -41,9 +41,13 @@ Ngày tính theo lịch địa phương của máy và đổi lúc 0:00. Nếu a
 
 ## Số của hôm nay (tính năng cho vui)
 
-Sau khi nhận thông điệp, nút **Dự đoán số** mở ra ba dãy: Mega 6/45, Power 6/55 và một dãy 6 chữ số kiểu giải đặc biệt.
+Một **ngôi sao nhỏ** nổi trên màn hình, không chữ. Bấm vào mở ra ba dãy: Mega 6/45, Power 6/55 và một dãy 6 chữ số kiểu giải đặc biệt.
 
-Số sinh từ hạt giống của máy cộng với ngày hôm nay, nên mỗi người một bộ, mỗi ngày một bộ, và bấm lại trong ngày không đổi được. Đây là số ngẫu nhiên thuần túy, không phải dự đoán, và màn hình có ghi rõ điều đó cùng lời nhắc chơi trong khả năng của mình.
+Vị trí ngôi sao ngẫu nhiên, mỗi lần tải trang lại rơi một chỗ khác, và tự né chữ lẫn lá bài. Thuật toán thử nới dần: tránh cả chữ lẫn lá bài với khoảng đệm rộng, hẹp dần, rồi mới chỉ tránh chữ. Trên màn hình quá hẹp mà không còn chỗ trống nào, nó chọn ô đè ít nhất và tính chữ nặng gấp 40 lần lá bài, nên **không bao giờ đè lên chữ**.
+
+Tắt tính năng: đổi `BAT_DU_DOAN_SO` thành `false` ở đầu `assets/app.js`, ngôi sao và bảng số biến mất hoàn toàn. Nhớ tăng số phiên bản trong `sw.js`.
+
+Số thì ngược lại, không ngẫu nhiên theo lần bấm: sinh từ hạt giống của máy cộng với ngày hôm nay, nên mỗi người một bộ, mỗi ngày một bộ, bấm lại trong ngày không đổi được. Đây là số ngẫu nhiên thuần túy, không phải dự đoán, và màn hình có ghi rõ điều đó cùng lời nhắc chơi trong khả năng của mình.
 
 ## Xem thử ngày khác
 

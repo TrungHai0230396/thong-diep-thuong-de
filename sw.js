@@ -1,4 +1,4 @@
-const V = 'tdtd-v6';
+const V = 'tdtd-v8';
 const SHELL = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'data/cards.json',
                'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', e => {
