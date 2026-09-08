@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Thông Điệp Của Thượng Đế</title>
-<meta name="description" content="Mỗi ngày một thông điệp, lấy cảm hứng từ bộ sách Đối thoại với Thượng đế.">
+<meta name="description" content="Mỗi ngày một thông điệp. Nhận rồi thì để nó đi.">
 <meta name="theme-color" content="#0d0b1a">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Be+Vietnam+Pro:wght@300;400;500;600&display=swap&subset=vietnamese" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Be+Vietnam+Pro:wght@300;400;500&display=swap&subset=vietnamese" rel="stylesheet">
 <link rel="stylesheet" href="assets/app.css">
 </head>
 <body>
@@ -27,91 +27,54 @@
 </header>
 
 <main>
-  <!-- ================= HÔM NAY ================= -->
-  <section class="view is-active" id="view-today">
-    <p class="greeting" id="greeting">Chào con</p>
-    <p class="today-date" id="today-date"></p>
+  <p class="greeting" id="greeting">Chào con</p>
+  <p class="today-date" id="today-date"></p>
 
-    <div class="stage">
-      <div class="card-shell">
-        <div class="card" id="card" role="button" tabindex="0" aria-label="Lật lá thông điệp hôm nay">
-          <div class="face back">
-            <svg viewBox="0 0 200 300" class="back-art" aria-hidden="true">
-              <defs>
-                <radialGradient id="g1" cx="50%" cy="42%" r="55%">
-                  <stop offset="0%" stop-color="#3b2f6b"/><stop offset="100%" stop-color="#14102c"/>
-                </radialGradient>
-              </defs>
-              <rect x="0" y="0" width="200" height="300" rx="16" fill="url(#g1)"/>
-              <rect x="9" y="9" width="182" height="282" rx="11" fill="none" stroke="#c9a24d" stroke-opacity=".55"/>
-              <rect x="15" y="15" width="170" height="270" rx="8" fill="none" stroke="#c9a24d" stroke-opacity=".22"/>
-              <g stroke="#e8c37a" stroke-opacity=".75" fill="none" stroke-linecap="round">
-                <circle cx="100" cy="126" r="26" stroke-opacity=".9"/>
-                <circle cx="100" cy="126" r="40" stroke-opacity=".35"/>
-                <circle cx="100" cy="126" r="54" stroke-opacity=".16"/>
-                <g class="ray-set">
-                  <path d="M100 62v14M100 176v14M36 126h14M150 126h14M55 81l10 10M135 161l10 10M145 81l-10 10M65 161l-10 10"/>
-                </g>
-              </g>
-              <circle cx="100" cy="126" r="8" fill="#e8c37a" fill-opacity=".9"/>
-              <text x="100" y="232" text-anchor="middle" class="back-word">Thông điệp</text>
-              <text x="100" y="252" text-anchor="middle" class="back-word small">cho ngày hôm nay</text>
-            </svg>
-          </div>
-          <div class="face front">
-            <span class="card-no" id="card-no"></span>
-            <p class="message" id="message"></p>
-            <div class="rule"></div>
-            <p class="meaning" id="meaning"></p>
-          </div>
+  <div class="stage">
+    <div class="card-shell">
+      <div class="card" id="card" role="button" tabindex="0" aria-label="Lật lá thông điệp hôm nay">
+        <div class="face back">
+          <svg viewBox="0 0 200 300" class="back-art" aria-hidden="true">
+            <defs><radialGradient id="g1" cx="50%" cy="42%" r="55%">
+              <stop offset="0%" stop-color="#3b2f6b"/><stop offset="100%" stop-color="#14102c"/>
+            </radialGradient></defs>
+            <rect x="0" y="0" width="200" height="300" rx="16" fill="url(#g1)"/>
+            <rect x="9" y="9" width="182" height="282" rx="11" fill="none" stroke="#c9a24d" stroke-opacity=".55"/>
+            <rect x="15" y="15" width="170" height="270" rx="8" fill="none" stroke="#c9a24d" stroke-opacity=".22"/>
+            <g stroke="#e8c37a" stroke-opacity=".75" fill="none" stroke-linecap="round">
+              <circle cx="100" cy="126" r="26" stroke-opacity=".9"/>
+              <circle cx="100" cy="126" r="40" stroke-opacity=".35"/>
+              <circle cx="100" cy="126" r="54" stroke-opacity=".16"/>
+              <g class="ray-set"><path d="M100 62v14M100 176v14M36 126h14M150 126h14M55 81l10 10M135 161l10 10M145 81l-10 10M65 161l-10 10"/></g>
+            </g>
+            <circle cx="100" cy="126" r="8" fill="#e8c37a" fill-opacity=".9"/>
+            <text x="100" y="232" text-anchor="middle" class="back-word">Thông điệp</text>
+            <text x="100" y="252" text-anchor="middle" class="back-word small">cho ngày hôm nay</text>
+          </svg>
+        </div>
+        <div class="face front">
+          <p class="message" id="message"></p>
+          <div class="rule"></div>
+          <p class="meaning" id="meaning"></p>
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="cta" id="cta">
-      <button class="primary" id="btn-draw">Rút thông điệp hôm nay</button>
-      <p class="hint">Hít một hơi thật sâu, rồi chạm vào lá bài.</p>
+  <div class="cta" id="cta">
+    <button class="primary" id="btn-draw">Nhận thông điệp hôm nay</button>
+    <p class="hint">Hít một hơi thật sâu, rồi chạm vào lá bài.</p>
+  </div>
+
+  <div class="after" id="after" hidden>
+    <p class="ephemeral">Thông điệp này không được lưu lại ở đâu cả.<br>Hãy giữ nó trong lòng cho hết hôm nay.</p>
+    <div class="actions">
+      <button class="ghost" id="btn-share"><span class="ico">↗</span>Chép lại</button>
     </div>
-
-    <div class="after" id="after" hidden>
-      <div class="actions">
-        <button class="ghost" id="btn-fav" aria-pressed="false"><span class="ico">♡</span><span id="fav-label">Yêu thích</span></button>
-        <button class="ghost" id="btn-note"><span class="ico">✎</span>Nhật ký</button>
-        <button class="ghost" id="btn-share"><span class="ico">↗</span>Chia sẻ</button>
-      </div>
-      <p class="countdown" id="countdown"></p>
-    </div>
-
-    <div class="streak" id="streak"></div>
-  </section>
-
-  <!-- ================= BỘ SƯU TẬP ================= -->
-  <section class="view" id="view-deck">
-    <h2>Bộ sưu tập</h2>
-    <p class="sub" id="deck-sub"></p>
-    <div class="filters" role="tablist">
-      <button class="chip is-on" data-filter="all">Tất cả</button>
-      <button class="chip" data-filter="opened">Đã mở</button>
-      <button class="chip" data-filter="fav">Yêu thích</button>
-    </div>
-    <div class="grid" id="grid"></div>
-  </section>
-
-  <!-- ================= NHẬT KÝ ================= -->
-  <section class="view" id="view-journal">
-    <h2>Nhật ký</h2>
-    <p class="sub">Những dòng con viết cho chính mình.</p>
-    <div id="journal"></div>
-  </section>
+    <p class="countdown" id="countdown"></p>
+  </div>
 </main>
 
-<nav class="tabbar">
-  <button class="tab is-on" data-view="today"><span class="ico">☀</span>Hôm nay</button>
-  <button class="tab" data-view="deck"><span class="ico">▦</span>Bộ sưu tập</button>
-  <button class="tab" data-view="journal"><span class="ico">✎</span>Nhật ký</button>
-</nav>
-
-<!-- ================= SHEET ================= -->
 <div class="sheet-wrap" id="sheet-wrap" hidden>
   <div class="sheet-bg" data-close></div>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
