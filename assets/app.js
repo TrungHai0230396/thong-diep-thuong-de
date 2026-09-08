@@ -3,7 +3,8 @@
 'use strict';
 
 const { ymd, cardFor, newSeed } = self.TDTD;
-const SEED_KEY = 'tdtd.seed';
+const SEED_KEY = 'tdtd.seed';   // hạt giống riêng của máy
+const DAY_KEY  = 'tdtd.day';    // ngày đã nhận thông điệp, bị ghi đè mỗi ngày
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -28,6 +29,11 @@ function getSeed() {
     return newSeed();
   }
 }
+
+/* Ngày gần nhất đã nhận thông điệp. Chỉ giữ đúng một ngày, hôm sau ghi đè,
+   nên không có lịch sử nào tích lũy và cũng không xem lại được thông điệp cũ. */
+const readDay = () => { try { return localStorage.getItem(DAY_KEY); } catch (e) { return null; } };
+const writeDay = (d) => { try { localStorage.setItem(DAY_KEY, d); } catch (e) {} };
 
 /* Xem thử một ngày khác: thêm ?ngay=2026-12-25 vào URL. Chỉ để kiểm tra, không đổi cách app chạy thật. */
 const previewDate = () => {
@@ -67,6 +73,7 @@ function render() {
 function reveal() {
   if (revealed) return;
   revealed = true;
+  if (!PREVIEW) writeDay(today);
   render();
   setTimeout(() => $('#after').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 950);
 }
@@ -99,14 +106,14 @@ function fallback(text, done) {
 function about() {
   openSheet('Giới thiệu', `
     <p>Mỗi ngày, một thông điệp. Mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
-    <p>Ứng dụng không lưu lại bất cứ điều gì: không lịch sử, không bộ sưu tập, không tài khoản. Đóng lại là thông điệp đi qua. Ngày mai sẽ có lá khác.</p>
+    <p>Ứng dụng không giữ lịch sử: không bộ sưu tập, không nhật ký, không tài khoản. Thông điệp cũ không xem lại được. Mỗi ngày chỉ nhận một lần, ngày mai sẽ có lá khác.</p>
     <p>Bộ bài gồm ${CARDS.length} thông điệp và được xáo riêng cho từng người, nên hai người mở cùng một ngày vẫn nhận hai thông điệp khác nhau. Đi hết ${CARDS.length} ngày mới trọn một vòng, trong vòng đó không thông điệp nào lặp lại.</p>
     <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>
     <button class="ghost" id="btn-reshuffle" style="margin-top:4px">Xáo lại bộ bài của tôi</button>`);
   $('#btn-reshuffle').onclick = () => {
     if (!confirm('Xáo lại bộ bài? Thông điệp hôm nay sẽ đổi sang lá khác.')) return;
     seed = newSeed();
-    try { localStorage.setItem(SEED_KEY, String(seed)); } catch (e) {}
+    try { localStorage.setItem(SEED_KEY, String(seed)); localStorage.removeItem(DAY_KEY); } catch (e) {}
     revealed = false; closeSheet(); render(); toast('Đã xáo lại bộ bài');
   };
 }
@@ -136,6 +143,8 @@ async function init() {
   }
   IDS = CARDS.map(c => c.id);
   seed = getSeed();
+  today = nowDate();
+  revealed = !PREVIEW && readDay() === today;   // đã nhận hôm nay thì hiện lại luôn
   stars(); render();
 
   $('#card').onclick = reveal;
