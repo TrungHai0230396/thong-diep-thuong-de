@@ -118,7 +118,11 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 
 .ve{margin-bottom:15px}
 .ve-ten{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);opacity:.75;margin-bottom:8px}
-.balls{display:flex;gap:8px;flex-wrap:wrap}
+.ve-ten .ghi{display:block;margin-top:3px;font-size:10px;letter-spacing:.02em;text-transform:none;opacity:.6}
+.balls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ngan{color:var(--gold);opacity:.5;font-size:14px;margin:0 -1px}
+.ball.db{background:linear-gradient(180deg,#f0a9a0,#c96b5e);color:#3a1410;
+  box-shadow:0 4px 12px rgba(201,107,94,.28)}
 .ball{width:40px;height:40px;flex:0 0 40px;border-radius:50%;display:grid;place-items:center;
   font-family:"Be Vietnam Pro",system-ui,-apple-system,sans-serif;font-size:15px;font-weight:600;
   font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1;

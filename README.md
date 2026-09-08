@@ -41,7 +41,14 @@ Ngày tính theo lịch địa phương của máy và đổi lúc 0:00. Nếu a
 
 ## Số của hôm nay (tính năng cho vui)
 
-Một **ngôi sao nhỏ** nổi trên màn hình, không chữ. Bấm vào mở ra bốn dãy: Mega 6/45, Power 6/55, Điện toán 5/35 và một dãy 6 chữ số kiểu giải đặc biệt.
+Một **ngôi sao nhỏ** nổi trên màn hình, không chữ. Bấm vào mở ra bốn dãy:
+
+| Loại | Sinh ra |
+|---|---|
+| Mega 6/45 | 6 số khác nhau từ 1–45 |
+| Power 6/55 | 6 số khác nhau từ 1–55 |
+| Điện toán 5/35 | 5 số khác nhau từ 1–35, kèm 1 số đặc biệt từ 1–12 (quả bóng màu đỏ) |
+| Vé số truyền thống | dãy 6 chữ số |
 
 Vị trí ngôi sao ngẫu nhiên, mỗi lần tải trang lại rơi một chỗ khác, và tự né chữ lẫn lá bài. Thuật toán thử nới dần: tránh cả chữ lẫn lá bài với khoảng đệm rộng, hẹp dần, rồi mới chỉ tránh chữ. Trên màn hình quá hẹp mà không còn chỗ trống nào, nó chọn ô đè ít nhất và tính chữ nặng gấp 40 lần lá bài, nên **không bao giờ đè lên chữ**.
 
@@ -75,7 +82,7 @@ assets/app.css             giao diện
 data/cards.json            100 lá dùng trong app (31 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      CSV -> data/cards.json
-scripts/test-core.js       44 kiểm thử lõi
+scripts/test-core.js       49 kiểm thử lõi
 content/raw/               CSV nguồn (v3 và v5)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
@@ -86,7 +93,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 44 kiểm thử lõi (Node 18+)
+node scripts/test-core.js        # chạy 49 kiểm thử lõi (Node 18+)
 ```
 
 ## Sửa chính tả trong nguồn

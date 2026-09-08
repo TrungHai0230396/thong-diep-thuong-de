@@ -70,6 +70,14 @@ ok('Power 6/55 nằm trong 1–55', C.luckyNumbers('2026-09-08', S1, 6, 55, 2).e
 const L535 = C.luckyNumbers('2026-09-08', S1, 5, 35, 4);
 ok('Điện toán 5/35 đủ 5 số trong 1–35', L535.length === 5 && L535.every(n => n >= 1 && n <= 35), L535.join(' '));
 ok('Điện toán 5/35 không trùng số', new Set(L535).size === 5);
+const DB = C.luckyNumbers('2026-09-08', S1, 1, 12, 5);
+ok('5/35 có đúng 1 số đặc biệt', DB.length === 1);
+ok('số đặc biệt nằm trong 1–12', DB[0] >= 1 && DB[0] <= 12, String(DB[0]));
+let ngoaiKhoang = 0;
+for (let k = 0; k < 400; k++) { const v = C.luckyNumbers('2026-09-08', k * 5171 + 9, 1, 12, 5)[0]; if (v < 1 || v > 12) ngoaiKhoang++; }
+ok('400 người: số đặc biệt luôn trong 1–12', ngoaiKhoang === 0);
+ok('số đặc biệt phủ đủ 12 giá trị', new Set(Array.from({ length: 600 }, (_, k) => C.luckyNumbers('2026-09-08', k * 7717 + 5, 1, 12, 5)[0])).size === 12);
+ok('số đặc biệt ổn định trong ngày', DB[0] === C.luckyNumbers('2026-09-08', S1, 1, 12, 5)[0]);
 ok('4 loại vé cho 4 bộ khác nhau', new Set([
   C.luckyNumbers('2026-09-08', S1, 6, 45, 1).join(),
   C.luckyNumbers('2026-09-08', S1, 6, 55, 2).join(),

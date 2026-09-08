@@ -116,18 +116,26 @@ function fallback(text, done) {
 /* Dự đoán số — thuần giải trí. Số sinh ngẫu nhiên từ hạt giống của máy và ngày hôm nay,
    nên mỗi người một bộ, mỗi ngày một bộ, và bấm lại trong ngày không đổi được. */
 const VE = [
-  { ten: 'Mega 6/45',      loai: 'so',    n: 6, max: 45, salt: 1 },
-  { ten: 'Power 6/55',     loai: 'so',    n: 6, max: 55, salt: 2 },
-  { ten: 'Điện toán 5/35', loai: 'so',    n: 5, max: 35, salt: 4 },
-  { ten: 'Giải đặc biệt',  loai: 'chuso', len: 6,        salt: 3 },
+  { ten: 'Mega 6/45',           loai: 'so',    n: 6, max: 45, salt: 1 },
+  { ten: 'Power 6/55',          loai: 'so',    n: 6, max: 55, salt: 2 },
+  // 5/35: năm số từ 1–35, kèm một số đặc biệt riêng từ 1–12
+  { ten: 'Điện toán 5/35',      loai: 'so',    n: 5, max: 35, salt: 4, db: { max: 12, salt: 5 } },
+  { ten: 'Vé số truyền thống',  loai: 'chuso', len: 6,        salt: 3 },
 ];
 
 function lucky() {
+  const bong = (n, lop = '') => `<span class="ball${lop}">${String(n).padStart(2, '0')}</span>`;
   const khoi = VE.map(v => {
-    const bi = v.loai === 'so'
-      ? luckyNumbers(today, seed, v.n, v.max, v.salt).map(n => `<span class="ball">${String(n).padStart(2, '0')}</span>`).join('')
+    let bi = v.loai === 'so'
+      ? luckyNumbers(today, seed, v.n, v.max, v.salt).map(n => bong(n)).join('')
       : luckyDigits(today, seed, v.len, v.salt).split('').map(d => `<span class="ball">${d}</span>`).join('');
-    return `<div class="ve"><div class="ve-ten">${v.ten}</div><div class="balls">${bi}</div></div>`;
+    if (v.db) {
+      const db = luckyNumbers(today, seed, 1, v.db.max, v.db.salt)[0];
+      bi += `<span class="ngan" aria-hidden="true">+</span>` + bong(db, ' db');
+    }
+    const chu = v.db ? `<div class="ve-ten">${v.ten}<span class="ghi">số cuối là số đặc biệt (1–${v.db.max})</span></div>`
+                     : `<div class="ve-ten">${v.ten}</div>`;
+    return `<div class="ve">${chu}<div class="balls">${bi}</div></div>`;
   }).join('');
   openSheet('Số của hôm nay', `
     ${khoi}
