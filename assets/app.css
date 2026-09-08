@@ -54,11 +54,12 @@ main{position:relative;z-index:1;padding:0 18px calc(40px + var(--safe-b));max-w
 
 .front{transform:rotateY(180deg);background:linear-gradient(168deg,#1d1740 0%,#151030 60%,#100d24 100%);
   border:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;
-  padding:30px 24px;text-align:center;gap:14px}
-.message{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(18px,5.1vw,22px);
-  line-height:1.5;margin:0;font-weight:600}
-.rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold-deep),transparent);opacity:.55;margin:0 12%}
-.meaning{font-size:12.5px;line-height:1.65;color:var(--ink-dim);margin:0;font-weight:300}
+  padding:30px 22px;text-align:center;gap:16px}
+.crest{width:44px;height:16px;align-self:center;color:var(--gold);margin-bottom:2px}
+.message{font-family:"Cormorant Garamond",Georgia,serif;font-size:clamp(21px,6.2vw,26px);
+  line-height:1.45;margin:0;font-weight:600;text-wrap:balance}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--gold-deep),transparent);opacity:.5;margin:0 20%}
+.meaning{font-size:13.5px;line-height:1.7;color:var(--ink-dim);margin:0;font-weight:300;text-wrap:pretty}
 
 /* ---------- cta ---------- */
 .cta{text-align:center;margin-top:26px}

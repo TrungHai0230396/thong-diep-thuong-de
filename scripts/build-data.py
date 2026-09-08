@@ -1,17 +1,13 @@
 #!/usr/bin/env python3
-"""Chuyển CSV v5 -> data/cards.json cho app."""
+"""Chuyển CSV v6 -> data/cards.json cho app."""
 import csv, json, os, re, collections
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SRC = os.path.join(ROOT, "content/raw/100-thong-diep-thuong-de-v5.csv")
+SRC = os.path.join(ROOT, "content/raw/100-thong-diep-thuong-de-v6.csv")
 OUT = os.path.join(ROOT, "data/cards.json")
 
 # Sửa lỗi chính tả / diễn đạt phát hiện trong nguồn (id -> (tìm, thay))
 FIXES = {
-    1:  [("Thượng đế tính là", "Thượng đế chính là")],
-    94: [("dành cho con lúc nãy là", "dành cho con lúc này là")],
-    47: [("Các sinh mệnh tiến hóa cao (HEBs) sống", "Các sinh mệnh tiến hóa cao sống")],
-    70: [("HEBs luôn giữ", "Các sinh mệnh tiến hóa cao luôn giữ")],
-    60: [("HEBs không dạy", "Các sinh mệnh tiến hóa cao không dạy")],
+    95: [("tử tế with mình", "tử tế với mình")],
 }
 
 def clean(s):
