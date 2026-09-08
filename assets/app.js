@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 
-const { ymd, cardFor, newSeed } = self.TDTD;
+const { ymd, cardFor, luckyNumbers, luckyDigits, newSeed } = self.TDTD;
 const SEED_KEY = 'tdtd.seed';   // hạt giống riêng của máy
 const DAY_KEY  = 'tdtd.day';    // ngày đã nhận thông điệp, bị ghi đè mỗi ngày
 const $ = (s, r = document) => r.querySelector(s);
@@ -103,6 +103,35 @@ function fallback(text, done) {
   document.body.removeChild(ta);
 }
 
+/* Dự đoán số — thuần giải trí. Số sinh ngẫu nhiên từ hạt giống của máy và ngày hôm nay,
+   nên mỗi người một bộ, mỗi ngày một bộ, và bấm lại trong ngày không đổi được. */
+const VE = [
+  { ten: 'Mega 6/45',  loai: 'so', n: 6, max: 45, salt: 1 },
+  { ten: 'Power 6/55', loai: 'so', n: 6, max: 55, salt: 2 },
+  { ten: 'Giải đặc biệt', loai: 'chuso', len: 6, salt: 3 },
+];
+
+function lucky() {
+  const khoi = VE.map(v => {
+    const bi = v.loai === 'so'
+      ? luckyNumbers(today, seed, v.n, v.max, v.salt).map(n => `<span class="ball">${String(n).padStart(2, '0')}</span>`).join('')
+      : luckyDigits(today, seed, v.len, v.salt).split('').map(d => `<span class="ball">${d}</span>`).join('');
+    return `<div class="ve"><div class="ve-ten">${v.ten}</div><div class="balls">${bi}</div></div>`;
+  }).join('');
+  openSheet('Số của hôm nay', `
+    ${khoi}
+    <p class="canh-bao">Đây là số ngẫu nhiên sinh từ ngày hôm nay, không phải dự đoán. Không ai đoán trước được kết quả xổ số. Xin chơi cho vui và trong khả năng của mình.</p>
+    <button class="ghost" id="btn-chep-so">Chép dãy số</button>`);
+  $('#btn-chep-so').onclick = () => {
+    const txt = VE.map(v => `${v.ten}: ` + (v.loai === 'so'
+      ? luckyNumbers(today, seed, v.n, v.max, v.salt).map(n => String(n).padStart(2, '0')).join(' - ')
+      : luckyDigits(today, seed, v.len, v.salt))).join('\n');
+    const done = () => toast('Đã chép dãy số');
+    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => fallback(txt, done));
+    else fallback(txt, done);
+  };
+}
+
 function about() {
   openSheet('Giới thiệu', `
     <p>Mỗi ngày, một thông điệp. Mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
@@ -150,6 +179,7 @@ async function init() {
   $('#card').onclick = reveal;
   $('#card').onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } };
   $('#btn-draw').onclick = reveal;
+  $('#btn-lucky').onclick = lucky;
   $('#btn-share').onclick = copyText;
   $('#btn-about').onclick = about;
   $$('[data-close]').forEach(el => el.onclick = closeSheet);

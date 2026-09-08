@@ -56,6 +56,24 @@ for (const sd of [S1, S2, 7, -3, 2 ** 29]) {
 }
 ok('5 hạt giống × 3000 ngày: khoảng cách trùng lá > 50 ngày', minGap > 50, `nhỏ nhất ${minGap} ngày (${when})`);
 
+console.log('\n— Số may mắn (giải trí) —');
+const L1 = C.luckyNumbers('2026-09-08', S1, 6, 45, 1);
+ok('đủ 6 số', L1.length === 6);
+ok('không trùng số', new Set(L1).size === 6);
+ok('nằm trong 1–45', L1.every(n => n >= 1 && n <= 45));
+ok('đã sắp tăng dần', L1.every((n, i) => i === 0 || n >= L1[i - 1]));
+ok('cùng người cùng ngày ra cùng bộ', JSON.stringify(L1) === JSON.stringify(C.luckyNumbers('2026-09-08', S1, 6, 45, 1)));
+ok('người khác ra bộ khác', JSON.stringify(L1) !== JSON.stringify(C.luckyNumbers('2026-09-08', S2, 6, 45, 1)));
+ok('ngày khác ra bộ khác', JSON.stringify(L1) !== JSON.stringify(C.luckyNumbers('2026-09-09', S1, 6, 45, 1)));
+ok('hai loại vé ra bộ khác', JSON.stringify(L1) !== JSON.stringify(C.luckyNumbers('2026-09-08', S1, 6, 45, 2)));
+ok('Power 6/55 nằm trong 1–55', C.luckyNumbers('2026-09-08', S1, 6, 55, 2).every(n => n >= 1 && n <= 55));
+const D1 = C.luckyDigits('2026-09-08', S1, 6, 3);
+ok('giải đặc biệt đúng 6 chữ số', /^\d{6}$/.test(D1), D1);
+ok('giải đặc biệt ổn định trong ngày', D1 === C.luckyDigits('2026-09-08', S1, 6, 3));
+let deu = new Set();
+for (let k = 0; k < 300; k++) deu.add(C.luckyNumbers('2026-09-08', k * 7919 + 3, 6, 45, 1).join());
+ok('300 người cho 300 bộ số gần như đều khác nhau', deu.size > 295, `${deu.size}/300 bộ khác nhau`);
+
 console.log('\n— Dữ liệu —');
 ok('đúng 100 lá', cards.length === 100);
 ok('ID liên tục 1–100', IDS.every((v, i) => v === i + 1));

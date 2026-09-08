@@ -39,6 +39,12 @@ Ngày tính theo lịch địa phương của máy và đổi lúc 0:00. Nếu a
 
 **Hệ quả:** trong cùng một ngày, một người mở lại bao nhiêu lần cũng chỉ thấy đúng lá đó. Đó là chủ ý, không phải lỗi.
 
+## Số của hôm nay (tính năng cho vui)
+
+Sau khi nhận thông điệp, nút **Dự đoán số** mở ra ba dãy: Mega 6/45, Power 6/55 và một dãy 6 chữ số kiểu giải đặc biệt.
+
+Số sinh từ hạt giống của máy cộng với ngày hôm nay, nên mỗi người một bộ, mỗi ngày một bộ, và bấm lại trong ngày không đổi được. Đây là số ngẫu nhiên thuần túy, không phải dự đoán, và màn hình có ghi rõ điều đó cùng lời nhắc chơi trong khả năng của mình.
+
 ## Xem thử ngày khác
 
 Thêm `?ngay=YYYY-MM-DD` vào URL để xem lá của một ngày bất kỳ:
@@ -65,7 +71,7 @@ assets/app.css             giao diện
 data/cards.json            100 lá dùng trong app (31 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      CSV -> data/cards.json
-scripts/test-core.js       29 kiểm thử lõi
+scripts/test-core.js       41 kiểm thử lõi
 content/raw/               CSV nguồn (v3 và v5)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
@@ -76,7 +82,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 29 kiểm thử lõi (Node 18+)
+node scripts/test-core.js        # chạy 41 kiểm thử lõi (Node 18+)
 ```
 
 ## Sửa chính tả trong nguồn
