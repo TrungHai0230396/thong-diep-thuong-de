@@ -67,6 +67,15 @@ ok('người khác ra bộ khác', JSON.stringify(L1) !== JSON.stringify(C.lucky
 ok('ngày khác ra bộ khác', JSON.stringify(L1) !== JSON.stringify(C.luckyNumbers('2026-09-09', S1, 6, 45, 1)));
 ok('hai loại vé ra bộ khác', JSON.stringify(L1) !== JSON.stringify(C.luckyNumbers('2026-09-08', S1, 6, 45, 2)));
 ok('Power 6/55 nằm trong 1–55', C.luckyNumbers('2026-09-08', S1, 6, 55, 2).every(n => n >= 1 && n <= 55));
+const L535 = C.luckyNumbers('2026-09-08', S1, 5, 35, 4);
+ok('Điện toán 5/35 đủ 5 số trong 1–35', L535.length === 5 && L535.every(n => n >= 1 && n <= 35), L535.join(' '));
+ok('Điện toán 5/35 không trùng số', new Set(L535).size === 5);
+ok('4 loại vé cho 4 bộ khác nhau', new Set([
+  C.luckyNumbers('2026-09-08', S1, 6, 45, 1).join(),
+  C.luckyNumbers('2026-09-08', S1, 6, 55, 2).join(),
+  L535.join(),
+  C.luckyDigits('2026-09-08', S1, 6, 3),
+]).size === 4);
 const D1 = C.luckyDigits('2026-09-08', S1, 6, 3);
 ok('giải đặc biệt đúng 6 chữ số', /^\d{6}$/.test(D1), D1);
 ok('giải đặc biệt ổn định trong ngày', D1 === C.luckyDigits('2026-09-08', S1, 6, 3));

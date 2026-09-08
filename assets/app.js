@@ -116,9 +116,10 @@ function fallback(text, done) {
 /* Dự đoán số — thuần giải trí. Số sinh ngẫu nhiên từ hạt giống của máy và ngày hôm nay,
    nên mỗi người một bộ, mỗi ngày một bộ, và bấm lại trong ngày không đổi được. */
 const VE = [
-  { ten: 'Mega 6/45',  loai: 'so', n: 6, max: 45, salt: 1 },
-  { ten: 'Power 6/55', loai: 'so', n: 6, max: 55, salt: 2 },
-  { ten: 'Giải đặc biệt', loai: 'chuso', len: 6, salt: 3 },
+  { ten: 'Mega 6/45',      loai: 'so',    n: 6, max: 45, salt: 1 },
+  { ten: 'Power 6/55',     loai: 'so',    n: 6, max: 55, salt: 2 },
+  { ten: 'Điện toán 5/35', loai: 'so',    n: 5, max: 35, salt: 4 },
+  { ten: 'Giải đặc biệt',  loai: 'chuso', len: 6,        salt: 3 },
 ];
 
 function lucky() {
@@ -130,16 +131,7 @@ function lucky() {
   }).join('');
   openSheet('Số của hôm nay', `
     ${khoi}
-    <p class="canh-bao">Đây là số ngẫu nhiên sinh từ ngày hôm nay, không phải dự đoán. Không ai đoán trước được kết quả xổ số. Xin chơi cho vui và trong khả năng của mình.</p>
-    <button class="ghost" id="btn-chep-so">Chép dãy số</button>`);
-  $('#btn-chep-so').onclick = () => {
-    const txt = VE.map(v => `${v.ten}: ` + (v.loai === 'so'
-      ? luckyNumbers(today, seed, v.n, v.max, v.salt).map(n => String(n).padStart(2, '0')).join(' - ')
-      : luckyDigits(today, seed, v.len, v.salt))).join('\n');
-    const done = () => toast('Đã chép dãy số');
-    if (navigator.clipboard) navigator.clipboard.writeText(txt).then(done, () => fallback(txt, done));
-    else fallback(txt, done);
-  };
+    <p class="canh-bao">Đây là số ngẫu nhiên sinh từ ngày hôm nay, không phải dự đoán. Không ai đoán trước được kết quả xổ số. Xin chơi cho vui và trong khả năng của mình.</p>`);
 }
 
 function about() {
