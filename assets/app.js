@@ -10,9 +10,6 @@ const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt
 const THU = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm', 'Thứ sáu', 'Thứ bảy'];
 const prettyDate = (s) => { const [y, m, d] = s.split('-').map(Number); const t = new Date(y, m - 1, d);
   return `${THU[t.getDay()]}, ngày ${d} tháng ${m} năm ${y}`; };
-const greet = () => { const h = new Date().getHours();
-  return h < 5 ? 'Đêm an lành' : h < 11 ? 'Chào buổi sáng' : h < 14 ? 'Chào buổi trưa'
-       : h < 18 ? 'Chào buổi chiều' : 'Chào buổi tối'; };
 
 let CARDS = [], IDS = [], today = null, revealed = false;   // toàn bộ trạng thái, chỉ trong bộ nhớ
 
@@ -30,7 +27,6 @@ const closeSheet = () => { $('#sheet-wrap').hidden = true; document.body.style.o
 
 function render() {
   today = ymd();
-  $('#greeting').textContent = greet();
   $('#today-date').textContent = prettyDate(today);
   const c = cardOfToday();
   $('#message').textContent = c.thong_diep;
