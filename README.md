@@ -83,4 +83,4 @@ node scripts/test-core.js        # chạy 29 kiểm thử lõi (Node 18+)
 
 ## Đưa lên mạng
 
-Web tĩnh thuần, kéo cả thư mục lên Netlify / Vercel / GitHub Pages là chạy.
+Web tĩnh thuần, không cần build. Xem [DEPLOY.md](DEPLOY.md) để biết cách đưa lên Vercel.
