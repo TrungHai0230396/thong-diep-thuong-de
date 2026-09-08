@@ -1,0 +1,402 @@
+[
+ {
+  "id": 1,
+  "co_che_game": "Cơ chế 'Năm Chìa Khóa Vàng': Hệ thống thuộc tính cốt lõi của nhân vật; tăng đều cả 5 chỉ số này để mở khóa sức mạnh tối thượng của Thượng đế."
+ },
+ {
+  "id": 2,
+  "co_che_game": "Cơ chế 'Nội Tại Buông Bỏ': Người chơi tự động nhận được các thuộc tính hiếm khi họ tự nguyện tặng hoặc cho đi các trang bị quý giá cho NPC nghèo."
+ },
+ {
+  "id": 3,
+  "co_che_game": "Cơ chế 'Chuyển Kênh Tần Số': Nhân vật có thể hóa thân thành dạng linh hồn siêu hình để đi xuyên qua các bức tường vật lý trong game."
+ },
+ {
+  "id": 4,
+  "co_che_game": "Cơ chế 'Nỗi Sợ Hóa Thân': Quái vật trong game sẽ tăng sức mạnh dựa trên chỉ số 'Sợ hãi' của người chơi."
+ },
+ {
+  "id": 5,
+  "co_che_game": "Cơ chế 'Đồng Hành Tự Do': Các bạn đồng hành (companions) trong game sẽ trung thành và mạnh mẽ hơn khi người chơi cho phép họ tự do đưa ra quyết định."
+ },
+ {
+  "id": 6,
+  "co_che_game": "Cơ chế 'Đồng Sáng Tạo Thế Giới': Người chơi có quyền thay đổi các quy luật vật lý của thế giới game (trọng lực, ánh sáng) để vượt qua các chướng ngại vật."
+ },
+ {
+  "id": 7,
+  "co_che_game": "Cơ chế 'Bộ Ba Sáng Tạo': Hệ thống chế tạo (crafting) trong game yêu cầu người chơi phải kết hợp đủ 3 yếu tố: Ý tưởng (Mind), Khẩu quyết (Word) và Nguyên liệu (Action)."
+ },
+ {
+  "id": 8,
+  "co_che_game": "Cơ chế 'An Yên Tự Tại': Người chơi mở khóa các kỹ năng ẩn khi nhân vật đứng yên tĩnh lặng tại một vị trí đẹp trên bản đồ trong 1 phút."
+ },
+ {
+  "id": 9,
+  "co_che_game": "Cơ chế 'Gương Phản Chiếu': Thế giới game thay đổi thời tiết, địa hình và độ khó dựa trên các lựa chọn thoại tích cực hay tiêu cực của người chơi."
+ },
+ {
+  "id": 10,
+  "co_che_game": "Cơ chế 'Nhất thể' (Oneness Gauge): Khi nhân vật làm tổn thương NPC, thanh năng lượng tự dội ngược sát thương."
+ },
+ {
+  "id": 11,
+  "co_che_game": "Cơ chế 'Giải Thoát Tín Ngưỡng': Loại bỏ các quest hiến tế hay thờ cúng thần linh."
+ },
+ {
+  "id": 12,
+  "co_che_game": "Cơ chế 'Máy Chiếu Nội Tâm': Bản đồ game thay đổi từ u tối, giông bão sang nắng ấm, thanh bình dựa trên chỉ số 'Bình an Nội tâm' của nhân vật."
+ },
+ {
+  "id": 13,
+  "co_che_game": "Cơ chế 'Không Địa Ngục': Trò chơi hoàn toàn loại bỏ các vùng đất trừng phạt."
+ },
+ {
+  "id": 14,
+  "co_che_game": "Cơ chế 'Định Hình Vật Chất': Người chơi có thể dùng ý nghĩ để tạm thời hóa cứng nước thành băng, hoặc hóa mềm đá thành lối đi trong thời gian ngắn."
+ },
+ {
+  "id": 15,
+  "co_che_game": "Cơ chế 'Sứ Giả Truyền Tin': Người chơi nhận được các phần thưởng danh giá khi hoàn thành một ngày game mà không gây ra bất kỳ xung đột nào."
+ },
+ {
+  "id": 16,
+  "co_che_game": "Cơ chế 'Vô Bộ' (No-Mission Game): Cho phép người chơi hoàn thành game bằng cách 'không làm gì cả', chỉ dạo chơi và ngắm cảnh, mở khóa kết cục hòa bình."
+ },
+ {
+  "id": 17,
+  "co_che_game": "Cơ chế 'Hào Quang Vinh Quang': Khi người chơi giúp đỡ muôn loài, nhân vật phát ra hào quang rực rỡ giúp tăng cường sinh lực cho mọi sinh vật xung quanh."
+ },
+ {
+  "id": 18,
+  "co_che_game": "Cơ chế 'Dòng Chảy Bất Tận': Nhân vật tự động tích lũy điểm kinh nghiệm theo thời gian thực, ngay cả khi người chơi không thực hiện nhiệm vụ."
+ },
+ {
+  "id": 19,
+  "co_che_game": "Cơ chế 'Cân Bằng Âm Dương': Người chơi phải giữ cho hai chỉ số Sáng và Tối của nhân vật luôn ở trạng thái cân bằng để kích hoạt sức mạnh tối thượng."
+ },
+ {
+  "id": 20,
+  "co_che_game": "Cơ chế 'Tái Sinh Tức Thời': Người chơi có thể thiết lập lại toàn bộ điểm kỹ năng (reset thuộc tính) bất cứ lúc nào ngay trong trận chiến để thay đổi lối chơi."
+ },
+ {
+  "id": 21,
+  "co_che_game": "Cơ chế 'Nhìn Thấu Vai Diễn': Kỹ năng ẩn cho phép người chơi nhìn thấy 'màu sắc linh hồn nguyên bản' của đối phương đằng sau lớp vỏ bọc quái vật."
+ },
+ {
+  "id": 22,
+  "co_che_game": "Cơ chế 'Tự Do Nghiệp Quả': Người chơi có thể xóa bỏ hoàn toàn các chỉ số bất lợi từ quyết định sai lầm trước đó bằng cách thực hiện một hành động tử tế mới."
+ },
+ {
+  "id": 23,
+  "co_che_game": "Cơ chế 'Làm Chủ Số Phận': Người chơi không thể đổ lỗi cho lỗi game hay NPC phản bội; game cung cấp các lựa chọn để tự chịu trách nhiệm và bẻ lái kịch bản."
+ },
+ {
+  "id": 24,
+  "co_che_game": "Cơ chế 'Kim Chỉ Nam Tình Yêu': Một nút bấm gợi ý đặc biệt trong game; khi nhấn vào, hệ thống sẽ hiển thị lựa chọn hội thoại mang tính bao dung nhất."
+ },
+ {
+  "id": 25,
+  "co_che_game": "Cơ chế 'Cộng Hưởng Linh Hồn': Người chơi có thể triệu hồi linh hồn của các bạn đồng hành đã khuất để hỗ trợ trong các trận chiến cam go."
+ },
+ {
+  "id": 26,
+  "co_che_game": "Cơ chế 'Kiến Tạo Thực Tại': Người chơi có thể tự do thay đổi cấu trúc bản đồ, tạo ra các lối đi mới bằng năng lượng ý chí của nhân vật."
+ },
+ {
+  "id": 27,
+  "co_che_game": "Cơ chế 'Hệ Thống Lựa Chọn Gốc': Các quyết định trong hội thoại được phân loại rõ ràng dựa trên động cơ: Hành động từ Tình yêu hay Hành động từ Sợ hãi."
+ },
+ {
+  "id": 28,
+  "co_che_game": "Cơ chế 'Bánh Xe Vũ Trụ': Bản đồ game tự động xoay chuyển qua các chu kỳ thời gian và chiều kích không gian khác nhau để mở ra các thử thách mới."
+ },
+ {
+  "id": 29,
+  "co_che_game": "Cơ chế 'Hơi thở Tâm linh': Sử dụng microphone thực tế của người chơi; khi người chơi hít thở chậm và sâu, nhân vật trong game sẽ hồi phục thể lực."
+ },
+ {
+  "id": 30,
+  "co_che_game": "Cơ chế 'Slow-Motion Taste': Người chơi có thể kích hoạt chế độ quay chậm để thưởng thức các chi tiết đồ họa và tìm kiếm các kho báu ẩn."
+ },
+ {
+  "id": 31,
+  "co_che_game": "Cơ chế 'Đa Diện Nhân Vật': Người chơi có thể nhập vai vào bất kỳ NPC nào trong game, vì tất cả NPC thực chất đều là các mảnh hồn của nhân vật chính."
+ },
+ {
+  "id": 32,
+  "co_che_game": "Cơ chế 'Không Kẻ Thù': Người chơi đạt thành tựu tối cao của game khi hoàn thành toàn bộ cốt truyện mà không coi bất kỳ ai là kẻ thù cần tiêu diệt."
+ },
+ {
+  "id": 33,
+  "co_che_game": "Cơ chế 'Chữa Lành Chấp Nhận': Khi nhân vật bị dính sát thương, việc kích hoạt trạng thái 'Chấp nhận' giúp chuyển hóa 50% sát thương thành lượng máu hồi phục."
+ },
+ {
+  "id": 34,
+  "co_che_game": "Cơ chế 'Hóa Giải Kháng Cự': Khi quái vật tấn công, nếu người chơi không dùng khiên đỡ (kháng cự) mà dùng kỹ năng 'Né tránh mềm mại', năng lượng quái vật sẽ tự tiêu hao."
+ },
+ {
+  "id": 35,
+  "co_che_game": "Cơ chế 'Tiếng Cười Vũ Trụ': Một kỹ năng đặc biệt trong game; khi nhân vật cười vang, toàn bộ đồng đội xung quanh sẽ được giải phóng khỏi mọi hiệu ứng khống chế."
+ },
+ {
+  "id": 36,
+  "co_che_game": "Cơ chế 'Thiên Thần Nghịch Cảnh': Tất cả NPC phe địch sau khi bị đánh bại đều rơi ra các 'mảnh ghép tri thức' giúp người chơi tăng chỉ số thông tuệ."
+ },
+ {
+  "id": 37,
+  "co_che_game": "Cơ chế 'Divine Inquiry': Khi kết thúc một chương game, người chơi đối diện với Thượng đế để tự đánh giá hành trình và chọn độ khó cho chương tiếp theo."
+ },
+ {
+  "id": 38,
+  "co_che_game": "Cơ chế 'Nhảy Kênh Thời Gian': Người chơi có thể lựa chọn nhảy qua lại giữa các mốc thời gian khác nhau của cùng một bản đồ để thay đổi kết quả."
+ },
+ {
+  "id": 39,
+  "co_che_game": "Cơ chế 'Chúc Phúc Nghịch Cảnh': Người chơi chúc phúc cho kẻ địch thay vì tiêu diệt chúng; kẻ địch sẽ hóa thân thành đồng minh hoặc rời đi trong hòa bình."
+ },
+ {
+  "id": 40,
+  "co_che_game": "Cơ chế 'Độc Bản Tự Custom': Trò chơi không có các class nhân vật cố định."
+ },
+ {
+  "id": 41,
+  "co_che_game": "Cơ chế 'Hội Tụ Sáng Tối': Người chơi phải vượt qua các hang động tối tăm nhất để thu thập các hạt ánh sáng vĩnh cửu nâng cấp cho nhân vật."
+ },
+ {
+  "id": 42,
+  "co_che_game": "Cơ chế 'Hiện Thực Hóa Ý Chí': Khi người chơi chọn một mục tiêu trên bản đồ và giữ vững ý chí tập trung, các lối đi ẩn sẽ tự động hiển lộ."
+ },
+ {
+  "id": 43,
+  "co_che_game": "Cơ chế 'Hồi Tưởng Thần Tính': Khi người chơi đạt trạng thái tập trung (thiền định), họ mở khóa tạm thời các kỹ năng tối thượng của Thượng đế."
+ },
+ {
+  "id": 44,
+  "co_che_game": "Cơ chế 'Hồi Tưởng Đồng Thuận': Khi người chơi kích hoạt đền thờ cổ xưa, họ sẽ phát ra một sóng năng lượng nhắc nhở tất cả NPC xung quanh về bản thể thiêng liêng."
+ },
+ {
+  "id": 45,
+  "co_che_game": "Cơ chế 'Lăng Kính Đa Chiều': Người chơi có thể chuyển đổi lăng kính của các nhân vật khác nhau để nhìn thấy các lối đi ẩn và giải mã bí mật bản đồ."
+ },
+ {
+  "id": 46,
+  "co_che_game": "Cơ chế 'Góc Nhìn Toàn Cảnh': Người chơi có thể kích hoạt tính năng 'Nhìn từ trên cao' để thấy sợi dây nhân quả liên kết các sự kiện trong game."
+ },
+ {
+  "id": 47,
+  "co_che_game": "Cơ chế 'Vương Quốc Nhất Thể': Bản đồ của các sinh mệnh tiến hóa cao; nơi đây người chơi không cần dùng vũ khí, mọi giao dịch đều dựa trên sự chia sẻ."
+ },
+ {
+  "id": 48,
+  "co_che_game": "Cơ chế 'Đảo Ngược Thăng Cấp': Nhân vật thăng cấp bằng cách duy trì trạng thái thiền định (Being), mở khóa các kỹ năng tương tác (Doing) để nhận trang bị (Having)."
+ },
+ {
+  "id": 49,
+  "co_che_game": "Cơ chế 'Cổng Chuyển Giao': Khi vượt qua ranh giới sinh tử, nhân vật bước vào một không gian rực rỡ để tự do lựa chọn thử thách tiếp theo."
+ },
+ {
+  "id": 50,
+  "co_che_game": "Cơ chế 'Hàn Gắn Đồng Thuận': Nhiệm vụ chính của game không phải là tiêu diệt quái vật, mà là kết nối các bộ tộc đang xung đột lại với nhau."
+ },
+ {
+  "id": 51,
+  "co_che_game": "Cơ chế 'Cầu Nguyện Biết Ơn': Khi đến đền thờ, người chơi không 'xin' buff."
+ },
+ {
+  "id": 52,
+  "co_che_game": "Cơ chế 'Vòng hồi chuyển': Mọi phép thuật hỗ trợ (buff) hoặc chữa trị gieo lên đồng đội đều được nhân đôi tác dụng lên chính người chơi."
+ },
+ {
+  "id": 53,
+  "co_che_game": "Cơ chế 'Hóa Thân Thiên Đường': Khi người chơi đạt chỉ số bình an cao, cảnh quan game xung quanh sẽ biến đổi thành một khu vườn rực rỡ."
+ },
+ {
+  "id": 54,
+  "co_che_game": "Cơ chế 'Xoa Dịu Lo Âu': Khi nhân vật bị dính hiệu ứng 'Lo âu' (giảm tốc độ, mờ màn hình), người chơi chỉ cần nhấn phím 'Hít thở' để thanh lọc trạng thái."
+ },
+ {
+  "id": 55,
+  "co_che_game": "Cơ chế 'Sandbox Tuyệt Đối': Trò chơi hoàn toàn không có tường vô hình hay rào cản cốt truyện."
+ },
+ {
+  "id": 56,
+  "co_che_game": "Cơ chế 'Hồi Tưởng Cuộc Đời': Khi kết thúc màn chơi, game hiển thị một video tóm tắt các quyết định của người chơi dưới dạng một bức tranh nghệ thuật."
+ },
+ {
+  "id": 57,
+  "co_che_game": "Cơ chế 'Đảo cực Nhất thể': Nhân vật có thể chuyển đổi linh hoạt giữa hai dạng năng lượng Ánh sáng và Bóng tối để giải các câu đố trong game."
+ },
+ {
+  "id": 58,
+  "co_che_game": "Cơ chế 'Ý Chí Linh Hồn': Cho phép người chơi tự quyết định thời điểm 'tái sinh' hoặc 'quay lại thế giới' để hoàn thành các quest dang dở."
+ },
+ {
+  "id": 59,
+  "co_che_game": "Cơ chế 'Nhịp Đập Trái Tim': Hệ thống giải đố của game yêu cầu người chơi tắt hết các chỉ số phân tích trên màn hình, chỉ dựa vào âm thanh nhịp đập để tìm đường."
+ },
+ {
+  "id": 60,
+  "co_che_game": "Cơ chế 'Giáo Dục Khám Phá': Người chơi hướng dẫn các đệ tử/NPC nhỏ bằng cách cho họ tự do thử nghiệm giải pháp, mở khóa các kỹ năng sáng tạo độc lạ."
+ },
+ {
+  "id": 61,
+  "co_che_game": "Cơ chế 'Thanh Tẩy Áo Ảnh': Khi dẫm vào vùng sương mù 'Sợ hãi', người chơi kích hoạt kỹ năng 'Niệm chú Thần tính' để xua tan sương mù."
+ },
+ {
+  "id": 62,
+  "co_che_game": "Cơ chế 'Vòng Lặp Vĩnh Cửu': Sau khi phá đảo game, người chơi bước vào chế độ New Game+ với toàn bộ ký ức được giữ lại để tiếp tục dạo chơi tự do."
+ },
+ {
+  "id": 63,
+  "co_che_game": "Cơ chế 'Bậc Thầy Giác Ngộ': Nhân vật đạt trạng thái vô địch tạm thời khi người chơi liên tục chọn các hành động từ Tình yêu trong trận chiến."
+ },
+ {
+  "id": 64,
+  "co_che_game": "Cơ chế 'Tình Yêu Vô Điều Kiện': Tăng tối đa chỉ số liên kết với các NPC khi người chơi giúp đỡ họ mà không nhận phần thưởng (vàng/trang bị)."
+ },
+ {
+  "id": 65,
+  "co_che_game": "Cơ chế 'Giải Thoát Tội Lỗi': Nhân vật giải phóng một lượng lớn năng lượng bị khóa khi người chơi thực hiện nhiệm vụ 'Hòa giải với bản ngã quá khứ'."
+ },
+ {
+  "id": 66,
+  "co_che_game": "Cơ chế 'Sân Khấu Tương Đối': Người chơi có thể thay đổi các thuộc tính môi trường để trải nghiệm cùng một thử thách dưới các góc độ khác nhau."
+ },
+ {
+  "id": 67,
+  "co_che_game": "Cơ chế 'Thấu Cảm Cơn Giận': Khi đối đầu với NPC đang giận dữ, người chơi chọn 'Lắng nghe nỗi sợ' để hóa giải cơn giận của họ mà không cần chiến đấu."
+ },
+ {
+  "id": 68,
+  "co_che_game": "Cơ chế 'Hồi Phục Hiện Tại': Nhân vật tự động được tăng tốc độ hồi phục năng lượng khi đứng yên và không thực hiện bất kỳ hành động tấn công nào."
+ },
+ {
+  "id": 69,
+  "co_che_game": "Cơ chế 'Khoảnh Khắc Hiện Tại': Người chơi có khả năng ngưng đọng thời gian xung quanh để tập trung giải quyết các tình huống khẩn cấp."
+ },
+ {
+  "id": 70,
+  "co_che_game": "Cơ chế 'Công Nghệ Xanh': Người chơi chỉ có thể chế tạo các thiết bị công nghệ cao khi chỉ số 'Đạo đức Môi trường' của họ đạt mức an toàn tối đa."
+ },
+ {
+  "id": 71,
+  "co_che_game": "Cơ chế 'Khoảnh Khắc Vàng': Mỗi ngày, game cung cấp một khung giờ đặc biệt; khi người chơi đăng nhập và dạo chơi, họ sẽ được nhân đôi điểm thức tỉnh."
+ },
+ {
+  "id": 72,
+  "co_che_game": "Cơ chế 'Hào Quang Năng Lượng': Nhân vật có hai trạng thái hào quang."
+ },
+ {
+  "id": 73,
+  "co_che_game": "Cơ chế 'Năng Lượng Nguyên Bản': Khi chỉ số Tình yêu đạt tối đa, nhân vật sẽ được khôi phục toàn bộ sinh lực và phát ra hào quang chữa lành xung quanh."
+ },
+ {
+  "id": 74,
+  "co_che_game": "Cơ chế 'Xứng Đáng Nội Tại': Nhân vật được giải phóng khỏi các thuộc tính 'Danh vọng' hay 'Địa vị'."
+ },
+ {
+  "id": 75,
+  "co_che_game": "Cơ chế 'Tỏa Sáng Thần Tính': Khi chỉ số bao dung đạt tối đa, nhân vật phát ra ánh sáng rực rỡ làm dịu cơn giận của tất cả quái vật xung quanh."
+ },
+ {
+  "id": 76,
+  "co_che_game": "Cơ chế 'Ánh Nhìn Tôn Vinh': Khi người chơi đối thoại và tập trung vào điểm tốt của NPC, NPC đó sẽ được tăng sức mạnh chiến đấu và hỗ trợ người chơi."
+ },
+ {
+  "id": 77,
+  "co_che_game": "Cơ chế 'Bẻ Cong Không Thời Gian': Người chơi có thể bẻ cong không gian để di chuyển tức thời giữa các điểm mốc bằng năng lượng ý chí."
+ },
+ {
+  "id": 78,
+  "co_che_game": "Cơ chế 'Hào Quang Thức Tỉnh': Nhân vật chính không cần chiến đấu; chỉ cần tăng chỉ số thức tỉnh cá nhân, các NPC xung quanh sẽ tự động thay đổi hành vi tốt lên."
+ },
+ {
+  "id": 79,
+  "co_che_game": "Cơ chế 'Trở Thành Sự Thay Đổi': Người chơi thay đổi ngoại cảnh của một thành phố bằng cách thay đổi hành vi và cách ứng xử của chính mình với người dân."
+ },
+ {
+  "id": 80,
+  "co_che_game": "Cơ chế 'Ôm Lấy Bóng Tối': Kỹ năng chữa trị tối thượng; thay vì tiêu diệt quái vật bóng tối, người chơi ôm lấy chúng để chuyển hóa chúng thành linh thú đồng hành."
+ },
+ {
+  "id": 81,
+  "co_che_game": "Cơ chế 'Điểm Neo Hiện Tại': Người chơi có thể đặt một 'Điểm neo' tại khoảnh khắc hiện tại để quay lại sửa chữa quyết định nếu làm sai."
+ },
+ {
+  "id": 82,
+  "co_che_game": "Cơ chế 'Kinh Tế Sẻ Chia': Trò chơi loại bỏ tính năng mua bán kiếm lời."
+ },
+ {
+  "id": 83,
+  "co_che_game": "Cơ chế 'Bất Tử Linh Hồn': Game hoàn toàn không có màn hình 'Game Over'."
+ },
+ {
+  "id": 84,
+  "co_che_game": "Cơ chế 'Dòng Chảy Thịnh Vượng': Người chơi nhận được nhiều vàng và vật phẩm quý hiếm hơn khi hoàn thành các nhiệm vụ cứu trợ và chữa lành cho NPC."
+ },
+ {
+  "id": 85,
+  "co_che_game": "Cơ chế 'Ân sủng Không điều kiện': Loại bỏ hệ thống điểm Karma (Thiện/Ác) truyền thống."
+ },
+ {
+  "id": 86,
+  "co_che_game": "Cơ chế 'Hơi Ấm Vô Hạn': Nhân vật tự động được phục hồi năng lượng đầy đủ khi đứng yên trong các vùng ánh sáng dịu dàng của đền thờ."
+ },
+ {
+  "id": 87,
+  "co_che_game": "Cơ chế 'Khẩu Lệnh Quyền Năng': Hệ thống chọn thoại của game sử dụng cấu trúc 'Tôi là."
+ },
+ {
+  "id": 88,
+  "co_che_game": "Cơ chế 'Thoại Trực Giác' (Intuitive Dialogue): Người chơi có thể sử dụng tính năng 'Lắng nghe' để phát hiện các gợi ý ẩn từ môi trường xung quanh."
+ },
+ {
+  "id": 89,
+  "co_che_game": "Cơ chế 'Định Hình Bản Đồ': Các khu vực trong game sẽ sinh ra quái vật hoặc báu vật dựa trên tần suất suy nghĩ lo âu hay bình yên của người chơi."
+ },
+ {
+  "id": 90,
+  "co_che_game": "Cơ chế 'Cộng Hưởng Thức Tỉnh': Khi người chơi giúp đỡ một NPC thức tỉnh, nhân vật chính sẽ được tăng vĩnh viễn 5% chỉ số thông tuệ."
+ },
+ {
+  "id": 91,
+  "co_che_game": "Cơ chế 'Tĩnh Lặng Quan Sát': Khi trận đấu diễn ra quá nhanh, người chơi có thể kích hoạt chế độ 'Quan sát' để làm chậm nhịp độ và phân tích chiêu thức đối phương."
+ },
+ {
+  "id": 92,
+  "co_che_game": "Cơ chế 'Hành Trình Trở Về': Màn chơi cuối cùng dẫn người chơi quay trở về điểm khởi đầu của game, nhưng với một tâm thức hoàn toàn mới và thông tuệ."
+ },
+ {
+  "id": 93,
+  "co_che_game": "Cơ chế 'Bức Màn Quên Lãng': Đầu game, nhân vật bị khóa hết kỹ năng và ký ức; qua quá trình khám phá thế giới, họ dần mở khóa lại sức mạnh thần thánh."
+ },
+ {
+  "id": 94,
+  "co_che_game": "Cơ chế 'Sứ Giả Thức Tỉnh': Người chơi hoàn thành các nhiệm vụ truyền cảm hứng cho NPC bằng cách thực hiện các hành động tử tế thầm lặng."
+ },
+ {
+  "id": 95,
+  "co_che_game": "Cơ chế 'Sân Chơi Tự Do': Trò chơi không có tính điểm phạt hay trừ điểm kinh nghiệm khi làm sai."
+ },
+ {
+  "id": 96,
+  "co_che_game": "Cơ chế 'Bảo Toàn Sinh Lực': Cơ chế sinh tồn độc đáo; khi thanh máu vật lý về 0, nhân vật chuyển sang trạng thái 'Thể năng lượng bất tử'."
+ },
+ {
+  "id": 97,
+  "co_che_game": "Cơ chế 'Kinh Nghiệm Thực Tế': Người chơi nhận được điểm 'Giác ngộ' khi biến các ý thuyết tâm linh trong game thành các hành động ứng xử thực tế."
+ },
+ {
+  "id": 98,
+  "co_che_game": "Cơ chế 'Đồng Điệu Cảm Xúc': Nhân vật chính có thanh trạng thái cảm xúc."
+ },
+ {
+  "id": 99,
+  "co_che_game": "Cơ chế 'Quyết Định Trưởng Thành': Loại bỏ các lựa chọn thoại vâng lời mù quáng; người chơi chỉ thăng cấp khi tự đưa ra quyết định độc lập dựa trên tình yêu."
+ },
+ {
+  "id": 100,
+  "co_che_game": "Cơ chế 'Sự Thật Yêu Thương': Lựa chọn thoại 'Nói sự thật bằng tình yêu' luôn mở ra các giải pháp hòa giải êm đẹp nhất giữa các phe phái."
+ }
+]

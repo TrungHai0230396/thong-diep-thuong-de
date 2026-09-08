@@ -1,0 +1,502 @@
+[
+ {
+  "id": 1,
+  "thong_diep": "Năm thái độ của Thượng đế chính là: Vui vẻ, Yêu thương, Chấp nhận, Ban phước và Biết ơn. Hãy áp dụng chúng vào đời sống.",
+  "y_nghia": "Năm chìa khóa vàng để chuyển hóa năng lượng của con lên tần số thần thánh."
+ },
+ {
+  "id": 2,
+  "thong_diep": "Đừng cố gắng bám chặt lấy một người hay một vật vì sợ mất mát. Tình yêu đích thực luôn đi kèm với sự buông lỏng tự do.",
+  "y_nghia": "Sự bám chấp quá mức sinh ra từ nỗi sợ hãi thiếu thốn."
+ },
+ {
+  "id": 3,
+  "thong_diep": "Cái chết chỉ là một sự đổi kênh tần số năng lượng từ thô đặc (vật lý) sang tinh thuần và siêu hình.",
+  "y_nghia": "Không có sự biến mất hoàn toàn của sự sống."
+ },
+ {
+  "id": 4,
+  "thong_diep": "Sợ hãi là thứ năng lượng hút về những gì con lo sợ nhất. Hãy buông bỏ sợ hãi để nhường chỗ cho niềm tin tỏa sáng.",
+  "y_nghia": "Những gì con lo sợ và liên tục né tránh thực chất đang nhận được năng lượng từ con và sẽ hiển lộ trong thực tại của con để con đối diện."
+ },
+ {
+  "id": 5,
+  "thong_diep": "Tình yêu không phải là sự hy sinh hay đòi hỏi trao đổi. Tình yêu đích thực là sự tự do hoàn toàn cho cả hai phía.",
+  "y_nghia": "Sự ràng buộc, kiểm soát nhân danh tình yêu thực chất là nỗi sợ hãi mất mát."
+ },
+ {
+  "id": 6,
+  "thong_diep": "Thượng đế là một Quá Trình liên tục sáng tạo, và chính con cũng là một phần không thể tách rời của Quá trình thần thánh đó.",
+  "y_nghia": "Vũ trụ không phải là một sản phẩm tĩnh đã hoàn thành."
+ },
+ {
+  "id": 7,
+  "thong_diep": "Ba công cụ của sự sáng tạo là: Suy nghĩ, Lời nói và Hành động. Hãy sử dụng chúng một cách có ý thức.",
+  "y_nghia": "Mọi vật thể vật lý đều bắt đầu từ một Suy nghĩ, được củng cố bằng Lời nói và được biểu hiện ra thế giới thông qua Hành động thực tế."
+ },
+ {
+  "id": 8,
+  "thong_diep": "Mục đích của cuộc sống này không phải là đi tới một cái đích nào cả, mà chỉ cần nhận thức rằng con vẫn luôn ở đó.",
+  "y_nghia": "Tiến hóa không phải là cuộc đua giành giật thành tích."
+ },
+ {
+  "id": 9,
+  "thong_diep": "Ta không bao giờ nói 'Không' với những lựa chọn của con. Ta luôn nói 'Có' và trao quyền cho con trải nghiệm chúng.",
+  "y_nghia": "Vũ trụ là một tấm gương phản chiếu trung thực."
+ },
+ {
+  "id": 10,
+  "thong_diep": "Chúng ta chỉ là Một. Không hề có sự tách biệt nào giữa Ta và con, giữa con và mọi người xung quanh.",
+  "y_nghia": "Mọi linh hồn đều phát khởi từ một nguồn năng lượng vĩ đại duy nhất của Thượng đế."
+ },
+ {
+  "id": 11,
+  "thong_diep": "Ta không cần bất cứ sự thờ phụng nào của con. Điều duy nhất Ta mong mỏi là con nhận ra sự vĩ đại bên trong chính mình.",
+  "y_nghia": "Thượng đế không có cái tôi (ego) cần được vuốt ve bằng sự thờ lạy."
+ },
+ {
+  "id": 12,
+  "thong_diep": "Tâm trí con là một chiếc máy chiếu khổng lồ. Thế giới bên ngoài chỉ phản chiếu những gì con đang giữ kín bên trong.",
+  "y_nghia": "Thế giới vật chất là tấm gương phản chiếu trung thực thế giới nội tâm của con."
+ },
+ {
+  "id": 13,
+  "thong_diep": "Không có địa ngục hay sự trừng phạt đau khổ vô tận nào sau khi chết. Đó chỉ là những suy diễn sai lầm dựa trên sợ hãi.",
+  "y_nghia": "Thượng đế không bao giờ trừng phạt các con của Ngài."
+ },
+ {
+  "id": 14,
+  "thong_diep": "Tất cả các điều kiện vật chất đều là nhất thời và luôn biến đổi. Con có thể định hình lại chúng bằng chính tư tưởng mới.",
+  "y_nghia": "Thế giới vật lý là thể lỏng, luôn biến động theo dòng chảy của ý thức."
+ },
+ {
+  "id": 15,
+  "thong_diep": "Con là một người mang thông điệp của Ta. Con được chọn để lan tỏa chân lý vĩ đại này bằng chính cuộc sống thường nhật.",
+  "y_nghia": "Con không cần phải là một diễn giả vĩ đại để lan tỏa sự thật."
+ },
+ {
+  "id": 16,
+  "thong_diep": "Không có gì con PHẢI làm, không có gì con cần CÓ, và không có gì con cần trở THÀNH. Hãy chỉ nhận ra con là ai.",
+  "y_nghia": "Con vốn dĩ đã hoàn hảo và trọn vẹn ngay lúc này."
+ },
+ {
+  "id": 17,
+  "thong_diep": "Mục đích duy nhất của sự sống là kinh nghiệm cái vinh quang nhất cho con và cho tất cả mọi loài sinh mệnh.",
+  "y_nghia": "Sự sống tồn tại để cái đẹp, tình yêu và sự vĩ đại được hiển lộ và trải nghiệm một cách trọn vẹn nhất thông qua các sinh thể sống."
+ },
+ {
+  "id": 18,
+  "thong_diep": "Linh hồn con là một dòng chảy sáng tạo bất tận, chưa từng bắt đầu và sẽ không bao giờ có điểm kết thúc.",
+  "y_nghia": "Con là năng lượng vĩnh cửu."
+ },
+ {
+  "id": 19,
+  "thong_diep": "Ta là cái cao và cái thấp, cái nóng và cái lạnh, cái tôn quý và cái bất kính. Ta là tất cả những gì hiện hữu.",
+  "y_nghia": "Thượng đế không loại trừ bất cứ điều gì."
+ },
+ {
+  "id": 20,
+  "thong_diep": "Mỗi khoảnh khắc là một cơ hội để con tự tái tạo mình trong phiên bản vĩ đại nhất của ý niệm cao cả nhất.",
+  "y_nghia": "Quá khứ không định hình con."
+ },
+ {
+  "id": 21,
+  "thong_diep": "Sự khoan dung không phải là phán xét ai đó sai rồi tha thứ, mà là nhận ra bản chất thiêng liêng đằng sau mọi vai diễn.",
+  "y_nghia": "Mọi người trên thế gian đều đang đóng các vai diễn khác nhau trong trò chơi trần thế."
+ },
+ {
+  "id": 22,
+  "thong_diep": "Không có nợ nghiệp báo theo nghĩa trừng phạt bắt buộc. Con hoàn toàn tự do lựa chọn nước đi mới mà không bị ràng buộc.",
+  "y_nghia": "Vũ trụ không vận hành bằng sự trừng trị hay nợ nần nghiệp quả."
+ },
+ {
+  "id": 23,
+  "thong_diep": "Hãy chấm dứt lối sống vô ý thức như một nạn nhân của hoàn cảnh. Con chính là đấng đồng sáng tạo thực tại của mình.",
+  "y_nghia": "Mọi sự việc đến với cuộc đời con không phải là sự trừng phạt hay ngẫu nhiên, mà là cơ hội do linh hồn con đồng kiến tạo để trải nghiệm bản thân."
+ },
+ {
+  "id": 24,
+  "thong_diep": "Khi con đứng trước ngã rẽ hay bối rối, hãy luôn tự hỏi mình câu hỏi tối thượng này: 'Tình yêu sẽ làm gì lúc này?'.",
+  "y_nghia": "Tình yêu vô điều kiện luôn là kim chỉ nam vạn năng cho mọi tình huống khó khăn."
+ },
+ {
+  "id": 25,
+  "thong_diep": "Khi con chết đi, con sẽ đoàn tụ với những người thân yêu của mình nếu đó thực sự là mong muốn mạnh mẽ của linh hồn con.",
+  "y_nghia": "Mối liên kết bằng tình yêu thương giữa các linh hồn là vĩnh cửu."
+ },
+ {
+  "id": 26,
+  "thong_diep": "Con là con của Thượng đế, một phần của Thượng đế và ngang hàng với Thượng đế trong quyền năng sáng tạo.",
+  "y_nghia": "Con được tạo ra từ cùng một chất liệu năng lượng với Thượng đế."
+ },
+ {
+  "id": 27,
+  "thong_diep": "Mọi hành động của con người đều được thúc đẩy bởi một trong hai cảm xúc gốc rễ: Tình Yêu hoặc Sợ Hãi.",
+  "y_nghia": "Mọi quyết định của con, từ công việc, tình cảm đến cách hành xử hàng ngày, suy cho cùng đều xuất phát từ lòng yêu thương hoặc nỗi sợ hãi mất mát, tổn thương."
+ },
+ {
+  "id": 28,
+  "thong_diep": "Bánh Xe Vũ Trụ liên tục vận hành, đưa linh hồn từ trạng thái Biết sang Không Biết, rồi trở về Hiệp Nhất trong một vòng tuần hoàn vĩnh cửu.",
+  "y_nghia": "Hành trình tiến hóa là một vòng xoáy trôn ốc đi lên bất tận."
+ },
+ {
+  "id": 29,
+  "thong_diep": "Khi con không còn nhìn thấy Ta ở ngoài con, mà tìm thấy Ta trong từng hơi thở, khi đó con đã giao hòa với Ta.",
+  "y_nghia": "Thượng đế không ngự trị ở một thánh đường xa xôi nào."
+ },
+ {
+  "id": 30,
+  "thong_diep": "Ảo ảnh về thời gian giúp linh hồn con khám phá và thưởng thức từng phần của sự vĩnh cửu một cách trọn vẹn nhất.",
+  "y_nghia": "Nếu mọi thứ xảy ra cùng một lúc, con sẽ bị quá tải nhận thức."
+ },
+ {
+  "id": 31,
+  "thong_diep": "Chỉ có Cái Một Duy Nhất là Chúng Ta. Không bao giờ có nhiều hơn một người ở đây cả.",
+  "y_nghia": "Mọi linh hồn thực chất là những điểm nhìn khác nhau của một thực thể duy nhất."
+ },
+ {
+  "id": 32,
+  "thong_diep": "Không có kẻ thù nào ở ngoài kia cả. Mọi sự đối nghịch chỉ là cơ hội để con lựa chọn biểu hiện tình yêu vĩ đại của mình.",
+  "y_nghia": "Thế giới bên ngoài đầy rẫy thử thách chỉ là sân khấu được thiết kế để con rèn luyện và chứng minh phẩm chất yêu thương thiêng liêng của mình."
+ },
+ {
+  "id": 33,
+  "thong_diep": "Chữa lành thực chất là việc chấp nhận tất cả những gì đang hiện hữu, rồi lựa chọn phiên bản tốt đẹp nhất tiếp theo.",
+  "y_nghia": "Kháng cự nỗi đau chỉ làm nỗi đau kéo dài."
+ },
+ {
+  "id": 34,
+  "thong_diep": "Những gì con chống cự sẽ tồn tại. Khi con kháng cự điều gì, con đang trực tiếp truyền năng lượng nuôi dưỡng cho nó.",
+  "y_nghia": "Khi con cố gắng đấu tranh và ghét bỏ một điều gì đó, con đang tập trung tâm trí vào nó và vô tình hút nó về phía mình mạnh mẽ hơn."
+ },
+ {
+  "id": 35,
+  "thong_diep": "Hãy cười thật nhiều! Ta rất thích sự hài hước và cười cùng con trước những màn kịch lo âu mà con tự tạo ra.",
+  "y_nghia": "Thượng đế có sự hài hước vĩ đại."
+ },
+ {
+  "id": 36,
+  "thong_diep": "Ta chưa từng gửi đến cho con điều gì khác ngoài những thiên thần. Mọi người con gặp đều mang đến một món quà trải nghiệm.",
+  "y_nghia": "Ngay cả những người gây khó khăn cho con cũng chính là những 'thiên thần' đóng vai ác để giúp con rèn luyện sự bao dung, dũng cảm và thấu suốt."
+ },
+ {
+  "id": 37,
+  "thong_diep": "Khi ranh giới sinh tử khép lại, linh hồn con sẽ đối diện với câu hỏi linh thiêng từ Ta: 'Con có muốn ở lại trải nghiệm tiếp không?'.",
+  "y_nghia": "Sự chất vấn thiêng liêng ở ranh giới sinh tử không phải là sự phán xét tội lỗi, mà là lời mời gọi tự do lựa chọn hành trình tiếp theo của linh hồn con."
+ },
+ {
+  "id": 38,
+  "thong_diep": "Thời gian không phải là một sợi dây kéo dài. Nó là một bánh xe tĩnh lặng, nơi con chọn phân vùng dữ liệu để trải nghiệm.",
+  "y_nghia": "Vũ trụ giống như một chiếc đĩa CD-ROM chứa sẵn mọi kịch bản."
+ },
+ {
+  "id": 39,
+  "thong_diep": "Con không thể sáng tạo ra cái mà con đang chối bỏ. Hãy chúc phúc cho cái sai để con có thể tự do chọn cái đúng.",
+  "y_nghia": "Khi con phán xét và ghét bỏ một điều gì đó, con bị trói buộc năng lượng vào nó."
+ },
+ {
+  "id": 40,
+  "thong_diep": "Con là Thượng đế đang trải nghiệm chính mình trong hình hài tuyệt vời và độc bản mang tên con người.",
+  "y_nghia": "Mỗi con người là một cách thức độc nhất vô nhị để Thượng đế tự chiêm ngưỡng sự huy hoàng của Ngài dưới dạng vật lý tương đối."
+ },
+ {
+  "id": 41,
+  "thong_diep": "Học thuyết nhị nguyên cho thấy: không có bóng tối, con sẽ không bao giờ biết đến sự vĩ đại của ánh sáng bên trong mình.",
+  "y_nghia": "Thế giới vật lý tương đối cần có các cực đối nghịch để trải nghiệm được diễn ra."
+ },
+ {
+  "id": 42,
+  "thong_diep": "Khi con có ý nghĩ rõ ràng và vững chắc, hãy bắt đầu nói và hành động như thể nó đã là chân lý hiện hữu.",
+  "y_nghia": "Sự nhất quán giữa Ý nghĩ, Lời nói và Hành động tạo ra lực hút mạnh mẽ nhất để hiện thực hóa mọi ước mơ của con."
+ },
+ {
+  "id": 43,
+  "thong_diep": "Sự khác biệt duy nhất giữa Ta và con là Ta biết Ta là ai, còn con thì đang tạm quên điều đó.",
+  "y_nghia": "Bản tính thần thánh luôn ẩn sâu trong con."
+ },
+ {
+  "id": 44,
+  "thong_diep": "Mục đích duy nhất của linh hồn là hồi tưởng các con là ai, và nhắc nhở những người khác cùng hồi tưởng lại điều đó.",
+  "y_nghia": "Hành trình cuộc đời là một chuyến đi đánh thức trí nhớ."
+ },
+ {
+  "id": 45,
+  "thong_diep": "Chân lý không phải là một hiện thực khách quan. Lập trường của con tạo ra nhận thức, và nhận thức kiến tạo nên chân lý.",
+  "y_nghia": "Không có một chân lý tuyệt đối bên ngoài con."
+ },
+ {
+  "id": 46,
+  "thong_diep": "Khi con hiểu rằng mọi sự đều hoàn hảo theo cách của nó, con sẽ không còn phán xét thế giới mà bắt đầu yêu thương nó.",
+  "y_nghia": "Mọi sự kiện xảy ra đều có lý do sâu xa của nó trong bức tranh tổng thể của vũ trụ."
+ },
+ {
+  "id": 47,
+  "thong_diep": "Các sinh mệnh tiến hóa cao sống bằng ý thức Nhất thể: không có bạo lực, cạnh tranh hay phân biệt quốc gia, tôn giáo.",
+  "y_nghia": "Các nền văn minh tiến bộ trong vũ trụ vận hành bằng sự hợp tác và thấu cảm."
+ },
+ {
+  "id": 48,
+  "thong_diep": "Mô hình kiến tạo đúng đắn của vũ trụ là Be - Do - Have (Là - Làm - Có). Hãy bắt đầu từ trạng thái Hiện Hữu trước.",
+  "y_nghia": "Con người thường nghĩ phải 'Có' tiền để 'Làm' việc lớn rồi mới 'Là' người hạnh phúc."
+ },
+ {
+  "id": 49,
+  "thong_diep": "Cái chết không phải là một kết thúc đáng sợ, mà là một sự mở ra huy hoàng của nhận thức và sự trở về Nhà.",
+  "y_nghia": "Cái chết chỉ đơn giản là hành động linh hồn cởi bỏ chiếc áo khoác vật lý nặng nề để quay về với trạng thái tự do, tràn ngập tình yêu thương ở cõi siêu hình."
+ },
+ {
+  "id": 50,
+  "thong_diep": "Sự chia rẽ là ảo tưởng lớn nhất của nhân loại. Nó là gốc rễ của mọi nỗi đau khổ và chiến tranh trên Trái Đất.",
+  "y_nghia": "Niềm tin sai lầm rằng chúng ta độc lập và tách biệt khỏi người khác khiến con người nảy sinh lòng tham, sự ích kỷ và sợ hãi."
+ },
+ {
+  "id": 51,
+  "thong_diep": "Đừng xin điều con thiếu, vì hành động cầu xin chỉ khẳng định con đang không có nó. Hãy cảm ơn như thể mọi sự đã hoàn tất.",
+  "y_nghia": "Lời cầu nguyện mạnh mẽ nhất là lòng biết ơn trước."
+ },
+ {
+  "id": 52,
+  "thong_diep": "Điều mà con làm cho bản thân, con cũng đang làm cho người khác. Và điều con làm cho người khác, con đang làm cho chính mình.",
+  "y_nghia": "Sự phản chiếu hoàn hảo của vũ trụ: mỗi hành động gieo đi đều quay trở lại."
+ },
+ {
+  "id": 53,
+  "thong_diep": "Vương quốc của Ta có rất nhiều dinh thự, và ngay cả Trái Đất này cũng chính là một phần của Thiên đường.",
+  "y_nghia": "Thiên đường không phải là một địa danh xa xôi sau cái chết."
+ },
+ {
+  "id": 54,
+  "thong_diep": "Sự lo âu chỉ là phản ứng của tâm trí trước ảo vọng thiếu thốn. Hãy hít thở sâu và nhận biết sự đủ đầy của vũ trụ.",
+  "y_nghia": "Vũ trụ luôn tràn ngập nguồn sống và cơ hội."
+ },
+ {
+  "id": 55,
+  "thong_diep": "Không có luật lệ nào của Thượng đế ngoại trừ tự do ý chí tuyệt đối. Luật duy nhất của Thượng đế là không có luật nào cả.",
+  "y_nghia": "Vũ trụ không vận hành bằng sự ép buộc hay phán xét."
+ },
+ {
+  "id": 56,
+  "thong_diep": "Sau cái chết, con sẽ có dịp nhìn lại cuộc đời mình một cách trọn vẹn, không có sự phán xét hay đau khổ, chỉ có lòng biết ơn.",
+  "y_nghia": "Quá trình nhìn lại cuộc đời ở cõi sáng là để linh hồn tự rút ra bài học tiến hóa trong sự bao dung tuyệt đối của Thượng đế, không có sự trừng phạt."
+ },
+ {
+  "id": 57,
+  "thong_diep": "Ta là tất cả: Alpha và Omega, khởi đầu và kết thúc, lên và xuống, trong và ngoài, tại đây và bây giờ.",
+  "y_nghia": "Thượng đế là trường năng lượng vô hạn bao trùm mọi cực đối nghịch."
+ },
+ {
+  "id": 58,
+  "thong_diep": "Không một linh hồn nào rời bỏ thân xác vật lý (chết) vào một thời điểm hoặc theo một cách thức mà họ không tự lựa chọn.",
+  "y_nghia": "Ở cấp độ linh hồn sâu thẳm, cái chết luôn là một quyết định có ý thức của linh hồn khi đã hoàn thành hoặc muốn dừng lại trải nghiệm vật lý."
+ },
+ {
+  "id": 59,
+  "thong_diep": "Hãy vượt khỏi ranh giới của lý trí phân tích. Chỉ có con đường của trái tim mới dẫn con chạm đến chân lý vĩ đại.",
+  "y_nghia": "Trí óc phân tích luôn dựa trên những dữ liệu cũ và nỗi sợ hãi từ quá khứ."
+ },
+ {
+  "id": 60,
+  "thong_diep": "Các sinh mệnh tiến hóa cao không dạy trẻ em bằng sự rập khuôn, mà hướng dẫn chúng ghi nhớ 'cái vốn là như vậy' và 'cái hoạt động hiệu quả'.",
+  "y_nghia": "Giáo dục tiến bộ tôn trọng bản tính tự nhiên của trẻ, khuyến khích chúng tự khám phá quy luật cuộc sống và hành xử theo sự thấu hiểu chân thực."
+ },
+ {
+  "id": 61,
+  "thong_diep": "Khi con sợ hãi, con đang chối bỏ Ta và chối bỏ chính bản thể rực rỡ của mình.",
+  "y_nghia": "Sợ hãi là ảo tưởng rằng con bị tách biệt và không được vũ trụ bảo bọc."
+ },
+ {
+  "id": 62,
+  "thong_diep": "Hành trình này là vô hạn, trò chơi vĩnh cửu này không bao giờ có kết thúc, bởi vì sự sống chính là Ta và chính là Con.",
+  "y_nghia": "Không có điểm dừng chân cuối cùng nào khiến con phải vội vã."
+ },
+ {
+  "id": 63,
+  "thong_diep": "Những bậc thầy giác ngộ là những người luôn chọn lựa Tình yêu trong mọi khoảnh khắc, ngay cả khi đối mặt với cái chết.",
+  "y_nghia": "Sự làm chủ tâm thức tối cao là khi con chọn phản hồi bằng tình yêu thương ngay cả trước những nghịch cảnh hay mối đe dọa lớn nhất."
+ },
+ {
+  "id": 64,
+  "thong_diep": "Cảm xúc cao cả nhất mà linh hồn con liên tục tìm kiếm để trải nghiệm chính là Tình yêu tuyệt đối không điều kiện.",
+  "y_nghia": "Linh hồn con người khao khát được trải nghiệm trạng thái yêu thương không ràng buộc, không đòi hỏi đáp trả — trạng thái nguyên bản của Thượng đế."
+ },
+ {
+  "id": 65,
+  "thong_diep": "Hãy tha thứ cho bản thân mình trước hết. Sự tự buộc tội chính là rào cản ngăn con cảm nhận tình yêu của Ta.",
+  "y_nghia": "Sự tự dằn vặt và cảm giác tội lỗi giữ chân con trong tần số năng lượng thấp của sợ hãi."
+ },
+ {
+  "id": 66,
+  "thong_diep": "Thế giới tương đối là một món quà vĩ đại Ta tự hiến cho mình để có thể kinh nghiệm sự huy hoàng của cõi Tuyệt đối.",
+  "y_nghia": "Thượng đế tạo ra vũ trụ vật lý với các cực đối nghịch để có thể trực tiếp trải nghiệm và cảm nhận những khái niệm trừu tượng như lòng bao dung, tình yêu."
+ },
+ {
+  "id": 67,
+  "thong_diep": "Sự tức giận chỉ là một biểu hiện méo mó của nỗi sợ hãi bên dưới. Hãy chữa lành nó bằng lòng trắc ẩn và sự thấu hiểu.",
+  "y_nghia": "Khi ai đó nổi giận với con, họ thực chất đang lo sợ bị tổn thương hoặc mất kiểm soát."
+ },
+ {
+  "id": 68,
+  "thong_diep": "Nỗi nhớ tiếc quá khứ và lo lắng về tương lai chỉ làm hao mòn năng lượng hiện tại của con. Hãy neo mình vào cái Bây Giờ.",
+  "y_nghia": "Sự rò rỉ năng lượng lớn nhất của con người là sống trong những ảo ảnh không tồn tại."
+ },
+ {
+  "id": 69,
+  "thong_diep": "Thời gian tuyến tính chỉ là ảo ảnh của trí óc. Quá khứ, hiện tại và tương lai đều đang tồn tại đồng thời ngay Bây Giờ.",
+  "y_nghia": "Thời gian không phải là một dòng sông chảy một chiều."
+ },
+ {
+  "id": 70,
+  "thong_diep": "Các sinh mệnh tiến hóa cao luôn giữ trình độ công nghệ song hành tương thích với nhận thức vũ trụ, giúp họ làm chủ năng lượng sạch bảo vệ môi trường.",
+  "y_nghia": "Sự tiến bộ khoa học đích thực phải phục vụ cho sự sống và bảo vệ môi trường."
+ },
+ {
+  "id": 71,
+  "thong_diep": "Mỗi giây phút con sống là một cơ hội vàng để linh hồn viết tiếp trang sử vĩ đại của hành trình tiến hóa.",
+  "y_nghia": "Hiện tại là khoảnh khắc thiêng liêng để con chọn lựa và định hình con người mới của mình."
+ },
+ {
+  "id": 72,
+  "thong_diep": "Sợ hãi co rút, đóng kín, cất giấu và gây tổn thương. Tình yêu mở rộng, chia sẻ, chữa lành và tự do.",
+  "y_nghia": "Sợ hãi khiến con người dựng lên những bức tường phòng thủ và làm tổn thương kẻ khác để tự vệ."
+ },
+ {
+  "id": 73,
+  "thong_diep": "Bản chất thực sự của con chính là Tình yêu thương. Khi con yêu thương, con chỉ đang đơn giản là trở lại là chính mình.",
+  "y_nghia": "Con không cần phải học cách yêu thương, vì yêu thương là DNA nguyên bản của linh hồn con."
+ },
+ {
+  "id": 74,
+  "thong_diep": "Nỗi sợ lớn nhất của con người là nỗi sợ không xứng đáng. Nhưng Ta nói cho con biết: con mãi mãi hoàn hảo và xứng đáng.",
+  "y_nghia": "Con được tạo ra từ tình yêu của Thượng đế, sự tồn tại của con tự thân nó đã là một giá trị tuyệt mỹ."
+ },
+ {
+  "id": 75,
+  "thong_diep": "Hãy dũng cảm công bố bản tính thần thánh của mình bằng cách sống hòa ái, bao dung và tràn ngập lòng nhân từ.",
+  "y_nghia": "Công bố thần tính không phải bằng lời nói kiêu ngạo, mà bằng việc tỏa sáng các phẩm chất của Thượng đế: yêu thương vô điều kiện và mang lại bình an cho vạn vật."
+ },
+ {
+  "id": 76,
+  "thong_diep": "Món quà quý giá nhất con có thể trao cho người khác là nhìn thấy họ bằng con mắt của tình yêu thương và sự tôn trọng tuyệt đối.",
+  "y_nghia": "Khi con nhìn thấy sự vĩ đại và thần thánh bên trong một ai đó, con đang giúp họ nhận ra và đánh thức sức mạnh vĩ đại của chính họ."
+ },
+ {
+  "id": 77,
+  "thong_diep": "Thời gian và Không gian thực chất chỉ là một thực thể năng lượng duy nhất được hiển thị theo các góc độ quan sát khác nhau.",
+  "y_nghia": "Dưới góc nhìn khoa học tâm linh, không-thời gian là một mạng lưới năng lượng đồng nhất."
+ },
+ {
+  "id": 78,
+  "thong_diep": "Sự thay đổi thế giới không bắt đầu từ việc sửa đổi xã hội bên ngoài, mà từ việc chuyển dịch ý thức bên trong từng cá nhân.",
+  "y_nghia": "Mọi nỗ lực thay đổi cấu trúc xã hội bằng bạo lực hay ép buộc đều thất bại nếu ý thức con người chưa tiến hóa."
+ },
+ {
+  "id": 79,
+  "thong_diep": "Đừng chờ đợi thế giới thay đổi. Hãy trở thành sự thay đổi mà con mong muốn nhìn thấy trong xã hội.",
+  "y_nghia": "Thế giới bên ngoài chỉ là sự phản chiếu của ý thức tập thể."
+ },
+ {
+  "id": 80,
+  "thong_diep": "Hãy để tình yêu của con bao trùm lấy cả những góc tối và những sai lầm của cuộc đời. Đó mới là sự chữa lành trọn vẹn.",
+  "y_nghia": "Sự chữa lành thực sự không loại bỏ hay ghét bỏ những phần bất hảo, mà ôm lấy chúng bằng lòng trắc ẩn để chuyển hóa chúng."
+ },
+ {
+  "id": 81,
+  "thong_diep": "Sức mạnh tối thượng nằm ở khoảnh khắc Bây Giờ. Đó là điểm duy nhất con có thể định hình lại toàn bộ số mệnh của mình.",
+  "y_nghia": "Con không thể hành động ở quá khứ hay tương lai."
+ },
+ {
+  "id": 82,
+  "thong_diep": "Ở các xã hội tiến hóa cao, không một cá nhân nào sở hữu đất đai hay tài nguyên. Họ là những người chăm nom và sẻ chia tất cả.",
+  "y_nghia": "Sự tiến hóa cao của một nền văn minh được đo bằng lòng rộng lượng và sự sẻ chia tài nguyên, bảo vệ môi trường, không có lòng tham sở hữu."
+ },
+ {
+  "id": 83,
+  "thong_diep": "Con không bao giờ có thể thua trong trò chơi này, vì đích đến cuối cùng đã được Ta thiết lập sẵn là sự quay trở về.",
+  "y_nghia": "Hành trình của linh hồn là một vòng tròn hoàn hảo."
+ },
+ {
+  "id": 84,
+  "thong_diep": "Không có gì là sai trái khi con nhận được tiền tài từ công việc gieo rắc sự tử tế và chữa lành. Hãy để dòng chảy tự do lưu thông.",
+  "y_nghia": "Sự thịnh vượng vật chất là một phần của dòng chảy năng lượng vũ trụ."
+ },
+ {
+  "id": 85,
+  "thong_diep": "Ta không phải là một vị thần phán xét hay trừng phạt. Ta là năng lượng sáng tạo, là tình yêu thuần khiết bao trùm vạn vật.",
+  "y_nghia": "Thượng đế không vận hành như một quan tòa loài người."
+ },
+ {
+  "id": 86,
+  "thong_diep": "Tình yêu của Ta dành cho con là vô điều kiện và không giới hạn. Con không cần phải làm gì để 'kiếm tìm' hay xứng đáng với nó.",
+  "y_nghia": "Tình yêu của Thượng đế luôn hiện hữu xung quanh con giống như không khí."
+ },
+ {
+  "id": 87,
+  "thong_diep": "Khi con tuyên bố 'Ta là', con đang kích hoạt quyền năng sáng tạo lớn nhất trong vũ trụ.",
+  "y_nghia": "Lời tuyên bố 'Ta là' (I AM) định hình nhận thức và thu hút các trải nghiệm tương ứng."
+ },
+ {
+  "id": 88,
+  "thong_diep": "Ta nói chuyện với tất cả mọi người, mọi lúc. Câu hỏi không phải là Ta nói chuyện với ai, mà là ai đang lắng nghe.",
+  "y_nghia": "Thượng đế luôn giao tiếp với con người thông qua cảm xúc, trực giác, những sự trùng hợp và dấu hiệu cuộc sống."
+ },
+ {
+  "id": 89,
+  "thong_diep": "Mỗi suy nghĩ của con là một năng lượng sáng tạo. Những gì con tập trung suy nghĩ vào nhiều nhất sẽ trở thành thực tại của con.",
+  "y_nghia": "Tâm trí con giống như một nam châm khổng lồ."
+ },
+ {
+  "id": 90,
+  "thong_diep": "Cách nhanh nhất để tự đánh thức bản thân chính là dấn thân nâng đỡ và đánh thức linh hồn của những người xung quanh.",
+  "y_nghia": "Khi con tập trung giúp đỡ người khác nhận ra vẻ đẹp linh hồn của họ, năng lượng yêu thương đó sẽ dội ngược lại và làm thức tỉnh chính con."
+ },
+ {
+  "id": 91,
+  "thong_diep": "Sự khác biệt lớn nhất giữa con người và sinh mệnh tiến hóa cao là mức độ họ chủ động quan sát thế giới thay vì phản ứng vô thức.",
+  "y_nghia": "Người kém tiến hóa thường phản ứng giận dữ, sợ hãi một cách vô thức trước hoàn cảnh."
+ },
+ {
+  "id": 92,
+  "thong_diep": "Hành trình trở về Nhà (Home with God) là một chu kỳ hoàn hảo, nơi linh hồn nhận biết sự hiệp nhất tuyệt đối với Ta.",
+  "y_nghia": "Mỗi linh hồn sau khi trải nghiệm đủ đầy thế giới tương đối sẽ tự nguyện quay trở về hòa nhập với nguồn năng lượng hợp nhất vĩ đại của Thượng đế."
+ },
+ {
+  "id": 93,
+  "thong_diep": "Trò chơi vũ trụ được thiết kế để con đeo lên bức màn quên lãng, rồi trải nghiệm niềm vui vỡ òa của sự Hồi tưởng.",
+  "y_nghia": "Linh hồn tự nguyện quên đi thần tính của mình khi bước vào thế giới vật chất để có thể trải nghiệm quá trình tự khám phá và thức tỉnh đầy vi diệu."
+ },
+ {
+  "id": 94,
+  "thong_diep": "Lời mời gọi thứ ba thiêng liêng dành cho con lúc này là: Hãy thức tỉnh nhân loại bằng chính lối sống tỉnh thức của mình.",
+  "y_nghia": "Cách truyền giáo vĩ đại nhất không phải bằng lời nói giáo điều, mà bằng việc con mô hình hóa lối sống tử tế, bình an và tràn ngập tình yêu thương."
+ },
+ {
+  "id": 95,
+  "thong_diep": "Cuộc đời không phải là một trường học để đi học, mà là một sân chơi sáng tạo để con quyết định và trải nghiệm Con Là Ai.",
+  "y_nghia": "Trái Đất không phải là nơi con bị đày ải để trả nợ nghiệp, mà là một không gian tự do để con thể hiện và trải nghiệm phiên bản vĩ đại nhất của mình."
+ },
+ {
+  "id": 96,
+  "thong_diep": "Thân thể của con được thiết kế để sống mãi mãi. Con không bao giờ thực sự chết, con chỉ thay đổi hình dạng vật chất.",
+  "y_nghia": "Thân thể vật lý là phương tiện tạm thời của linh hồn."
+ },
+ {
+  "id": 97,
+  "thong_diep": "Cuộc sống trần thế là cơ hội để linh hồn con chuyển hóa những khái niệm vĩ đại nhất thành kinh nghiệm thực tế.",
+  "y_nghia": "Ở cõi siêu hình, con biết thế nào là bao dung bằng khái niệm."
+ },
+ {
+  "id": 98,
+  "thong_diep": "Ta không ngồi trên cao để cân đo tội lỗi. Ta cười cùng con, khóc cùng con và kinh nghiệm đời sống thông qua con.",
+  "y_nghia": "Thượng đế là người bạn đồng hành trung thành nhất của con."
+ },
+ {
+  "id": 99,
+  "thong_diep": "Vâng phục không phải là sự trưởng thành. Trưởng thành thực sự là khi con tự quyết định hành động dựa trên tình yêu.",
+  "y_nghia": "Làm điều tốt chỉ vì sợ hãi hình phạt hay tuân theo mệnh lệnh một cách mù quáng không giúp linh hồn tiến hóa."
+ },
+ {
+  "id": 100,
+  "thong_diep": "Khi con diễn tả sự thật của mình bằng tình yêu mến, mọi hậu quả tiêu cực hay tổn thương sẽ tự khắc biến mất.",
+  "y_nghia": "Nói ra sự thật không nhất thiết phải gây tổn thương."
+ }
+]
