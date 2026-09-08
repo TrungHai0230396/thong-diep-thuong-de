@@ -3,6 +3,13 @@
 'use strict';
 
 const { ymd, cardFor, luckyNumbers, luckyDigits, newSeed } = self.TDTD;
+/* ─────────────────────────────────────────────────────────────
+   BẬT / TẮT TÍNH NĂNG SỐ MAY MẮN
+   Đổi true thành false là nút "Dự đoán số" biến mất hoàn toàn.
+   Không cần xoá dòng code nào khác. Nhớ tăng số phiên bản trong sw.js.
+   ───────────────────────────────────────────────────────────── */
+const BAT_DU_DOAN_SO = true;
+
 const SEED_KEY = 'tdtd.seed';   // hạt giống riêng của máy
 const DAY_KEY  = 'tdtd.day';    // ngày đã nhận thông điệp, bị ghi đè mỗi ngày
 const $ = (s, r = document) => r.querySelector(s);
@@ -179,7 +186,8 @@ async function init() {
   $('#card').onclick = reveal;
   $('#card').onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } };
   $('#btn-draw').onclick = reveal;
-  $('#btn-lucky').onclick = lucky;
+  if (BAT_DU_DOAN_SO) $('#btn-lucky').onclick = lucky;
+  else $('#btn-lucky').remove();
   $('#btn-share').onclick = copyText;
   $('#btn-about').onclick = about;
   $$('[data-close]').forEach(el => el.onclick = closeSheet);
