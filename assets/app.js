@@ -11,8 +11,8 @@ const THU = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm',
 const prettyDate = (s) => { const [y, m, d] = s.split('-').map(Number); const t = new Date(y, m - 1, d);
   return `${THU[t.getDay()]}, ngày ${d} tháng ${m} năm ${y}`; };
 const greet = () => { const h = new Date().getHours();
-  return h < 5 ? 'Đêm an lành, con' : h < 11 ? 'Chào buổi sáng, con' : h < 14 ? 'Chào buổi trưa, con'
-       : h < 18 ? 'Chào buổi chiều, con' : 'Chào buổi tối, con'; };
+  return h < 5 ? 'Đêm an lành' : h < 11 ? 'Chào buổi sáng' : h < 14 ? 'Chào buổi trưa'
+       : h < 18 ? 'Chào buổi chiều' : 'Chào buổi tối'; };
 
 let CARDS = [], IDS = [], today = null, revealed = false;   // toàn bộ trạng thái, chỉ trong bộ nhớ
 
@@ -74,7 +74,7 @@ function fallback(text, done) {
 
 function about() {
   openSheet('Giới thiệu', `
-    <p>Mỗi ngày, một thông điệp. Con mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
+    <p>Mỗi ngày, một thông điệp. Mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
     <p>Ứng dụng không lưu lại bất cứ điều gì: không lịch sử, không bộ sưu tập, không tài khoản. Đóng lại là thông điệp đi qua. Ngày mai sẽ có lá khác.</p>
     <p>Bộ bài gồm ${CARDS.length} thông điệp. Lá của mỗi ngày do chính ngày hôm đó quyết định, nên ai mở cùng ngày cũng nhận cùng một thông điệp. Đi hết ${CARDS.length} ngày mới trọn một vòng.</p>
     <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>`);
