@@ -187,7 +187,7 @@ async function init() {
   $('#card').onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } };
   $('#btn-draw').onclick = reveal;
   if (BAT_DU_DOAN_SO) $('#btn-lucky').onclick = lucky;
-  else $('#btn-lucky').remove();
+  else $('.extra').remove();
   $('#btn-share').onclick = copyText;
   $('#btn-about').onclick = about;
   $$('[data-close]').forEach(el => el.onclick = closeSheet);
