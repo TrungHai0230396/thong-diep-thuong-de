@@ -1,0 +1,302 @@
+[
+  {
+    "slug": "nhat-the",
+    "ten": "Nhất Thể",
+    "thu_tu": 1,
+    "mo_ta": "Chủ đề này mở ra cái nhìn rằng sự tách biệt giữa người với người, giữa con người và vạn vật chỉ là một lớp ảo ảnh của thế giới hữu hình. Bên dưới lớp ảo ảnh ấy, tất cả cùng thuộc về một sự sống duy nhất, như những tế bào trên cùng một cơ thể. Bởi vậy, điều mỗi người làm cho người khác cũng chính là làm cho mình. Những lá thông điệp ở đây gợi lại cảm giác thuộc về, để không ai phải gồng gánh thế giới một mình.",
+    "cau_dan": "Mọi ranh giới chỉ là ảo ảnh; tất cả cùng thuộc về một sự sống.",
+    "quyen_nguon": "Quyển 1",
+    "mau_sac": {
+      "primary": "#412c86",
+      "accent": "#c9b8ff"
+    },
+    "bieu_tuong": {
+      "ten": "Hai vòng giao nhau",
+      "emoji": "🫂",
+      "svg_goi_y": "Hai vòng tròn nét mảnh giao nhau, phần giao ở giữa tô sáng hơn và có một chấm nhỏ ở tâm. Nét đơn, không viền ngoài."
+    },
+    "tu_khoa": [
+      "hợp nhất",
+      "kết nối",
+      "vạn vật",
+      "ảo ảnh chia rẽ",
+      "thuộc về"
+    ],
+    "co_che_game_goc": "Cơ chế 'Nhất Thể' (Oneness Gauge): Thiết lập một thanh liên kết năng lượng giữa người chơi và môi trường/NPC. Khi người chơi gây sát thương hoặc giúp đỡ kẻ khác, một lượng hiệu ứng (heal hoặc tổn thương) tương ứng sẽ dội ngược lại bản thân. Lựa chọn hội thoại sẽ mở khóa dòng năng lượng cộng hưởng, hồi sinh khí lực (HP/MP) cho cả đội mà không cần dùng vật phẩm."
+  },
+  {
+    "slug": "ban-chat-thuong-de",
+    "ten": "Bản Chất Thượng Đế",
+    "thu_tu": 2,
+    "mo_ta": "Hình ảnh một đấng phán xét ngồi trên cao để cân đo tội lỗi được thay bằng một Nguồn yêu thương vô điều kiện, luôn có mặt trong từng hơi thở và từng lựa chọn. Thượng Đế ở đây không đòi hỏi sự thờ phụng hay nỗi sợ, mà đồng hành, lắng nghe và trải nghiệm cuộc sống cùng mỗi người, kể cả qua những sai lầm. Chủ đề này gỡ bỏ cảm giác tội lỗi và mở ra một mối quan hệ thân mật, tin cậy với điều thiêng liêng.",
+    "cau_dan": "Không phải đấng phán xét trên cao, mà là tình yêu vô điều kiện luôn ở bên.",
+    "quyen_nguon": "Quyển 1",
+    "mau_sac": {
+      "primary": "#7b540f",
+      "accent": "#f7d271"
+    },
+    "bieu_tuong": {
+      "ten": "Mặt trời dịu",
+      "emoji": "☀️",
+      "svg_goi_y": "Một vòng tròn đầy ở giữa với tám tia ngắn tỏa đều xung quanh, đầu tia bo tròn; tổng thể mềm, không sắc nhọn."
+    },
+    "tu_khoa": [
+      "tình yêu vô điều kiện",
+      "nguồn",
+      "không phán xét",
+      "đồng hành",
+      "tin cậy"
+    ],
+    "co_che_game_goc": "Cơ chế 'Hội thoại Thượng đế' (Divine Conversation): Khi người chơi gặp các thần linh hoặc đền thờ, thay vì nhận nhiệm vụ diệt quái thông thường, họ sẽ đối thoại. Lựa chọn tin tưởng vào bản tính bao dung sẽ xóa bỏ hoàn toàn các debuff (nguyền rủa, lo âu) của nhân vật và ban cho họ nội tại 'Tự do Ý chí' (miễn nhiễm khống chế)."
+  },
+  {
+    "slug": "su-that-toi-hau",
+    "ten": "Sự Thật Tối Hậu",
+    "thu_tu": 3,
+    "mo_ta": "Chủ đề này gom những mệnh đề cốt lõi nhất, có sức tháo gỡ các xiềng xích luân lý mà con người tự đặt lên mình. Không có điều gì bắt buộc phải làm, phải có hay phải trở thành; linh hồn vốn tự do và không chịu bất kỳ hình phạt nào. Khi nhìn mọi sự đều hoàn hảo theo cách riêng của nó, phán xét lắng xuống và tình thương có chỗ để lớn lên. Đây là lời nhắc về sự tự do tuyệt đối để mỗi người tự sáng tạo cuộc đời mình.",
+    "cau_dan": "Linh hồn vốn tự do; không luật lệ nào trói buộc ngoài chính lựa chọn của mình.",
+    "quyen_nguon": "Quyển 1",
+    "mau_sac": {
+      "primary": "#0d5668",
+      "accent": "#82e3ee"
+    },
+    "bieu_tuong": {
+      "ten": "Giọt pha lê",
+      "emoji": "💎",
+      "svg_goi_y": "Một hình giọt nước đơn nét, bên trong là một đường cong sáng gợi ánh phản chiếu; không tô đầy, nét mảnh."
+    },
+    "tu_khoa": [
+      "tự do",
+      "không luật lệ",
+      "hoàn hảo",
+      "buông áp lực",
+      "chân lý"
+    ],
+    "co_che_game_goc": "Cơ chế 'Zero Obligation' (Vô Bộ): Trò chơi loại bỏ thanh đo 'Nhiệm vụ bắt buộc'. Người chơi có thể hoàn thành game bằng cách chọn 'Không làm gì' hoặc tự do dạo chơi. Khi đối mặt với thử thách, giúp nhân vật mở khóa một kết cục ẩn siêu thoát (Pacifist/Ascension Ending) mà không cần chiến đấu."
+  },
+  {
+    "slug": "sang-tao",
+    "ten": "Sáng Tạo",
+    "thu_tu": 4,
+    "mo_ta": "Cuộc sống không phải là một trường thi để tích điểm, mà là một xưởng thiết kế rộng lớn nơi mỗi người tự tay định hình trải nghiệm của mình. Ba công cụ luôn sẵn có là suy nghĩ, lời nói và hành động; khi cả ba cùng hướng về một ý niệm, ý niệm ấy dần trở thành hiện thực. Chủ đề này mời gọi rời khỏi vai nạn nhân của hoàn cảnh để bước vào vai người đồng sáng tạo, bắt đầu từ những lựa chọn nhỏ mỗi ngày.",
+    "cau_dan": "Suy nghĩ, lời nói, hành động: ba công cụ tự tay dựng nên đời mình.",
+    "quyen_nguon": "Quyển 1",
+    "mau_sac": {
+      "primary": "#8c2568",
+      "accent": "#ff9dd8"
+    },
+    "bieu_tuong": {
+      "ten": "Tam hợp",
+      "emoji": "✨",
+      "svg_goi_y": "Ba vòng tròn nhỏ xếp thành tam giác, nối với nhau bằng ba đoạn thẳng mảnh; một tia sáng ngắn tỏa ra từ tâm tam giác."
+    },
+    "tu_khoa": [
+      "sáng tạo",
+      "suy nghĩ lời nói hành động",
+      "đồng sáng tạo",
+      "chủ động",
+      "biết ơn trước"
+    ],
+    "co_che_game_goc": "Cơ chế 'Tam Hợp Kiến Tạo' (Trinity Crafting System): Người chơi thu thập và kết hợp 3 loại tài nguyên năng lượng: Suy nghĩ (Tư duy), Lời nói (Phát ngôn), và Hành động để tự tạo ra (craft) các kỹ năng độc bản. Nhiệm vụ trong game yêu cầu người chơi bằng cách đồng bộ cả 3 yếu tố này để giải các câu đố môi trường."
+  },
+  {
+    "slug": "suc-manh-y-thuc",
+    "ten": "Sức Mạnh Ý Thức",
+    "thu_tu": 5,
+    "mo_ta": "Ý thức được ví như kiến trúc sư của thực tại: thế giới bên ngoài phản chiếu những gì đang được giữ trong tâm trí. Điều được tập trung vào sẽ lớn lên, và điều bị kháng cự dữ dội cũng lớn lên theo một cách khác. Bởi vậy, thay đổi bắt đầu từ bên trong, bằng việc chọn lập trường, chọn góc nhìn và chọn cách hiện hữu trước khi hành động. Chủ đề này giúp nhận ra sức mạnh lặng lẽ mà mỗi người đang nắm trong tay từng khoảnh khắc.",
+    "cau_dan": "Thế giới bên ngoài là tấm gương của những gì đang diễn ra bên trong.",
+    "quyen_nguon": "Quyển 1",
+    "mau_sac": {
+      "primary": "#223a98",
+      "accent": "#93bdff"
+    },
+    "bieu_tuong": {
+      "ten": "Vòng sóng đồng tâm",
+      "emoji": "🌀",
+      "svg_goi_y": "Một chấm ở tâm với ba vòng tròn đồng tâm nét mảnh lan ra ngoài, vòng ngoài cùng đứt nét như đang tan dần."
+    },
+    "tu_khoa": [
+      "ý thức",
+      "tập trung",
+      "chấp nhận",
+      "cộng hưởng",
+      "bên trong"
+    ],
+    "co_che_game_goc": "Cơ chế 'Tập trung & Kháng cự' (Focus & Resonance System): Bản đồ game sẽ tự động sinh quái vật hoặc bẫy rập dựa trên những thuộc tính mà người chơi liên tục lo sợ hoặc tấn công (kháng cự). Để vượt qua màn chơi, người chơi phải sử dụng kỹ năng 'Chấp nhận' hoặc 'Hòa giải', khiến quái vật tự động chuyển hóa thành năng lượng lành."
+  },
+  {
+    "slug": "tinh-yeu-va-so-hai",
+    "ten": "Tình Yêu và Sợ Hãi",
+    "thu_tu": 6,
+    "mo_ta": "Chỉ có hai gốc rễ đứng sau mọi hành vi của con người: tình yêu, thứ năng lượng mở rộng và chữa lành, và sợ hãi, thứ năng lượng co rút và tự vệ. Nhìn qua lăng kính ấy, cơn giận hay sự lạnh lùng của ai đó thường chỉ là tiếng kêu cứu của một nỗi sợ chưa được ôm lấy. Đây là chủ đề lớn nhất của bộ thông điệp, xoay quanh việc chọn tình yêu ở từng ngã rẽ nhỏ, bắt đầu từ việc tha thứ cho chính mình.",
+    "cau_dan": "Trước mỗi ngã rẽ chỉ có hai lối: co lại vì sợ hay mở ra vì yêu.",
+    "quyen_nguon": "Quyển 1",
+    "mau_sac": {
+      "primary": "#90213a",
+      "accent": "#ff9eab"
+    },
+    "bieu_tuong": {
+      "ten": "Trái tim mở",
+      "emoji": "💗",
+      "svg_goi_y": "Một trái tim vẽ bằng nét đơn không khép kín ở đỉnh, hai đầu nét hơi mở ra ngoài như đang nở; một chấm sáng nhỏ ở giữa."
+    },
+    "tu_khoa": [
+      "tình yêu",
+      "sợ hãi",
+      "tha thứ",
+      "trắc ẩn",
+      "lựa chọn"
+    ],
+    "co_che_game_goc": "Hệ thống lựa chọn 'Love/Fear Gauge' (Thay thế Karma): Người chơi đối mặt với các NPC hung dữ. Nếu chọn phản ứng Sợ hãi (tấn công phòng thủ, tích trữ tài nguyên), chỉ số phòng thủ cá nhân tăng nhưng NPC sẽ thù ghét. Nếu chọn phản ứng Tình yêu (chia sẻ, thấu cảm), người chơi sẽ mở khóa mạch truyện ẩn và có thêm đồng đội mạnh mẽ."
+  },
+  {
+    "slug": "su-song-va-cai-chet",
+    "ten": "Sự Sống và Cái Chết",
+    "thu_tu": 7,
+    "mo_ta": "Cái chết được nhìn như một bước chuyển tần số, từ thể vật lý thô đặc sang một trạng thái tinh nhẹ hơn, chứ không phải một dấu chấm hết. Linh hồn chưa từng bắt đầu và không bao giờ kết thúc; không có địa ngục hay hình phạt vô tận nào đang chờ. Từ góc nhìn ấy, nỗi sợ lớn nhất của con người dịu xuống, và cuộc sống trần thế hiện ra như một cơ hội quý giá để sống trọn vẹn, nhẹ nhàng, không bị đè nặng bởi ảo ảnh mất mát.",
+    "cau_dan": "Không có kết thúc, chỉ có sự đổi kênh của một dòng sống bất tận.",
+    "quyen_nguon": "Quyển 3",
+    "mau_sac": {
+      "primary": "#175a4d",
+      "accent": "#8fe6c0"
+    },
+    "bieu_tuong": {
+      "ten": "Vòng vô cực",
+      "emoji": "♾️",
+      "svg_goi_y": "Ký hiệu vô cực nét đơn mảnh, một nửa nét đậm dần và nửa kia nhạt dần, gợi vòng chuyển hóa liên tục không đứt đoạn."
+    },
+    "tu_khoa": [
+      "bất tử",
+      "linh hồn",
+      "chuyển hóa",
+      "không sợ chết",
+      "trở về nhà"
+    ],
+    "co_che_game_goc": "Cơ chế 'Chất Vấn Linh Thiêng' (Divine Inquiry / No Game Over): Khi nhân vật cạn HP, trò chơi không kết thúc. Linh hồn người chơi bước vào không gian siêu thực để đối thoại với Thượng đế. Người chơi có quyền tự quyết định: Quay lại cơ thể vật lý với một nội tại mới (Hồi sinh) hoặc chuyển sinh sang một dòng thời gian khác."
+  },
+  {
+    "slug": "thoi-gian",
+    "ten": "Thời Gian",
+    "thu_tu": 8,
+    "mo_ta": "Thời gian tuyến tính chỉ là một công cụ đo lường của trí óc; trong thực tại sâu hơn, quá khứ, hiện tại và tương lai cùng có mặt trong một khoảnh khắc duy nhất. Điểm duy nhất mà mọi thứ có thể được thay đổi là bây giờ, bởi bây giờ là nơi duy nhất thực sự tồn tại. Chủ đề này giúp buông những tiếc nuối về ngày hôm qua và những lo âu về ngày mai, để neo mình vào sự tĩnh lặng của hiện tại.",
+    "cau_dan": "Quá khứ và tương lai đều đang ở đây. Bây giờ là điểm tựa duy nhất.",
+    "quyen_nguon": "Quyển 2",
+    "mau_sac": {
+      "primary": "#35506a",
+      "accent": "#c6d2ea"
+    },
+    "bieu_tuong": {
+      "ten": "Bánh xe tĩnh lặng",
+      "emoji": "🌙",
+      "svg_goi_y": "Một vòng tròn nét mảnh có mười hai chấm nhỏ cách đều trên chu vi, ở tâm là một chấm sáng lớn hơn; không có kim đồng hồ."
+    },
+    "tu_khoa": [
+      "hiện tại",
+      "bây giờ",
+      "vĩnh cửu",
+      "ảo ảnh thời gian",
+      "tĩnh lặng"
+    ],
+    "co_che_game_goc": "Cơ chế 'Ma Trận Hiện Tại' (The Now Matrix): Thiết lập một phím bấm đặc biệt cho phép người chơi làm ngưng đọng thời gian. Trong trạng thái này, người chơi có thể nhìn thấy tất cả các nhánh kịch bản tương lai (CD-ROM branches) và bẻ lái đầu đọc laser của ý thức để nhảy sang dòng dữ liệu mong muốn."
+  },
+  {
+    "slug": "tien-hoa",
+    "ten": "Tiến Hóa",
+    "thu_tu": 9,
+    "mo_ta": "Tiến hóa không phải là cuộc đua về một đích đến xa xôi, mà là hành trình nhớ lại bản tính thiêng liêng vốn đã có sẵn trong mỗi người. Năm thái độ dẫn đường là vui vẻ, yêu thương, chấp nhận, ban phước và biết ơn; thực hành chúng trong đời thường chính là cách nâng tần số của chính mình. Không có nợ nghiệp nào mang tính trừng phạt, chỉ có những nước đi mới luôn sẵn sàng. Trưởng thành ở đây đến từ lựa chọn bằng tình yêu, không phải từ sự vâng phục.",
+    "cau_dan": "Không phải đi tới đâu, mà là nhớ lại mình vốn là ai.",
+    "quyen_nguon": "Quyển 3",
+    "mau_sac": {
+      "primary": "#55601a",
+      "accent": "#e3e17f"
+    },
+    "bieu_tuong": {
+      "ten": "Vòng xoắn đi lên",
+      "emoji": "🌿",
+      "svg_goi_y": "Một đường xoắn ốc nét đơn mở rộng dần từ tâm và vươn lên phía trên bên phải, kết thúc bằng một chấm sáng nhỏ."
+    },
+    "tu_khoa": [
+      "tiến hóa",
+      "hồi tưởng",
+      "biết ơn",
+      "chấp nhận",
+      "trưởng thành"
+    ],
+    "co_che_game_goc": "Chỉ số 'Evolution Index' (Chỉ số Tiến hóa - thay thế cho Level): Nhân vật không tăng cấp bằng cách giết quái tích XP. Level tâm thức tăng lên khi người chơi thực hiện các hành động Chấp nhận, Ban phước cho môi trường hoặc ban tặng lòng biết ơn cho NPC. Chỉ số này mở khóa các kỹ năng tương tác hòa bình và các vùng đất thần tiên ẩn."
+  },
+  {
+    "slug": "sinh-menh-tien-hoa-cao",
+    "ten": "Sinh Mệnh Tiến Hóa Cao",
+    "thu_tu": 10,
+    "mo_ta": "Ở nhiều nơi trong vũ trụ, các sinh mệnh tiến hóa cao đã sống theo ý thức hợp nhất: không bạo lực, không cạnh tranh, không ai sở hữu đất đai hay tài nguyên, mà tất cả cùng chăm nom hành tinh của mình. Họ quan sát nhiều hơn phán xét, chia sẻ nhiều hơn tích trữ, và giữ công nghệ luôn song hành với sự trưởng thành của nhận thức. Chủ đề này mở ra một hình mẫu tương lai khả dĩ cho nhân loại, bắt đầu từ lối sống tối giản, tin vào sự đủ đầy và biết sẻ chia.",
+    "cau_dan": "Một hình mẫu tương lai: sống hòa hợp, sẻ chia và chăm nom hành tinh.",
+    "quyen_nguon": "Quyển 3",
+    "mau_sac": {
+      "primary": "#2a6028",
+      "accent": "#a9e78c"
+    },
+    "bieu_tuong": {
+      "ten": "Lá ôm hành tinh",
+      "emoji": "🌍",
+      "svg_goi_y": "Một vòng tròn nét mảnh tượng trưng hành tinh, một chiếc lá đơn nét ôm lấy nửa dưới bên phải vòng tròn, cuống lá chạm chu vi."
+    },
+    "tu_khoa": [
+      "hòa hợp",
+      "chăm nom trái đất",
+      "sẻ chia",
+      "không bạo lực",
+      "đủ đầy"
+    ],
+    "co_che_game_goc": "Mở khóa 'HEB Realm' (Cõi giới Tiến hóa): Một bản đồ thế giới mở đặc biệt nơi người chơi không được phép mang theo vũ khí. Mọi thử thách tại đây yêu cầu người chơi — giải quyết xung đột bằng đối thoại, chia sẻ năng lượng phục hồi hệ sinh thái và cộng tác với các sinh mệnh vũ trụ để vượt qua các thảm họa tự nhiên."
+  },
+  {
+    "slug": "loi-moi-goi-thu-ba",
+    "ten": "Lời Mời Gọi Thứ Ba",
+    "thu_tu": 11,
+    "mo_ta": "Đây là lời mời dành cho những ai đã sẵn sàng thức tỉnh và muốn góp phần đánh thức thế giới, không bằng giáo điều mà bằng chính cách sống mỗi ngày. Khi một người thắp sáng ngọn đèn của mình, những người xung quanh tự nhiên được soi đường; khi nâng đỡ ai đó, chính mình cũng được sạc đầy. Chủ đề này chuyển sự chú ý từ việc chờ đợi thế giới đổi khác sang việc tự mình sống như điều mình mong thế giới trở thành, bắt đầu từ một hành động tử tế nhỏ.",
+    "cau_dan": "Thắp sáng ngọn đèn của mình, và con đường của người khác cũng sáng theo.",
+    "quyen_nguon": "Quyển 3",
+    "mau_sac": {
+      "primary": "#913612",
+      "accent": "#ffb47d"
+    },
+    "bieu_tuong": {
+      "ten": "Ngọn đuốc",
+      "emoji": "🔥",
+      "svg_goi_y": "Một ngọn lửa đơn nét trên thân đuốc thẳng ngắn; quanh ngọn lửa là ba tia sáng nhỏ tỏa ra hai bên và phía trên."
+    },
+    "tu_khoa": [
+      "thức tỉnh",
+      "sứ giả",
+      "lan tỏa",
+      "nâng đỡ",
+      "sống làm gương"
+    ],
+    "co_che_game_goc": "Cơ chế 'Awakening Aura' (Hào quang Thức tỉnh): Khi người chơi thực hiện các lựa chọn hội thoại chân thành và dũng cảm, họ phát ra một vầng hào quang làm xoa dịu các quái vật hoặc NPC đang bị 'lo âu khống chế'. Nhiệm vụ yêu cầu người chơi giải cứu một ngôi làng bằng cách đánh thức ý thức của dân làng thay vì tiêu diệt họ."
+  },
+  {
+    "slug": "tro-choi-vu-tru",
+    "ten": "Trò Chơi Vũ Trụ",
+    "thu_tu": 12,
+    "mo_ta": "Vũ trụ được ví như một sân chơi vĩ đại, nơi sự sống tự phân thân để trải nghiệm chính sự huy hoàng của mình. Linh hồn bước qua bức màn quên lãng để đi vào thế giới hữu hình, rồi tận hưởng niềm vui vỡ òa của việc nhớ lại mình là ai; vòng quay ấy không bao giờ kết thúc. Khi nhìn khó khăn như một thử thách trong cuộc chơi lớn, tâm trí nhẹ đi và tiếng cười trở lại. Chủ đề này mời gọi sống bớt nghiêm trọng, chơi trọn vẹn và cười thật nhiều.",
+    "cau_dan": "Quên đi để rồi nhớ lại: vòng quay vĩ đại của một cuộc chơi không hồi kết.",
+    "quyen_nguon": "Quyển 3",
+    "mau_sac": {
+      "primary": "#62268a",
+      "accent": "#dba9ff"
+    },
+    "bieu_tuong": {
+      "ten": "Bánh xe vũ trụ",
+      "emoji": "🪐",
+      "svg_goi_y": "Vòng tròn nét mảnh với tám nan hoa mỏng từ tâm; một chấm sao nhỏ nằm trên chu vi như đang lăn, hai chấm sao rải bên ngoài."
+    },
+    "tu_khoa": [
+      "trò chơi",
+      "bánh xe vũ trụ",
+      "hài hước",
+      "hồi tưởng",
+      "nhẹ nhàng"
+    ],
+    "co_che_game_goc": "Cơ chế 'Cosmic Loop / New Game+' (Vòng lặp Vũ trụ): Khi hoàn thành game, thay vì kết thúc thông thường, người chơi đạt đến trạng thái Hiệp nhất và được đưa vào chế độ New Game+. Họ sẽ bắt đầu lại với một 'Bức màn quên' mới nhưng giữ nguyên các chỉ số ngộ tính siêu hình, cho phép trải nghiệm game ở một góc nhìn hoàn toàn mới."
+  }
+]

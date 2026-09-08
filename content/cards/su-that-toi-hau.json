@@ -1,0 +1,50 @@
+[
+  {
+    "id": 5,
+    "topic": "su-that-toi-hau",
+    "tieu_de": "Đặt Chiếc Thang Xuống",
+    "thong_diep": "Không có gì con PHẢI làm, không có gì con cần CÓ, và không có gì con cần trở THÀNH. Hãy chỉ nhận ra con là ai.",
+    "loi_giang": "Con đã bỏ bao năm leo lên chiếc thang của thành tựu, tin rằng ở bậc trên cùng mới có giá trị của mình. Nhưng Ta không dựng thang nào cả: điều con tìm không nằm ở chức danh hay tài khoản, mà là cái con vốn là từ trước khi bắt đầu leo. Đặt gánh xuống, con sẽ thấy mình đứng sẵn ở nơi mình muốn tới.",
+    "hanh_dong": "Trước khi mở danh sách việc hôm nay, con hãy viết một dòng lên đầu trang: 'Dù xong hay chưa, tôi vẫn là tôi.' Mỗi lần gạch được một mục, đọc lại dòng ấy một lần.",
+    "cau_hoi": "Nếu hôm nay không ai chấm điểm công việc của con, con sẽ làm nó với tâm thế nào?",
+    "khang_dinh": "Tôi không cần thêm gì để xứng đáng; tôi làm việc từ chỗ đã đủ, không phải để trở nên đủ.",
+    "tu_khoa": [
+      "là ai",
+      "buông áp lực",
+      "đủ đầy"
+    ],
+    "boi_canh": "cong-viec"
+  },
+  {
+    "id": 9,
+    "topic": "su-that-toi-hau",
+    "tieu_de": "Bầu Trời Không Hàng Rào",
+    "thong_diep": "Không có luật lệ nào của Thượng đế ngoại trừ tự do ý chí tuyệt đối. Luật duy nhất của Thượng đế là không có luật nào cả.",
+    "loi_giang": "Ta chưa từng viết một điều răn nào để rồi đứng chờ con vi phạm. Những 'phải' và 'không được' con mang từ thuở nhỏ là do con người dựng lên rồi gắn tên Ta vào; Ta chỉ trao con quyền được chọn, và không có hình phạt nào đợi ở cuối lựa chọn ấy. Tự do này không phải buông thả, mà là lời mời con sống như một người được tin trọn vẹn.",
+    "hanh_dong": "Nhớ lại một câu 'phải' hoặc 'không được' con đã nghe từ nhỏ trong gia đình và vẫn đang sống theo, rồi tự hỏi thật lòng: nếu được chọn lại, con có giữ nó không? Giữ hay bỏ đều được, miễn lần này là con chọn.",
+    "cau_hoi": "Có việc gì hôm nay con đang tránh, không phải vì con không muốn, mà vì sợ mình 'sai luật' trong mắt ai đó?",
+    "khang_dinh": "Tôi được tự do lựa chọn cuộc đời mình, và tôi chịu trách nhiệm với mỗi lựa chọn bằng tình yêu, không bằng nỗi sợ.",
+    "tu_khoa": [
+      "tự do",
+      "lựa chọn",
+      "không hình phạt"
+    ],
+    "boi_canh": "gia-dinh"
+  },
+  {
+    "id": 20,
+    "topic": "su-that-toi-hau",
+    "tieu_de": "Thế Giới Không Cần Sửa",
+    "thong_diep": "Khi con hiểu rằng mọi sự đều hoàn hảo theo cách của nó, con sẽ không còn phán xét thế giới mà bắt đầu yêu thương nó.",
+    "loi_giang": "Điều con gọi là lỗi của thế giới thường chỉ là một mảnh con chưa thấy hết chỗ đứng của nó trong toàn cảnh. Khi con thôi cầm chiếc búa sửa chữa trong tay và chịu nhìn lâu hơn một chút, con sẽ nhận ra mọi thứ đang ở đúng nơi nó cần ở để câu chuyện lớn được tiếp diễn. Và cái nhìn không còn cần sửa ai ấy, Ta gọi tên nó là tình yêu.",
+    "hanh_dong": "Khi ra đường hôm nay, chọn một người lạ mà bình thường con sẽ chê thầm – người chen xe, người nói to nơi công cộng – và thay lời chê bằng một câu nói nhỏ trong đầu: 'Bạn cũng đang đi con đường của mình.'",
+    "cau_hoi": "Hôm nay con đang bận sửa ai hay điều gì, và nếu nó vốn đã đúng chỗ, con sẽ yêu nó như thế nào?",
+    "khang_dinh": "Tôi thôi sửa thế giới và bắt đầu nhìn nó bằng đôi mắt biết rằng mọi thứ đang ở đúng chỗ.",
+    "tu_khoa": [
+      "không phán xét",
+      "yêu thương",
+      "hoàn hảo"
+    ],
+    "boi_canh": "cong-dong"
+  }
+]

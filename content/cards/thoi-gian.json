@@ -1,0 +1,114 @@
+[
+  {
+    "id": 62,
+    "topic": "thoi-gian",
+    "tieu_de": "Tấm Ảnh Vẫn Đang Cười",
+    "thong_diep": "Thời gian tuyến tính chỉ là ảo ảnh của trí óc. Quá khứ, hiện tại và tương lai đều đang tồn tại đồng thời ngay Bây Giờ.",
+    "loi_giang": "Trí óc con xếp đời mình thành một hàng dài: chuyện đã qua nằm phía sau, chuyện chưa tới nằm phía trước, và con đứng kẹt ở giữa. Ta lại không nhìn như vậy: tuổi thơ của con, bàn cơm tối nay và mái đầu bạc con sẽ có đều đang cùng hiện diện trong một khoảnh khắc rộng mở. Bởi thế chẳng kỷ niệm nào thật sự mất đi, và chẳng lời nào là quá muộn.",
+    "hanh_dong": "Tấm ảnh cũ nào của gia đình còn cất trong ngăn kéo, tối nay con lấy ra xem cùng người thân; và thay cho hai chữ 'hồi đó', hãy kể lại khoảnh khắc ấy ở thì hiện tại: mẹ đang cười, con đang chạy, nắng đang đổ xuống sân.",
+    "cau_hoi": "Có kỷ niệm nào trong gia đình con vẫn đang sống, chỉ chờ con ngừng gọi nó là 'chuyện cũ'?",
+    "khang_dinh": "Tôi mang cả tuổi thơ và những ngày sắp tới của mình vào bàn cơm hôm nay, trọn vẹn và không muộn màng.",
+    "tu_khoa": [
+      "ảo ảnh",
+      "kỷ niệm",
+      "gia đình"
+    ],
+    "boi_canh": "gia-dinh"
+  },
+  {
+    "id": 64,
+    "topic": "thoi-gian",
+    "tieu_de": "Chốt Xoay Của Số Mệnh",
+    "thong_diep": "Sức mạnh tối thượng nằm ở khoảnh khắc Bây Giờ. Đó là điểm duy nhất con có thể định hình lại toàn bộ số mệnh của mình.",
+    "loi_giang": "Con hay để dành sự thay đổi cho một mốc nào đó: xong dự án này, qua kỳ đánh giá kia, đến khi được cất nhắc. Nhưng con không thể chạm vào ngày mai để sửa nó, cũng không thể quay về hôm qua để làm lại; bàn tay con chỉ đặt được lên phút này. Chính ở đây, trong một lựa chọn nhỏ giữa giờ làm, con bẻ hướng cả con đường phía trước.",
+    "hanh_dong": "Có một việc con vẫn hoãn 'chờ khi mọi thứ ổn hơn'; trước bữa trưa hôm nay, con làm phần đầu tiên của nó trong mười phút, không đợi thêm điều kiện nào nữa.",
+    "cau_hoi": "Trong công việc, con đang chờ cột mốc nào tới rồi mới cho phép mình đổi khác, và tại sao không phải là bây giờ?",
+    "khang_dinh": "Tôi cầm lấy phút này và bắt đầu điều tôi đã hoãn quá lâu.",
+    "tu_khoa": [
+      "bây giờ",
+      "quyết định",
+      "công việc"
+    ],
+    "boi_canh": "cong-viec"
+  },
+  {
+    "id": 66,
+    "topic": "thoi-gian",
+    "tieu_de": "Đĩa Nhạc Đã Thu Trọn",
+    "thong_diep": "Thời gian không phải là một sợi dây kéo dài. Nó là một bánh xe tĩnh lặng, nơi con chọn phân vùng dữ liệu để trải nghiệm.",
+    "loi_giang": "Con nghĩ mình phải đi hết một chặng dài mới trở thành người viết được, vẽ được, chơi được nhạc, như thể tài năng nằm ở cuối sợi dây. Ta bảo con: mọi phiên bản của con đã được thu trọn trên cùng một chiếc đĩa, người tập tễnh lẫn người thành thục cùng nằm đó. Điều con làm mỗi ngày không phải là tiến tới, mà là chọn đặt kim vào rãnh nào.",
+    "hanh_dong": "Dành hai mươi phút cho kỹ năng con đang học, nhưng bắt đầu bằng cách ngồi đúng dáng của người đã thành thục nó, rồi tập như thể con đang chọn rãnh nhạc ấy chứ không phải đang xin xỏ để được tới đó.",
+    "cau_hoi": "Con đang tin rằng phiên bản giỏi hơn của mình nằm ở đâu, và hôm nay con có sẵn lòng bước thẳng vào đó không?",
+    "khang_dinh": "Tôi chọn rãnh trải nghiệm mình muốn sống và đặt tay vào đó ngay hôm nay.",
+    "tu_khoa": [
+      "bánh xe",
+      "lựa chọn",
+      "học tập"
+    ],
+    "boi_canh": "sang-tao-hoc-tap"
+  },
+  {
+    "id": 69,
+    "topic": "thoi-gian",
+    "tieu_de": "Chiếc Thùng Rò Hai Đầu",
+    "thong_diep": "Nỗi nhớ tiếc quá khứ và lo lắng về tương lai chỉ làm hao mòn năng lượng hiện tại của con. Hãy neo mình vào cái Bây Giờ.",
+    "loi_giang": "Ta thấy con như một chiếc thùng nước có hai lỗ rò: một lỗ chảy về những cuộc họp đã qua mà con còn diễn lại trong đầu, một lỗ chảy về những hạn chót chưa tới mà con đã sống trước cả tuần. Đến khi việc trước mặt cần con, thùng đã cạn. Sức lực của con không thiếu, nó chỉ đang chảy đi nơi con không có mặt.",
+    "hanh_dong": "Mỗi lần mở lịch hôm nay, con chỉ nhìn đúng một việc kế tiếp thay vì lướt cả tuần; và trước khi chuyển sang việc mới, dành một phút đặt hai chân xuống sàn, nghe tiếng động trong phòng, để kéo mình về đúng nơi con đang đứng.",
+    "cau_hoi": "Hôm nay, bao nhiêu phần sức lực của con đã chảy về việc đã xong hoặc việc chưa tới, thay vì việc đang nằm trước mặt?",
+    "khang_dinh": "Tôi bịt lại hai lỗ rò và để toàn bộ sức lực mình đổ về nơi tôi đang đứng lúc này.",
+    "tu_khoa": [
+      "hao mòn",
+      "lịch trình",
+      "có mặt"
+    ],
+    "boi_canh": "thoi-gian-lich-trinh"
+  },
+  {
+    "id": 73,
+    "topic": "thoi-gian",
+    "tieu_de": "Từng Lát Của Vĩnh Cửu",
+    "thong_diep": "Ảo ảnh về thời gian giúp linh hồn con khám phá và thưởng thức từng phần của sự vĩnh cửu một cách trọn vẹn nhất.",
+    "loi_giang": "Đừng oán thời gian như một kẻ trộm, con ạ. Nếu mọi bình minh trong vĩnh cửu đổ xuống con cùng một lúc, con sẽ chẳng nếm được bình minh nào; vì thế Ta bày cho con cách nhìn từng buổi sáng nối tiếp nhau, như người ta cắt một ổ bánh lớn thành từng lát để có thể thưởng thức. Cái con gọi là thời gian thật ra là lưỡi dao cắt ân cần ấy.",
+    "hanh_dong": "Khi trời bắt đầu chuyển màu chiều nay, con ra ngoài, đứng yên mười phút không chụp ảnh, chỉ nhìn ánh sáng đổi trên một tán cây hay một bức tường, và cho phép lát bánh này của vĩnh cửu được nếm trọn.",
+    "cau_hoi": "Hôm nay con đã nuốt vội lát nào của ngày mà lẽ ra có thể nhấm nháp thật chậm?",
+    "khang_dinh": "Tôi đón từng khoảnh khắc như một lát vĩnh cửu được cắt riêng cho mình để thưởng thức.",
+    "tu_khoa": [
+      "vĩnh cửu",
+      "thưởng thức",
+      "thiên nhiên"
+    ],
+    "boi_canh": "thien-nhien"
+  },
+  {
+    "id": 76,
+    "topic": "thoi-gian",
+    "tieu_de": "Xa Và Lâu Là Một",
+    "thong_diep": "Thời gian và Không gian thực chất chỉ là một thực thể năng lượng duy nhất được hiển thị theo các góc độ quan sát khác nhau.",
+    "loi_giang": "Khi con nói một người 'ở xa quá' hay 'lâu rồi không gặp', con đang gọi cùng một khoảng cách bằng hai cái tên, bởi xa và lâu chỉ là hai mặt của một tấm vải mà con đứng ở hai góc để nhìn. Ta đã dệt chúng làm một, nên chẳng có tấm vải nào đủ rộng để tách con khỏi người con thương. Cái ngăn cách duy nhất là việc con chưa quay mặt về phía họ.",
+    "hanh_dong": "Nhắn cho một người bạn ở nơi xa mà nhiều năm rồi con không trò chuyện, chỉ một câu kể con đang ở đâu và đang thấy gì lúc này, rồi để ý xem năm tháng và cây số có còn dày như con tưởng.",
+    "cau_hoi": "Ai là người con vẫn xếp vào ngăn 'xa' hoặc 'lâu rồi', trong khi chỉ cần một cái quay mặt là họ đã ở đây?",
+    "khang_dinh": "Tôi không bị ngăn cách với ai cả, tôi chỉ đang chọn hướng nhìn của mình.",
+    "tu_khoa": [
+      "không gian",
+      "khoảng cách",
+      "kết nối"
+    ],
+    "boi_canh": "moi-quan-he"
+  },
+  {
+    "id": 80,
+    "topic": "thoi-gian",
+    "tieu_de": "Cây Bút Chưa Rời Tay",
+    "thong_diep": "Mỗi giây phút con sống là một cơ hội vàng để linh hồn viết tiếp trang sử vĩ đại của hành trình tiến hóa.",
+    "loi_giang": "Những trang đáng nhớ, con tưởng, chỉ được viết vào dịp lớn: ngày cưới, ngày nhận việc, ngày vượt qua biến cố. Nhưng cây bút của linh hồn chưa từng rời tay con, nó viết cả lúc con đứng đợi đèn đỏ, xếp hàng mua cơm, ngồi cạnh một người lạ trên xe. Những phút con gọi là 'thừa' ấy chính là nơi phần lớn câu chuyện của con được chép xuống.",
+    "hanh_dong": "Lúc chờ thang máy, chờ xe hay đứng xếp hàng hôm nay, con dùng chính khoảng trống ấy để làm một điều nhỏ cho người bên cạnh: giữ cửa, nhường chỗ, hỏi thăm người bán hàng quen một câu thật lòng.",
+    "cau_hoi": "Nếu ai đó đọc lại trang sử con viết hôm nay bằng những phút 'thừa', họ sẽ thấy con là người thế nào với những người quanh mình?",
+    "khang_dinh": "Tôi viết câu chuyện của mình bằng từng phút nhỏ, kể cả phút không ai để ý.",
+    "tu_khoa": [
+      "từng giây phút",
+      "trang sử",
+      "cộng đồng"
+    ],
+    "boi_canh": "cong-dong"
+  }
+]
