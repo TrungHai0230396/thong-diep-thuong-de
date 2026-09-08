@@ -21,28 +21,40 @@ ok('seed khác cho kết quả khác', JSON.stringify(C.shuffle(IDS, 7)) !== JSO
 ok('giữ đủ 100 lá', new Set(C.shuffle(IDS, 7)).size === 100);
 ok('thực sự đảo thứ tự', JSON.stringify(C.shuffle(IDS, 7)) !== JSON.stringify(IDS));
 
-console.log('\n— Lá của ngày: không cần lưu gì —');
-ok('cùng ngày luôn ra cùng lá', C.cardForDate(IDS, '2026-09-08') === C.cardForDate(IDS, '2026-09-08'));
-ok('hai ngày liền kề khác lá', C.cardForDate(IDS, '2026-09-08') !== C.cardForDate(IDS, '2026-09-09'));
-ok('ngày trước mốc vẫn hợp lệ', IDS.includes(C.cardForDate(IDS, '2020-03-15')));
-ok('ngày xa trong tương lai vẫn hợp lệ', IDS.includes(C.cardForDate(IDS, '2099-12-31')));
+const S1 = 123456, S2 = 987654;
+console.log('\n— Lá của ngày, riêng cho từng người —');
+ok('cùng người cùng ngày luôn ra cùng lá', C.cardFor(IDS, '2026-09-08', S1) === C.cardFor(IDS, '2026-09-08', S1));
+ok('hai ngày liền kề khác lá', C.cardFor(IDS, '2026-09-08', S1) !== C.cardFor(IDS, '2026-09-09', S1));
+ok('ngày trước mốc vẫn hợp lệ', IDS.includes(C.cardFor(IDS, '2020-03-15', S1)));
+ok('ngày xa trong tương lai vẫn hợp lệ', IDS.includes(C.cardFor(IDS, '2099-12-31', S1)));
+let khac = 0;
+for (let k = 0; k < 200; k++) if (C.cardFor(IDS, '2026-09-08', k * 7919 + 13) !== C.cardFor(IDS, '2026-09-08', S1)) khac++;
+ok('200 người khác hạt giống: đa số nhận lá khác nhau', khac > 190, `${khac}/200 khác`);
+const spread = new Set(Array.from({ length: 500 }, (_, k) => C.cardFor(IDS, '2026-09-08', C.mulberry32(k)() * 2 ** 31 | 0)));
+ok('500 người trải đều trên nhiều lá', spread.size > 60, `chạm ${spread.size}/100 lá`);
+ok('newSeed sinh giá trị khác nhau', C.newSeed() !== C.newSeed());
 
 console.log('\n— Mỗi vòng 100 ngày đi trọn bộ bài —');
-let allFull = true, worst = 0;
-for (let r = 0; r < 30; r++) {
-  const blk = Array.from({ length: 100 }, (_, i) => C.cardForDate(IDS, C.addDays('2026-01-01', r * 100 + i)));
-  if (new Set(blk).size !== 100) { allFull = false; worst = r; }
+let allFull = true, worst = '';
+for (const sd of [S1, S2, 0, -991, 2 ** 30]) {
+  for (let r = 0; r < 20; r++) {
+    const blk = Array.from({ length: 100 }, (_, i) => C.cardFor(IDS, C.addDays('2026-01-01', r * 100 + i), sd));
+    if (new Set(blk).size !== 100) { allFull = false; worst = `hạt giống ${sd}, vòng ${r}`; }
+  }
 }
-ok('30 vòng đầu, vòng nào cũng đủ 100 lá khác nhau', allFull, allFull ? '' : `hỏng ở vòng ${worst}`);
+ok('5 hạt giống × 20 vòng: vòng nào cũng đủ 100 lá khác nhau', allFull, worst);
 
 console.log('\n— Không gặp lại lá quá sớm —');
-let d = '2026-01-01', last = {}, minGap = Infinity, when = '';
-for (let k = 0; k < 3000; k++) {
-  const id = C.cardForDate(IDS, d);
-  if (last[id] !== undefined && k - last[id] < minGap) { minGap = k - last[id]; when = d; }
-  last[id] = k; d = C.addDays(d, 1);
+let minGap = Infinity, when = '';
+for (const sd of [S1, S2, 7, -3, 2 ** 29]) {
+  let d = '2026-01-01', last = {};
+  for (let k = 0; k < 3000; k++) {
+    const id = C.cardFor(IDS, d, sd);
+    if (last[id] !== undefined && k - last[id] < minGap) { minGap = k - last[id]; when = `${d}, hạt giống ${sd}`; }
+    last[id] = k; d = C.addDays(d, 1);
+  }
 }
-ok('quét 3000 ngày: khoảng cách trùng lá > 50 ngày', minGap > 50, `nhỏ nhất ${minGap} ngày (${when})`);
+ok('5 hạt giống × 3000 ngày: khoảng cách trùng lá > 50 ngày', minGap > 50, `nhỏ nhất ${minGap} ngày (${when})`);
 
 console.log('\n— Dữ liệu —');
 ok('đúng 100 lá', cards.length === 100);

@@ -30,39 +30,46 @@ const shuffle = (arr, seed) => {
   return a;
 };
 
-const SEED = 0x54444344;  // hạt giống cố định của bộ bài
+const BASE = 0x54444344;  // hằng số trộn, không phải bí mật
 
 /**
- * Bộ bài của vòng thứ `round` (mỗi vòng 100 ngày).
+ * Bộ bài của vòng thứ `round` cho một hạt giống riêng.
  * Mỗi vòng là một hoán vị đủ 100 lá, và được sắp lại sao cho nửa cuối của vòng trước
  * luôn rơi vào nửa sau của vòng này. Nhờ vậy hai lần gặp cùng một lá cách nhau ít nhất 51 ngày,
- * không bao giờ có chuyện nhận trùng thông điệp hai hôm liền lúc giao vòng.
+ * không bao giờ trùng thông điệp hai hôm liền lúc giao vòng.
  */
-const _deckCache = new Map();
-const deckOf = (ids, round) => {
-  const n = ids.length, key = round + 'x' + n;
-  if (_deckCache.has(key)) return _deckCache.get(key);
-  let deck = shuffle(ids, (SEED + round * 7919) | 0);
+const _cache = new Map();
+const deckOf = (ids, round, seed) => {
+  const n = ids.length, key = seed + '|' + round + '|' + n;
+  if (_cache.has(key)) return _cache.get(key);
+  let deck = shuffle(ids, (BASE + (seed | 0) * 2654435761 + round * 7919) | 0);
   if (round > 0) {
     const half = Math.floor(n / 2);
-    const tail = new Set(deckOf(ids, round - 1).slice(half));   // nửa cuối vòng trước
+    const tail = new Set(deckOf(ids, round - 1, seed).slice(half));   // nửa cuối vòng trước
     deck = [...deck.filter(x => !tail.has(x)), ...deck.filter(x => tail.has(x))];
   }
-  _deckCache.set(key, deck);
+  _cache.set(key, deck);
   return deck;
 };
 
 /**
- * Lá của một ngày — suy ra hoàn toàn từ ngày đó.
- * Không lưu gì cả: đóng app, xoá dữ liệu trình duyệt hay đổi máy vẫn ra cùng một lá trong cùng ngày.
- * Mỗi vòng 100 ngày đi hết trọn bộ 100 thông điệp, không lá nào lặp lại trong vòng đó.
+ * Lá của một ngày, cho một người.
+ * `seed` là hạt giống riêng của từng máy, nên hai người mở cùng ngày nhận hai thông điệp khác nhau.
+ * Cùng một người trong cùng một ngày thì luôn ra cùng một lá, dù tải lại trang hay đóng mở app.
+ * Mỗi vòng 100 ngày đi trọn bộ 100 thông điệp, không lá nào lặp lại trong vòng đó.
  */
-const cardForDate = (ids, dateStr) => {
+const cardFor = (ids, dateStr, seed) => {
   const n = ids.length, i = dayIndex(dateStr);
-  const round = Math.floor(i / n);
-  return deckOf(ids, round)[((i % n) + n) % n];
+  return deckOf(ids, Math.floor(i / n), seed)[((i % n) + n) % n];
 };
 
-const API = { ymd, addDays, dayIndex, mulberry32, shuffle, deckOf, cardForDate };
+/** Sinh hạt giống mới, ngẫu nhiên thật. */
+const newSeed = () => {
+  const c = (typeof crypto !== 'undefined' && crypto.getRandomValues) ? crypto : null;
+  if (c) { const a = new Uint32Array(1); c.getRandomValues(a); return a[0] | 0; }
+  return (Math.random() * 2 ** 32) | 0;
+};
+
+const API = { ymd, addDays, dayIndex, mulberry32, shuffle, deckOf, cardFor, newSeed };
 if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.TDTD = API;
 })(typeof self !== 'undefined' ? self : this);

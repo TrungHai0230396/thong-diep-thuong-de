@@ -2,7 +2,8 @@
 (() => {
 'use strict';
 
-const { ymd, cardForDate } = self.TDTD;
+const { ymd, cardFor, newSeed } = self.TDTD;
+const SEED_KEY = 'tdtd.seed';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -11,7 +12,22 @@ const THU = ['Chủ nhật', 'Thứ hai', 'Thứ ba', 'Thứ tư', 'Thứ năm',
 const prettyDate = (s) => { const [y, m, d] = s.split('-').map(Number); const t = new Date(y, m - 1, d);
   return `${THU[t.getDay()]}, ngày ${d} tháng ${m} năm ${y}`; };
 
-let CARDS = [], IDS = [], today = null, revealed = false;   // toàn bộ trạng thái, chỉ trong bộ nhớ
+let CARDS = [], IDS = [], today = null, revealed = false, seed = 0;
+
+/* Thứ duy nhất được ghi xuống máy: một con số làm hạt giống, để mỗi người có bộ bài riêng.
+   Không có lịch sử, không có lá đã rút, không có gì tích lũy theo thời gian.
+   Nếu trình duyệt chặn lưu trữ (chế độ ẩn danh chẳng hạn), hạt giống chỉ sống trong phiên này. */
+function getSeed() {
+  try {
+    const saved = localStorage.getItem(SEED_KEY);
+    if (saved !== null && /^-?\d+$/.test(saved)) return parseInt(saved, 10);
+    const fresh = newSeed();
+    localStorage.setItem(SEED_KEY, String(fresh));
+    return fresh;
+  } catch (e) {
+    return newSeed();
+  }
+}
 
 /* Xem thử một ngày khác: thêm ?ngay=2026-12-25 vào URL. Chỉ để kiểm tra, không đổi cách app chạy thật. */
 const previewDate = () => {
@@ -24,7 +40,7 @@ const previewDate = () => {
 const PREVIEW = previewDate();
 const nowDate = () => PREVIEW || ymd();
 
-const cardOfToday = () => CARDS.find(c => c.id === cardForDate(IDS, today));
+const cardOfToday = () => CARDS.find(c => c.id === cardFor(IDS, today, seed));
 
 let toastT;
 const toast = (msg) => { const el = $('#toast'); el.textContent = msg; el.hidden = false;
@@ -84,8 +100,15 @@ function about() {
   openSheet('Giới thiệu', `
     <p>Mỗi ngày, một thông điệp. Mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
     <p>Ứng dụng không lưu lại bất cứ điều gì: không lịch sử, không bộ sưu tập, không tài khoản. Đóng lại là thông điệp đi qua. Ngày mai sẽ có lá khác.</p>
-    <p>Bộ bài gồm ${CARDS.length} thông điệp. Lá của mỗi ngày do chính ngày hôm đó quyết định, nên ai mở cùng ngày cũng nhận cùng một thông điệp. Đi hết ${CARDS.length} ngày mới trọn một vòng.</p>
-    <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>`);
+    <p>Bộ bài gồm ${CARDS.length} thông điệp và được xáo riêng cho từng người, nên hai người mở cùng một ngày vẫn nhận hai thông điệp khác nhau. Đi hết ${CARDS.length} ngày mới trọn một vòng, trong vòng đó không thông điệp nào lặp lại.</p>
+    <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>
+    <button class="ghost" id="btn-reshuffle" style="margin-top:4px">Xáo lại bộ bài của tôi</button>`);
+  $('#btn-reshuffle').onclick = () => {
+    if (!confirm('Xáo lại bộ bài? Thông điệp hôm nay sẽ đổi sang lá khác.')) return;
+    seed = newSeed();
+    try { localStorage.setItem(SEED_KEY, String(seed)); } catch (e) {}
+    revealed = false; closeSheet(); render(); toast('Đã xáo lại bộ bài');
+  };
 }
 
 function stars() {
@@ -112,6 +135,7 @@ async function init() {
     return;
   }
   IDS = CARDS.map(c => c.id);
+  seed = getSeed();
   stars(); render();
 
   $('#card').onclick = reveal;
