@@ -1,0 +1,297 @@
+[
+  {
+    "slug": "nhat-the",
+    "ten": "Nhất Thể",
+    "ten_goc": "Nhất Thể",
+    "card_ids": [
+      1,
+      4,
+      6,
+      7,
+      10,
+      12,
+      14,
+      16,
+      17,
+      18
+    ],
+    "template_loi_giang": [
+      "Thông điệp này từ Quyển 1 chạm đến cốt tủy của Chân lý tối hậu: Sự chia rẽ chỉ là một ảo ảnh vật lý. Trong thế giới thực tại siêu hình, không có ranh giới giữa Ta (Thượng đế) và con, hay giữa con và vạn vật. Khi con hiểu rằng '{MSG}', con nhận ra mọi hành động con gieo cho thế giới đều dội ngược lại chính mình, bởi vì tất cả chúng ta đều là các tế bào trên một cơ thể thiêng liêng duy nhất.",
+      "Thông điệp này từ Quyển 10 chạm đến cốt tủy của Chân lý tối hậu: Sự chia rẽ chỉ là một ảo ảnh vật lý. Trong thế giới thực tại siêu hình, không có ranh giới giữa Ta (Thượng đế) và con, hay giữa con và vạn vật. Khi con hiểu rằng '{MSG}', con nhận ra mọi hành động con gieo cho thế giới đều dội ngược lại chính mình, bởi vì tất cả chúng ta đều là các tế bào trên một cơ thể thiêng liêng duy nhất.",
+      "Thông điệp này từ Quyển 2 chạm đến cốt tủy của Chân lý tối hậu: Sự chia rẽ chỉ là một ảo ảnh vật lý. Trong thế giới thực tại siêu hình, không có ranh giới giữa Ta (Thượng đế) và con, hay giữa con và vạn vật. Khi con hiểu rằng '{MSG}', con nhận ra mọi hành động con gieo cho thế giới đều dội ngược lại chính mình, bởi vì tất cả chúng ta đều là các tế bào trên một cơ thể thiêng liêng duy nhất.",
+      "Thông điệp này từ Quyển 3 chạm đến cốt tủy của Chân lý tối hậu: Sự chia rẽ chỉ là một ảo ảnh vật lý. Trong thế giới thực tại siêu hình, không có ranh giới giữa Ta (Thượng đế) và con, hay giữa con và vạn vật. Khi con hiểu rằng '{MSG}', con nhận ra mọi hành động con gieo cho thế giới đều dội ngược lại chính mình, bởi vì tất cả chúng ta đều là các tế bào trên một cơ thể thiêng liêng duy nhất."
+    ],
+    "template_hanh_dong": [
+      "Khi con thấy mệt mỏi hay mất ngủ, hãy thả lỏng và ngưng gồng gánh thế giới một mình. Hãy nhận thức rằng con đang kết nối với dòng sinh lực vũ trụ. Lời nhắc '{MSG}' là để con hiểu rằng sự an yên của con cũng là sự an yên của vũ trụ. Hãy ôm lấy chính mình và gửi tình yêu đến vạn vật để xoa dịu tâm trí lo âu."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Nhất Thể' (Oneness Gauge): Thiết lập một thanh liên kết năng lượng giữa người chơi và môi trường/NPC. Khi người chơi gây sát thương hoặc giúp đỡ kẻ khác, một lượng hiệu ứng (heal hoặc tổn thương) tương ứng sẽ dội ngược lại bản thân. Lựa chọn hội thoại thể hiện tinh thần '{MSG}' sẽ mở khóa dòng năng lượng cộng hưởng, hồi sinh khí lực (HP/MP) cho cả đội mà không cần dùng vật phẩm."
+    ]
+  },
+  {
+    "slug": "ban-chat-thuong-de",
+    "ten": "Bản Chất Thượng Đế",
+    "ten_goc": "Bản Chất Thượng Đế",
+    "card_ids": [
+      2,
+      3,
+      8,
+      11,
+      13,
+      15,
+      19
+    ],
+    "template_loi_giang": [
+      "Thượng đế trong đối thoại không phải là đấng phán xét râu trắng đứng trên cao để cân đo tội lỗi, mà chính là Nguồn năng lượng Tình yêu vô điều kiện bao trùm vạn vật. Lời khẳng định '{MSG}' làm sụp đổ hoàn toàn mọi tín điều tôn giáo sợ hãi truyền thống. Ta đồng hành, trải nghiệm và tự nhận biết mình qua từng niềm vui, nỗi buồn và cả những sai lầm của con."
+    ],
+    "template_hanh_dong": [
+      "Đừng tự trách phạt bản thân khi con cảm thấy trì trệ hay không ngủ được. Thượng đế yêu thương con vô điều kiện ngay cả khi con cảm thấy mình 'bất toàn' nhất. Hãy nhắm mắt lại, cảm nhận thông điệp '{MSG}' như một cái ôm ấm áp và buông bỏ mọi gánh nặng phán xét để chìm vào giấc ngủ an lành."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Hội thoại Thượng đế' (Divine Conversation): Khi người chơi gặp các thần linh hoặc đền thờ, thay vì nhận nhiệm vụ diệt quái thông thường, họ sẽ đối thoại dựa trên câu nói '{MSG}'. Lựa chọn tin tưởng vào bản tính bao dung sẽ xóa bỏ hoàn toàn các debuff (nguyền rủa, lo âu) của nhân vật và ban cho họ nội tại 'Tự do Ý chí' (miễn nhiễm khống chế)."
+    ]
+  },
+  {
+    "slug": "su-that-toi-hau",
+    "ten": "Sự Thật Tối Hậu",
+    "ten_goc": "Sự Thật Tối Hậu",
+    "card_ids": [
+      5,
+      9,
+      20
+    ],
+    "template_loi_giang": [
+      "Đây là những mệnh đề giải phóng linh hồn khỏi các xiềng xích luân lý do con người tự đặt ra. Siêu hình học chỉ ra rằng linh hồn con hoàn toàn tự do và không chịu sự ràng buộc của bất kỳ hình phạt nào. Ý nghĩa sâu xa của '{MSG}' là để con nhận ra tính tự trị tuyệt đối của linh hồn, tự do sáng tạo cuộc đời mà không bị đè nặng bởi cảm giác tội lỗi hay nghĩa vụ."
+    ],
+    "template_hanh_dong": [
+      "Nếu anh Kiên đang mệt mỏi, hãy cho phép mình được 'không làm gì cả'. Với thông điệp '{MSG}', hãy rũ bỏ áp lực phải hoàn hảo, phải thành công, hay thậm chí là áp lực phải ngủ ngay lập tức. Chấp nhận trạng thái hiện tại chính là chìa khóa để cơ thể tự cân bằng và hồi phục năng lượng."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Zero Obligation' (Vô Bộ): Trò chơi loại bỏ thanh đo 'Nhiệm vụ bắt buộc'. Người chơi có thể hoàn thành game bằng cách chọn 'Không làm gì' hoặc tự do dạo chơi. Khi đối mặt với thử thách, việc chọn tinh thần '{MSG}' giúp nhân vật mở khóa một kết cục ẩn siêu thoát (Pacifist/Ascension Ending) mà không cần chiến đấu."
+    ]
+  },
+  {
+    "slug": "sang-tao",
+    "ten": "Sáng Tạo",
+    "ten_goc": "Sáng Tạo",
+    "card_ids": [
+      21,
+      23,
+      25,
+      27,
+      30,
+      32,
+      34,
+      36,
+      38,
+      40
+    ],
+    "template_loi_giang": [
+      "Cuộc sống không phải là một phòng thi hay trường học để tích điểm, mà là một xưởng thiết kế vĩ đại. Mỗi linh hồn đi vào thế giới vật chất tương đối là để chuyển hóa các ý niệm cao cả nhất thành kinh nghiệm thực tế. Khi con thấu hiểu '{MSG}', con chuyển từ trạng thái bị động chịu trận sang chủ động thiết kế lại cuộc đời mình qua suy nghĩ, lời nói và hành động."
+    ],
+    "template_hanh_dong": [
+      "Đừng đóng vai nạn nhân của hoàn cảnh mệt mỏi hay áp lực kinh tế. Hãy dùng quyền năng sáng tạo của con. Nếu '{MSG}', hãy bắt đầu ngày mới bằng việc định hình lại suy nghĩ: 'Tôi chọn sự khỏe mạnh và vui vẻ'. Ý thức mới này sẽ điều chỉnh các phản ứng sinh hóa trong cơ thể con, giúp giải phóng năng lượng trì trệ."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Tam Hợp Kiến Tạo' (Trinity Crafting System): Người chơi thu thập và kết hợp 3 loại tài nguyên năng lượng: Suy nghĩ (Tư duy), Lời nói (Phát ngôn), và Hành động để tự tạo ra (craft) các kỹ năng độc bản. Nhiệm vụ trong game yêu cầu người chơi hiện thực hóa thông điệp '{MSG}' bằng cách đồng bộ cả 3 yếu tố này để giải các câu đố môi trường."
+    ]
+  },
+  {
+    "slug": "suc-manh-y-thuc",
+    "ten": "Sức Mạnh Ý Thức",
+    "ten_goc": "Sức Mạnh Ý Thức",
+    "card_ids": [
+      22,
+      24,
+      26,
+      28,
+      29,
+      31,
+      33,
+      35,
+      37,
+      39
+    ],
+    "template_loi_giang": [
+      "Ý thức là kiến trúc sư trưởng của thực tại vật lý. Thế giới bên ngoài chỉ là chiếc màn chiếu phản ánh những gì con đang giữ kín trong tâm trí. Bản chất siêu hình của việc '{MSG}' là quy luật cộng hưởng năng lượng: những gì con tập trung vào hoặc kháng cự mạnh mẽ nhất sẽ được vũ trụ 'nhân bản' và kéo về phía con nhiều hơn."
+    ],
+    "template_hanh_dong": [
+      "Khi mất ngủ, càng bực bội và tìm cách 'chống cự' cơn mất ngủ, con càng kích hoạt hệ thần kinh tỉnh táo. Hãy ứng dụng nguyên lý '{MSG}': chấp nhận việc mình đang thức một cách thản nhiên, hướng tâm trí vào sự biết ơn chiếc giường êm ái. Sự kháng cự biến mất, cơ thể sẽ tự động chìm vào giấc ngủ."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Tập trung & Kháng cự' (Focus & Resonance System): Bản đồ game sẽ tự động sinh quái vật hoặc bẫy rập dựa trên những thuộc tính mà người chơi liên tục lo sợ hoặc tấn công (kháng cự). Để vượt qua màn chơi theo tinh thần '{MSG}', người chơi phải sử dụng kỹ năng 'Chấp nhận' hoặc 'Hòa giải', khiến quái vật tự động chuyển hóa thành năng lượng lành."
+    ]
+  },
+  {
+    "slug": "tinh-yeu-va-so-hai",
+    "ten": "Tình Yêu và Sợ Hãi",
+    "ten_goc": "Tình Yêu và Sợ Hãi",
+    "card_ids": [
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60
+    ],
+    "template_loi_giang": [
+      "Trong vũ trụ nhị nguyên tương đối, chỉ có hai nguồn năng lượng gốc rễ vận hành mọi hành vi của con người: Tình yêu (năng lượng mở rộng, chữa lành) và Sợ hãi (năng lượng co rút, tự vệ). Khi Thượng đế nhắc nhở '{MSG}', Ngài muốn con thấu suốt rằng mọi hành vi tiêu cực của người khác thực chất là tiếng kêu cứu của nỗi sợ, và chỉ có Tình yêu thương vô điều kiện mới có thể chuyển hóa được nó."
+    ],
+    "template_hanh_dong": [
+      "Khi những cơn hoảng sợ, lo âu giật mình gõ cửa lúc nửa đêm, hãy ôm lấy nỗi sợ đó thay vì trốn chạy. Hãy tự hỏi theo thông điệp '{MSG}': 'Lúc này, Tình yêu tự thân sẽ làm gì?'. Hãy hít thở sâu, gửi tình thương đến cơ thể đang mệt mỏi của con. Khi tình yêu lên tiếng, bóng tối của sợ hãi sẽ tự khắc tan biến."
+    ],
+    "template_co_che_game": [
+      "Hệ thống lựa chọn 'Love/Fear Gauge' (Thay thế Karma): Người chơi đối mặt với các NPC hung dữ. Nếu chọn phản ứng Sợ hãi (tấn công phòng thủ, tích trữ tài nguyên), chỉ số phòng thủ cá nhân tăng nhưng NPC sẽ thù ghét. Nếu chọn phản ứng Tình yêu theo tinh thần '{MSG}' (chia sẻ, thấu cảm), người chơi sẽ mở khóa mạch truyện ẩn và có thêm đồng đội mạnh mẽ."
+    ]
+  },
+  {
+    "slug": "su-song-va-cai-chet",
+    "ten": "Sự Sống và Cái Chết",
+    "ten_goc": "Sự Sống và Cái Chết",
+    "card_ids": [
+      61,
+      63,
+      65,
+      67,
+      68,
+      70,
+      71,
+      72,
+      74,
+      75,
+      77,
+      78,
+      79
+    ],
+    "template_loi_giang": [
+      "Cái chết chỉ là một ảo ảnh vật lý, một bước chuyển giao tần số năng lượng từ thể thô đặc sang thể tinh khiết. Linh hồn là bất tử, chưa từng bắt đầu và không bao giờ kết thúc. Thông điệp '{MSG}' giải phóng con khỏi nỗi sợ lớn nhất của loài người, khẳng định rằng mọi sự ra đi đều là lựa chọn tự nguyện của linh hồn ở cấp độ siêu hình để tiếp tục tiến hóa ở cõi giới cao hơn."
+    ],
+    "template_hanh_dong": [
+      "Khi con sợ hãi thất bại hay lo âu về sức khỏe, hãy nhớ rằng con là một linh hồn vĩ đại đang dạo chơi dưới hình hài con người. Lớp vỏ bọc này có thể mệt mỏi, nhưng linh hồn con luôn tràn đầy sinh lực. Ghi nhớ '{MSG}' để chơi trò chơi cuộc đời một cách nhẹ nhàng, thản nhiên, không bị đè nặng bởi ảo ảnh mất mát."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Chất Vấn Linh Thiêng' (Divine Inquiry / No Game Over): Khi nhân vật cạn HP, trò chơi không kết thúc. Linh hồn người chơi bước vào không gian siêu thực để đối thoại với Thượng đế theo câu nói '{MSG}'. Người chơi có quyền tự quyết định: Quay lại cơ thể vật lý với một nội tại mới (Hồi sinh) hoặc chuyển sinh sang một dòng thời gian khác."
+    ]
+  },
+  {
+    "slug": "thoi-gian",
+    "ten": "Thời Gian",
+    "ten_goc": "Thời Gian",
+    "card_ids": [
+      62,
+      64,
+      66,
+      69,
+      73,
+      76,
+      80
+    ],
+    "template_loi_giang": [
+      "Thời gian tuyến tính chỉ là một công cụ đo lường chuyển động của trí óc trong thế giới tương đối. Trong thực tại tối hậu của Thượng đế, tất cả mọi sự đều diễn ra trong một khoảnh khắc vĩnh cửu duy nhất (The Eternal Now). Khi con hiểu rằng '{MSG}', con nắm giữ quyền năng thay đổi tương lai và chữa lành quá khứ bằng cách thay đổi tần số năng lượng ngay trong giây phút hiện tại."
+    ],
+    "template_hanh_dong": [
+      "Đừng đếm giờ lo lắng khi thức giấc lúc nửa đêm ('mình chỉ còn 3 tiếng để ngủ'). Áp lực thời gian đó chỉ là ảo ảnh. Hãy áp dụng '{MSG}': neo mình vào khoảnh khắc 'Bây giờ' tĩnh lặng. Thả lỏng cơ thể, cảm nhận sự an yên ngay lúc này mà không lo nghĩ về ngày mai. Giấc ngủ sẽ tự khắc đến khi con giải phóng ảo ảnh thời gian."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Ma Trận Hiện Tại' (The Now Matrix): Thiết lập một phím bấm đặc biệt cho phép người chơi làm ngưng đọng thời gian. Trong trạng thái này, người chơi có thể nhìn thấy tất cả các nhánh kịch bản tương lai (CD-ROM branches) và bẻ lái đầu đọc laser của ý thức để nhảy sang dòng dữ liệu mong muốn, hiện thực hóa thông điệp '{MSG}'."
+    ]
+  },
+  {
+    "slug": "tien-hoa",
+    "ten": "Tiến Hóa",
+    "ten_goc": "Tiến Hóa",
+    "card_ids": [
+      81,
+      84,
+      86,
+      89,
+      93,
+      96,
+      99
+    ],
+    "template_loi_giang": [
+      "Tiến hóa không phải là cuộc đua để đạt tới một cái đích xa xôi, mà là hành trình 'Hồi tưởng' (Re-membering) lại bản tính thiêng liêng vốn có của linh hồn. Năm thái độ của Thượng đế tính (Vui vẻ, Yêu thương, Chấp nhận, Ban phước, Biết ơn) chính là những công cụ mạnh mẽ nhất. Khi con thực hành '{MSG}', con đang nâng tần số rung động của mình để tiệm cận với Nguồn sáng tối cao."
+    ],
+    "template_hanh_dong": [
+      "Khi cơ thể mệt mỏi, hãy thực hành 'Ban phước và Chấp nhận' trạng thái này. Đừng bực bội với sự uể oải của bản thân. Hãy tự nói theo tinh thần '{MSG}': 'Tôi chấp nhận và biết ơn cơ thể đã đồng hành cùng tôi'. Sự hòa giải nội tâm này sẽ lập tức khơi thông dòng năng lượng chữa lành tự thân bên trong con."
+    ],
+    "template_co_che_game": [
+      "Chỉ số 'Evolution Index' (Chỉ số Tiến hóa - thay thế cho Level): Nhân vật không tăng cấp bằng cách giết quái tích XP. Level tâm thức tăng lên khi người chơi thực hiện các hành động Chấp nhận, Ban phước cho môi trường hoặc ban tặng lòng biết ơn cho NPC theo câu nói '{MSG}'. Chỉ số này mở khóa các kỹ năng tương tác hòa bình và các vùng đất thần tiên ẩn."
+    ]
+  },
+  {
+    "slug": "sinh-menh-tien-hoa-cao",
+    "ten": "Sinh Mệnh Tiến Hóa Cao",
+    "ten_goc": "Sinh Mệnh Tiến Hóa Cao",
+    "card_ids": [
+      82,
+      85,
+      90,
+      92,
+      98
+    ],
+    "template_loi_giang": [
+      "Các Sinh mệnh Tiến hóa Cao (HEBs) là hình mẫu tương lai của nhân loại. Họ sống hòa hợp tuyệt đối, từ bỏ quyền tư hữu, triệt tiêu hoàn toàn bạo lực và bảo vệ môi trường hoàn hảo. Thông điệp '{MSG}' mô tả lối sống tỉnh thức khi một giống loài đã vượt qua được ảo tưởng chia rẽ, chuyển dịch từ cạnh tranh ích kỷ sang cộng tác yêu thương để cùng chăm nom Trái Đất."
+    ],
+    "template_hanh_dong": [
+      "Hãy học cách sống tối giản và bớt lo lắng về việc tích trữ hay sở hữu. Khi con lo sợ thiếu thốn, con đang nuôi dưỡng năng lượng sợ hãi. Hãy hướng tư duy theo lối sống HEB qua câu '{MSG}': tin tưởng vào sự đủ đầy của vũ trụ, sẵn sàng sẻ chia và bảo vệ không gian sống trong lành xung quanh mình."
+    ],
+    "template_co_che_game": [
+      "Mở khóa 'HEB Realm' (Cõi giới Tiến hóa): Một bản đồ thế giới mở đặc biệt nơi người chơi không được phép mang theo vũ khí. Mọi thử thách tại đây yêu cầu người chơi ứng dụng nguyên lý '{MSG}' — giải quyết xung đột bằng đối thoại, chia sẻ năng lượng phục hồi hệ sinh thái và cộng tác với các sinh mệnh vũ trụ để vượt qua các thảm họa tự nhiên."
+    ]
+  },
+  {
+    "slug": "loi-moi-goi-thu-ba",
+    "ten": "Lời Mời Gọi Thứ Ba",
+    "ten_goc": "Lời Mời Gọi thứ 3",
+    "card_ids": [
+      83,
+      88,
+      95
+    ],
+    "template_loi_giang": [
+      "Đây là lời mời gọi khẩn thiết từ Thượng đế dành cho những linh hồn đã sẵn sàng thức tỉnh. Con được gọi để trở thành sứ giả của sự thật, không phải bằng cách giáo điều, mà bằng việc mô hình hóa lối sống tỉnh thức trong đời thường. Bản chất của việc '{MSG}' là quy luật cộng hưởng: khi con thắp sáng ngọn đuốc của chính mình, con sẽ tự động soi đường cho những người xung quanh."
+    ],
+    "template_hanh_dong": [
+      "Khi con cảm thấy mệt mỏi, hãy chuyển sự tập trung ra ngoài bằng cách giúp đỡ hoặc gửi một lời chúc lành thầm lặng cho ai đó. Theo thông điệp '{MSG}', khi con trở thành nguồn năng lượng nâng đỡ người khác, dòng chảy yêu thương đi qua con sẽ tự động sạc đầy lại năng lượng cho chính cơ thể và tâm hồn con."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Awakening Aura' (Hào quang Thức tỉnh): Khi người chơi thực hiện các lựa chọn hội thoại chân thành và dũng cảm theo câu nói '{MSG}', họ phát ra một vầng hào quang làm xoa dịu các quái vật hoặc NPC đang bị 'lo âu khống chế'. Nhiệm vụ yêu cầu người chơi giải cứu một ngôi làng bằng cách đánh thức ý thức của dân làng thay vì tiêu diệt họ."
+    ]
+  },
+  {
+    "slug": "tro-choi-vu-tru",
+    "ten": "Trò Chơi Vũ Trụ",
+    "ten_goc": "Trò Chơi Vũ Trụ",
+    "card_ids": [
+      87,
+      91,
+      94,
+      97,
+      100
+    ],
+    "template_loi_giang": [
+      "Vũ trụ là một sân chơi vĩ đại do Thượng đế tự phân rã để trải nghiệm sự huy hoàng của mình. Bánh Xe Vũ Trụ liên tục vận hành đưa linh hồn từ cõi Tuyệt đối sang thế giới Tương đối vật lý qua bức màn quên lãng, để rồi trải nghiệm niềm vui vỡ òa của sự Hồi tưởng. Khi con nhận ra '{MSG}', con hiểu rằng mọi thử thách, cay đắng, ngọt bùi chỉ là những chất liệu của trò chơi vĩ đại này."
+    ],
+    "template_hanh_dong": [
+      "Hãy nhìn nhận các khó khăn cơm áo gạo tiền hay những uể oải thể xác như một màn chơi thử thách trong game cuộc đời. Ghi nhớ câu '{MSG}' để mỉm cười vượt qua. Khi con bớt nghiêm trọng hóa vấn đề và coi nó là một trò chơi, tâm trí con sẽ lập tức được giải phóng khỏi áp lực căng thẳng, giúp con thư thái và dễ ngủ hơn."
+    ],
+    "template_co_che_game": [
+      "Cơ chế 'Cosmic Loop / New Game+' (Vòng lặp Vũ trụ): Khi hoàn thành game, thay vì kết thúc thông thường, người chơi đạt đến trạng thái Hiệp nhất theo câu nói '{MSG}' và được đưa vào chế độ New Game+. Họ sẽ bắt đầu lại với một 'Bức màn quên' mới nhưng giữ nguyên các chỉ số ngộ tính siêu hình, cho phép trải nghiệm game ở một góc nhìn hoàn toàn mới."
+    ]
+  }
+]
