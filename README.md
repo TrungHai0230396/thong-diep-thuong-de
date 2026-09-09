@@ -150,7 +150,11 @@ Không dùng ảnh nào, mọi cảnh sinh bằng thuật toán từ một hạt
 
 Mọi nhánh bị chặn không cho mọc ra ngoài vòng bán kính 1, nếu không tầng nọ đè lên tầng kia. Mỗi cảnh chừa một lỗ tròn ở giữa để cảnh tầng sau chui ra. Khung vẽ tính theo cạnh ngắn của màn hình nên tầng đang xem rộng đúng bằng bề ngang điện thoại, khớp với tên hiện trên đầu.
 
-Vòng lặp liền mạch: mỗi tầng nhỏ hơn tầng ngoài 0,42 lần và xoay thêm `π/9`, và chu kỳ cảnh là 7. Nên khi độ sâu tăng thêm 7, khung hình trùng khít với lúc đầu. Kiểm bằng cách so chuỗi ảnh ở tầng 2,4 với tầng 9,4 và tầng 702,4: giống từng điểm ảnh, còn tầng 3,4 thì khác.
+Vòng lặp liền mạch: mỗi tầng nhỏ hơn tầng ngoài 0,42 lần và xoay thêm `π/9`, và chu kỳ cảnh là 7. Nên khi độ sâu tăng thêm 7, khung hình trùng khít với lúc đầu. Kiểm bằng cách so chuỗi ảnh ở tầng 2,4 với tầng 9,4 và tầng 709,4: giống từng điểm ảnh, còn tầng 3,4 thì khác.
+
+Một chỗ dễ sai: độ sâu tương đối của một vòng phải là `i - le` chứ không phải `i + le`. Sai dấu ở đây thì hình co lại trong khi số tầng tăng lên, tức là phóng ngược chiều, và nhãn tên cảnh chạy lệch hẳn với thứ đang nhìn thấy. Kiểm bằng cách đo bán kính một cảnh khi độ sâu tăng: phải to dần, ví dụ cảnh mạch máu đi từ 76 lên 180 pixel khi độ sâu từ 1 tới 2.
+
+Số tầng và tên cảnh lấy theo `Math.round` chứ không phải `Math.floor`, để nhãn đổi đúng lúc hai cảnh giao nhau ở giữa.
 
 Ý tưởng lấy từ Zoomquilt, bức tranh phóng vô tận do Nikolaus Baumgarten và mười bốn hoạ sĩ vẽ năm 2004. Chi tiết mạng vũ trụ giống mạng nơ-ron không phải bịa: năm 2020 Vazza và Feletti công bố trên *Frontiers of Physics* một nghiên cứu đo và so hai mạng này, thấy chúng cùng mức phức tạp dù chênh nhau 27 bậc độ lớn.
 

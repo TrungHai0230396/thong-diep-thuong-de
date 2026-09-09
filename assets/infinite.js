@@ -9,7 +9,7 @@
 'use strict';
 
 const K = 0.42, GOC = Math.PI / 9;
-const TREN = 1, DUOI = 5;
+const NGOAI_CUNG = -2, TRONG_CUNG = 6;   // khoảng các vòng được vẽ, tính theo độ sâu tương đối
 const TRONG = 0.30;              // chừa lỗ giữa cho cảnh tầng sau chui ra
 
 const CANH = [
@@ -393,20 +393,23 @@ function buoc(t) {
   ctx.globalAlpha = 1;
 
   const le = sau - Math.floor(sau), goc = Math.floor(sau);
-  const R0 = Math.min(W, H) * .48;    // tầng số 0 rộng đúng bằng bề ngang màn hình, khớp với tên hiện trên đầu
+  const R0 = Math.min(W, H) * .48;    // vòng ở độ sâu 0 rộng đúng bằng bề ngang màn hình
   ctx.save();
   ctx.translate(W / 2, H / 2);
-  for (let i = -TREN; i <= DUOI; i++) {
-    const b = i + le;
+  /* Độ sâu tương đối của một vòng là (i - le), KHÔNG phải (i + le).
+     Sai dấu ở đây làm hình co lại trong khi số tầng tăng lên, tức là phóng ngược chiều. */
+  for (let i = NGOAI_CUNG; i <= TRONG_CUNG; i++) {
+    const b = i - le;
     const R = R0 * Math.pow(K, b);
     let mo = 1;
-    if (b < 0) mo = Math.max(0, 1 + b / TREN) * .5;
-    else if (b > DUOI - 1.8) mo = Math.max(0, (DUOI - b) / 1.8);
+    if (b < -.6) mo = Math.max(0, (b + 1.4) / .8) * .55;      // vòng ngoài phình to rồi tan dần
+    else if (b < 0) mo = .55 + (1 + b / .6) * .45;            // đang lớn lên thì rõ dần
+    else if (b > 3.4) mo = Math.max(0, (4.4 - b));            // vòng trong nhỏ quá thì mờ đi
     veTang(R, GOC * b, mo, ((goc + i) % N + N) % N);
   }
   ctx.restore();
 
-  const n = Math.floor(sau);
+  const n = Math.round(sau);   // vòng đang nhìn rõ nhất là vòng gần độ sâu 0
   tam.querySelector('.bt-so').textContent = n;
   if (n !== tangTruoc) {
     tangTruoc = n;
@@ -454,5 +457,5 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classLis
 self.TDTD_BUCTRANH = { mo, dong, _buoc: (t) => buoc(t), _canh: CANH,
   _dat: (s, v) => { sau = s; if (v !== undefined) toc = v; },
   _anh: () => cv.toDataURL('image/jpeg', .6),
-  _debug: () => ({ sau: +sau.toFixed(3), tang: Math.floor(sau), canh: CANH[((Math.floor(sau) % N) + N) % N].ten, toc, N }) };
+  _debug: () => ({ sau: +sau.toFixed(3), tang: Math.round(sau), canh: CANH[((Math.round(sau) % N) + N) % N].ten, toc, N }) };
 })();
