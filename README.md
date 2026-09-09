@@ -123,11 +123,26 @@ Một lưu ý về độ chính xác: Hội Thiên văn Việt Nam nêu rõ Th�
 
 ### Sao vàng — bức tranh của Thượng Đế
 
-Mã ở `assets/infinite.js`. Một mạn đà la vàng chứa chính nó, phóng vào mãi không hết. Cố ý vẽ thưa và mờ: bản đầu dày quá, nhìn lâu bị nhức mắt. Kéo lên để đi sâu, kéo xuống để lùi ra, con lăn chuột cũng được.
+Mã ở `assets/infinite.js`. Phóng vào mãi không hết, **mỗi tầng một cảnh khác nhau**, tới tầng thứ bảy thì quay về cảnh đầu.
 
-Cách làm cho vòng lặp liền mạch: mỗi tầng nhỏ hơn tầng ngoài đúng một nửa và xoay thêm đúng `π/7`. Khi độ sâu tăng thêm 1, toàn bộ khung hình trùng khít với lúc đầu, nên không có điểm nối và không có đáy. Tôi kiểm bằng cách chụp khung hình ở tầng 3,37, tầng 4,37 và tầng 3003,37 rồi so chuỗi ảnh: giống nhau từng điểm ảnh, trong khi tầng 3,62 thì khác.
+| Tầng | Cảnh |
+|---|---|
+| 0 | mạng vũ trụ |
+| 1 | mạng nơ-ron |
+| 2 | mạch máu |
+| 3 | rễ cây |
+| 4 | sông ngòi |
+| 5 | tia sét |
+| 6 | bông tuyết |
+| 7 | mạng vũ trụ, lặp lại |
 
-Số tầng vẫn đếm lên. Đó là chỗ đắt của trò này: con số cứ tăng mà bức tranh không đổi. Ở vài mốc có một dòng chữ hiện ra, mốc 50 ghi "Vì con không đi vào trong. Con đang đi vòng quanh."
+Bảy cảnh trông rất khác nhau nhưng đều là cùng một cấu trúc phân nhánh, chỉ khác tham số và màu. Đó là toàn bộ nội dung của trò này.
+
+Không dùng ảnh nào. Mỗi cảnh sinh bằng thuật toán từ một hạt giống cố định: cảnh mạng vũ trụ rải nút rồi nối hai nút gần nhất, sáu cảnh còn lại mọc nhánh từ vành trong ra ngoài với xác suất chẻ đôi và độ run khác nhau. Bông tuyết thì vẽ một cánh rồi nhân bản sáu lần cho đối xứng. Mỗi cảnh chừa một lỗ tròn ở giữa để cảnh tầng sau chui ra.
+
+Vòng lặp liền mạch: mỗi tầng nhỏ hơn tầng ngoài 0,42 lần và xoay thêm `π/9`, và chu kỳ cảnh là 7. Nên khi độ sâu tăng thêm 7, khung hình trùng khít với lúc đầu. Kiểm bằng cách so chuỗi ảnh ở tầng 2,4 với tầng 9,4 và tầng 702,4: giống từng điểm ảnh, còn tầng 3,4 thì khác.
+
+Ý tưởng lấy từ Zoomquilt, bức tranh phóng vô tận do Nikolaus Baumgarten và mười bốn hoạ sĩ vẽ năm 2004. Chi tiết mạng vũ trụ giống mạng nơ-ron không phải bịa: năm 2020 Vazza và Feletti công bố trên *Frontiers of Physics* một nghiên cứu đo và so hai mạng này, thấy chúng cùng mức phức tạp dù chênh nhau 27 bậc độ lớn.
 
 ## Chia sẻ ảnh
 
