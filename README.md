@@ -54,7 +54,7 @@ Thêm một ngôi sao mới chỉ cần thêm một dòng vào mảng `SAO` ở 
 
 Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, lá bài lẫn các sao đã đặt (cách nhau tối thiểu 18 px). Hết chỗ thì chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài, nên chữ không bao giờ bị che. Đã thử 24 ngôi sao trên màn 375×812, rải 60 lần: không cặp nào đè nhau, không sao nào đè chữ hay lọt ra ngoài màn hình.
 
-Hiện có năm ngôi sao:
+Hiện có sáu ngôi sao:
 
 ### Sao vàng — số của hôm nay
 
@@ -104,6 +104,16 @@ Nhãn từng nhịp ghi rõ hít bằng mũi hay thở ra bằng miệng, vì m�
 Màn hình có mục **Lưu ý an toàn**: dừng khi chóng mặt, không tập lúc lái xe, các kiểu nín thở không hợp với người mang thai, bệnh hô hấp hoặc huyết áp thấp, và đây không phải cách điều trị y tế.
 
 Nguồn số giây: nghiên cứu của Balban và cộng sự trên *Cell Reports Medicine* năm 2023 cho kiểu thở hai nhịp vào; hướng dẫn 4–7–8 của bác sĩ Andrew Weil; tài liệu về thở cộng hưởng quanh mức 5,5 hơi mỗi phút.
+
+### Sao trắng ngà — nối sao thành chòm
+
+Mã ở `assets/constellation.js`. Trong đám sao lấm tấm có vài ngôi sáng hơn. Kéo từ ngôi này sang ngôi kia để nối. Nối trúng thì đường vàng sáng lên và dính lại, nối trật thì đường tự tan, không báo sai, không đếm giờ, không thua. Nối đủ thì cả chòm bừng sáng, hiện lời giải thích và câu ca dao nếu có.
+
+Bốn nhóm sao theo cách gọi dân gian Việt Nam: **Tua Rua** (còn gọi sao Mạ, cụm Thất Nữ), **Bắc Đẩu** (bảy sao chòm Đại Hùng), **Lưỡi Cày** (ba sao giữa chòm Lạp Hộ) và **Thần Nông**.
+
+Thêm chòm mới chỉ cần thêm một mục vào mảng `CHOM` ở đầu file: toạ độ sao trong khung 0..1 và danh sách các cặp cần nối. Chương trình tự co giãn theo màn hình.
+
+Một lưu ý về độ chính xác: Hội Thiên văn Việt Nam nêu rõ Thần Nông chỉ là **nhóm sao** do người xưa đặt tên, không trùng khớp với chòm Thiên Yết trong thiên văn học hiện đại. App ghi đúng như vậy trong phần chú thích chứ không gọi nhầm là chòm sao.
 
 ## Chia sẻ ảnh
 

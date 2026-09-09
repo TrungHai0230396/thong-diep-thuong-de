@@ -36,6 +36,8 @@ const SAO = [
     mo: () => self.TDTD_HO && self.TDTD_HO.mo() },
   { id: 'sao-tho',  mau: '#b8a8e8', hinh: 'tia',       nhan: 'Hộp thở, thở theo nhịp bốn',
     mo: () => self.TDTD_THO && self.TDTD_THO.mo() },
+  { id: 'sao-chom', mau: '#f2ead0', hinh: 'sao4',      nhan: 'Nối sao thành chòm',
+    mo: () => self.TDTD_CHOMSAO && self.TDTD_CHOMSAO.mo() },
 ];
 
 const SEED_KEY = 'tdtd.seed';   // hạt giống riêng của máy
