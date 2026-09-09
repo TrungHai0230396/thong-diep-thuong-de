@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 
-const { ymd, cardFor, luckyNumbers, luckyDigits, newSeed } = self.TDTD;
+const { ymd, cardFor, newSeed } = self.TDTD;
 /* ─────────────────────────────────────────────────────────────
    BẦU TRỜI SAO
    Mỗi ngôi sao là một trò nhỏ nằm rải trên nền. Thêm sao mới chỉ cần
@@ -27,8 +27,6 @@ const HINH_SAO = {
 };
 
 const SAO = [
-  { id: 'sao-so',   mau: '#e8c37a', hinh: 'sao5',      nhan: 'Số may mắn hôm nay',
-    mo: () => lucky() },
   { id: 'sao-game', mau: '#8fd6c2', hinh: 'lap-lanh',  nhan: 'Chém trái cây, xả stress',
     mo: () => self.TDTD_GAME && self.TDTD_GAME.mo() },
   { id: 'sao-hoadang', mau: '#f0a860', hinh: 'hoa',    nhan: 'Thả đèn hoa đăng, buông điều nặng lòng',
@@ -39,7 +37,7 @@ const SAO = [
     mo: () => self.TDTD_THO && self.TDTD_THO.mo() },
   { id: 'sao-chom', mau: '#f2ead0', hinh: 'sao4',      nhan: 'Nối sao thành chòm',
     mo: () => self.TDTD_CHOMSAO && self.TDTD_CHOMSAO.mo() },
-  { id: 'sao-tranh', mau: '#f0899b', hinh: 'xoay',     nhan: 'Bức tranh của Thượng Đế, phóng vào mãi không hết',
+  { id: 'sao-tranh', mau: '#e8c37a', hinh: 'xoay',     nhan: 'Bức tranh của Thượng Đế, phóng vào mãi không hết',
     mo: () => self.TDTD_BUCTRANH && self.TDTD_BUCTRANH.mo() },
 ];
 
@@ -147,35 +145,6 @@ function fallback(text, done) {
   document.body.appendChild(ta); ta.select();
   try { document.execCommand('copy'); done(); } catch (e) { toast('Không chép được'); }
   document.body.removeChild(ta);
-}
-
-/* Dự đoán số — thuần giải trí. Số sinh ngẫu nhiên từ hạt giống của máy và ngày hôm nay,
-   nên mỗi người một bộ, mỗi ngày một bộ, và bấm lại trong ngày không đổi được. */
-const VE = [
-  { ten: 'Mega 6/45',           loai: 'so',    n: 6, max: 45, salt: 1 },
-  { ten: 'Power 6/55',          loai: 'so',    n: 6, max: 55, salt: 2 },
-  // 5/35: năm số từ 1–35, kèm một số đặc biệt riêng từ 1–12
-  { ten: 'Điện toán 5/35',      loai: 'so',    n: 5, max: 35, salt: 4, db: { max: 12, salt: 5 } },
-  { ten: 'Vé số truyền thống',  loai: 'chuso', len: 6,        salt: 3 },
-];
-
-function lucky() {
-  const bong = (n, lop = '') => `<span class="ball${lop}">${String(n).padStart(2, '0')}</span>`;
-  const khoi = VE.map(v => {
-    let bi = v.loai === 'so'
-      ? luckyNumbers(today, seed, v.n, v.max, v.salt).map(n => bong(n)).join('')
-      : luckyDigits(today, seed, v.len, v.salt).split('').map(d => `<span class="ball">${d}</span>`).join('');
-    if (v.db) {
-      const db = luckyNumbers(today, seed, 1, v.db.max, v.db.salt)[0];
-      bi += `<span class="ngan" aria-hidden="true">+</span>` + bong(db, ' db');
-    }
-    const chu = v.db ? `<div class="ve-ten">${v.ten}<span class="ghi">số cuối là số đặc biệt (1–${v.db.max})</span></div>`
-                     : `<div class="ve-ten">${v.ten}</div>`;
-    return `<div class="ve">${chu}<div class="balls">${bi}</div></div>`;
-  }).join('');
-  openSheet('', `
-    ${khoi}
-    <p class="canh-bao">Đây là số ngẫu nhiên sinh từ ngày hôm nay, không phải dự đoán. Không ai đoán trước được kết quả xổ số. Xin chơi cho vui và trong khả năng của mình.</p>`);
 }
 
 /* Chia sẻ ảnh: vẽ lá thành PNG rồi mở bảng chia sẻ của máy.

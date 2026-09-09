@@ -63,26 +63,6 @@ const cardFor = (ids, dateStr, seed) => {
   return deckOf(ids, Math.floor(i / n), seed)[((i % n) + n) % n];
 };
 
-/**
- * Bộ số may mắn của một ngày, cho một người. Thuần giải trí.
- * Cùng người + cùng ngày + cùng loại vé thì luôn ra cùng bộ số, bấm lại không đổi được.
- * `count` số khác nhau lấy trong khoảng 1..max; `salt` để hai loại vé cho hai bộ số khác nhau.
- */
-const luckyNumbers = (dateStr, seed, count, max, salt) => {
-  const rnd = mulberry32((BASE ^ ((seed | 0) * 2246822519) ^ (dayIndex(dateStr) * 2654435761) ^ (salt * 40503)) | 0);
-  const pool = Array.from({ length: max }, (_, i) => i + 1);
-  for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  return pool.slice(0, count).sort((a, b) => a - b);
-};
-
-/** Dãy `len` chữ số của một ngày, cho một người. Dùng cho kiểu vé số truyền thống. Thuần giải trí. */
-const luckyDigits = (dateStr, seed, len, salt) => {
-  const rnd = mulberry32((BASE ^ ((seed | 0) * 1597334677) ^ (dayIndex(dateStr) * 374761393) ^ (salt * 40503)) | 0);
-  let out = '';
-  for (let i = 0; i < len; i++) out += Math.floor(rnd() * 10);
-  return out;
-};
-
 /** Sinh hạt giống mới, ngẫu nhiên thật. */
 const newSeed = () => {
   const c = (typeof crypto !== 'undefined' && crypto.getRandomValues) ? crypto : null;
@@ -90,6 +70,6 @@ const newSeed = () => {
   return (Math.random() * 2 ** 32) | 0;
 };
 
-const API = { ymd, addDays, dayIndex, mulberry32, shuffle, deckOf, cardFor, luckyNumbers, luckyDigits, newSeed };
+const API = { ymd, addDays, dayIndex, mulberry32, shuffle, deckOf, cardFor, newSeed };
 if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.TDTD = API;
 })(typeof self !== 'undefined' ? self : this);

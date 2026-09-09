@@ -54,20 +54,7 @@ Thêm một ngôi sao mới chỉ cần thêm một dòng vào mảng `SAO` ở 
 
 Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, lá bài lẫn các sao đã đặt (cách nhau tối thiểu 18 px). Hết chỗ thì chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài, nên chữ không bao giờ bị che. Đã thử 24 ngôi sao trên màn 375×812, rải 60 lần: không cặp nào đè nhau, không sao nào đè chữ hay lọt ra ngoài màn hình.
 
-Hiện có bảy ngôi sao:
-
-### Sao vàng — số của hôm nay
-
-Bấm vào mở ra bốn dãy:
-
-| Loại | Sinh ra |
-|---|---|
-| Mega 6/45 | 6 số khác nhau từ 1–45 |
-| Power 6/55 | 6 số khác nhau từ 1–55 |
-| Điện toán 5/35 | 5 số khác nhau từ 1–35, kèm 1 số đặc biệt từ 1–12 (quả bóng màu đỏ) |
-| Vé số truyền thống | dãy 6 chữ số |
-
-Số thì ngược lại, không ngẫu nhiên theo lần bấm: sinh từ hạt giống của máy cộng với ngày hôm nay, nên mỗi người một bộ, mỗi ngày một bộ, bấm lại trong ngày không đổi được. Đây là số ngẫu nhiên thuần túy, không phải dự đoán, và màn hình có ghi rõ điều đó cùng lời nhắc chơi trong khả năng của mình.
+Hiện có sáu ngôi sao:
 
 ### Sao xanh ngọc — Đồ Long Đao
 
@@ -134,9 +121,9 @@ Vùng bắt điểm khi chạm cũng tự co theo từng chòm: chòm nào có h
 
 Một lưu ý về độ chính xác: Hội Thiên văn Việt Nam nêu rõ Thần Nông chỉ là **nhóm sao** do người xưa đặt tên, không trùng khớp với chòm Thiên Yết trong thiên văn học hiện đại. App ghi đúng như vậy trong phần chú thích chứ không gọi nhầm là chòm sao.
 
-### Sao hồng — bức tranh của Thượng Đế
+### Sao vàng — bức tranh của Thượng Đế
 
-Mã ở `assets/infinite.js`. Một mạn đà la vàng chứa chính nó, phóng vào mãi không hết. Kéo lên để đi sâu, kéo xuống để lùi ra, con lăn chuột cũng được.
+Mã ở `assets/infinite.js`. Một mạn đà la vàng chứa chính nó, phóng vào mãi không hết. Cố ý vẽ thưa và mờ: bản đầu dày quá, nhìn lâu bị nhức mắt. Kéo lên để đi sâu, kéo xuống để lùi ra, con lăn chuột cũng được.
 
 Cách làm cho vòng lặp liền mạch: mỗi tầng nhỏ hơn tầng ngoài đúng một nửa và xoay thêm đúng `π/7`. Khi độ sâu tăng thêm 1, toàn bộ khung hình trùng khít với lúc đầu, nên không có điểm nối và không có đáy. Tôi kiểm bằng cách chụp khung hình ở tầng 3,37, tầng 4,37 và tầng 3003,37 rồi so chuỗi ảnh: giống nhau từng điểm ảnh, trong khi tầng 3,62 thì khác.
 
@@ -178,7 +165,7 @@ assets/app.css             giao diện
 data/cards.json            100 lá dùng trong app (31 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      CSV -> data/cards.json
-scripts/test-core.js       49 kiểm thử lõi
+scripts/test-core.js       29 kiểm thử lõi
 content/raw/               CSV nguồn (v3 và v5)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
@@ -189,7 +176,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 49 kiểm thử lõi (Node 18+)
+node scripts/test-core.js        # chạy 29 kiểm thử lõi (Node 18+)
 ```
 
 ## Sửa chính tả trong nguồn

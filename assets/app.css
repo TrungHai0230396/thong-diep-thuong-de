@@ -151,21 +151,6 @@ textarea{width:100%;min-height:130px;background:rgba(0,0,0,.28);border:1px solid
   border-radius:12px;color:var(--ink);font-family:inherit;font-size:14px;line-height:1.65;padding:12px;resize:vertical}
 textarea:focus{outline:1px solid var(--gold-deep)}
 
-.ve{margin-bottom:15px}
-.ve-ten{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);opacity:.75;margin-bottom:8px}
-.ve-ten .ghi{display:block;margin-top:3px;font-size:10px;letter-spacing:.02em;text-transform:none;opacity:.6}
-.balls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.ngan{color:var(--gold);opacity:.5;font-size:14px;margin:0 -1px}
-.ball.db{background:linear-gradient(180deg,#f0a9a0,#c96b5e);color:#3a1410;
-  box-shadow:0 4px 12px rgba(201,107,94,.28)}
-.ball{width:40px;height:40px;flex:0 0 40px;border-radius:50%;display:grid;place-items:center;
-  font-family:"Be Vietnam Pro",system-ui,-apple-system,sans-serif;font-size:15px;font-weight:600;
-  font-variant-numeric:tabular-nums lining-nums;font-feature-settings:"tnum" 1,"lnum" 1;
-  letter-spacing:.01em;color:#241b06;
-  background:linear-gradient(180deg,#f2d69c,#c9a24d);box-shadow:0 4px 12px rgba(201,162,77,.24)}
-.canh-bao{font-size:12px!important;line-height:1.7!important;opacity:.7;
-  border-top:1px solid var(--line);padding-top:12px;margin-top:4px!important}
-
 /* ---------- toast ---------- */
 .toast{position:fixed;left:50%;bottom:calc(30px + var(--safe-b));transform:translateX(-50%);z-index:40;
   background:rgba(232,195,122,.95);color:#231a05;padding:10px 18px;border-radius:999px;font-size:13px;

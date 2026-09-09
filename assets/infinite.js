@@ -7,8 +7,8 @@
 
 const K = 0.5;                       // mỗi tầng nhỏ đi một nửa
 const GOC = Math.PI / 7;             // và xoay thêm chừng ấy
-const TIA = 12;                      // số tia mỗi tầng
-const TREN = 3, DUOI = 9;            // vẽ mấy tầng phía ngoài và phía trong
+const TIA = 8;                       // số tia mỗi tầng
+const TREN = 1, DUOI = 7;            // vẽ mấy tầng phía ngoài và phía trong
 
 const LOI = [
   [8,   'Con đang đi vào trong.'],
@@ -22,7 +22,7 @@ const LOI = [
 ];
 
 let tam, cv, ctx, W, H, DPR, raf = null, tTruoc = 0;
-let sau = 0, toc = 0.55, keo = null, moc = -1, nen = [];
+let sau = 0, toc = 0.28, keo = null, moc = -1, nen = [];
 
 const dungKhung = () => {
   if (tam) return;
@@ -46,13 +46,13 @@ const dungKhung = () => {
     tam.querySelector('.bt-nhac').classList.add('mo'); });
   cv.addEventListener('pointermove', e => {
     if (!keo) return;
-    toc = Math.max(-3.2, Math.min(3.2, keo.toc0 + (keo.y - y(e)) * .013));
+    toc = Math.max(-1.5, Math.min(1.5, keo.toc0 + (keo.y - y(e)) * .006));
   });
   const tha = () => { keo = null; };
   cv.addEventListener('pointerup', tha);
   cv.addEventListener('pointercancel', tha);
   cv.addEventListener('wheel', e => { e.preventDefault();
-    toc = Math.max(-3.2, Math.min(3.2, toc - e.deltaY * .002)); }, { passive: false });
+    toc = Math.max(-1.5, Math.min(1.5, toc - e.deltaY * .0012)); }, { passive: false });
   addEventListener('resize', doCo);
 };
 
@@ -68,59 +68,48 @@ function doCo() {
   }));
 }
 
-/* Một tầng: vòng tròn, các tia, hạt ở đầu tia, và một mặt trời con ở giữa. */
+/* Một tầng: một vòng tròn mảnh, vài tia ngắn, vài hạt nhỏ, và một đốm sáng ở giữa.
+   Cố ý để thưa. Bản trước vẽ dày quá nên nhìn lâu bị nhức mắt. */
 function veTang(R, xoay, mo) {
-  if (R < 1.5 || mo <= .004) return;
+  if (R < 2 || mo <= .004) return;
   ctx.save();
   ctx.rotate(xoay);
-  ctx.globalAlpha = mo;
 
-  ctx.strokeStyle = '#e8c37a';
-  ctx.lineWidth = Math.max(.4, R * .008);
-  ctx.globalAlpha = mo * .5;
+  ctx.strokeStyle = '#c9a24d';
+  ctx.lineWidth = Math.max(.35, R * .0045);
+  ctx.globalAlpha = mo * .3;
   ctx.beginPath(); ctx.arc(0, 0, R, 0, 6.284); ctx.stroke();
-  ctx.globalAlpha = mo * .22;
-  ctx.beginPath(); ctx.arc(0, 0, R * .74, 0, 6.284); ctx.stroke();
 
-  ctx.globalAlpha = mo * .62;
+  ctx.globalAlpha = mo * .34;
   ctx.lineCap = 'round';
-  ctx.lineWidth = Math.max(.4, R * .011);
+  ctx.lineWidth = Math.max(.35, R * .0075);
   for (let i = 0; i < TIA; i++) {
     const a = i * 6.2832 / TIA;
-    const c = Math.cos(a), s = Math.sin(a);
+    const c = Math.cos(a), s2 = Math.sin(a);
     ctx.beginPath();
-    ctx.moveTo(c * R * .78, s * R * .78);
-    ctx.lineTo(c * R * .97, s * R * .97);
+    ctx.moveTo(c * R * .86, s2 * R * .86);
+    ctx.lineTo(c * R * .98, s2 * R * .98);
     ctx.stroke();
   }
-  ctx.globalAlpha = mo * .85;
-  ctx.fillStyle = '#f4dca6';
+
+  ctx.globalAlpha = mo * .5;
+  ctx.fillStyle = '#e8c37a';
   for (let i = 0; i < TIA; i++) {
     const a = (i + .5) * 6.2832 / TIA;
-    ctx.beginPath(); ctx.arc(Math.cos(a) * R * .87, Math.sin(a) * R * .87, Math.max(.5, R * .018), 0, 6.284); ctx.fill();
-  }
-
-  // cánh hoa giữa
-  ctx.globalAlpha = mo * .3;
-  ctx.strokeStyle = '#c9a24d';
-  ctx.lineWidth = Math.max(.35, R * .006);
-  for (let i = 0; i < TIA / 2; i++) {
-    const a = i * 6.2832 / (TIA / 2);
     ctx.beginPath();
-    ctx.ellipse(Math.cos(a) * R * .38, Math.sin(a) * R * .38, R * .34, R * .13, a, 0, 6.284);
-    ctx.stroke();
+    ctx.arc(Math.cos(a) * R * .92, Math.sin(a) * R * .92, Math.max(.45, R * .012), 0, 6.284);
+    ctx.fill();
   }
 
-  // mặt trời con ở tâm, chính là mầm của tầng kế tiếp
-  ctx.globalAlpha = mo;
-  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, R * .17);
-  g.addColorStop(0, 'rgba(255,240,205,.95)');
-  g.addColorStop(.55, 'rgba(232,195,122,.5)');
+  ctx.globalAlpha = mo * .55;
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, R * .2);
+  g.addColorStop(0, 'rgba(250,232,196,.5)');
   g.addColorStop(1, 'rgba(232,195,122,0)');
   ctx.fillStyle = g;
-  ctx.beginPath(); ctx.arc(0, 0, R * .17, 0, 6.284); ctx.fill();
+  ctx.beginPath(); ctx.arc(0, 0, R * .2, 0, 6.284); ctx.fill();
 
   ctx.restore();
+  ctx.globalAlpha = 1;
 }
 
 function vong(t) { raf = requestAnimationFrame(vong); buoc(t); }
@@ -150,15 +139,15 @@ function buoc(t) {
     const b = i + le;                       // khoảng cách tới tầng hiện tại
     const R = R0 * Math.pow(K, b);
     let mo = 1;
-    if (b < 0) mo = Math.max(0, 1 + b / TREN);          // tầng ngoài mờ dần khi trôi ra
+    if (b < 0) mo = Math.max(0, 1 + b / TREN) * .55;    // tầng ngoài mờ nhanh cho đỡ rối rìa
     else if (b > DUOI - 2.2) mo = Math.max(0, (DUOI - b) / 2.2);
     veTang(R, GOC * b, mo);
   }
   ctx.restore();
 
   // hào quang ở tâm
-  const q = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.min(W, H) * .2);
-  q.addColorStop(0, 'rgba(255,240,205,.16)'); q.addColorStop(1, 'rgba(255,240,205,0)');
+  const q = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.min(W, H) * .26);
+  q.addColorStop(0, 'rgba(255,240,205,.07)'); q.addColorStop(1, 'rgba(255,240,205,0)');
   ctx.fillStyle = q; ctx.fillRect(0, 0, W, H);
 
   const n = Math.floor(sau);
@@ -180,7 +169,7 @@ function mo() {
   document.body.classList.add('khoa-cuon');
   tam.classList.add('hien');
   doCo();
-  sau = 0; toc = .55; moc = -1; keo = null;
+  sau = 0; toc = .28; moc = -1; keo = null;
   tam.querySelector('.bt-loi').textContent = '';
   tam.querySelector('.bt-loi').classList.remove('hien');
   tam.querySelector('.bt-nhac').classList.remove('mo');
