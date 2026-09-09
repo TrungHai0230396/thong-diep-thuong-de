@@ -4,11 +4,31 @@
 
 const { ymd, cardFor, luckyNumbers, luckyDigits, newSeed } = self.TDTD;
 /* ─────────────────────────────────────────────────────────────
-   BẬT / TẮT TÍNH NĂNG SỐ MAY MẮN
-   Đổi true thành false là nút "Dự đoán số" biến mất hoàn toàn.
-   Không cần xoá dòng code nào khác. Nhớ tăng số phiên bản trong sw.js.
+   BẦU TRỜI SAO
+   Mỗi ngôi sao là một trò nhỏ nằm rải trên nền. Thêm sao mới chỉ cần
+   thêm một dòng vào mảng SAO bên dưới:
+       { id, mau, nhan, hinh?, mo }
+     id   : định danh duy nhất, dùng làm id của nút
+     mau  : màu ngôi sao (bất kỳ mã màu CSS nào)
+     nhan : mô tả cho trình đọc màn hình, không hiện thành chữ
+     hinh : 'sao5' | 'lap-lanh' | 'sao4' | 'hoa' | chuỗi path SVG riêng
+     mo   : hàm chạy khi bấm vào
+   Bỏ một ngôi sao thì xoá dòng của nó, hoặc thêm bat: false.
+   Các sao tự rải ngẫu nhiên, không bao giờ đè lên nhau, cũng không đè chữ.
    ───────────────────────────────────────────────────────────── */
-const BAT_DU_DOAN_SO = true;
+const HINH_SAO = {
+  sao5:      'M12 2.6l2.5 6.3 6.8.4-5.2 4.3 1.7 6.6L12 16.6 6.2 20.2l1.7-6.6-5.2-4.3 6.8-.4z',
+  'lap-lanh':'M12 1.8l1.6 6.1 6.1 1.6-6.1 1.6L12 17.2l-1.6-6.1L4.3 9.5l6.1-1.6zM19.4 15.2l.7 2.3 2.3.7-2.3.7-.7 2.3-.7-2.3-2.3-.7 2.3-.7z',
+  sao4:      'M12 1.5c.7 4.6 2.4 7.3 8.5 10.5-6.1 3.2-7.8 5.9-8.5 10.5-.7-4.6-2.4-7.3-8.5-10.5C9.6 8.8 11.3 6.1 12 1.5z',
+  hoa:       'M12 2.4a3.4 3.4 0 013.3 4.2 3.4 3.4 0 012.1 5.4 3.4 3.4 0 01-2.1 5.4A3.4 3.4 0 0112 21.6a3.4 3.4 0 01-3.3-4.2 3.4 3.4 0 01-2.1-5.4 3.4 3.4 0 012.1-5.4A3.4 3.4 0 0112 2.4zm0 6a3.6 3.6 0 100 7.2 3.6 3.6 0 000-7.2z',
+};
+
+const SAO = [
+  { id: 'sao-so',   mau: '#e8c37a', hinh: 'sao5',      nhan: 'Số may mắn hôm nay',
+    mo: () => lucky() },
+  { id: 'sao-game', mau: '#8fd6c2', hinh: 'lap-lanh',  nhan: 'Chém trái cây, xả stress',
+    mo: () => self.TDTD_GAME && self.TDTD_GAME.mo() },
+];
 
 const SEED_KEY = 'tdtd.seed';   // hạt giống riêng của máy
 const DAY_KEY  = 'tdtd.day';    // ngày đã nhận thông điệp, bị ghi đè mỗi ngày
@@ -87,7 +107,7 @@ function reveal() {
   render();
   setTimeout(() => {
     $('#after').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    if (BAT_DU_DOAN_SO) datNgoiSao();     // bố cục vừa đổi, tìm chỗ trống mới
+    datCacSao();                          // bố cục vừa đổi, tìm chỗ trống mới
   }, 950);
 }
 
@@ -164,17 +184,49 @@ function about() {
    Ưu tiên tuyệt đối là không chạm chữ; lá bài chỉ nhường khi màn hình quá hẹp. */
 const VUNG_CHU = ['.topbar', '.today-date', '#cta', '#after', '#toast'];   // không bao giờ được đè
 const VUNG_BAI = ['.card-shell'];                                          // tránh nốt nếu còn chỗ
+const KHOANG_SAO = 18;   // hai ngôi sao phải cách nhau ít nhất bằng này
 
-function datNgoiSao() {
-  const el = $('#btn-lucky');
-  if (!el) return;
+function taoCacSao() {
+  const troi = $('#bau-troi-sao');
+  if (!troi) return [];
+  troi.innerHTML = '';
+  return SAO.filter(s => s.bat !== false).map(s => {
+    const b = document.createElement('button');
+    b.className = 'star';
+    b.id = s.id;
+    b.setAttribute('aria-label', s.nhan);
+    b.style.setProperty('--mau-sao', s.mau);
+    b.style.animationDelay = -(Math.random() * 4).toFixed(2) + 's';
+    b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HINH_SAO[s.hinh] || s.hinh || HINH_SAO.sao5}"/></svg>`;
+    b.onclick = s.mo;
+    troi.appendChild(b);
+    return b;
+  });
+}
+let NUT_SAO = [];
+
+function datCacSao() {
+  const daDat = [];
+  // đặt theo thứ tự ngẫu nhiên để không ngôi sao nào luôn được ưu tiên chỗ đẹp
+  for (const el of NUT_SAO.slice().sort(() => Math.random() - .5)) {
+    const r = datNgoiSao(el, daDat);
+    if (r) daDat.push(r);
+  }
+}
+
+function datNgoiSao(el, daDat = []) {
+  if (!el) return null;
   const D = 34, LE = 10;
 
   const hinh = (list) => list.map(q => $(q))
     .filter(n => n && !n.hidden && n.offsetParent !== null)
     .map(n => n.getBoundingClientRect())
     .filter(r => r.width > 0 && r.height > 0);
-  const chu = hinh(VUNG_CHU), bai = hinh(VUNG_BAI);
+  // sao đã đặt cũng là vùng cấm, nới thêm KHOANG_SAO để không dính sát nhau
+  const noRong = (r) => ({ left: r.left - KHOANG_SAO, right: r.right + KHOANG_SAO,
+                           top: r.top - KHOANG_SAO, bottom: r.bottom + KHOANG_SAO });
+  const chu = hinh(VUNG_CHU).concat(daDat.map(noRong));
+  const bai = hinh(VUNG_BAI);
 
   const W = innerWidth, H = innerHeight;
   const xMin = LE, xMax = W - D - LE, yMin = LE, yMax = H - D - LE;
@@ -197,13 +249,13 @@ function datNgoiSao() {
     for (let i = 0; i < 260; i++) {
       const x = xMin + Math.random() * (xMax - xMin);
       const y = yMin + Math.random() * (yMax - yMin);
-      if (!dinh(x, y, ds, dem)) return dat(el, x, y);
+      if (!dinh(x, y, ds, dem)) return dat(el, x, y, D);
     }
     const troi = [];
     for (let y = yMin; y <= yMax; y += 6)
       for (let x = xMin; x <= xMax; x += 6)
         if (!dinh(x, y, ds, dem)) troi.push([x, y]);
-    if (troi.length) { const [x, y] = troi[Math.floor(Math.random() * troi.length)]; return dat(el, x, y); }
+    if (troi.length) { const [x, y] = troi[Math.floor(Math.random() * troi.length)]; return dat(el, x, y, D); }
   }
 
   // Hết đường: chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài.
@@ -215,17 +267,18 @@ function datNgoiSao() {
       for (const r of bai) gia += chong(x, y, r, 0);
       if (gia < reNhat) { reNhat = gia; tot = [x, y]; }
     }
-  if (tot) dat(el, tot[0], tot[1]);
+  return tot ? dat(el, tot[0], tot[1], D) : null;
 }
 
-function dat(el, x, y) {
+function dat(el, x, y, D) {
   el.style.left = Math.round(x) + 'px';
   el.style.top = Math.round(y) + 'px';
   el.classList.add('is-placed');
+  return { left: x, right: x + D, top: y, bottom: y + D, width: D, height: D };
 }
 
 let henDatSao;
-const datLaiNgoiSao = () => { clearTimeout(henDatSao); henDatSao = setTimeout(datNgoiSao, 120); };
+const datLaiNgoiSao = () => { clearTimeout(henDatSao); henDatSao = setTimeout(datCacSao, 120); };
 
 function stars() {
   const cv = $('#stars'), ctx = cv.getContext('2d'), rndSeed = self.TDTD.mulberry32;
@@ -259,14 +312,10 @@ async function init() {
   $('#card').onclick = reveal;
   $('#card').onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } };
   $('#btn-draw').onclick = reveal;
-  if (BAT_DU_DOAN_SO) {
-    $('#btn-lucky').onclick = lucky;
-    datNgoiSao();
-    addEventListener('resize', datLaiNgoiSao);
-    addEventListener('orientationchange', datLaiNgoiSao);
-  } else {
-    $('#btn-lucky').remove();
-  }
+  NUT_SAO = taoCacSao();
+  datCacSao();
+  addEventListener('resize', datLaiNgoiSao);
+  addEventListener('orientationchange', datLaiNgoiSao);
   $('#btn-share').onclick = copyText;
   $('#btn-about').onclick = about;
   $$('[data-close]').forEach(el => el.onclick = closeSheet);
@@ -282,4 +331,16 @@ async function init() {
   }
 }
 init();
+
+/* Móc cho kiểm thử: gọi thẳng bộ rải sao mà không phải chờ sự kiện resize. */
+self.TDTD_SAO = {
+  raiLai: () => datCacSao(),
+  themSaoThu: (n, mau) => {                       // chỉ dùng khi thử, không ảnh hưởng bản chạy thật
+    const troi = $('#bau-troi-sao'), goc = troi.children[0];
+    while (troi.children.length < n) { const c = goc.cloneNode(true); c.id = 'sao-thu-' + troi.children.length; troi.appendChild(c); }
+    [...troi.children].forEach((c, i) => c.style.setProperty('--mau-sao', mau[i % mau.length]));
+    NUT_SAO = [...troi.children];
+    return NUT_SAO.length;
+  },
+};
 })();

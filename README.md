@@ -39,9 +39,26 @@ Ngày tính theo lịch địa phương của máy và đổi lúc 0:00. Nếu a
 
 **Hệ quả:** trong cùng một ngày, một người mở lại bao nhiêu lần cũng chỉ thấy đúng lá đó. Đó là chủ ý, không phải lỗi.
 
-## Số của hôm nay (tính năng cho vui)
+## Bầu trời sao
 
-Một **ngôi sao nhỏ** nổi trên màn hình, không chữ. Bấm vào mở ra bốn dãy:
+Trên nền có những ngôi sao nhỏ đủ màu, mỗi ngôi là một trò riêng. Chúng rơi vào vị trí ngẫu nhiên mỗi lần tải trang, **không bao giờ đè lên nhau**, cũng không đè chữ.
+
+Thêm một ngôi sao mới chỉ cần thêm một dòng vào mảng `SAO` ở đầu `assets/app.js`:
+
+```js
+{ id: 'sao-moi', mau: '#f0b46a', hinh: 'sao4', nhan: 'Mô tả cho trình đọc màn hình',
+  mo: () => moTroChoiCuaBan() },
+```
+
+`hinh` chọn trong `sao5`, `lap-lanh`, `sao4`, `hoa`, hoặc đưa thẳng một chuỗi path SVG. `mau` nhận mọi mã màu CSS. Thêm `bat: false` để tạm ẩn một ngôi sao mà không xoá dòng.
+
+Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, lá bài lẫn các sao đã đặt (cách nhau tối thiểu 18 px). Hết chỗ thì chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài, nên chữ không bao giờ bị che. Đã thử 24 ngôi sao trên màn 375×812, rải 60 lần: không cặp nào đè nhau, không sao nào đè chữ hay lọt ra ngoài màn hình.
+
+Hiện có hai ngôi sao:
+
+### Sao vàng — số của hôm nay
+
+Bấm vào mở ra bốn dãy:
 
 | Loại | Sinh ra |
 |---|---|
@@ -50,11 +67,15 @@ Một **ngôi sao nhỏ** nổi trên màn hình, không chữ. Bấm vào mở 
 | Điện toán 5/35 | 5 số khác nhau từ 1–35, kèm 1 số đặc biệt từ 1–12 (quả bóng màu đỏ) |
 | Vé số truyền thống | dãy 6 chữ số |
 
-Vị trí ngôi sao ngẫu nhiên, mỗi lần tải trang lại rơi một chỗ khác, và tự né chữ lẫn lá bài. Thuật toán thử nới dần: tránh cả chữ lẫn lá bài với khoảng đệm rộng, hẹp dần, rồi mới chỉ tránh chữ. Trên màn hình quá hẹp mà không còn chỗ trống nào, nó chọn ô đè ít nhất và tính chữ nặng gấp 40 lần lá bài, nên **không bao giờ đè lên chữ**.
-
-Tắt tính năng: đổi `BAT_DU_DOAN_SO` thành `false` ở đầu `assets/app.js`, ngôi sao và bảng số biến mất hoàn toàn. Nhớ tăng số phiên bản trong `sw.js`.
-
 Số thì ngược lại, không ngẫu nhiên theo lần bấm: sinh từ hạt giống của máy cộng với ngày hôm nay, nên mỗi người một bộ, mỗi ngày một bộ, bấm lại trong ngày không đổi được. Đây là số ngẫu nhiên thuần túy, không phải dự đoán, và màn hình có ghi rõ điều đó cùng lời nhắc chơi trong khả năng của mình.
+
+### Sao xanh ngọc — Đồ Long Đao
+
+Game chém trái cây để xả stress, mã nguồn ở `assets/game.js`, độc lập hẳn với phần thông điệp.
+
+Miết ngón tay hoặc rê chuột để vung đao. Vệt đao là dải vàng có quầng sáng, mô phỏng lưỡi Đồ Long. Trái cây gồm dưa hấu, cam, chanh, thanh long, dừa, xoài, măng cụt, chém trúng thì đứt đôi và bắn nước. Chém liên tiếp trong 320 mili giây được nhân điểm tới 5 lần. Ba mạng, để rơi một quả hoặc chém trúng bom là mất một mạng. Không lưu điểm, đóng là hết.
+
+Bấm Esc hoặc nút ✕ để thoát.
 
 ## Xem thử ngày khác
 

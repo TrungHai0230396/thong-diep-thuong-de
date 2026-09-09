@@ -87,16 +87,50 @@ main{position:relative;z-index:1;padding:0 18px calc(40px + var(--safe-b));max-w
   border:0;background:transparent;display:grid;place-items:center;
   opacity:0;left:-999px;top:-999px;-webkit-tap-highlight-color:transparent;
   transition:opacity .6s ease,transform .25s}
-.star svg{width:17px;height:17px;fill:var(--gold);
-  filter:drop-shadow(0 0 5px rgba(232,195,122,.5))}
+.star svg{width:17px;height:17px;fill:var(--mau-sao,var(--gold));
+  filter:drop-shadow(0 0 6px var(--mau-sao,var(--gold)))}
+@supports (color:color-mix(in srgb,red 50%,transparent)){
+  .star svg{filter:drop-shadow(0 0 6px color-mix(in srgb,var(--mau-sao,var(--gold)) 62%,transparent))}
+}
 .star.is-placed{opacity:.6;animation:twinkle 3.6s ease-in-out infinite}
 .star:hover{opacity:1;transform:scale(1.25);animation:none}
 .star:active{transform:scale(.9)}
-.star:focus-visible{outline:2px solid var(--gold);outline-offset:4px;border-radius:50%;opacity:1}
+.star:focus-visible{outline:2px solid var(--mau-sao,var(--gold));outline-offset:4px;border-radius:50%;opacity:1}
 @keyframes twinkle{
   0%,100%{opacity:.35;transform:scale(.94)}
   50%{opacity:.95;transform:scale(1.06)}
 }
+
+/* ---------- game chém trái cây ---------- */
+body.khoa-cuon{overflow:hidden}
+.game{position:fixed;inset:0;z-index:30;display:none;
+  background:radial-gradient(120% 90% at 50% 0%,#241d4a 0%,#141029 45%,#0b0917 100%)}
+.game.hien{display:block}
+.game-cv{position:absolute;inset:0;display:block;touch-action:none;cursor:crosshair}
+.game-hud{position:absolute;top:0;left:0;right:0;z-index:2;pointer-events:none;
+  display:flex;align-items:center;gap:12px;
+  padding:calc(env(safe-area-inset-top,0px) + 14px) 16px 0}
+.g-diem{font-family:"Cormorant Garamond",Georgia,serif;font-size:30px;font-weight:600;color:var(--gold);
+  display:flex;align-items:baseline;gap:8px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.g-nhan{font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:600;color:#8fd6c2}
+.g-mang{margin-left:auto;font-size:17px;letter-spacing:3px;color:#c94f5e;text-shadow:0 2px 10px rgba(0,0,0,.6)}
+.g-mang .tim{opacity:.3}
+.g-mang .tim.day{opacity:1}
+.g-dong{pointer-events:auto;width:34px;height:34px;flex:0 0 34px;border-radius:50%;cursor:pointer;
+  border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.3);color:var(--ink);font-size:14px;line-height:1}
+.g-dong:hover{background:rgba(255,255,255,.12)}
+
+.game-mo,.game-het{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;text-align:center;padding:26px;
+  background:rgba(9,7,20,.72);backdrop-filter:blur(4px);animation:fade .3s ease both}
+.game-mo[hidden],.game-het[hidden]{display:none}
+.game-mo h2,.game-het h2{font-family:"Cormorant Garamond",Georgia,serif;font-size:38px;font-weight:600;
+  margin:0;color:var(--gold);letter-spacing:.04em}
+.g-dao{width:min(74vw,260px);margin-bottom:2px;filter:drop-shadow(0 6px 18px rgba(232,195,122,.3))}
+.g-dao svg{width:100%;height:auto;display:block}
+.g-phu,.g-tong{color:var(--ink-dim);font-size:14px;margin:0;line-height:1.7}
+.g-cach{color:var(--ink-dim);font-size:12px;opacity:.65;margin:6px 0 0}
+.game-het .ghost{margin-top:2px}
 .ephemeral{text-align:center;color:var(--ink-dim);font-size:12.5px;line-height:1.8;margin:0 0 16px;opacity:.85}
 
 /* ---------- sheet ---------- */

@@ -1,5 +1,5 @@
-const V = 'tdtd-v12';
-const SHELL = ['./', 'index.html', 'assets/app.css', 'assets/app.js', 'data/cards.json',
+const V = 'tdtd-v17';
+const SHELL = ['./', 'index.html', 'assets/app.css', 'assets/core.js', 'assets/app.js', 'assets/game.js', 'data/cards.json',
                'manifest.webmanifest', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(V).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
