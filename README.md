@@ -54,7 +54,7 @@ Thêm một ngôi sao mới chỉ cần thêm một dòng vào mảng `SAO` ở 
 
 Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, lá bài lẫn các sao đã đặt (cách nhau tối thiểu 18 px). Hết chỗ thì chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài, nên chữ không bao giờ bị che. Đã thử 24 ngôi sao trên màn 375×812, rải 60 lần: không cặp nào đè nhau, không sao nào đè chữ hay lọt ra ngoài màn hình.
 
-Hiện có sáu ngôi sao:
+Hiện có năm ngôi sao:
 
 ### Sao xanh ngọc — Đồ Long Đao
 
@@ -72,7 +72,40 @@ Mã ở `assets/lantern.js`. Gõ ra điều đang nặng lòng rồi bấm Thả
 
 ### Sao xanh nước — hồ nước
 
-Mã ở `assets/pond.js`. Chạm hoặc miết trên mặt nước, sóng lan ra rồi tắt. Vài chiếc lá sen nhún lên khi sóng đi qua. Thỉnh thoảng có hạt mưa tự rơi. Không điểm, không thắng thua, không kết thúc.
+Mã ở `assets/pond.js`. Chạm hoặc miết trên mặt nước, sóng lan ra rồi tắt. Năm chiếc lá sen rải thưa, không đè nhau, nhún lên khi sóng đi qua. Thỉnh thoảng có hạt mưa tự rơi.
+
+Trên lá có bốn con ếch lúc mở màn. Chạm đúng vào con nào thì con đó giật mình phóng sang chiếc lá **xa ngón tay nhất**, nên chạm bên này là đẩy nó qua bên kia. Chạm chỗ khác trên hồ thì chỉ có sóng, ếch vẫn ngồi. Không có nhiệm vụ nào cả: muốn dồn cả đàn vào một lá, muốn rải mỗi con một nơi, hay chỉ ngồi xem cũng được.
+
+- Vùng chạm của mỗi con nới rộng tới 40 px vì ngón tay to hơn con ếch. Con đang bay thì chạm không ăn, con đang bơi thì chạm là nó phóng lên lá gần nhất.
+- Chọn lá đích bằng cách chấm điểm: đúng hướng tránh ngón tay được ưu tiên gấp đôi, lá gần hơn được thêm một chút. Giật mình thì cú nhảy nhanh và cao hơn cú nhảy thường.
+- Mỗi con tự nhảy sau 5–15 giây; ngồi cùng lá với bạn, hoặc già rồi, thì lười hơn.
+- Con trỏ chuột là mũi trỏ thường trên mặt nước, chỉ thành bàn tay khi rê vào đúng một con ếch.
+
+**Lá chìm.** Sức chở của lá chia theo bán kính, mỗi 6 px thêm một con: 26–31 px chịu 2 con, 32–37 px chịu 3, 38–43 px chịu 4, từ 44 px chịu 5. Chiếc lá đầu tiên luôn được rải to (44–50 px). Dồn quá sức thì lá lún dần chừng một giây rưỡi, nước loang lên mặt lá, rồi **con lên sau cùng bị tuột xuống nước**: nó bơi 54 px mỗi giây sang chiếc lá gần nhất còn chỗ rồi trèo lên, thân ngập nước chỉ còn cái đầu nhô lên, hai chân đạp nước và để lại vệt sóng.
+
+**Vòng đời.** Ngồi chơi lâu thì thấy trọn một vòng, không có gì phải bấm:
+
+| Chặng | Thời gian | Chuyện gì xảy ra |
+|---|---|---|
+| Ruồi hoặc muỗi bay qua | 16–34 giây một con, chia cho mức mùa | Bay lượn thất thường, hay quẩn quanh mấy chiếc lá, có bóng nhỏ chạy theo dưới nước. Muỗi nhỏ hơn và có chân dài lêu nghêu |
+| Ếch ngắm | khi con bọ vào trong 4,2 lần thân | Ếch quay đầu nhìn theo. Con nào no gần đầy (trên 0,92) thì chẳng thèm, để dành cho con đói |
+| Phóng lưỡi | 0,3 giây | Vào trong 2,5 lần thân và đầu đã quay tới trong 0,6 radian thì lưỡi phóng ra, dính con bọ ở đầu lưỡi rồi kéo về. Nhảy giữa lúc đó thì nhả lưỡi, con bọ thoát |
+| Đẻ trứng | xét lại mỗi 2–3,3 phút | Tới hẹn mà mức no trên 0,6 thì đẻ một ổ **3–7 trứng** sát mép lá và trả 0,3 mức no. Còn đói thì khoan, nửa phút nữa xét lại |
+| Trứng nở | 34–42 giây | Mầm đen mọc đuôi rồi nở ra một đàn nòng nọc |
+| Nòng nọc lớn | 70–88 giây | Bơi lượn, thân to dần, quá 62% thời gian thì nhú hai chân sau. Chạm gần thì nó vọt đi tránh ngón tay |
+| Thành ếch | | Bơi tới chiếc lá còn chỗ rồi trèo lên. Hồ đã đủ 9 con thì nó chờ, mỗi lần 20 giây, chờ hết ba lần vẫn chật thì không qua được |
+
+Từ lúc ếch ăn tới lúc có thêm một con ếch mới mất khoảng hai phút.
+
+**Đói và chết.** Mỗi con có mức no từ 0 tới 1. Sống là tiêu: no đầy mà không ăn gì thì 5 phút là kiệt. Một con mồi bù lại 0,4. Đói thì **trước hết là không đẻ**, cạn hẳn mới chết; ngoài ra mỗi con có tuổi thọ riêng 5–8 phút, hết tuổi cũng chết. Chết thì ngồi yên, nhắm mắt, màu bạc dần rồi lịm xuống tan vào nước trong 2,6 giây, để lại một vòng sóng — không có xác nổi. Càng đói hoặc càng già thì màu càng bạc, nên nhìn là biết con nào đang yếu.
+
+**Cá.** Mỗi 45–110 giây có một con cá ghé hồ, bơi dưới mặt nước nên chỉ là cái bóng mờ, nổi rõ dần khi nó rượt. Thấy nòng nọc trong 130 px thì đuổi, vào 55 px thì phóng một cú nhanh gấp đôi, tới 30 px là đớp; đớp xong lặn xuống nghỉ 5–11 giây. Nòng nọc thấy cá trong 58 px thì cong đuôi chạy, nhưng chỉ vọt được một quãng nên không thắng nổi cú phóng. Mỗi chuyến cá ghé thường mất 0–3 con nòng nọc.
+
+**Mùa con trùng.** Cứ 50–110 giây hồ đổi mức mùa, ngẫu nhiên từ 0,35 tới 1,9 lần. Mùa rộ thì 8–18 giây một con bọ và cùng lúc có tới bốn con; mùa vắng thì gần hai phút mới có một con. Đó là cái làm đàn ếch phồng lên rồi xẹp xuống.
+
+**Không có ai đỡ.** Hồ tự chạy: mùa rộ thì ếch no, đẻ nhiều, đàn phình lên tới mức chặn 9 con; mùa vắng thì đói, thôi đẻ, rồi chết dần. Không có sàn giữ lại con cuối cùng — hồ **có quyền tuyệt chủng**. Chạy thử sáu hồ, mỗi hồ 30 phút: đàn dao động từ 1 tới 9 con, trung bình 6–8 con, nòng nọc trung bình 3–6 con, không hồ nào tuyệt chủng hẳn nhưng có hồ tụt xuống một con rồi gượng lại được nhờ mẻ nòng nọc còn dưới nước. Đóng màn hình là hồ trở về bốn con ban đầu.
+
+Không điểm, không đếm, không thắng thua, không kết thúc.
 
 ### Sao tím — hộp thở
 
@@ -120,59 +153,6 @@ Thêm chòm mới chỉ cần thêm một mục vào mảng `CHOM`: tên, lời 
 Vùng bắt điểm khi chạm cũng tự co theo từng chòm: chòm nào có hai ngôi nằm sát nhau ngoài trời thật, như hai sao giữa lưỡi cày cách nhau 33 pixel, thì bán kính bắt nhỏ lại thay vì kéo giãn hình cho dễ bấm.
 
 Một lưu ý về độ chính xác: Hội Thiên văn Việt Nam nêu rõ Thần Nông chỉ là **nhóm sao** do người xưa đặt tên, không trùng khớp với chòm Thiên Yết trong thiên văn học hiện đại. App ghi đúng như vậy trong phần chú thích chứ không gọi nhầm là chòm sao.
-
-### Sao vàng — bức tranh của Thượng Đế
-
-Mã ở `assets/infinite.js`. Phóng vào mãi không hết, **mỗi tầng một cảnh khác nhau**, tới tầng thứ bảy thì quay về cảnh đầu.
-
-| Tầng | Cảnh |
-|---|---|
-| 0 | mạng vũ trụ |
-| 1 | mạng nơ-ron |
-| 2 | mạch máu |
-| 3 | rễ cây |
-| 4 | sông ngòi |
-| 5 | tia sét |
-| 6 | bông tuyết |
-| 7 | mạng vũ trụ, lặp lại |
-
-Bảy cảnh trông rất khác nhau nhưng đều là cùng một cấu trúc phân nhánh, chỉ khác tham số và màu. Đó là toàn bộ nội dung của trò này.
-
-Không dùng ảnh nào, mọi cảnh sinh bằng thuật toán từ một hạt giống cố định. **Mỗi cảnh có hàm vẽ riêng**, không dùng chung một hàm mọc nhánh, vì làm vậy thì cảnh nào cũng ra một kiểu cây và không nhận ra là gì:
-
-- **mạng vũ trụ**: 15 cụm sáng to nhỏ khác nhau, nối hai cụm gần nhất bằng sợi hơi cong, rải thiên hà lẻ dọc sợi
-- **mạng nơ-ron**: bốn thân tế bào méo có nhân, sáu tua ngắn chẻ nhiều toả ra, kèm một sợi trục dài thẳng hơn hẳn kết thúc bằng cúc tận cùng
-- **mạch máu**: ống to chẻ đôi góc hẹp thành ống nhỏ, vẽ bằng dải có bề dày thon dần, không bao giờ nhập lại
-- **rễ cây**: nhánh thon cong đều, dấu nhận biết là lông rễ tua tủa hai bên mỗi đoạn
-- **sông ngòi**: lòng sông uốn lượn kiểu sin, có nhánh tách ra rồi nhập lại, giữa dòng có cồn cát
-- **tia sét**: gãy khúc sắc cạnh không làm mượt, rất ít nhánh, lõi sáng nằm trên một quầng mờ
-- **bông tuyết**: vẽ một cánh với nhánh phụ đúng 60 độ rồi nhân bản sáu lần
-
-Mọi nhánh bị chặn không cho mọc ra ngoài vòng bán kính 1, nếu không tầng nọ đè lên tầng kia. Mỗi cảnh chừa một lỗ tròn ở giữa để cảnh tầng sau chui ra. Khung vẽ tính theo cạnh ngắn của màn hình nên tầng đang xem rộng đúng bằng bề ngang điện thoại, khớp với tên hiện trên đầu.
-
-Vòng lặp liền mạch: mỗi tầng nhỏ hơn tầng ngoài 0,42 lần và xoay thêm `π/9`, và chu kỳ cảnh là 7. Nên khi độ sâu tăng thêm 7, khung hình trùng khít với lúc đầu. Kiểm bằng cách so chuỗi ảnh ở tầng 2,4 với tầng 9,4 và tầng 709,4: giống từng điểm ảnh, còn tầng 3,4 thì khác.
-
-Một chỗ dễ sai: độ sâu tương đối của một vòng phải là `i - le` chứ không phải `i + le`. Sai dấu ở đây thì hình co lại trong khi số tầng tăng lên, tức là phóng ngược chiều, và nhãn tên cảnh chạy lệch hẳn với thứ đang nhìn thấy. Kiểm bằng cách đo bán kính một cảnh khi độ sâu tăng: phải to dần, ví dụ cảnh mạch máu đi từ 76 lên 180 pixel khi độ sâu từ 1 tới 2.
-
-Số tầng và tên cảnh lấy theo `Math.round` chứ không phải `Math.floor`, để nhãn đổi đúng lúc hai cảnh giao nhau ở giữa.
-
-Mỗi cảnh có một dòng chú thích. Nguyên tắc: **câu nào cũng phải nói về chuyện phân nhánh**, tức là về cái ý của trò này, chứ không phải một mẩu thông tin thú vị về chủ thể. Bản đầu tôi viết sai nguyên tắc đó, cảnh sông thì kể chuyện cống ngăn mặn, cảnh sét thì kể chuyện tiếng sấm, đọc xong không thấy liên quan gì.
-
-| Cảnh | Ý | Nguồn |
-|---|---|---|
-| mạng vũ trụ | trọng lực kéo vật chất về các sợi, mạng là hình còn lại chứ không ai vẽ | Void (astronomy), Wikipedia |
-| mạng nơ-ron | đem đo với mạng vũ trụ thì cùng mức phức tạp, chênh 27 bậc độ lớn | Vazza & Feletti, *Frontiers of Physics* 2020 |
-| mạch máu | chẻ nhỏ là cách rẻ nhất để chạm tới từng tế bào; mao mạch 8 micromet, chiếm hơn 90% tổng chiều dài | tài liệu sinh lý tuần hoàn |
-| rễ cây | cùng lý do, chạm tới từng hạt đất; một cây lúa mạch đen 4 tháng có hơn 13 triệu nhánh, dài 620 km | Dittmer 1937, *American Journal of Botany* |
-| sông ngòi | cùng một hình nhưng dòng chảy ngược: gom vào thay vì toả ra | hình thái mạng sông |
-| tia sét | chẻ nhánh vì đang dò đường; chỉ một nhánh chạm đất, phần còn lại tắt ngay khi có đường dẫn | NOAA, HowStuffWorks |
-| bông tuyết | đầu nhọn hứng nhiều hơn nên mọc nhanh hơn rồi nhọn thêm; chính vòng lặp đó đẻ ra nhánh | bất ổn Mullins–Sekerka, Physics World |
-
-Cảnh bông tuyết đặt cuối để khép lại: nó nói ra cái cơ chế chung mà sáu cảnh trước đều đi theo.
-
-Con số 100 000 km cho tổng chiều dài mạch máu bị bỏ, vì đó là ước lượng cũ của Krogh dựa trên một cơ thể bất thường; số hiện đại thấp hơn nhiều và còn tranh cãi, nên chỉ ghi hai điều chắc chắn là đường kính mao mạch và tỉ lệ hơn 90 phần trăm.
-
-Ý tưởng lấy từ Zoomquilt, bức tranh phóng vô tận do Nikolaus Baumgarten và mười bốn hoạ sĩ vẽ năm 2004. Chi tiết mạng vũ trụ giống mạng nơ-ron không phải bịa: năm 2020 Vazza và Feletti công bố trên *Frontiers of Physics* một nghiên cứu đo và so hai mạng này, thấy chúng cùng mức phức tạp dù chênh nhau 27 bậc độ lớn.
 
 ## Chia sẻ ảnh
 

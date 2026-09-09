@@ -22,7 +22,6 @@ const HINH_SAO = {
   sao4:      'M12 1.5c.7 4.6 2.4 7.3 8.5 10.5-6.1 3.2-7.8 5.9-8.5 10.5-.7-4.6-2.4-7.3-8.5-10.5C9.6 8.8 11.3 6.1 12 1.5z',
   hoa:       'M12 2.4a3.4 3.4 0 013.3 4.2 3.4 3.4 0 012.1 5.4 3.4 3.4 0 01-2.1 5.4A3.4 3.4 0 0112 21.6a3.4 3.4 0 01-3.3-4.2 3.4 3.4 0 01-2.1-5.4 3.4 3.4 0 012.1-5.4A3.4 3.4 0 0112 2.4zm0 6a3.6 3.6 0 100 7.2 3.6 3.6 0 000-7.2z',
   tia:       'M12 1l1.9 7.2 5.4-4-4 5.4L22.5 12l-7.2 1.9 4 5.4-5.4-4L12 22.5l-1.9-7.2-5.4 4 4-5.4L1.5 12l7.2-1.9-4-5.4 5.4 4z',
-  xoay:      'M12 2.2a9.8 9.8 0 109.8 9.8 7.7 7.7 0 01-7.7 7.7A6 6 0 0112 12a4.3 4.3 0 004.3 4.3A2.6 2.6 0 0012 14.6a1.2 1.2 0 001.2 1.2.9.9 0 01-.9-.9.6.6 0 00.6.6z',
   giot:      'M12 2.2c3.6 4.6 6.4 8.1 6.4 11.4A6.4 6.4 0 1 1 5.6 13.6c0-3.3 2.8-6.8 6.4-11.4z',
 };
 
@@ -31,14 +30,12 @@ const SAO = [
     mo: () => self.TDTD_GAME && self.TDTD_GAME.mo() },
   { id: 'sao-hoadang', mau: '#f0a860', hinh: 'hoa',    nhan: 'Thả đèn hoa đăng, buông điều nặng lòng',
     mo: () => self.TDTD_HOADANG && self.TDTD_HOADANG.mo() },
-  { id: 'sao-ho',   mau: '#7ec8e3', hinh: 'giot',      nhan: 'Hồ nước, chạm vào cho nhẹ đầu',
+  { id: 'sao-ho',   mau: '#7ec8e3', hinh: 'giot',      nhan: 'Hồ nước, chạm cho ếch nhảy',
     mo: () => self.TDTD_HO && self.TDTD_HO.mo() },
   { id: 'sao-tho',  mau: '#b8a8e8', hinh: 'tia',       nhan: 'Hộp thở, thở theo nhịp bốn',
     mo: () => self.TDTD_THO && self.TDTD_THO.mo() },
   { id: 'sao-chom', mau: '#f2ead0', hinh: 'sao4',      nhan: 'Nối sao thành chòm',
     mo: () => self.TDTD_CHOMSAO && self.TDTD_CHOMSAO.mo() },
-  { id: 'sao-tranh', mau: '#e8c37a', hinh: 'xoay',     nhan: 'Bức tranh của Thượng Đế, phóng vào mãi không hết',
-    mo: () => self.TDTD_BUCTRANH && self.TDTD_BUCTRANH.mo() },
 ];
 
 const SEED_KEY = 'tdtd.seed';   // hạt giống riêng của máy
