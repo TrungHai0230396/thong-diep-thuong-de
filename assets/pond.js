@@ -135,10 +135,10 @@ const SO_ECH = 4;
 
 const yLa = (l) => l.yVe ?? l.y;
 const nguoi = (e) => !e.nhay && !e.boi && e.tan === null;   // đang ngồi trên lá, không bay không bơi không tan
-const DOI_SONG = () => rnd(300000, 480000);             // sống được 5–8 phút thì già, mỗi con một số riêng
-const CHU_KY = () => rnd(120000, 200000);               // 2–3 phút một lần xét chuyện đẻ
+const DOI_SONG = () => rnd(210000, 360000);             // sống được 3,5–6 phút thì già, mỗi con một số riêng
+const CHU_KY = () => rnd(35000, 60000);                 // 35–60 giây một lần xét chuyện đẻ
 const MUC_BO = () => rnd(.35, 1.9);                     // hồ có mùa nhiều mùa ít con trùng
-const KIET = 300000;                                    // no đầy mà không ăn gì thì 5 phút là kiệt
+const KIET = 220000;                                    // no đầy mà không ăn gì thì gần 4 phút là kiệt
 const BU_MOI = .4;                                      // một con mồi bù được bốn phần mười mức no
 const DU_DE = .6, TON_DE = .3;                          // no hơn 0,6 mới đẻ, đẻ một ổ tốn 0,3
 const soEch = (l) => ech.reduce((n, e) => n + (nguoi(e) && la[e.la] === l ? 1 : 0), 0);
@@ -268,7 +268,7 @@ function buocMotCon(e, dt) {
     if (e.nl > DU_DE) {                                 // đủ no thì đẻ một ổ, và trả giá bằng mức no
       e.tChuKy = 0; e.chuKy = CHU_KY(); e.nl -= TON_DE;
       if (!deTrung(e)) e.deT = 8000;
-    } else e.tChuKy = e.chuKy - 30000;                  // còn đói thì khoan, nửa phút nữa xét lại
+    } else e.tChuKy = e.chuKy - 12000;                  // còn đói thì khoan, mươi giây nữa xét lại
   }
   e.nghi = Math.max(0, e.nghi - dt);
   e.nhamMat = Math.max(0, e.nhamMat - dt);
@@ -651,7 +651,7 @@ function deTrung(e) {
   const gx = l ? l.x : e.x, gy = l ? yLa(l) : e.y, b = (l ? l.r : 20) + rnd(12, 24);
   const x = Math.max(16, Math.min(W - 16, gx + Math.cos(g) * b));
   const y = Math.max(16, Math.min(H - 16, gy + Math.sin(g) * b));
-  trung.push({ x, y, t: 0, doi: rnd(34000, 42000), n: 3 + Math.floor(Math.random() * 5), pha: rnd(0, 6.28) });
+  trung.push({ x, y, t: 0, doi: rnd(20000, 26000), n: 3 + Math.floor(Math.random() * 5), pha: rnd(0, 6.28) });
   themSong(x, y, .22);
   return true;
 }
@@ -689,7 +689,7 @@ function veTrung(t) {
 
 function themNong(x, y) {
   nong.push({ x, y, huong: rnd(0, 6.284), toc: rnd(20, 30), s: 4.4, cho: 0,
-              t: 0, doi: rnd(70000, 88000), pha: rnd(0, 6.28), vot: 0 });
+              t: 0, doi: rnd(40000, 55000), pha: rnd(0, 6.28), vot: 0 });
 }
 
 function buocNong(dt) {
@@ -711,7 +711,7 @@ function buocNong(dt) {
     n.x += Math.cos(n.huong) * toc * g;
     n.y += Math.sin(n.huong) * toc * g;
     if (n.t >= n.doi) {
-      if (ech.length >= TOI_DA_ECH && n.cho < 3) { n.doi += 20000; n.cho++; continue; }   // hồ chật thì chờ, mỗi lần 20 giây
+      if (ech.length >= TOI_DA_ECH && n.cho < 3) { n.doi += 12000; n.cho++; continue; }   // hồ chật thì chờ, mỗi lần 12 giây
       if (ech.length >= TOI_DA_ECH) { themSong(n.x, n.y, .14); nong.splice(i, 1); continue; }   // chờ hết một phút mà vẫn chật thì không qua được
       thanhEch(n); nong.splice(i, 1);
     }
@@ -794,7 +794,7 @@ function mo() {
   tam.classList.add('hien');
   doCo();
   song = []; tMua = 900;
-  bo = []; trung = []; nong = []; ca = []; tBo = rnd(5000, 11000); tCa = rnd(25000, 60000);
+  bo = []; trung = []; nong = []; ca = []; tBo = rnd(4000, 9000); tCa = rnd(20000, 45000);
   mucBo = MUC_BO(); tDan = rnd(50000, 110000);
   tam.querySelector('.ho-nhac').classList.remove('mo');
   tTruoc = performance.now();
