@@ -13,16 +13,16 @@ const TREN = 1, DUOI = 5;
 const TRONG = 0.30;              // chừa lỗ giữa cho cảnh tầng sau chui ra
 
 const CANH = [
-  { id: 'vu-tru',     ten: 'mạng vũ trụ',  loai: 'mang',  mau: '#9fb8e8', hat: 3.4, day: .85,
+  { id: 'vu-tru',     ten: 'mạng vũ trụ',  loai: 'mang',  mau: '#aac4f0', hat: 3.4, day: .85,
     chu: 'Các thiên hà nối nhau thành sợi, khoảng giữa là những khoảng trống mênh mông.' },
   { id: 'no-ron',     ten: 'mạng nơ-ron',  loai: 'nhanh', mau: '#e8c37a', goc: 7, chia: .52, run: .55, day: 1.5, hat: 1.9,
     chu: 'Tế bào thần kinh trong não người. Năm 2020 có nghiên cứu đo và thấy nó xếp giống hệt mạng vũ trụ.' },
-  { id: 'mach-mau',   ten: 'mạch máu',     loai: 'nhanh', mau: '#d9707a', goc: 5, chia: .56, run: .38, day: 2.1, hat: 0 },
-  { id: 're-cay',     ten: 'rễ cây',       loai: 'nhanh', mau: '#c2a06a', goc: 6, chia: .48, run: .34, day: 1.7, hat: 0 },
-  { id: 'song',       ten: 'sông ngòi',    loai: 'nhanh', mau: '#7ec8e3', goc: 4, chia: .52, run: .46, day: 2.6, hat: 0,
+  { id: 'mach-mau',   ten: 'mạch máu',     loai: 'nhanh', mau: '#e0656f', goc: 5, chia: .56, run: .38, day: 2.1, hat: 0 },
+  { id: 're-cay',     ten: 'rễ cây',       loai: 'nhanh', mau: '#c9a473', goc: 6, chia: .48, run: .34, day: 1.7, hat: 0 },
+  { id: 'song',       ten: 'sông ngòi',    loai: 'nhanh', mau: '#6fc3e8', goc: 4, chia: .52, run: .46, day: 2.6, hat: 0,
     chu: 'Nhìn từ trên cao, một vùng châu thổ.' },
-  { id: 'tia-set',    ten: 'tia sét',      loai: 'nhanh', mau: '#c3b2f2', goc: 3, chia: .3,  run: .85, day: 1.3, hat: 0, thang: true },
-  { id: 'bong-tuyet', ten: 'bông tuyết',   loai: 'nhanh', mau: '#cfe6f5', goc: 6, chia: .42, run: .14, day: 1.4, hat: 1.4, doiXung: 6,
+  { id: 'tia-set',    ten: 'tia sét',      loai: 'nhanh', mau: '#e6dcff', goc: 3, chia: .3,  run: .85, day: 1.3, hat: 0, thang: true },
+  { id: 'bong-tuyet', ten: 'bông tuyết',   loai: 'nhanh', mau: '#d8ecfa', goc: 6, chia: .42, run: .14, day: 1.4, hat: 1.4, doiXung: 6,
     chu: 'Rồi lại về mạng vũ trụ. Cùng một hình vẽ, ở mọi cỡ.' },
 ];
 const N = CANH.length;
@@ -43,62 +43,244 @@ const nn = (a) => () => { a |= 0; a = (a + 0x6D2B79F5) | 0;
   t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
   return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 
-/* ---------- dựng hình cho từng cảnh, toạ độ trong hình tròn bán kính 1 ---------- */
-function dungCanh(c, i) {
-  const rnd = nn(9176 + i * 7919);
-  const doan = [], hat = [];
+/* ---------- dựng hình riêng cho từng cảnh ----------
+   Mỗi cảnh có nét vẽ riêng chứ không dùng chung một hàm mọc nhánh,
+   vì như vậy cảnh nào cũng ra một kiểu cây, nhìn không nhận ra là gì.
+   Hình vẽ nằm trong hình tròn bán kính 1, chừa lỗ giữa cho tầng sau. */
 
-  if (c.loai === 'mang') {                       // mạng vũ trụ: nút và sợi nối
-    const nut = [];
-    for (let k = 0; k < 30; k++) {
-      const a = rnd() * 6.2832, r = TRONG + Math.pow(rnd(), .62) * (1 - TRONG);
-      nut.push([Math.cos(a) * r, Math.sin(a) * r, .45 + rnd() * .9]);
-    }
-    for (let a = 0; a < nut.length; a++) {
-      const gan = nut.map((p, b) => [b, Math.hypot(p[0] - nut[a][0], p[1] - nut[a][1])])
-        .filter(([b]) => b !== a).sort((x, y) => x[1] - y[1]).slice(0, 2);
-      for (const [b, d] of gan) if (a < b || d < .34) doan.push([[nut[a][0], nut[a][1]], [nut[b][0], nut[b][1]], .55]);
-    }
-    for (const p of nut) hat.push([p[0], p[1], p[2]]);
-    return { doan, hat };
-  }
+const T2 = Math.PI * 2;
+const NGOAI = 1.0;   // không nhánh nào được mọc ra ngoài vòng này, kẻo tầng nọ đè tầng kia
+const raNgoai = (p) => Math.hypot(p[0], p[1]) > NGOAI;
 
-  // các cảnh còn lại: nhánh mọc từ vành trong ra ngoài
-  const moc_ = (x, y, a, r, day, sau_) => {
-    if (r > 1.02 || sau_ > 9 || day < .12) { if (c.hat && r > .5) hat.push([x, y, day * .9]); return; }
-    const buoc = .055 + rnd() * .05;
-    const a2 = a + (rnd() - .5) * c.run * (c.thang ? .55 : 1);
-    const nx = x + Math.cos(a2) * buoc, ny = y + Math.sin(a2) * buoc;
-    doan.push([[x, y], [nx, ny], day]);
-    const r2 = Math.hypot(nx, ny);
-    if (rnd() < c.chia && sau_ > 1) {
-      const t = .34 + rnd() * .3;
-      moc_(nx, ny, a2 - t, r2, day * .72, sau_ + 1);
-      moc_(nx, ny, a2 + t, r2, day * .72, sau_ + 1);
-    } else {
-      moc_(nx, ny, a2, r2, day * .965, sau_ + 1);
-    }
-  };
-  const doiXung = c.doiXung || 0;
-  const soGoc = doiXung || c.goc;
-  for (let k = 0; k < soGoc; k++) {
-    const a = k * 6.2832 / soGoc + (doiXung ? 0 : rnd() * .5);
-    moc_(Math.cos(a) * TRONG, Math.sin(a) * TRONG, a, TRONG, c.day, 0);
-    if (doiXung) break;                          // đối xứng thì vẽ một cánh rồi nhân bản
+
+const diNguoc = (p, a, d) => [p[0] + Math.cos(a) * d, p[1] + Math.sin(a) * d];
+
+/* Mạng vũ trụ: cụm thiên hà sáng nối nhau bằng sợi mảnh, giữa là khoảng trống. */
+function canhVuTru(rnd) {
+  const duong = [], dom = [], hao = [];
+  const cum = [];
+  for (let k = 0; k < 15; k++) {
+    const a = rnd() * T2, r = TRONG + .08 + Math.pow(rnd(), .7) * (.9 - TRONG);
+    cum.push([Math.cos(a) * r, Math.sin(a) * r, .018 + Math.pow(rnd(), 2) * .055]);
   }
-  if (doiXung) {
-    const g0 = doan.slice(), h0 = hat.slice();
-    for (let k = 1; k < doiXung; k++) {
-      const a = k * 6.2832 / doiXung, ca = Math.cos(a), sa = Math.sin(a);
-      const q = ([x, y]) => [x * ca - y * sa, x * sa + y * ca];
-      for (const [p1, p2, d] of g0) doan.push([q(p1), q(p2), d]);
-      for (const [x, y, d] of h0) { const [X, Y] = q([x, y]); hat.push([X, Y, d]); }
+  for (let a = 0; a < cum.length; a++) {
+    const gan = cum.map((p, b) => [b, Math.hypot(p[0] - cum[a][0], p[1] - cum[a][1])])
+      .filter(([b]) => b !== a).sort((x, y) => x[1] - y[1]).slice(0, 2);
+    for (const [b] of gan) {
+      if (b < a) continue;
+      const pts = [];
+      for (let s = 0; s <= 7; s++) {                  // sợi hơi cong, không thẳng đơ
+        const t = s / 7;
+        const x = cum[a][0] + (cum[b][0] - cum[a][0]) * t;
+        const y = cum[a][1] + (cum[b][1] - cum[a][1]) * t;
+        const w = Math.sin(t * Math.PI) * .05;
+        pts.push([x + (rnd() - .5) * w, y + (rnd() - .5) * w]);
+      }
+      duong.push({ pts, day: .7, mo: .34 });
+      for (let s = 0; s < 9; s++) {                   // thiên hà lẻ nằm rải trên sợi
+        const t = rnd(), k2 = Math.min(6, Math.floor(t * 7));
+        dom.push([pts[k2][0] + (rnd() - .5) * .05, pts[k2][1] + (rnd() - .5) * .05, .0035 + rnd() * .004, .5]);
+      }
     }
   }
-  return { doan, hat };
+  for (const [x, y, r] of cum) {
+    hao.push([x, y, r * 3.2, .5]);
+    dom.push([x, y, r * .5, .95]);
+    for (let k = 0; k < 7; k++) {
+      const a = rnd() * T2, d = r * (.7 + rnd() * 1.8);
+      dom.push([x + Math.cos(a) * d, y + Math.sin(a) * d, .004 + rnd() * .005, .7]);
+    }
+  }
+  return { duong, dom, hao, bang: [], hinh: [] };
 }
 
-const kho = CANH.map((c, i) => dungCanh(c, i));
+/* Nơ-ron: thân tế bào tròn có nhân, tua ngắn toả ra, một sợi trục dài kết thúc bằng chấm. */
+function canhNoRon(rnd) {
+  const duong = [], dom = [], hao = [], hinh = [];
+  const than = [];
+  for (let k = 0; k < 4; k++) {
+    const a = k * T2 / 4 + rnd() * .6, r = TRONG + .14 + rnd() * .3;
+    than.push([Math.cos(a) * r, Math.sin(a) * r, .045 + rnd() * .02, a]);
+  }
+  for (const [x, y, R, huong] of than) {
+    const vien = [];                                   // thân hơi méo, không tròn đều
+    for (let k = 0; k < 14; k++) {
+      const a = k * T2 / 14;
+      const rr = R * (.82 + rnd() * .38);
+      vien.push([x + Math.cos(a) * rr, y + Math.sin(a) * rr]);
+    }
+    hinh.push({ pts: vien, mo: .5 });
+    hao.push([x, y, R * 2.2, .3]);
+    dom.push([x, y, R * .34, .75]);                    // nhân
+
+    const soTua = 6;
+    for (let k = 0; k < soTua; k++) {
+      const a0 = k * T2 / soTua + rnd() * .5;
+      const tua = (p, a, d, dai_, cap) => {            // tua ngắn, chẻ nhiều, thon nhanh
+        if (cap > 3 || d < .1 || raNgoai(p)) return;
+        const pts = [p];
+        let cur = p, ang = a;
+        for (let s = 0; s < 5; s++) { ang += (rnd() - .5) * .5; cur = diNguoc(cur, ang, dai_ / 5); pts.push(cur); }
+        duong.push({ pts, day: d, mo: .55 });
+        if (rnd() < .75) {
+          tua(cur, ang - .45 - rnd() * .3, d * .6, dai_ * .68, cap + 1);
+          tua(cur, ang + .45 + rnd() * .3, d * .6, dai_ * .68, cap + 1);
+        } else dom.push([cur[0], cur[1], .004, .6]);
+      };
+      tua([x + Math.cos(a0) * R, y + Math.sin(a0) * R], a0, 1.5, .13 + rnd() * .07, 0);
+    }
+    // sợi trục: dài, thẳng hơn hẳn, cuối có cúc tận cùng
+    let cur = [x + Math.cos(huong) * R, y + Math.sin(huong) * R], ang = huong;
+    const pts = [cur];
+    for (let s = 0; s < 16; s++) { ang += (rnd() - .5) * .16; const t2 = diNguoc(cur, ang, .038); if (raNgoai(t2)) break; cur = t2; pts.push(cur); }
+    duong.push({ pts, day: 1.15, mo: .5 });
+    dom.push([cur[0], cur[1], .011, .85]);
+  }
+  return { duong, dom, hao, bang: [], hinh };
+}
+
+/* Mạch máu: ống to chẻ dần thành ống nhỏ, vẽ bằng dải có bề dày thon, không bao giờ nhập lại. */
+function canhMachMau(rnd) {
+  const bang = [];
+  const chay = (p, a, w, cap) => {
+    if (cap > 6 || w < .0016 || raNgoai(p)) return;
+    const pts = [p]; let cur = p, ang = a;
+    const khuc = 5 + Math.floor(rnd() * 3);
+    for (let s = 0; s < khuc; s++) { ang += (rnd() - .5) * .34; const t2 = diNguoc(cur, ang, .020 + rnd() * .012); if (raNgoai(t2)) break; cur = t2; pts.push(cur); }
+    bang.push({ pts, w0: w, w1: w * .86 });
+    const t = .3 + rnd() * .18;
+    chay(cur, ang - t, w * .76, cap + 1);
+    chay(cur, ang + t, w * .76, cap + 1);
+  };
+  for (let k = 0; k < 3; k++) {
+    const a = k * T2 / 3 + rnd() * .5;
+    chay([Math.cos(a) * TRONG, Math.sin(a) * TRONG], a, .055, 0);
+  }
+  return { duong: [], dom: [], hao: [], bang, hinh: [] };
+}
+
+/* Rễ cây: nhánh thon, cong đều, và điểm nhận ra là có lông rễ tua tủa hai bên. */
+function canhReCay(rnd) {
+  const duong = [], dom = [];
+  const re = (p, a, d, cap) => {
+    if (cap > 5 || d < .18 || raNgoai(p)) return;
+    const pts = [p]; let cur = p, ang = a;
+    for (let s = 0; s < 7; s++) {
+      ang += (rnd() - .5) * .26; const truoc = cur; const t2 = diNguoc(cur, ang, .022); if (raNgoai(t2)) break; cur = t2; pts.push(cur);
+      if (cap < 4) for (let h = 0; h < 2; h++) {       // lông rễ
+        const b = ang + (h ? 1.4 : -1.4) + (rnd() - .5) * .5;
+        duong.push({ pts: [truoc, diNguoc(truoc, b, .012 + rnd() * .016)], day: .35, mo: .3 });
+      }
+    }
+    duong.push({ pts, day: d, mo: .55 });
+    if (rnd() < .72) { re(cur, ang - .3 - rnd() * .25, d * .68, cap + 1); re(cur, ang + .3 + rnd() * .25, d * .68, cap + 1); }
+    else { re(cur, ang + (rnd() - .5) * .3, d * .8, cap + 1); dom.push([cur[0], cur[1], .005, .5]); }
+  };
+  for (let k = 0; k < 5; k++) {
+    const a = k * T2 / 5 + rnd() * .5;
+    re([Math.cos(a) * TRONG, Math.sin(a) * TRONG], a, 2.1, 0);
+  }
+  return { duong, dom, hao: [], bang: [], hinh: [] };
+}
+
+/* Sông ngòi: lòng sông uốn lượn, có chỗ tách ra rồi nhập lại, giữa dòng có cồn cát. */
+function canhSong(rnd) {
+  const bang = [], hinh = [];
+  const chay = (p, a, w, cap) => {
+    if (cap > 5 || w < .003 || raNgoai(p)) return;
+    const pts = [p]; let cur = p, ang = a;
+    const khuc = 8;
+    for (let s = 0; s < khuc; s++) {
+      ang += Math.sin(s * 1.1 + cap) * .3 + (rnd() - .5) * .2;   // uốn lượn kiểu sông
+      const t2 = diNguoc(cur, ang, .019); if (raNgoai(t2)) break; cur = t2; pts.push(cur);
+      if (rnd() < .3 && w > .008) {                              // cồn cát giữa dòng
+        const b = ang + Math.PI / 2, d = w * .35;
+        hinh.push({ pts: [diNguoc(cur, ang, .022), diNguoc(diNguoc(cur, b, d), ang, 0),
+                          diNguoc(cur, ang, -.022), diNguoc(diNguoc(cur, b, -d), ang, 0)], mo: .35 });
+      }
+    }
+    bang.push({ pts, w0: w, w1: w * .82 });
+    if (rnd() < .8) {
+      const t = .3 + rnd() * .25;
+      chay(cur, ang - t, w * .7, cap + 1);
+      chay(cur, ang + t, w * .7, cap + 1);
+      if (rnd() < .35 && pts.length > 2) {                        // một nhánh nhỏ tách ra rồi nhập lại
+        const giua = pts[Math.floor(pts.length / 2)];
+        bang.push({ pts: [giua, diNguoc(giua, ang + 1.1, .05), diNguoc(cur, ang + .4, .03), cur], w0: w * .3, w1: w * .3 });
+      }
+    }
+  };
+  for (let k = 0; k < 2; k++) {
+    const a = k * Math.PI + rnd() * .8;
+    chay([Math.cos(a) * TRONG, Math.sin(a) * TRONG], a, .052, 0);
+  }
+  return { duong: [], dom: [], hao: [], bang, hinh };
+}
+
+/* Tia sét: gãy khúc sắc cạnh, rất ít nhánh, nhánh phụ tắt nhanh. Lõi trắng, quầng tím. */
+function canhTiaSet(rnd) {
+  const duong = [];
+  const set = (p, a, d, cap) => {
+    if (cap > 3 || d < .25 || raNgoai(p)) return;
+    let cur = p, ang = a;
+    const pts = [cur];
+    const khuc = cap === 0 ? 11 : 5;
+    for (let s = 0; s < khuc; s++) {
+      ang = a + (rnd() - .5) * 1.25;                    // đổi hướng đột ngột, không làm mượt
+      const t2 = diNguoc(cur, ang, .035 + rnd() * .035); if (raNgoai(t2)) break; cur = t2; pts.push(cur);
+      if (rnd() < .22 && cap < 3) set(cur, ang + (rnd() < .5 ? -1 : 1) * (.6 + rnd() * .5), d * .5, cap + 1);
+    }
+    duong.push({ pts, day: d * 3.2, mo: .12 });         // quầng
+    duong.push({ pts, day: d, mo: .85 });               // lõi
+  };
+  for (let k = 0; k < 3; k++) {
+    const a = k * T2 / 3 + rnd() * .7;
+    set([Math.cos(a) * TRONG, Math.sin(a) * TRONG], a, 1.1, 0);
+  }
+  return { duong, dom: [], hao: [], bang: [], hinh: [] };
+}
+
+/* Bông tuyết: sáu cánh giống hệt nhau, nhánh phụ đúng 60 độ, giữa là tấm lục giác. */
+function canhBongTuyet(rnd) {
+  const duong = [], hinh = [];
+  const luc = (x, y, r) => {
+    const p = []; for (let k = 0; k < 6; k++) { const a = k * T2 / 6 + Math.PI / 6; p.push([x + Math.cos(a) * r, y + Math.sin(a) * r]); }
+    return p;
+  };
+  const canh = [], hinhCanh = [];
+  const A = 0;                                          // dựng một cánh dọc trục x rồi nhân bản
+  let x = TRONG;
+  const dai = .96 - TRONG;
+  canh.push({ pts: [[TRONG, 0], [.96, 0]], day: 2.2, mo: .75 });
+  const soNhanh = 5;
+  for (let k = 1; k <= soNhanh; k++) {
+    const t = k / (soNhanh + 1);
+    const px = TRONG + dai * t;
+    const L = dai * (.34 - t * .2);
+    for (const dau of [1, -1]) {
+      const a = dau * Math.PI / 3;
+      const q = [px + Math.cos(a) * L, Math.sin(a) * L];
+      canh.push({ pts: [[px, 0], q], day: 1.4, mo: .6 });
+      for (const d2 of [1, -1]) {                       // nhánh con cũng 60 độ
+        const a2 = a + d2 * Math.PI / 3, L2 = L * .42;
+        canh.push({ pts: [q, [q[0] + Math.cos(a2) * L2, q[1] + Math.sin(a2) * L2]], day: .8, mo: .45 });
+      }
+    }
+    if (k % 2 === 1) hinhCanh.push({ pts: luc(px, 0, dai * .028), mo: .3 });
+  }
+  hinhCanh.push({ pts: luc(.96, 0, dai * .05), mo: .35 });
+  for (let k = 0; k < 6; k++) {
+    const a = k * T2 / 6, ca = Math.cos(a), sa = Math.sin(a);
+    const q = ([X, Y]) => [X * ca - Y * sa, X * sa + Y * ca];
+    for (const d of canh) duong.push({ pts: d.pts.map(q), day: d.day, mo: d.mo });
+    for (const h of hinhCanh) hinh.push({ pts: h.pts.map(q), mo: h.mo });
+  }
+  return { duong, dom: [], hao: [], bang: [], hinh };
+}
+
+const XUONG = { 'vu-tru': canhVuTru, 'no-ron': canhNoRon, 'mach-mau': canhMachMau,
+                're-cay': canhReCay, 'song': canhSong, 'tia-set': canhTiaSet, 'bong-tuyet': canhBongTuyet };
+const kho = CANH.map((c, i) => XUONG[c.id](nn(9176 + i * 7919)));
 
 /* ---------- vẽ một tầng ---------- */
 function veTang(R, xoay, mo, chiSo) {
@@ -109,22 +291,46 @@ function veTang(R, xoay, mo, chiSo) {
   ctx.strokeStyle = c.mau; ctx.fillStyle = c.mau;
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
 
-  ctx.globalAlpha = mo * .5;
-  for (const [p1, p2, d] of h.doan) {
-    ctx.lineWidth = Math.max(.3, d * R * .0055);
-    ctx.beginPath();
-    ctx.moveTo(p1[0] * R, p1[1] * R);
-    ctx.lineTo(p2[0] * R, p2[1] * R);
-    ctx.stroke();
+  for (const { x, y, r, a } of h.hao.map(([x, y, r, a]) => ({ x, y, r, a }))) {
+    const g = ctx.createRadialGradient(x * R, y * R, 0, x * R, y * R, r * R);
+    g.addColorStop(0, c.mau); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.globalAlpha = mo * a * .5; ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x * R, y * R, r * R, 0, T2); ctx.fill();
   }
-  if (c.hat) {
-    ctx.globalAlpha = mo * .8;
-    for (const [x, y, d] of h.hat) {
+  ctx.fillStyle = c.mau;
+
+  for (const { pts, mo: m } of h.hinh) {
+    ctx.globalAlpha = mo * m;
+    ctx.beginPath(); ctx.moveTo(pts[0][0] * R, pts[0][1] * R);
+    for (const p of pts) ctx.lineTo(p[0] * R, p[1] * R);
+    ctx.closePath(); ctx.fill();
+  }
+
+  for (const { pts, w0, w1 } of h.bang) {               // dải có bề dày thon dần
+    ctx.globalAlpha = mo * .55;
+    for (let s = 0; s < pts.length - 1; s++) {
+      const t = s / (pts.length - 1);
+      ctx.lineWidth = Math.max(.4, (w0 + (w1 - w0) * t) * R);
       ctx.beginPath();
-      ctx.arc(x * R, y * R, Math.max(.4, c.hat * d * R * .0042), 0, 6.284);
-      ctx.fill();
+      ctx.moveTo(pts[s][0] * R, pts[s][1] * R);
+      ctx.lineTo(pts[s + 1][0] * R, pts[s + 1][1] * R);
+      ctx.stroke();
     }
   }
+
+  for (const { pts, day, mo: m } of h.duong) {
+    ctx.globalAlpha = mo * m;
+    ctx.lineWidth = Math.max(.3, day * R * .0026);
+    ctx.beginPath(); ctx.moveTo(pts[0][0] * R, pts[0][1] * R);
+    for (let s = 1; s < pts.length; s++) ctx.lineTo(pts[s][0] * R, pts[s][1] * R);
+    ctx.stroke();
+  }
+
+  for (const [x, y, r, a] of h.dom) {
+    ctx.globalAlpha = mo * a;
+    ctx.beginPath(); ctx.arc(x * R, y * R, Math.max(.35, r * R), 0, T2); ctx.fill();
+  }
+
   ctx.restore();
   ctx.globalAlpha = 1;
 }
@@ -187,7 +393,7 @@ function buoc(t) {
   ctx.globalAlpha = 1;
 
   const le = sau - Math.floor(sau), goc = Math.floor(sau);
-  const R0 = Math.max(W, H) * .82;
+  const R0 = Math.min(W, H) * .48;    // tầng số 0 rộng đúng bằng bề ngang màn hình, khớp với tên hiện trên đầu
   ctx.save();
   ctx.translate(W / 2, H / 2);
   for (let i = -TREN; i <= DUOI; i++) {

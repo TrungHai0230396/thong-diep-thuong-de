@@ -138,7 +138,17 @@ Mã ở `assets/infinite.js`. Phóng vào mãi không hết, **mỗi tầng mộ
 
 Bảy cảnh trông rất khác nhau nhưng đều là cùng một cấu trúc phân nhánh, chỉ khác tham số và màu. Đó là toàn bộ nội dung của trò này.
 
-Không dùng ảnh nào. Mỗi cảnh sinh bằng thuật toán từ một hạt giống cố định: cảnh mạng vũ trụ rải nút rồi nối hai nút gần nhất, sáu cảnh còn lại mọc nhánh từ vành trong ra ngoài với xác suất chẻ đôi và độ run khác nhau. Bông tuyết thì vẽ một cánh rồi nhân bản sáu lần cho đối xứng. Mỗi cảnh chừa một lỗ tròn ở giữa để cảnh tầng sau chui ra.
+Không dùng ảnh nào, mọi cảnh sinh bằng thuật toán từ một hạt giống cố định. **Mỗi cảnh có hàm vẽ riêng**, không dùng chung một hàm mọc nhánh, vì làm vậy thì cảnh nào cũng ra một kiểu cây và không nhận ra là gì:
+
+- **mạng vũ trụ**: 15 cụm sáng to nhỏ khác nhau, nối hai cụm gần nhất bằng sợi hơi cong, rải thiên hà lẻ dọc sợi
+- **mạng nơ-ron**: bốn thân tế bào méo có nhân, sáu tua ngắn chẻ nhiều toả ra, kèm một sợi trục dài thẳng hơn hẳn kết thúc bằng cúc tận cùng
+- **mạch máu**: ống to chẻ đôi góc hẹp thành ống nhỏ, vẽ bằng dải có bề dày thon dần, không bao giờ nhập lại
+- **rễ cây**: nhánh thon cong đều, dấu nhận biết là lông rễ tua tủa hai bên mỗi đoạn
+- **sông ngòi**: lòng sông uốn lượn kiểu sin, có nhánh tách ra rồi nhập lại, giữa dòng có cồn cát
+- **tia sét**: gãy khúc sắc cạnh không làm mượt, rất ít nhánh, lõi sáng nằm trên một quầng mờ
+- **bông tuyết**: vẽ một cánh với nhánh phụ đúng 60 độ rồi nhân bản sáu lần
+
+Mọi nhánh bị chặn không cho mọc ra ngoài vòng bán kính 1, nếu không tầng nọ đè lên tầng kia. Mỗi cảnh chừa một lỗ tròn ở giữa để cảnh tầng sau chui ra. Khung vẽ tính theo cạnh ngắn của màn hình nên tầng đang xem rộng đúng bằng bề ngang điện thoại, khớp với tên hiện trên đầu.
 
 Vòng lặp liền mạch: mỗi tầng nhỏ hơn tầng ngoài 0,42 lần và xoay thêm `π/9`, và chu kỳ cảnh là 7. Nên khi độ sâu tăng thêm 7, khung hình trùng khít với lúc đầu. Kiểm bằng cách so chuỗi ảnh ở tầng 2,4 với tầng 9,4 và tầng 702,4: giống từng điểm ảnh, còn tầng 3,4 thì khác.
 
