@@ -299,8 +299,8 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   opacity:0;transition:opacity 1s ease;text-shadow:0 2px 14px rgba(0,0,0,.8)}
 .bt-canh.hien{opacity:1}
 .bt-loi{position:absolute;left:50%;transform:translateX(-50%);z-index:3;pointer-events:none;
-  bottom:calc(96px + env(safe-area-inset-bottom,0px));width:min(86vw,380px);margin:0;text-align:center;
-  font-family:"Cormorant Garamond",Georgia,serif;font-size:20px;line-height:1.5;color:#f4efe6;
+  bottom:calc(88px + env(safe-area-inset-bottom,0px));width:min(88vw,400px);margin:0;text-align:center;
+  font-family:"Cormorant Garamond",Georgia,serif;font-size:17.5px;line-height:1.55;color:#f4efe6;
   text-shadow:0 2px 18px rgba(0,0,0,.85);opacity:0;transition:opacity 1.6s ease}
 .bt-loi.hien{opacity:1}
 .bt-nhac{position:absolute;left:0;right:0;z-index:3;pointer-events:none;text-align:center;margin:0;

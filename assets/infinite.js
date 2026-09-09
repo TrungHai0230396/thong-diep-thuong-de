@@ -14,16 +14,19 @@ const TRONG = 0.30;              // chừa lỗ giữa cho cảnh tầng sau chu
 
 const CANH = [
   { id: 'vu-tru',     ten: 'mạng vũ trụ',  loai: 'mang',  mau: '#aac4f0', hat: 3.4, day: .85,
-    chu: 'Các thiên hà nối nhau thành sợi, khoảng giữa là những khoảng trống mênh mông.' },
+    chu: 'Thiên hà không rải đều mà tụ thành sợi. Giữa các sợi là những khoảng trống rộng hàng trăm triệu năm ánh sáng, chiếm chừng 80 phần trăm thể tích vũ trụ nhưng chỉ chứa 20 phần trăm vật chất.' },
   { id: 'no-ron',     ten: 'mạng nơ-ron',  loai: 'nhanh', mau: '#e8c37a', goc: 7, chia: .52, run: .55, day: 1.5, hat: 1.9,
-    chu: 'Tế bào thần kinh trong não người. Năm 2020 có nghiên cứu đo và thấy nó xếp giống hệt mạng vũ trụ.' },
-  { id: 'mach-mau',   ten: 'mạch máu',     loai: 'nhanh', mau: '#e0656f', goc: 5, chia: .56, run: .38, day: 2.1, hat: 0 },
-  { id: 're-cay',     ten: 'rễ cây',       loai: 'nhanh', mau: '#c9a473', goc: 6, chia: .48, run: .34, day: 1.7, hat: 0 },
+    chu: 'Tế bào thần kinh trong não người. Năm 2020, Vazza và Feletti đo và so mạng này với mạng vũ trụ, thấy hai bên cùng một mức phức tạp, dù chênh nhau 27 bậc độ lớn.' },
+  { id: 'mach-mau',   ten: 'mạch máu',     loai: 'nhanh', mau: '#e0656f', goc: 5, chia: .56, run: .38, day: 2.1, hat: 0,
+    chu: 'Ống to chẻ mãi thành ống nhỏ, tới mao mạch thì đường kính chỉ còn chừng tám phần triệu mét. Riêng mao mạch đã chiếm hơn 90 phần trăm tổng chiều dài mạch máu trong người.' },
+  { id: 're-cay',     ten: 'rễ cây',       loai: 'nhanh', mau: '#c9a473', goc: 6, chia: .48, run: .34, day: 1.7, hat: 0,
+    chu: 'Năm 1937, Dittmer đào nguyên bộ rễ một cây lúa mạch đen bốn tháng tuổi. Hơn 13 triệu nhánh, nối lại dài chừng 620 cây số. Tính cả lông rễ thì lên tới 11 nghìn cây số.' },
   { id: 'song',       ten: 'sông ngòi',    loai: 'nhanh', mau: '#6fc3e8', goc: 4, chia: .52, run: .46, day: 2.6, hat: 0,
-    chu: 'Nhìn từ trên cao, một vùng châu thổ.' },
-  { id: 'tia-set',    ten: 'tia sét',      loai: 'nhanh', mau: '#e6dcff', goc: 3, chia: .3,  run: .85, day: 1.3, hat: 0, thang: true },
+    chu: 'Sông Cửu Long mang tên chín cửa. Nay chỉ còn bảy: cửa Ba Lai bị cống ngăn mặn khoá lại, cửa Ba Thắc thì phù sa bồi lấp dần.' },
+  { id: 'tia-set',    ten: 'tia sét',      loai: 'nhanh', mau: '#e6dcff', goc: 3, chia: .3,  run: .85, day: 1.3, hat: 0, thang: true,
+    chu: 'Trong vài phần triệu giây, không khí trong lòng tia sét nóng tới chừng 30 nghìn độ Kelvin, hơn năm lần bề mặt Mặt Trời. Chính cú giãn nở đột ngột đó nứt ra thành tiếng sấm.' },
   { id: 'bong-tuyet', ten: 'bông tuyết',   loai: 'nhanh', mau: '#d8ecfa', goc: 6, chia: .42, run: .14, day: 1.4, hat: 1.4, doiXung: 6,
-    chu: 'Rồi lại về mạng vũ trụ. Cùng một hình vẽ, ở mọi cỡ.' },
+    chu: 'Sáu cánh là vì khi đóng băng, phân tử nước xếp thành mạng lục giác. Hình cụ thể do nhiệt độ và độ ẩm quyết định, điều Nakaya lập thành biểu đồ từ những năm 1930. Rồi lại về mạng vũ trụ. Cùng một hình vẽ, ở mọi cỡ.' },
 ];
 const N = CANH.length;
 
