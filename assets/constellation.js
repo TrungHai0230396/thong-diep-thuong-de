@@ -4,43 +4,155 @@
 (() => {
 'use strict';
 
+/* Mỗi ngôi sao ghi bằng toạ độ thiên văn thật (xích kinh giờ, xích vĩ độ, mốc J2000)
+   rồi chương trình tự chiếu xuống khung 0..1, nên hình dạng đúng như trên trời
+   chứ không phải đặt tay. Thêm chòm mới chỉ cần tra toạ độ, không phải căn chỉnh. */
+/* Mỗi ngôi sao ghi bằng số liệu thiên văn thật: xích kinh (giờ), xích vĩ (độ) mốc J2000,
+   và khoảng cách tới Trái Đất (năm ánh sáng). Chương trình dựng vị trí ba chiều rồi chiếu
+   xuống màn hình, nên nhìn từ Trái Đất thì hình đúng như trên trời, còn xoay đi thì hình vỡ ra
+   — vì chòm sao vốn chỉ là một góc nhìn, không phải một vật có thật.
+   Vài khoảng cách còn tranh cãi trong giới thiên văn, rõ nhất là Betelgeuse và Alnilam. */
 const CHOM = [
-  {
-    ten: 'Tua Rua',
-    phu: 'cụm sao Thất Nữ · sao Mạ',
-    loi: 'Nông dân đồng bằng Bắc Bộ gọi là sao Mạ, vì Tua Rua ló lên là tới mùa gieo mạ.',
-    cadao: 'Tua rua đi rắc mạ mùa\nTiểu thử đi bừa, cày ruộng rất sâu',
-    sao: [[.30,.30],[.44,.22],[.58,.28],[.50,.42],[.36,.48],[.62,.46],[.46,.58]],
-    noi: [[0,1],[1,2],[2,3],[3,4],[0,4],[3,5],[4,6],[6,5]],
-  },
   {
     ten: 'Bắc Đẩu',
     phu: 'bảy sao của chòm Đại Hùng',
-    loi: 'Hình cái gàu múc nước. Kéo dài mép ngoài của gàu chừng năm lần là gặp sao Bắc Cực, nên xưa đi biển đi rừng nhìn nó tìm phương bắc.',
+    loi: 'Hình cái gàu múc nước: bốn ngôi làm thân gàu, ba ngôi làm cán. Kéo dài mép ngoài thân gàu chừng năm lần là gặp sao Bắc Cực, nên xưa đi biển đi rừng nhìn nó tìm phương bắc.',
+    xoay: 'Năm ngôi ở giữa cùng sinh ra từ một đám mây khí và đang trôi cùng hướng. Riêng Thiên Xu và Dao Quang ở hai đầu thì không cùng họ, nên vài chục vạn năm nữa cái gàu sẽ méo dần rồi tan.',
     cadao: '',
-    sao: [[.18,.62],[.32,.66],[.46,.64],[.58,.56],[.68,.42],[.58,.30],[.44,.32]],
-    noi: [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,3]],
+    sao: [
+      ['Thiên Xu (Dubhe)',     11.0621,  61.751, 123],
+      ['Thiên Toàn (Merak)',   11.0307,  56.382,  79.7],
+      ['Thiên Cơ (Phecda)',    11.8972,  53.695,  83.2],
+      ['Thiên Quyền (Megrez)', 12.2571,  57.033,  80.5],
+      ['Ngọc Hành (Alioth)',   12.9005,  55.960,  82.6],
+      ['Khai Dương (Mizar)',   13.3987,  54.925,  82.9],
+      ['Dao Quang (Alkaid)',   13.7924,  49.313, 103.9],
+    ],
+    noi: [[0,1],[1,2],[2,3],[3,0],[3,4],[4,5],[5,6]],
   },
   {
     ten: 'Lưỡi Cày',
-    phu: 'ba sao giữa chòm Lạp Hộ',
+    phu: 'chòm Lạp Hộ',
     loi: 'Bốn ngôi ngoài là bốn góc thửa ruộng, ba ngôi thẳng hàng ở giữa là lưỡi cày. Tháng Giêng chừng chín giờ tối nhìn rõ nhất.',
+    xoay: 'Ba ngôi thắt lưng nhìn từ đây thì thẳng tăm tắp, nhưng ngôi xa nhất cách ta gần gấp đôi ngôi gần nhất. Chúng chỉ tình cờ nằm cùng một hướng nhìn.',
     cadao: '',
-    sao: [[.30,.24],[.62,.20],[.40,.46],[.48,.50],[.56,.54],[.26,.74],[.62,.78]],
-    noi: [[0,2],[2,3],[3,4],[4,1],[0,5],[1,6],[5,2],[4,6]],
+    sao: [
+      ['Betelgeuse', 5.9195,   7.407,  550],
+      ['Bellatrix',  5.4188,   6.350,  243],
+      ['Mintaka',    5.5334,  -0.299,  916],
+      ['Alnilam',    5.6036,  -1.202, 1300],
+      ['Alnitak',    5.6793,  -1.943,  736],
+      ['Saiph',      5.7959,  -9.670,  645],
+      ['Rigel',      5.2423,  -8.202,  848],
+    ],
+    noi: [[0,1],[1,2],[2,3],[3,4],[4,0],[4,5],[2,6]],
+  },
+  {
+    ten: 'Tua Rua',
+    phu: 'cụm sao Thất Nữ · sao Mạ',
+    loi: 'Nông dân đồng bằng Bắc Bộ gọi là sao Mạ, vì Tua Rua ló lên là tới mùa gieo mạ. Mắt thường thấy chừng sáu bảy ngôi, xếp thành cái gàu tí hon.',
+    xoay: 'Xoay thế nào chúng cũng dính chùm với nhau, chỉ nghiêng đi chứ không vỡ. Đây là cụm sao thật: bảy ngôi cùng sinh ra một chỗ, cách nhau vài năm ánh sáng và vẫn đang đi cùng nhau, khác hẳn mấy chòm kia.',
+    cadao: 'Tua rua đi rắc mạ mùa\nTiểu thử đi bừa, cày ruộng rất sâu',
+    // Cụm này ở quanh 135 parsec, tức chừng 440 năm ánh sáng. Các ngôi sáng nằm cách nhau
+    // chỉ vài năm ánh sáng nên ghi cùng một khoảng cách là sát thực tế hơn là chép
+    // các số đo lẻ từng ngôi, vốn sai số lớn hơn cả bề dày thật của cụm.
+    sao: [
+      ['Alcyone', 3.7914, 24.105, 440],
+      ['Atlas',   3.8194, 24.053, 440],
+      ['Electra', 3.7483, 24.113, 440],
+      ['Maia',    3.7644, 24.368, 440],
+      ['Merope',  3.7719, 23.948, 440],
+      ['Taygeta', 3.7539, 24.467, 440],
+      ['Pleione', 3.8203, 24.136, 440],
+    ],
+    noi: [[2,4],[4,0],[0,1],[1,6],[2,3],[3,5],[3,0]],
   },
   {
     ten: 'Thần Nông',
     phu: 'nhóm sao dân gian, phần trên chòm Thiên Yết',
-    loi: 'Người xưa thấy hình ông Thần Nông chống gậy. Đây là cách gọi dân gian cho một nhóm sao, không trùng khớp với chòm Thiên Yết trong thiên văn.',
+    loi: 'Người xưa thấy hình ông Thần Nông chống gậy. Đây là cách gọi dân gian cho một nhóm sao, không trùng khớp với chòm Thiên Yết trong thiên văn học, vì thiếu phần đuôi bọ cạp.',
+    xoay: 'Ngôi cuối ở chân hình chỉ cách ta chừng sáu mươi lăm năm ánh sáng, gần gấp gần mười lần các ngôi còn lại. Xoay một chút là nó rời hẳn ra.',
     cadao: '',
-    sao: [[.24,.24],[.36,.32],[.30,.44],[.46,.44],[.58,.50],[.66,.62],[.60,.74],[.46,.78]],
-    noi: [[0,1],[1,2],[1,3],[3,4],[4,5],[5,6],[6,7]],
+    sao: [
+      ['Acrab',       16.0903, -19.805, 400],
+      ['Dschubba',    16.0055, -22.622, 490],
+      ['Pi Sco',      15.9817, -26.114, 590],
+      ['Sigma Sco',   16.3533, -25.593, 700],
+      ['Antares',     16.4901, -26.432, 550],
+      ['Tau Sco',     16.5983, -28.216, 470],
+      ['Epsilon Sco', 16.8360, -34.293,  65],
+    ],
+    noi: [[2,1],[1,0],[1,3],[3,4],[4,5],[5,6]],
   },
 ];
 
+/* Vị trí ba chiều thật, gốc toạ độ là Trái Đất, đơn vị năm ánh sáng. */
+function viTri3D(sao) {
+  return sao.map(([, ra, dec, ly]) => {
+    const a = ra * 15 * Math.PI / 180, d = dec * Math.PI / 180;
+    return [ly * Math.cos(d) * Math.cos(a), ly * Math.cos(d) * Math.sin(a), ly * Math.sin(d)];
+  });
+}
+
+const tru = (a, b) => [a[0]-b[0], a[1]-b[1], a[2]-b[2]];
+const cong = (a, b) => [a[0]+b[0], a[1]+b[1], a[2]+b[2]];
+const nhan = (a, k) => [a[0]*k, a[1]*k, a[2]*k];
+const cham = (a, b) => a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+const tich = (a, b) => [a[1]*b[2]-a[2]*b[1], a[2]*b[0]-a[0]*b[2], a[0]*b[1]-a[1]*b[0]];
+const dai = (a) => Math.hypot(a[0], a[1], a[2]);
+const chuan = (a) => { const l = dai(a) || 1; return nhan(a, 1/l); };
+const xoayQuanh = (v, truc, goc) => {          // công thức Rodrigues
+  const c = Math.cos(goc), s = Math.sin(goc);
+  return cong(cong(nhan(v, c), nhan(tich(truc, v), s)), nhan(truc, cham(truc, v) * (1 - c)));
+};
+
+/* Chiếu các sao lên mặt phẳng ảnh.
+   quay = 0 nghĩa là đứng đúng chỗ Trái Đất, khi đó hình hiện ra y như nhìn lên trời thật. */
+function chieu(diem3d, tam3d, ngang, doc) {
+  const R = dai(tam3d) || 1;
+  const veTraiDat = chuan(nhan(tam3d, -1));
+  const bac = [0, 0, 1];
+  let ph = chuan(tich(veTraiDat, bac));
+  if (dai(ph) < 1e-6) ph = [1, 0, 0];
+  const tren0 = chuan(tich(ph, veTraiDat));
+  let huong = xoayQuanh(veTraiDat, tren0, ngang);
+  huong = xoayQuanh(huong, chuan(tich(huong, tren0)), doc);
+  const may = cong(tam3d, nhan(huong, R));            // vị trí người xem
+  const truoc = chuan(tru(tam3d, may));
+  let phai = tich(truoc, bac);
+  if (dai(phai) < 1e-6) phai = tich(truoc, [0, 1, 0]);
+  phai = chuan(phai);
+  const tren = chuan(tich(phai, truoc));
+  return diem3d.map(p => {
+    const v = tru(p, may);
+    const sau = Math.max(cham(v, truoc), R * .02);     // chặn sao rơi ra sau lưng
+    return [cham(v, phai) / sau, -cham(v, tren) / sau, sau];
+  });
+}
+
+
+/* Chiếu toạ độ thiên văn xuống khung vuông 0..1, giữ đúng tỉ lệ hình.
+   Xích kinh tăng về phía đông, trên bầu trời đông nằm bên trái, nên trục x đảo dấu. */
+function chieuSao(sao) {
+  const decTB = sao.reduce((s, r) => s + r[2], 0) / sao.length;
+  const k = Math.cos(decTB * Math.PI / 180);
+  const tho = sao.map(([, ra, dec]) => [-ra * 15 * k, -dec]);
+  const xs = tho.map(t => t[0]), ys = tho.map(t => t[1]);
+  const x0 = Math.min(...xs), x1 = Math.max(...xs);
+  const y0 = Math.min(...ys), y1 = Math.max(...ys);
+  const rong = x1 - x0, cao = y1 - y0;
+  const canh = Math.max(rong, cao) || 1;
+  const le = 0.08, ty = 1 - le * 2;
+  const dx = le + (canh - rong) / canh * ty / 2;
+  const dy = le + (canh - cao) / canh * ty / 2;
+  return tho.map(([x, y]) => [dx + (x - x0) / canh * ty, dy + (y - y0) / canh * ty]);
+}
+
+
 let tam, cv, ctx, W, H, DPR, raf = null, tTruoc = 0;
 let chi = 0, diem = [], canhCanNoi = [], daNoi = new Set(), keo = null, xong = false, sangDan = 0, nen = [];
+let banKinhBam = 34;   // co lại ở chòm có sao nằm sát nhau, để không bắt nhầm ngôi bên cạnh
+let goc3d = [0, 0], tyLe = 0, tyLeDich = 0, tam3d = null, diem3d = null, xoayTay = null, oX = 0, oY = 0;
 
 const rnd = (a, b) => a + Math.random() * (b - a);
 const khoa = (a, b) => a < b ? a + '-' + b : b + '-' + a;
@@ -57,6 +169,7 @@ function dungKhung() {
       <p class="cs-phu"></p>
     </div>
     <p class="cs-nhac">Kéo từ ngôi sao này sang ngôi sao kia</p>
+    <button class="cs-goc" hidden>Về góc nhìn Trái Đất</button>
     <div class="cs-xong" hidden>
       <p class="cs-loi"></p>
       <p class="cs-cadao"></p>
@@ -67,20 +180,33 @@ function dungKhung() {
   ctx = cv.getContext('2d');
   tam.querySelector('.cs-dong').onclick = dong;
   tam.querySelector('.cs-tiep').onclick = () => nap((chi + 1) % CHOM.length);
+  tam.querySelector('.cs-goc').onclick = () => { goc3d = [0, 0]; xoayTay = null; };
 
   const toa = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
   const gan = (p) => {
-    let tot = -1, gn = 34;
+    let tot = -1, gn = banKinhBam;
     diem.forEach((d, i) => { const k = Math.hypot(d.x - p.x, d.y - p.y); if (k < gn) { gn = k; tot = i; } });
     return tot;
   };
   cv.addEventListener('pointerdown', e => {
-    if (xong) return;
-    const i = gan(toa(e));
-    if (i >= 0) { keo = { tu: i, ...toa(e) }; cv.setPointerCapture(e.pointerId); }
+    const p = toa(e);
+    cv.setPointerCapture(e.pointerId);
+    if (xong) { xoayTay = { x: p.x, y: p.y, g0: goc3d.slice() }; return; }   // xong rồi thì kéo để xoay
+    const i = gan(p);
+    if (i >= 0) keo = { tu: i, ...p };
   });
-  cv.addEventListener('pointermove', e => { if (keo) Object.assign(keo, toa(e)); });
+  cv.addEventListener('pointermove', e => {
+    const p = toa(e);
+    if (xoayTay) {
+      const GH = 1.15;                                    // chặn góc, không cho lộn ngược
+      goc3d[0] = Math.max(-GH, Math.min(GH, xoayTay.g0[0] + (p.x - xoayTay.x) * .0055));
+      goc3d[1] = Math.max(-1.0, Math.min(1.0, xoayTay.g0[1] - (p.y - xoayTay.y) * .0055));
+      return;
+    }
+    if (keo) Object.assign(keo, p);
+  });
   cv.addEventListener('pointerup', e => {
+    if (xoayTay) { xoayTay = null; return; }
     if (!keo) return;
     const j = gan(toa(e));
     if (j >= 0 && j !== keo.tu) {
@@ -95,7 +221,7 @@ function dungKhung() {
     }
     keo = null;
   });
-  cv.addEventListener('pointercancel', () => { keo = null; });
+  cv.addEventListener('pointercancel', () => { keo = null; xoayTay = null; });
   addEventListener('resize', doCo);
 }
 
@@ -116,18 +242,43 @@ function doCo() {
 function datSao() {
   const c = CHOM[chi];
   if (!c || !W) return;
-  const leTren = 130, leDuoi = xong ? 250 : 120;
-  const oW = W - 60, oH = H - leTren - leDuoi;
-  const canh = Math.min(oW, oH);
-  const x0 = (W - canh) / 2, y0 = leTren + (oH - canh) / 2;
-  diem = c.sao.map(([sx, sy], i) => ({
-    x: x0 + sx * canh, y: y0 + sy * canh,
-    sang: diem[i] ? diem[i].sang : 0, nhay: rnd(0, 6.28),
+  diem3d = c._p3 || (c._p3 = viTri3D(c.sao));
+  tam3d = c._tam || (c._tam = nhan(diem3d.reduce(cong, [0, 0, 0]), 1 / diem3d.length));
+
+  const leTren = xong ? 172 : 132, leDuoi = xong ? 250 : 118;
+  oX = W / 2;
+  oY = leTren + (H - leTren - leDuoi) / 2;
+  const khung = Math.min(W - 56, H - leTren - leDuoi) * .92;
+
+  const ph = chieu(diem3d, tam3d, goc3d[0], goc3d[1]);
+  let rong = 0;
+  for (const [x, y] of ph) rong = Math.max(rong, Math.abs(x) * 2, Math.abs(y) * 2);
+  tyLeDich = khung / (rong || 1);
+  if (!tyLe) tyLe = tyLeDich;                       // lần đầu thì khớp luôn, không phóng dần
+
+  veLaiDiem(ph);
+
+  /* Có chòm mà hai ngôi nằm rất sát nhau ngoài trời thật, như hai sao giữa lưỡi cày.
+     Thay vì kéo giãn cho dễ bấm, giữ nguyên hình và thu nhỏ vùng bắt điểm lại. */
+  let gapMin = Infinity;
+  for (let a = 0; a < diem.length; a++)
+    for (let b = a + 1; b < diem.length; b++)
+      gapMin = Math.min(gapMin, Math.hypot(diem[a].x - diem[b].x, diem[a].y - diem[b].y));
+  banKinhBam = Math.max(13, Math.min(34, gapMin * .46));
+}
+
+function veLaiDiem(ph) {
+  const c = CHOM[chi];
+  diem = ph.map(([x, y, sau], i) => ({
+    x: oX + x * tyLe, y: oY + y * tyLe, sau,
+    ten: c.sao[i][0], ly: c.sao[i][3],
+    sang: diem[i] ? diem[i].sang : 0, nhay: diem[i] ? diem[i].nhay : rnd(0, 6.28),
   }));
 }
 
 function nap(i) {
   chi = i; xong = false; sangDan = 0; daNoi = new Set(); keo = null;
+  goc3d = [0, 0]; tyLe = 0; xoayTay = null;
   const c = CHOM[chi];
   canhCanNoi = new Set(c.noi.map(([a, b]) => khoa(a, b)));
   diem = [];
@@ -135,7 +286,9 @@ function nap(i) {
   tam.querySelector('.cs-ten').textContent = c.ten;
   tam.querySelector('.cs-phu').textContent = c.phu;
   tam.querySelector('.cs-xong').hidden = true;
-  tam.querySelector('.cs-nhac').classList.remove('mo');
+  tam.querySelector('.cs-nhac').textContent = 'Kéo từ ngôi sao này sang ngôi sao kia';
+  tam.querySelector('.cs-nhac').classList.remove('mo', 'tren');
+  tam.querySelector('.cs-goc').hidden = true;
 }
 
 function hoanThanh() {
@@ -146,7 +299,13 @@ function hoanThanh() {
   const cd = tam.querySelector('.cs-cadao');
   cd.textContent = c.cadao;
   cd.hidden = !c.cadao;
+  tam.querySelector('.cs-loi').textContent = c.loi + ' ' + c.xoay;
   tam.querySelector('.cs-xong').hidden = false;
+  const n = tam.querySelector('.cs-nhac');
+  n.textContent = 'Kéo màn hình để xoay, nhìn từ hướng khác';
+  n.classList.remove('mo');
+  n.classList.add('tren');
+  setTimeout(() => n.classList.add('mo'), 6000);
   datSao();
   if (navigator.vibrate) { try { navigator.vibrate([16, 60, 30]); } catch (e) {} }
 }
@@ -156,6 +315,22 @@ function vong(t) { raf = requestAnimationFrame(vong); buoc(t); }
 function buoc(t) {
   const dt = Math.max(0, Math.min(34, t - tTruoc)); tTruoc = t;
   if (xong && sangDan < 1) sangDan = Math.min(1, sangDan + dt / 900);
+
+  if (diem3d) {
+    const ph = chieu(diem3d, tam3d, goc3d[0], goc3d[1]);
+    const khung = Math.min(W - 56, H - (xong ? 172 : 132) - (xong ? 250 : 118)) * .92;
+    let rong = 0;
+    for (const [x, y] of ph) rong = Math.max(rong, Math.abs(x) * 2, Math.abs(y) * 2);
+    tyLeDich = khung / (rong || 1);
+    tyLe += (tyLeDich - tyLe) * Math.min(1, dt / 160);    // thu phóng theo kịp, không giật
+    veLaiDiem(ph);
+    if (xong) {
+      const lech = Math.round(Math.hypot(goc3d[0], goc3d[1]) * 180 / Math.PI);
+      const nut = tam.querySelector('.cs-goc');
+      nut.hidden = lech < 4;
+      nut.textContent = `Về góc nhìn Trái Đất · đang lệch ${lech}°`;
+    }
+  }
 
   const g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, '#141032'); g.addColorStop(.6, '#100d28'); g.addColorStop(1, '#080716');
@@ -189,9 +364,11 @@ function buoc(t) {
   }
 
   // các ngôi sao của chòm
+  const sauMin = Math.min(...diem.map(d => d.sau)), sauMax = Math.max(...diem.map(d => d.sau));
   for (const d of diem) {
+    const gan_ = sauMax > sauMin ? 1 - (d.sau - sauMin) / (sauMax - sauMin) : 1;   // 1 = gần nhất
     const nhay = .82 + Math.sin(t / 900 + d.nhay) * .18;
-    const r = (d.sang ? 4.6 : 3.4) * nhay + sangDan * 1.6;
+    const r = ((d.sang ? 4.6 : 3.4) * (.72 + gan_ * .5)) * nhay + sangDan * 1.6;
     const q = ctx.createRadialGradient(d.x, d.y, 0, d.x, d.y, r * 5);
     const dam = d.sang ? .5 : .26;
     q.addColorStop(0, `rgba(255,244,214,${dam + sangDan * .3})`);
@@ -219,8 +396,10 @@ function dong() {
 }
 
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
-self.TDTD_CHOMSAO = { mo, dong, _buoc: (t) => buoc(t), _chom: CHOM,
+self.TDTD_CHOMSAO = { mo, dong, _buoc: (t) => buoc(t), _chom: CHOM, _chieu: chieuSao,
   _nap: (i) => nap(i),
+  _diem: () => diem.map(d => ({ x: d.x, y: d.y, sau: d.sau, ten: d.ten })),
+  _xoay: (a, b) => { goc3d = [a, b]; },
   _noi: (a, b) => { const k = khoa(a, b);
     if (canhCanNoi.has(k) && !daNoi.has(k)) { daNoi.add(k); diem[a].sang = diem[b].sang = 1;
       if (daNoi.size === canhCanNoi.size) hoanThanh(); return true; } return false; },

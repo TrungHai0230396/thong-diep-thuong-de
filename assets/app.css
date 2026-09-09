@@ -275,6 +275,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   bottom:calc(46px + env(safe-area-inset-bottom,0px));
   font-size:12.5px;color:rgba(200,193,216,.5);transition:opacity 1.2s ease}
 .cs-nhac.mo{opacity:0}
+.cs-nhac.tren{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 170px)}
 .cs-xong{position:absolute;left:0;right:0;z-index:4;text-align:center;
   bottom:calc(30px + env(safe-area-inset-bottom,0px));padding:0 26px;
   display:flex;flex-direction:column;align-items:center;gap:12px;animation:rise .6s ease both}
@@ -284,3 +285,9 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   color:rgba(232,195,122,.9);margin:0;white-space:pre-line;font-style:italic}
 .cs-cadao[hidden]{display:none}
 .cs-xong .primary{margin-top:2px}
+.cs-goc{position:absolute;left:50%;transform:translateX(-50%);z-index:5;
+  top:calc(env(safe-area-inset-top,0px) + 126px);
+  background:rgba(0,0,0,.35);border:1px solid rgba(232,195,122,.3);color:rgba(232,195,122,.85);
+  border-radius:999px;padding:6px 14px;font-size:11.5px;font-family:inherit;cursor:pointer}
+.cs-goc[hidden]{display:none}
+.cs-goc:hover{background:rgba(232,195,122,.14)}
