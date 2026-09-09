@@ -89,7 +89,21 @@ Mã ở `assets/pond.js`. Chạm hoặc miết trên mặt nước, sóng lan ra
 
 ### Sao tím — hộp thở
 
-Mã ở `assets/breath.js`. Thở vuông bốn nhịp: hít vào 4 giây, giữ 4 giây, thở ra 4 giây, giữ 4 giây. Vòng tròn phồng xẹp theo nhịp, cung vàng chạy hết một vòng là xong 16 giây, có đếm ngược và đếm số vòng. Máy nào hỗ trợ thì rung nhẹ mỗi lần đổi nhịp.
+Mã ở `assets/breath.js`. Năm kiểu thở, mỗi kiểu cho một hoàn cảnh. Chọn kiểu, đọc phần giới thiệu ngắn, rồi bắt đầu. Vòng tròn phồng xẹp theo nhịp, cung vàng chạy hết một vòng là xong một chu kỳ, có đếm ngược từng giây và đếm số vòng. Máy nào hỗ trợ thì rung nhẹ mỗi lần đổi nhịp.
+
+| Kiểu | Nhịp | Khi nào dùng | Một chu kỳ |
+|---|---|---|---|
+| Thở ra dài | 4 vào, 6 ra | Chỉ cần dịu lại một chút | 10 giây |
+| Thở hai nhịp vào | 2 vào, 1 vào thêm, 6 ra | Đang lo lắng, cần dịu nhanh | 9 giây |
+| Thở vuông | 4 · 4 · 4 · 4 | Cần bình tĩnh và tập trung | 16 giây |
+| Thở cộng hưởng | 5,5 vào, 5,5 ra | Muốn ngồi yên lâu một chút | 11 giây |
+| Thở 4–7–8 | 4 vào, 7 giữ, 8 ra | Khó ngủ | 19 giây, tự dừng sau 4 vòng |
+
+Nhãn từng nhịp ghi rõ hít bằng mũi hay thở ra bằng miệng, vì mỗi kiểu một khác. Riêng 4–7–8 tự dừng sau 4 vòng theo đúng khuyến cáo của tài liệu gốc, và có ghi chú đặt đầu lưỡi chạm nướu sau hai răng cửa trên.
+
+Màn hình có mục **Lưu ý an toàn**: dừng khi chóng mặt, không tập lúc lái xe, các kiểu nín thở không hợp với người mang thai, bệnh hô hấp hoặc huyết áp thấp, và đây không phải cách điều trị y tế.
+
+Nguồn số giây: nghiên cứu của Balban và cộng sự trên *Cell Reports Medicine* năm 2023 cho kiểu thở hai nhịp vào; hướng dẫn 4–7–8 của bác sĩ Andrew Weil; tài liệu về thở cộng hưởng quanh mức 5,5 hơi mỗi phút.
 
 ## Chia sẻ ảnh
 
