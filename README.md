@@ -109,7 +109,18 @@ Nguồn số giây: nghiên cứu của Balban và cộng sự trên *Cell Repor
 
 Mã ở `assets/constellation.js`. Trong đám sao lấm tấm có vài ngôi sáng hơn. Kéo từ ngôi này sang ngôi kia để nối. Nối trúng thì đường vàng sáng lên và dính lại, nối trật thì đường tự tan, không báo sai, không đếm giờ, không thua. Nối đủ thì cả chòm bừng sáng, hiện lời giải thích và câu ca dao nếu có.
 
-Bốn nhóm sao theo cách gọi dân gian Việt Nam: **Bắc Đẩu**, **Lưỡi Cày**, **Tua Rua** và **Thần Nông**.
+Tám nhóm sao, tên theo cách gọi tiếng Việt:
+
+| Chòm | Sao | Gần nhất – xa nhất | Xoay đi thì |
+|---|---|---|---|
+| Bắc Đẩu | 7 | 80–123 năm ánh sáng | méo dần |
+| Lưỡi Cày | 7 | 243–1300 | vỡ hẳn |
+| Tua Rua | 7 | đều 440 | chỉ nghiêng, không vỡ |
+| Ngưu Lang Chức Nữ | 3 | 17–2600 | Thiên Tân trôi ra xa |
+| Thiên Nga | 5 | 73–2600 | dài ra thành chuỗi |
+| Tiên Hậu | 5 | 55–550 | chữ M tan |
+| Sư Tử | 9 | 36–1270 | mất hình con sư tử |
+| Thần Nông | 7 | 65–700 | ngôi ở chân rời ra |
 
 **Nối xong thì kéo được để xoay.** Mỗi ngôi sao lưu bằng số liệu thiên văn thật, gồm xích kinh, xích vĩ mốc J2000 và khoảng cách tới Trái Đất tính bằng năm ánh sáng. Chương trình dựng vị trí ba chiều rồi chiếu xuống màn hình. Đứng đúng chỗ Trái Đất thì hình hiện ra y như nhìn lên trời, xoay đi thì hình vỡ ra, vì chòm sao vốn chỉ là một góc nhìn chứ không phải một vật có thật.
 

@@ -68,6 +68,68 @@ const CHOM = [
     noi: [[2,4],[4,0],[0,1],[1,6],[2,3],[3,5],[3,0]],
   },
   {
+    ten: 'Ngưu Lang Chức Nữ',
+    phu: 'tam giác mùa hè',
+    loi: 'Ngưu Lang ở chòm Thiên Ưng, Chức Nữ ở chòm Thiên Cầm, hai người ngồi hai bên sông Ngân. Ngôi thứ ba là Thiên Tân bên chòm Thiên Nga. Mùa hè ngẩng lên là thấy tam giác này ngay đỉnh đầu.',
+    xoay: 'Ngưu Lang cách ta 17 năm ánh sáng, Chức Nữ 25, còn Thiên Tân thì tới 2600. Nhìn từ Trái Đất thì ba ngôi thành một tam giác đẹp, xoay đi một chút là Thiên Tân trôi tuốt ra xa. Chuyện đôi lứa cách sông cũng là chuyện của góc nhìn.',
+    cadao: '',
+    sao: [
+      ['Chức Nữ (Vega)',   18.6156,  38.784,   25],
+      ['Ngưu Lang (Altair)', 19.8464,   8.868,   16.7],
+      ['Thiên Tân (Deneb)', 20.6905,  45.280, 2600],
+    ],
+    noi: [[0,1],[1,2],[2,0]],
+  },
+  {
+    ten: 'Thiên Nga',
+    phu: 'chữ thập phương bắc',
+    loi: 'Con thiên nga sải cánh bay dọc sông Ngân, cổ vươn dài về phía trước. Người phương Tây gọi là chữ thập phương bắc. Mùa hè và đầu thu nhìn rõ.',
+    xoay: 'Ngôi ở đầu cánh chỉ cách ta 73 năm ánh sáng, còn ngôi ở đuôi xa tới 2600, gấp hơn ba mươi lần. Cây thánh giá này mỏng như tờ giấy khi nhìn từ đây, nhưng thật ra trải dài cả ngàn năm ánh sáng.',
+    cadao: '',
+    sao: [
+      ['Thiên Tân (Deneb)', 20.6905, 45.280, 2600],
+      ['Sadr',              20.3705, 40.257, 1800],
+      ['Albireo',           19.5120, 27.960,  415],
+      ['Delta Cygni',       19.7495, 45.131,  165],
+      ['Gienah',            20.7702, 33.970,   72.7],
+    ],
+    noi: [[0,1],[1,2],[3,1],[1,4]],
+  },
+  {
+    ten: 'Tiên Hậu',
+    phu: 'hình chữ M',
+    loi: 'Năm ngôi sáng xếp thành chữ M, hoặc chữ W tuỳ lúc trong đêm. Chòm này nằm gần sao Bắc Cực nên quay quanh nó suốt năm, ai ở miền Bắc nhìn về hướng bắc là thấy.',
+    xoay: 'Năm ngôi nằm rải từ 55 tới 550 năm ánh sáng. Chữ M gọn gàng kia thật ra là năm ngôi sao ở năm độ sâu khác nhau, tình cờ chồng lên nhau trong mắt ta.',
+    cadao: '',
+    sao: [
+      ['Caph',         0.1528, 59.150,  54.7],
+      ['Schedar',      0.6751, 56.537, 228],
+      ['Gamma Cas',    0.9451, 60.717, 550],
+      ['Ruchbah',      1.4303, 60.235,  99],
+      ['Segin',        1.9067, 63.670, 410],
+    ],
+    noi: [[0,1],[1,2],[2,3],[3,4]],
+  },
+  {
+    ten: 'Sư Tử',
+    phu: 'lưỡi liềm và thân sư tử',
+    loi: 'Sáu ngôi phía trước uốn thành lưỡi liềm, chính là đầu và bờm sư tử, ngôi sáng nhất ở chân liềm là Hiên Viên. Ba ngôi phía sau khép lại thành thân và đuôi. Mùa xuân nhìn rõ nhất.',
+    xoay: 'Ngôi ở giữa lưỡi liềm xa tới 1270 năm ánh sáng, trong khi ngôi cuối đuôi chỉ 36. Con sư tử này được ghép từ những ngôi sao chẳng liên quan gì tới nhau.',
+    cadao: '',
+    sao: [
+      ['Hiên Viên (Regulus)', 10.1395, 11.967,   79.3],
+      ['Eta Leonis',          10.1222, 16.763, 1270],
+      ['Algieba',             10.3329, 19.841,  130],
+      ['Adhafera',            10.2783, 23.417,  260],
+      ['Mu Leonis',            9.8794, 26.007,  133],
+      ['Epsilon Leonis',       9.7648, 23.774,  247],
+      ['Zosma',               11.2351, 20.524,   58.4],
+      ['Denebola',            11.8177, 14.572,   35.9],
+      ['Chertan',             11.2372, 15.430,  165],
+    ],
+    noi: [[5,4],[4,3],[3,2],[2,1],[1,0],[2,6],[6,7],[7,8],[8,0]],
+  },
+  {
     ten: 'Thần Nông',
     phu: 'nhóm sao dân gian, phần trên chòm Thiên Yết',
     loi: 'Người xưa thấy hình ông Thần Nông chống gậy. Đây là cách gọi dân gian cho một nhóm sao, không trùng khớp với chòm Thiên Yết trong thiên văn học, vì thiếu phần đuôi bọ cạp.',
@@ -153,6 +215,7 @@ let tam, cv, ctx, W, H, DPR, raf = null, tTruoc = 0;
 let chi = 0, diem = [], canhCanNoi = [], daNoi = new Set(), keo = null, xong = false, sangDan = 0, nen = [];
 let banKinhBam = 34;   // co lại ở chòm có sao nằm sát nhau, để không bắt nhầm ngôi bên cạnh
 let goc3d = [0, 0], tyLe = 0, tyLeDich = 0, tam3d = null, diem3d = null, xoayTay = null, oX = 0, oY = 0;
+let giua = [0, 0];   // tâm khung bao của hình chiếu, không phải trọng tâm 3 chiều
 
 const rnd = (a, b) => a + Math.random() * (b - a);
 const khoa = (a, b) => a < b ? a + '-' + b : b + '-' + a;
@@ -245,15 +308,14 @@ function datSao() {
   diem3d = c._p3 || (c._p3 = viTri3D(c.sao));
   tam3d = c._tam || (c._tam = nhan(diem3d.reduce(cong, [0, 0, 0]), 1 / diem3d.length));
 
-  const leTren = xong ? 172 : 132, leDuoi = xong ? 250 : 118;
+  const [leTren, leDuoi] = doLe();
   oX = W / 2;
   oY = leTren + (H - leTren - leDuoi) / 2;
-  const khung = Math.min(W - 56, H - leTren - leDuoi) * .92;
 
   const ph = chieu(diem3d, tam3d, goc3d[0], goc3d[1]);
-  let rong = 0;
-  for (const [x, y] of ph) rong = Math.max(rong, Math.abs(x) * 2, Math.abs(y) * 2);
-  tyLeDich = khung / (rong || 1);
+  const k = doKhung(ph);
+  giua = k.giua;
+  tyLeDich = vuaKhung(k, leTren, leDuoi);
   if (!tyLe) tyLe = tyLeDich;                       // lần đầu thì khớp luôn, không phóng dần
 
   veLaiDiem(ph);
@@ -267,10 +329,33 @@ function datSao() {
   banKinhBam = Math.max(13, Math.min(34, gapMin * .46));
 }
 
+/* Đo bề rộng và tâm của hình sau khi chiếu.
+   Không dùng trọng tâm ba chiều làm tâm, vì chòm nào có một ngôi ở rất xa,
+   như Thiên Tân cách 2600 năm ánh sáng, thì trọng tâm bị kéo lệch hẳn khỏi hình nhìn thấy. */
+function doKhung(ph) {
+  let x0 = Infinity, x1 = -Infinity, y0 = Infinity, y1 = -Infinity;
+  for (const [x, y] of ph) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+  return { giua: [(x0 + x1) / 2, (y0 + y1) / 2], rongX: (x1 - x0) || 1e-6, rongY: (y1 - y0) || 1e-6 };
+}
+
+/* Phóng to nhất có thể mà vẫn lọt cả bề ngang lẫn bề dọc. */
+function vuaKhung(k, leTren, leDuoi) {
+  return Math.min((W - 52) * .94 / k.rongX, (H - leTren - leDuoi) * .94 / k.rongY);
+}
+
+/* Hình chiếm gần trọn màn hình. Chữ nằm đè lên trên với nền mờ dần,
+   vẫn đọc được mà sao vẫn to. Muốn nhìn ngôi bị khuất thì kéo xoay là thấy. */
+function doLe() {
+  const day = (q) => { const n = tam.querySelector(q); if (!n || n.hidden) return 0;
+    const r = n.getBoundingClientRect(); return r.height ? r.bottom : 0; };
+  const tren = Math.max(day('.cs-tren'), day('.cs-goc')) + 14;
+  return [Math.max(96, tren), 96];
+}
+
 function veLaiDiem(ph) {
   const c = CHOM[chi];
   diem = ph.map(([x, y, sau], i) => ({
-    x: oX + x * tyLe, y: oY + y * tyLe, sau,
+    x: oX + (x - giua[0]) * tyLe, y: oY + (y - giua[1]) * tyLe, sau,
     ten: c.sao[i][0], ly: c.sao[i][3],
     sang: diem[i] ? diem[i].sang : 0, nhay: diem[i] ? diem[i].nhay : rnd(0, 6.28),
   }));
@@ -318,10 +403,11 @@ function buoc(t) {
 
   if (diem3d) {
     const ph = chieu(diem3d, tam3d, goc3d[0], goc3d[1]);
-    const khung = Math.min(W - 56, H - (xong ? 172 : 132) - (xong ? 250 : 118)) * .92;
-    let rong = 0;
-    for (const [x, y] of ph) rong = Math.max(rong, Math.abs(x) * 2, Math.abs(y) * 2);
-    tyLeDich = khung / (rong || 1);
+    const [lt, ld] = doLe();
+    oY = lt + (H - lt - ld) / 2;
+    const k = doKhung(ph);
+    giua = k.giua;
+    tyLeDich = vuaKhung(k, lt, ld);
     tyLe += (tyLeDich - tyLe) * Math.min(1, dt / 160);    // thu phóng theo kịp, không giật
     veLaiDiem(ph);
     if (xong) {
@@ -396,7 +482,7 @@ function dong() {
 }
 
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
-self.TDTD_CHOMSAO = { mo, dong, _buoc: (t) => buoc(t), _chom: CHOM, _chieu: chieuSao,
+self.TDTD_CHOMSAO = { mo, dong, _v3: viTri3D, _chieuXa: chieu, _buoc: (t) => buoc(t), _chom: CHOM, _chieu: chieuSao,
   _nap: (i) => nap(i),
   _diem: () => diem.map(d => ({ x: d.x, y: d.y, sau: d.sau, ten: d.ten })),
   _xoay: (a, b) => { goc3d = [a, b]; },
