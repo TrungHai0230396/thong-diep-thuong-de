@@ -188,10 +188,6 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 /* ---------- hồ nước ---------- */
 .ho-cv{touch-action:none;cursor:default}
 .ho-cv.tro{cursor:pointer}          /* đang trỏ vào một con ếch */
-.ho-nhac{position:absolute;left:0;right:0;bottom:calc(46px + env(safe-area-inset-bottom,0px));
-  z-index:3;text-align:center;margin:0;color:rgba(190,225,240,.55);font-size:13px;letter-spacing:.06em;
-  transition:opacity 1.2s ease;pointer-events:none}
-.ho-nhac.mo{opacity:0}
 
 /* ---------- hộp thở ---------- */
 .ht-giua{position:absolute;inset:0;z-index:3;display:none;flex-direction:column;

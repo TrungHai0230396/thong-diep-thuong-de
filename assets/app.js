@@ -30,7 +30,7 @@ const SAO = [
     mo: () => self.TDTD_GAME && self.TDTD_GAME.mo() },
   { id: 'sao-hoadang', mau: '#f0a860', hinh: 'hoa',    nhan: 'Thả đèn hoa đăng, buông điều nặng lòng',
     mo: () => self.TDTD_HOADANG && self.TDTD_HOADANG.mo() },
-  { id: 'sao-ho',   mau: '#7ec8e3', hinh: 'giot',      nhan: 'Hồ nước, chạm cho ếch nhảy',
+  { id: 'sao-ho',   mau: '#7ec8e3', hinh: 'giot',      nhan: 'Hồ nước, có đàn ếch',
     mo: () => self.TDTD_HO && self.TDTD_HO.mo() },
   { id: 'sao-tho',  mau: '#b8a8e8', hinh: 'tia',       nhan: 'Hộp thở, thở theo nhịp bốn',
     mo: () => self.TDTD_THO && self.TDTD_THO.mo() },

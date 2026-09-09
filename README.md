@@ -72,7 +72,7 @@ Mã ở `assets/lantern.js`. Gõ ra điều đang nặng lòng rồi bấm Thả
 
 ### Sao xanh nước — hồ nước
 
-Mã ở `assets/pond.js`. Chạm hoặc miết trên mặt nước, sóng lan ra rồi tắt. Mở lên có năm chiếc lá sen rải thưa, không đè nhau, nhún lên khi sóng đi qua — nhưng lá cũng có đời riêng, chỗ nào cũng đổi theo thời gian. Thỉnh thoảng có hạt mưa tự rơi.
+Mã ở `assets/pond.js`. **Không có một dòng chữ hướng dẫn nào trong hồ** — chỉ có mặt nước và nút đóng, ai chơi thì tự thấy. Chạm hoặc miết trên mặt nước, sóng lan ra rồi tắt. Mở lên có năm chiếc lá sen rải thưa, không đè nhau, nhún lên khi sóng đi qua — nhưng lá cũng có đời riêng, chỗ nào cũng đổi theo thời gian. Thỉnh thoảng có hạt mưa tự rơi.
 
 Trên lá có bốn con ếch lúc mở màn. Chạm đúng vào con nào thì con đó giật mình phóng sang chiếc lá **xa ngón tay nhất**, nên chạm bên này là đẩy nó qua bên kia. Chạm chỗ khác trên hồ thì chỉ có sóng, ếch vẫn ngồi. Không có nhiệm vụ nào cả: muốn dồn cả đàn vào một lá, muốn rải mỗi con một nơi, hay chỉ ngồi xem cũng được.
 
@@ -103,7 +103,7 @@ Hai chỗ dễ sai khi lá biến mất, đều đã sửa và có bài kiểm b
 
 | Chặng | Thời gian | Chuyện gì xảy ra |
 |---|---|---|
-| Ruồi hoặc muỗi bay qua | 16–34 giây một con, chia cho mức mùa | Bay lượn thất thường, hay quẩn quanh mấy chiếc lá, có bóng nhỏ chạy theo dưới nước. Muỗi nhỏ hơn và có chân dài lêu nghêu |
+| Ruồi hoặc muỗi bay vào | 16–34 giây một tốp, chia cho mức mùa | Bay lượn thất thường, hay quẩn quanh mấy chiếc lá, có bóng nhỏ chạy theo dưới nước. Muỗi nhỏ hơn và có chân dài lêu nghêu |
 | Ếch ngắm | khi con bọ vào trong 4,2 lần thân | Ếch quay đầu nhìn theo. Con nào no gần đầy (trên 0,92) thì chẳng thèm, để dành cho con đói |
 | Phóng lưỡi | 0,3 giây | Vào trong 2,5 lần thân và đầu đã quay tới trong 0,6 radian thì lưỡi phóng ra, dính con bọ ở đầu lưỡi rồi kéo về. Nhảy giữa lúc đó thì nhả lưỡi, con bọ thoát |
 | Đẻ trứng | xét lại mỗi 35–60 giây | Tới hẹn mà mức no trên 0,6 thì đẻ một ổ **3–7 trứng** sát mép lá và trả 0,3 mức no. Còn đói thì khoan, mươi giây nữa xét lại |
@@ -117,7 +117,9 @@ Thang thời gian đặt cho **một phiên chơi 5 phút thấy trọn vòng**.
 
 **Cá.** Mỗi 45–110 giây có một chuyến cá ghé hồ, số con **ngẫu nhiên**: phần lớn một con, chừng ba lần trên mười thì hai con, thỉnh thoảng ba con. Nhiều nhất ba con cùng lúc, đông hơn nữa thì hồ thành cái chậu cá. Đếm 69 chuyến trong lúc chạy thử: 44 chuyến một con, 21 chuyến hai con, 4 chuyến ba con. Mỗi con ở lại 24–44 giây rồi bơi ra mép mà biến. Cá bơi dưới mặt nước nên chỉ là cái bóng mờ, nổi rõ dần khi nó rượt. Thấy nòng nọc trong 130 px thì đuổi, vào 55 px thì phóng một cú nhanh gấp đôi, tới 30 px là đớp; đớp xong lặn xuống nghỉ 5–11 giây. Nòng nọc thấy cá trong 58 px thì cong đuôi chạy, nhưng chỉ vọt được một quãng nên không thắng nổi cú phóng. Mỗi con cá trong một chuyến thường ăn 0–3 con nòng nọc, nên chuyến ba con là một mẻ nòng nọc gần như không con nào qua được.
 
-**Mùa con trùng.** Cứ 50–110 giây hồ đổi mức mùa, ngẫu nhiên từ 0,35 tới 1,9 lần. Mùa rộ thì 8–18 giây một con bọ và cùng lúc có tới bốn con; mùa vắng thì gần hai phút mới có một con. Đó là cái làm đàn ếch phồng lên rồi xẹp xuống.
+**Mùa con trùng.** Cứ 50–110 giây hồ đổi mức mùa, ngẫu nhiên từ 0,35 tới 1,9 lần. Mùa rộ thì 8–18 giây một tốp và cùng lúc có tới bốn con; mùa vắng thì gần hai phút mới có một con. Đó là cái làm đàn ếch phồng lên rồi xẹp xuống.
+
+Số con mỗi tốp cũng **ngẫu nhiên và ăn theo mùa**: mỗi con thêm vào có xác suất `0,34 × mức mùa`, tối đa bốn con. Đếm 177 tốp trong hơn một giờ chạy thử: 102 tốp một con, 51 tốp hai con, 21 tốp ba con, 3 tốp bốn con. Chia theo mùa thì rõ hơn — mùa vắng gần như tốp nào cũng một con (28 tốp một con, 1 tốp hai con), mùa rộ thì 36 tốp một con nhưng có tới 30 tốp hai, 17 tốp ba và 3 tốp bốn.
 
 **Không có ai đỡ.** Hồ tự chạy: mùa rộ thì ếch no, đẻ nhiều, đàn phình lên tới mức chặn 9 con; mùa vắng thì đói, thôi đẻ, rồi chết dần. Không có sàn giữ lại con cuối cùng — hồ **có quyền tuyệt chủng**. Chạy thử ba hồ, mỗi hồ 30 phút: hai hồ phình lên sát mức chặn 9 con và ở đó (trung bình 7,3 và 7,5 con, nòng nọc 5–6 con), **một hồ tuyệt chủng ở phút thứ mười lăm** rồi im luôn tới hết. Thang thời gian rút ngắn làm cả hai đầu đều nhanh hơn: đẻ nhanh hơn mà đói cũng chết nhanh hơn, nên khoảng một phần ba số hồ sẽ chết sạch trong nửa giờ. Chết sạch là hết, không có con nào tự đến. Đóng màn hình là hồ trở về bốn con ban đầu.
 

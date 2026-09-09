@@ -13,8 +13,7 @@ function dungKhung() {
   tam.className = 'ho';
   tam.innerHTML = `
     <canvas class="ho-cv"></canvas>
-    <button class="ho-dong" aria-label="Đóng">✕</button>
-    <p class="ho-nhac">Chạm vào con ếch cho nó nhảy</p>`;
+    <button class="ho-dong" aria-label="Đóng">✕</button>`;
   document.body.appendChild(tam);
   cv = tam.querySelector('.ho-cv');
   ctx = cv.getContext('2d');
@@ -29,7 +28,6 @@ function dungKhung() {
     for (const n of nong) if (Math.hypot(n.x - x, n.y - y) < 72) {   // nòng nọc vọt đi tránh ngón tay
       n.huong = Math.atan2(n.y - y, n.x - x); n.vot = 620;
     }
-    tam.querySelector('.ho-nhac').classList.add('mo');
   };
   cv.addEventListener('pointerdown', cham);
   cv.addEventListener('pointermove', e => {
@@ -560,15 +558,18 @@ const demCon = () => ech.length + nong.length + trung.reduce((n, o) => n + o.n, 
 
 /* ---- ruồi và muỗi ---- */
 
-function themBo() {
-  if (bo.length >= Math.max(1, Math.round(mucBo * 2))) return;   // mùa rộ thì cùng lúc có tới bốn con
-  const muoi = Math.random() < .45;
-  const ben = Math.random() < .5;
-  bo.push({ muoi, x: ben ? -18 : W + 18, y: rnd(H * .16, H * .9),
-            huong: ben ? rnd(-.5, .5) : Math.PI + rnd(-.5, .5),
-            toc: muoi ? rnd(30, 46) : rnd(40, 62),
-            cao: rnd(11, 20), pha: rnd(0, 6.28), to: muoi ? 1.05 : 1.45,
-            t: 0, doi: rnd(24000, 32000), dinh: null });
+function themBo(so) {
+  if (so === undefined) { so = 1; while (so < 4 && Math.random() < .34 * mucBo) so++; }   // vào theo tốp, mùa rộ thì tốp đông
+  const tran = Math.max(1, Math.round(mucBo * 2));      // mùa rộ thì cùng lúc có tới bốn con
+  for (let n = 0; n < so && bo.length < tran; n++) {
+    const muoi = Math.random() < .45;
+    const ben = Math.random() < .5;
+    bo.push({ muoi, x: ben ? -18 - n * 14 : W + 18 + n * 14, y: rnd(H * .16, H * .9),
+              huong: ben ? rnd(-.5, .5) : Math.PI + rnd(-.5, .5),
+              toc: muoi ? rnd(30, 46) : rnd(40, 62),
+              cao: rnd(11, 20), pha: rnd(0, 6.28), to: muoi ? 1.05 : 1.45,
+              t: 0, doi: rnd(24000, 32000), dinh: null });
+  }
 }
 
 function buocBo(dt) {
@@ -912,7 +913,6 @@ function mo() {
   song = []; tMua = 900;
   bo = []; trung = []; nong = []; ca = []; tBo = rnd(4000, 9000); tCa = rnd(20000, 45000);
   mucBo = MUC_BO(); tDan = rnd(50000, 110000);
-  tam.querySelector('.ho-nhac').classList.remove('mo');
   tTruoc = performance.now();
   if (!raf) raf = requestAnimationFrame(vong);
 }
@@ -940,7 +940,7 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _themNong: (x, y, n = 1) => { for (let i = 0; i < n; i++) themNong(x + rnd(-8, 8), y + rnd(-8, 8)); return nong.length; },
   _nong: () => nong.map(n => ({ x: Math.round(n.x), y: Math.round(n.y), s: +n.s.toFixed(1), vot: Math.round(n.vot) })),
   _themCa: (x, y, so = 1) => { ca = []; themCa(so); const c = ca[0]; if (c && x !== undefined) { c.x = x; c.y = y; } return !!c; },
-  _themBo: (x, y) => { themBo(); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
+  _themBo: (x, y) => { themBo(1); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
   _dam: () => ({ trung: trung.length, nong: nong.length, an: ech.reduce((n, e) => n + e.an, 0),
                  no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2) }),
   _giaDi: (ms) => { for (const e of ech) { e.tuoi += ms; e.tChuKy += ms; } return ech.length; },
