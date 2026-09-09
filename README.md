@@ -156,17 +156,19 @@ Một chỗ dễ sai: độ sâu tương đối của một vòng phải là `i 
 
 Số tầng và tên cảnh lấy theo `Math.round` chứ không phải `Math.floor`, để nhãn đổi đúng lúc hai cảnh giao nhau ở giữa.
 
-Mỗi cảnh có một dòng chú thích bằng số liệu thật, không tự nghĩ ra:
+Mỗi cảnh có một dòng chú thích. Nguyên tắc: **câu nào cũng phải nói về chuyện phân nhánh**, tức là về cái ý của trò này, chứ không phải một mẩu thông tin thú vị về chủ thể. Bản đầu tôi viết sai nguyên tắc đó, cảnh sông thì kể chuyện cống ngăn mặn, cảnh sét thì kể chuyện tiếng sấm, đọc xong không thấy liên quan gì.
 
-| Cảnh | Số liệu | Nguồn |
+| Cảnh | Ý | Nguồn |
 |---|---|---|
-| mạng vũ trụ | khoảng trống rộng hàng trăm triệu năm ánh sáng, chiếm 80% thể tích nhưng 20% vật chất | Void (astronomy), Wikipedia |
-| mạng nơ-ron | Vazza và Feletti 2020, hai mạng cùng mức phức tạp dù chênh 27 bậc độ lớn | *Frontiers of Physics* |
-| mạch máu | mao mạch đường kính chừng 8 micromet, chiếm hơn 90% tổng chiều dài mạch máu | tài liệu sinh lý tuần hoàn |
-| rễ cây | Dittmer 1937, một cây lúa mạch đen 4 tháng tuổi có hơn 13 triệu nhánh, dài 620 km, cả lông rễ là 11 000 km | *American Journal of Botany* |
-| sông ngòi | sông Cửu Long tên chín cửa, nay còn bảy vì Ba Lai bị cống khoá và Ba Thắc bồi lấp | VnExpress, Wikipedia tiếng Việt |
-| tia sét | khoảng 30 000 K trong vài phần triệu giây, hơn năm lần bề mặt Mặt Trời | Britannica |
-| bông tuyết | sáu cánh do mạng lục giác của nước đá, hình cụ thể theo nhiệt độ và độ ẩm, biểu đồ Nakaya thập niên 1930 | Physics Today, Physics World |
+| mạng vũ trụ | trọng lực kéo vật chất về các sợi, mạng là hình còn lại chứ không ai vẽ | Void (astronomy), Wikipedia |
+| mạng nơ-ron | đem đo với mạng vũ trụ thì cùng mức phức tạp, chênh 27 bậc độ lớn | Vazza & Feletti, *Frontiers of Physics* 2020 |
+| mạch máu | chẻ nhỏ là cách rẻ nhất để chạm tới từng tế bào; mao mạch 8 micromet, chiếm hơn 90% tổng chiều dài | tài liệu sinh lý tuần hoàn |
+| rễ cây | cùng lý do, chạm tới từng hạt đất; một cây lúa mạch đen 4 tháng có hơn 13 triệu nhánh, dài 620 km | Dittmer 1937, *American Journal of Botany* |
+| sông ngòi | cùng một hình nhưng dòng chảy ngược: gom vào thay vì toả ra | hình thái mạng sông |
+| tia sét | chẻ nhánh vì đang dò đường; chỉ một nhánh chạm đất, phần còn lại tắt ngay khi có đường dẫn | NOAA, HowStuffWorks |
+| bông tuyết | đầu nhọn hứng nhiều hơn nên mọc nhanh hơn rồi nhọn thêm; chính vòng lặp đó đẻ ra nhánh | bất ổn Mullins–Sekerka, Physics World |
+
+Cảnh bông tuyết đặt cuối để khép lại: nó nói ra cái cơ chế chung mà sáu cảnh trước đều đi theo.
 
 Con số 100 000 km cho tổng chiều dài mạch máu bị bỏ, vì đó là ước lượng cũ của Krogh dựa trên một cơ thể bất thường; số hiện đại thấp hơn nhiều và còn tranh cãi, nên chỉ ghi hai điều chắc chắn là đường kính mao mạch và tỉ lệ hơn 90 phần trăm.
 
