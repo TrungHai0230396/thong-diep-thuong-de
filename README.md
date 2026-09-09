@@ -54,7 +54,7 @@ Thêm một ngôi sao mới chỉ cần thêm một dòng vào mảng `SAO` ở 
 
 Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, lá bài lẫn các sao đã đặt (cách nhau tối thiểu 18 px). Hết chỗ thì chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài, nên chữ không bao giờ bị che. Đã thử 24 ngôi sao trên màn 375×812, rải 60 lần: không cặp nào đè nhau, không sao nào đè chữ hay lọt ra ngoài màn hình.
 
-Hiện có hai ngôi sao:
+Hiện có năm ngôi sao:
 
 ### Sao vàng — số của hôm nay
 
@@ -76,6 +76,20 @@ Game chém trái cây để xả stress, mã nguồn ở `assets/game.js`, độ
 Miết ngón tay hoặc rê chuột để vung đao. Vệt đao là dải vàng có quầng sáng, mô phỏng lưỡi Đồ Long. Trái cây gồm dưa hấu, cam, chanh, thanh long, dừa, xoài, măng cụt, chém trúng thì đứt đôi và bắn nước. Chém liên tiếp trong 320 mili giây được nhân điểm tới 5 lần. Ba mạng, để rơi một quả hoặc chém trúng bom là mất một mạng. Không lưu điểm, đóng là hết.
 
 Bấm Esc hoặc nút ✕ để thoát.
+
+### Sao cam — thả đèn hoa đăng
+
+Mã ở `assets/lantern.js`. Gõ ra điều đang nặng lòng rồi bấm Thả đi. Chữ biến thành một chiếc đèn giấy bay lên, chữ mờ dần trước, rồi đèn nhỏ lại và tắt hẳn sau khoảng 17 giây. Vài chiếc đèn khác trôi sẵn trên nền cho đỡ trống.
+
+Ô nhập được xoá ngay lúc bấm thả. Chữ chỉ tồn tại trong bộ nhớ của trang, không ghi xuống máy, không gửi đi đâu. Đóng màn hình là mất sạch.
+
+### Sao xanh nước — hồ nước
+
+Mã ở `assets/pond.js`. Chạm hoặc miết trên mặt nước, sóng lan ra rồi tắt. Vài chiếc lá sen nhún lên khi sóng đi qua. Thỉnh thoảng có hạt mưa tự rơi. Không điểm, không thắng thua, không kết thúc.
+
+### Sao tím — hộp thở
+
+Mã ở `assets/breath.js`. Thở vuông bốn nhịp: hít vào 4 giây, giữ 4 giây, thở ra 4 giây, giữ 4 giây. Vòng tròn phồng xẹp theo nhịp, cung vàng chạy hết một vòng là xong 16 giây, có đếm ngược và đếm số vòng. Máy nào hỗ trợ thì rung nhẹ mỗi lần đổi nhịp.
 
 ## Chia sẻ ảnh
 

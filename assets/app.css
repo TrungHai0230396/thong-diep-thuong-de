@@ -177,3 +177,51 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
 }
+
+/* ---------- màn hình phủ kín dùng chung cho các ngôi sao ---------- */
+.hoadang,.ho,.hopho{position:fixed;inset:0;z-index:30;display:none}
+.hoadang.hien,.ho.hien,.hopho.hien{display:block}
+.hd-cv,.ho-cv,.ht-cv{position:absolute;inset:0;display:block;width:100%;height:100%}
+.hd-dong,.ho-dong,.ht-dong{position:absolute;z-index:4;
+  top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;
+  width:34px;height:34px;border-radius:50%;cursor:pointer;
+  border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.32);color:var(--ink);font-size:14px;line-height:1}
+.hd-dong:hover,.ho-dong:hover,.ht-dong:hover{background:rgba(255,255,255,.12)}
+
+/* ---------- thả đèn hoa đăng ---------- */
+.hd-cv{touch-action:none}
+.hd-lop{position:absolute;left:0;right:0;bottom:0;z-index:3;
+  padding:22px 22px calc(30px + env(safe-area-inset-bottom,0px));
+  display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.hd-viet[hidden],.hd-xong[hidden]{display:none}
+.hd-viet,.hd-xong{display:flex;flex-direction:column;align-items:center;gap:12px;
+  width:100%;max-width:420px;animation:rise .45s ease both}
+.hd-hoi{font-family:"Cormorant Garamond",Georgia,serif;font-size:25px;margin:0;color:var(--ink)}
+.hd-o{width:100%;min-height:88px;background:rgba(0,0,0,.34);border:1px solid rgba(240,168,96,.3);
+  border-radius:14px;color:var(--ink);font-family:inherit;font-size:15px;line-height:1.6;padding:12px;resize:none}
+.hd-o:focus{outline:1px solid rgba(240,168,96,.7)}
+.hd-ghi{font-size:11.5px;color:var(--ink-dim);opacity:.65;margin:0;line-height:1.6}
+.hd-loi{font-family:"Cormorant Garamond",Georgia,serif;font-size:27px;margin:0;color:#f0c48a}
+
+/* ---------- hồ nước ---------- */
+.ho-cv{touch-action:none;cursor:crosshair}
+.ho-nhac{position:absolute;left:0;right:0;bottom:calc(46px + env(safe-area-inset-bottom,0px));
+  z-index:3;text-align:center;margin:0;color:rgba(190,225,240,.55);font-size:13px;letter-spacing:.06em;
+  transition:opacity 1.2s ease;pointer-events:none}
+.ho-nhac.mo{opacity:0}
+
+/* ---------- hộp thở ---------- */
+.ht-giua{position:absolute;inset:0;z-index:3;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:4px;pointer-events:none;text-align:center}
+.ht-giua.hien{display:flex}
+.ht-nhip{font-family:"Cormorant Garamond",Georgia,serif;font-size:30px;margin:0;color:#ded4f5}
+.ht-dem{font-family:"Be Vietnam Pro",sans-serif;font-size:15px;margin:0;color:rgba(200,186,240,.55);
+  font-variant-numeric:tabular-nums}
+.ht-vong{position:absolute;left:0;right:0;z-index:3;text-align:center;margin:0;pointer-events:none;
+  bottom:calc(44px + env(safe-area-inset-bottom,0px));font-size:12px;color:rgba(200,186,240,.45);letter-spacing:.1em}
+.ht-mo{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:14px;text-align:center;padding:26px;
+  background:rgba(9,7,20,.55);backdrop-filter:blur(4px);animation:fade .3s ease both}
+.ht-mo[hidden]{display:none}
+.ht-mo h2{font-family:"Cormorant Garamond",Georgia,serif;font-size:36px;font-weight:600;margin:0;color:#ded4f5}
+.ht-mo p{color:var(--ink-dim);font-size:14px;line-height:1.8;margin:0;max-width:340px}
