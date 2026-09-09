@@ -99,9 +99,8 @@ function dungKhung() {
       <p class="ht-phu">Chọn kiểu hợp với lúc này.</p>
       <div class="ht-ds">${KIEU.map(k => `
         <button class="ht-the" data-id="${k.id}">
-          <span class="ht-the-ten">${esc(k.ten)}</span>
           <span class="ht-the-khi">${esc(k.khiNao)}</span>
-          <span class="ht-the-nhip">${esc(k.nhip)}</span>
+          <span class="ht-the-ten">${esc(k.ten)} · ${esc(k.nhip)}</span>
         </button>`).join('')}</div>
       <button class="ht-luuy-nut">Lưu ý an toàn</button>
     </div>

@@ -89,7 +89,7 @@ Mã ở `assets/pond.js`. Chạm hoặc miết trên mặt nước, sóng lan ra
 
 ### Sao tím — hộp thở
 
-Mã ở `assets/breath.js`. Năm kiểu thở, mỗi kiểu cho một hoàn cảnh. Chọn kiểu, đọc phần giới thiệu ngắn, rồi bắt đầu. Vòng tròn phồng xẹp theo nhịp, cung vàng chạy hết một vòng là xong một chu kỳ, có đếm ngược từng giây và đếm số vòng. Máy nào hỗ trợ thì rung nhẹ mỗi lần đổi nhịp.
+Mã ở `assets/breath.js`. Năm kiểu thở, mỗi kiểu cho một hoàn cảnh. Thẻ chọn lấy **trạng thái của người dùng làm dòng chính**, tên kỹ thuật và nhịp chỉ là dòng chú thích bên dưới, vì người ta chọn theo cảm giác lúc đó chứ không theo tên bài thở. Chọn xong đọc phần giới thiệu ngắn rồi bắt đầu. Vòng tròn phồng xẹp theo nhịp, cung vàng chạy hết một vòng là xong một chu kỳ, có đếm ngược từng giây và đếm số vòng. Máy nào hỗ trợ thì rung nhẹ mỗi lần đổi nhịp.
 
 | Kiểu | Nhịp | Khi nào dùng | Một chu kỳ |
 |---|---|---|---|
