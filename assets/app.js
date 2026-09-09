@@ -165,6 +165,44 @@ function lucky() {
     <p class="canh-bao">Đây là số ngẫu nhiên sinh từ ngày hôm nay, không phải dự đoán. Không ai đoán trước được kết quả xổ số. Xin chơi cho vui và trong khả năng của mình.</p>`);
 }
 
+/* Chia sẻ ảnh: vẽ lá thành PNG rồi mở bảng chia sẻ của máy.
+   Máy không hỗ trợ chia sẻ tệp thì tải ảnh về. */
+let dangVeAnh = false;
+async function chiaSeAnh() {
+  if (dangVeAnh || !self.TDTD_ANH) return;
+  const nut = $('#btn-anh'), chuCu = nut.innerHTML;
+  dangVeAnh = true; nut.disabled = true; nut.innerHTML = '<span class="ico">◌</span>Đang vẽ…';
+  try {
+    const c = cardOfToday();
+    const blob = await self.TDTD_ANH.veAnh({
+      thongDiep: c.thong_diep, yNghia: c.y_nghia, ngayDep: prettyDate(today), id: c.id,
+    });
+    if (!blob) throw new Error('không tạo được ảnh');
+    const ten = `thong-diep-${today}.png`;
+    const tep = new File([blob], ten, { type: 'image/png' });
+    const loi = `“${c.thong_diep}” — Thông điệp của Thượng Đế, ${prettyDate(today).toLowerCase()}`;
+    if (navigator.canShare && navigator.canShare({ files: [tep] })) {
+      try { await navigator.share({ files: [tep], text: loi }); }
+      catch (e) { if (e.name !== 'AbortError') taiAnh(blob, ten); }
+    } else {
+      taiAnh(blob, ten);
+    }
+  } catch (e) {
+    toast('Không tạo được ảnh, thử lại nhé');
+  } finally {
+    dangVeAnh = false; nut.disabled = false; nut.innerHTML = chuCu;
+  }
+}
+
+function taiAnh(blob, ten) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = ten;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  toast('Đã tải ảnh về máy');
+}
+
 function about() {
   openSheet('Giới thiệu', `
     <p>Mỗi ngày, một thông điệp. Mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
@@ -316,6 +354,7 @@ async function init() {
   datCacSao();
   addEventListener('resize', datLaiNgoiSao);
   addEventListener('orientationchange', datLaiNgoiSao);
+  $('#btn-anh').onclick = chiaSeAnh;
   $('#btn-share').onclick = copyText;
   $('#btn-about').onclick = about;
   $$('[data-close]').forEach(el => el.onclick = closeSheet);
