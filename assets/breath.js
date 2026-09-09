@@ -13,7 +13,7 @@ const KIEU = [
     khiNao: 'Khi chỉ cần dịu lại một chút',
     nhip: '4 vào · 6 ra',
     goiY: 'Thở 2–3 phút',
-    moTa: 'Thở ra lâu hơn hít vào là cách đơn giản nhất để hệ thần kinh dịu xuống. Dễ làm, không nín thở, hợp cho người mới.',
+    nhac: 'Thở ra lâu hơn hít vào. Không cần gắng sức.',
     chuKy: [
       { ten: 'Hít vào bằng mũi', giay: 4, tu: NHO, den: TO },
       { ten: 'Thở ra bằng miệng', giay: 6, tu: TO, den: NHO },
@@ -25,7 +25,7 @@ const KIEU = [
     khiNao: 'Khi đang lo lắng, cần dịu nhanh',
     nhip: '2 vào · 1 vào thêm · 6 ra',
     goiY: 'Thở 5 phút',
-    moTa: 'Hít một hơi bằng mũi, hít thêm một hơi ngắn nữa cho phổi nở hết, rồi thở ra thật chậm bằng miệng. Đây là kiểu được nghiên cứu năm 2023 của Đại học Stanford ghi nhận cải thiện tâm trạng tốt nhất trong các kiểu thở đem so.',
+    nhac: 'Hai hơi vào bằng mũi, hơi sau ngắn hơn. Rồi thở ra thật chậm bằng miệng.',
     chuKy: [
       { ten: 'Hít vào bằng mũi', giay: 2, tu: NHO, den: .84 },
       { ten: 'Hít thêm một hơi ngắn', giay: 1, tu: .84, den: TO },
@@ -38,7 +38,7 @@ const KIEU = [
     khiNao: 'Khi cần bình tĩnh và tập trung',
     nhip: '4 · 4 · 4 · 4',
     goiY: 'Thở 3–5 phút',
-    moTa: 'Bốn nhịp bằng nhau, có nín thở. Hợp lúc cần lấy lại bình tĩnh trước khi làm việc gì đó quan trọng.',
+    nhac: 'Bốn nhịp bằng nhau. Giữ hơi nhẹ nhàng, đừng gồng.',
     chuKy: [
       { ten: 'Hít vào bằng mũi', giay: 4, tu: NHO, den: TO },
       { ten: 'Giữ hơi', giay: 4, tu: TO, den: TO },
@@ -52,7 +52,7 @@ const KIEU = [
     khiNao: 'Khi muốn ngồi yên lâu một chút',
     nhip: '5,5 vào · 5,5 ra',
     goiY: 'Thở 5–10 phút',
-    moTa: 'Khoảng năm hơi rưỡi mỗi phút, vào ra bằng nhau, đều bằng mũi, không nín. Nhịp này được ghi nhận làm nhịp tim biến thiên nhiều nhất, tức là cơ thể đang ở trạng thái dễ chịu.',
+    nhac: 'Vào ra bằng nhau, đều bằng mũi, không nín hơi.',
     chuKy: [
       { ten: 'Hít vào bằng mũi', giay: 5.5, tu: NHO, den: TO },
       { ten: 'Thở ra bằng mũi', giay: 5.5, tu: TO, den: NHO },
@@ -63,9 +63,8 @@ const KIEU = [
     ten: 'Thở 4–7–8',
     khiNao: 'Khi khó ngủ',
     nhip: '4 vào · 7 giữ · 8 ra',
-    goiY: 'Chỉ 4 vòng',
-    canhBao: 'Kiểu này nín thở lâu. Tài liệu gốc khuyên tháng đầu chỉ làm tối đa 4 vòng mỗi lần, nên ứng dụng tự dừng sau 4 vòng.',
-    moTa: 'Đặt đầu lưỡi chạm nướu ngay sau hai răng cửa trên và giữ nguyên suốt bài. Hít vào bằng mũi thật êm, giữ hơi, rồi thở ra bằng miệng thành tiếng nhẹ.',
+    nhac: 'Đặt đầu lưỡi chạm nướu sau hai răng cửa trên, giữ nguyên suốt bài. Thở ra thành tiếng nhẹ.',
+    canhBao: 'Kiểu này nín thở lâu nên tự dừng sau 4 vòng.',
     chuKy: [
       { ten: 'Hít vào bằng mũi', giay: 4, tu: NHO, den: TO },
       { ten: 'Giữ hơi', giay: 7, tu: TO, den: TO },
@@ -92,6 +91,7 @@ function dungKhung() {
       <p class="ht-nhip"></p>
       <p class="ht-dem"></p>
     </div>
+    <p class="ht-nhac"></p>
     <p class="ht-vong"></p>
     <button class="ht-thoat" hidden>Chọn kiểu khác</button>
     <div class="ht-chon">
@@ -103,16 +103,6 @@ function dungKhung() {
           <span class="ht-the-ten">${esc(k.ten)} · ${esc(k.nhip)}</span>
         </button>`).join('')}</div>
       <button class="ht-luuy-nut">Lưu ý an toàn</button>
-    </div>
-    <div class="ht-tin" hidden>
-      <div class="ht-tin-trong">
-        <h3 class="ht-tin-ten"></h3>
-        <p class="ht-tin-mota"></p>
-        <p class="ht-tin-canh" hidden></p>
-        <p class="ht-tin-goi"></p>
-        <button class="primary ht-batdau">Bắt đầu</button>
-        <button class="ghost ht-quay">Quay lại</button>
-      </div>
     </div>
     <div class="ht-luuy" hidden>
       <div class="ht-tin-trong">
@@ -131,11 +121,9 @@ function dungKhung() {
 
   tam.querySelector('.ht-dong').onclick = dong;
   tam.querySelector('.ht-thoat').onclick = veChon;
-  tam.querySelector('.ht-quay').onclick = veChon;
   tam.querySelector('.ht-quay2').onclick = veChon;
   tam.querySelector('.ht-luuy-nut').onclick = () => { an(); tam.querySelector('.ht-luuy').hidden = false; };
-  tam.querySelector('.ht-batdau').onclick = batDau;
-  tam.querySelectorAll('.ht-the').forEach(b => b.onclick = () => gioiThieu(b.dataset.id));
+  tam.querySelectorAll('.ht-the').forEach(b => b.onclick = () => batDau(b.dataset.id));
   addEventListener('resize', doCo);
 }
 
@@ -148,7 +136,7 @@ function doCo() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
 }
 
-const an = () => ['.ht-chon', '.ht-tin', '.ht-luuy'].forEach(q => tam.querySelector(q).hidden = true);
+const an = () => ['.ht-chon', '.ht-luuy'].forEach(q => tam.querySelector(q).hidden = true);
 
 function veChon() {
   chay = false; xong = false; kieu = null;
@@ -159,21 +147,14 @@ function veChon() {
   tam.querySelector('.ht-thoat').hidden = true;
 }
 
-function gioiThieu(id) {
-  kieu = KIEU.find(k => k.id === id);
+/* Bấm thẻ là thở luôn. Câu dặn hiện ngay trong vòng đầu rồi tự mờ đi. */
+function batDau(id) {
+  kieu = KIEU.find(k => k.id === id) || kieu;
   an();
-  const t = tam.querySelector('.ht-tin');
-  t.querySelector('.ht-tin-ten').textContent = kieu.ten + ' · ' + kieu.nhip;
-  t.querySelector('.ht-tin-mota').textContent = kieu.moTa;
-  const c = t.querySelector('.ht-tin-canh');
-  c.hidden = !kieu.canhBao;
-  if (kieu.canhBao) c.textContent = kieu.canhBao;
-  t.querySelector('.ht-tin-goi').textContent = kieu.goiY;
-  t.hidden = false;
-}
-
-function batDau() {
-  an();
+  const n = tam.querySelector('.ht-nhac');
+  n.textContent = [kieu.nhac, kieu.canhBao, kieu.goiY].filter(Boolean).join(' ');
+  n.classList.remove('mo');
+  setTimeout(() => n.classList.add('mo'), Math.max(7000, tongChuKy(kieu) * .9));
   chay = true; xong = false; troi = 0; vongSo = 0; nhipTruoc = -1;
   tam.querySelector('.ht-giua').classList.add('hien');
   tam.querySelector('.ht-thoat').hidden = false;
@@ -270,7 +251,7 @@ function dong() {
 
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
 self.TDTD_THO = { mo, dong, _buoc: (t) => buoc(t), _kieu: KIEU,
-  _chon: (id) => { gioiThieu(id); batDau(); },
+  _chon: (id) => batDau(id),
   _debug: () => ({ chay, xong, kieu: kieu && kieu.id, troi: Math.round(troi), vong: vongSo,
                    nhip: tam && tam.querySelector('.ht-nhip').textContent,
                    dem: tam && tam.querySelector('.ht-dem').textContent }) };

@@ -217,6 +217,11 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .ht-nhip{font-family:"Cormorant Garamond",Georgia,serif;font-size:27px;margin:0;color:#ded4f5;line-height:1.25}
 .ht-dem{font-family:"Be Vietnam Pro",sans-serif;font-size:14px;margin:0;color:rgba(200,186,240,.55);
   font-variant-numeric:tabular-nums}
+.ht-nhac{position:absolute;left:50%;transform:translateX(-50%);z-index:3;pointer-events:none;
+  bottom:calc(112px + env(safe-area-inset-bottom,0px));
+  width:min(88vw,340px);margin:0;text-align:center;
+  font-size:12.5px;line-height:1.75;color:rgba(200,186,240,.6);transition:opacity 1.8s ease}
+.ht-nhac.mo{opacity:0}
 .ht-vong{position:absolute;left:0;right:0;z-index:3;text-align:center;margin:0;pointer-events:none;
   bottom:calc(78px + env(safe-area-inset-bottom,0px));font-size:12px;color:rgba(200,186,240,.45);letter-spacing:.08em}
 .ht-thoat{position:absolute;left:50%;transform:translateX(-50%);z-index:4;
@@ -226,11 +231,11 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .ht-thoat[hidden]{display:none}
 .ht-thoat:hover{background:rgba(200,186,240,.1)}
 
-.ht-chon,.ht-tin,.ht-luuy{position:absolute;inset:0;z-index:4;overflow-y:auto;
+.ht-chon,.ht-luuy{position:absolute;inset:0;z-index:4;overflow-y:auto;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:14px;text-align:center;padding:30px 22px calc(30px + env(safe-area-inset-bottom,0px));
   background:rgba(9,7,20,.66);backdrop-filter:blur(5px);animation:fade .3s ease both}
-.ht-chon[hidden],.ht-tin[hidden],.ht-luuy[hidden]{display:none}
+.ht-chon[hidden],.ht-luuy[hidden]{display:none}
 .ht-chon h2{font-family:"Cormorant Garamond",Georgia,serif;font-size:36px;font-weight:600;margin:0;color:#ded4f5}
 .ht-phu{color:var(--ink-dim);font-size:13.5px;margin:0}
 .ht-ds{display:flex;flex-direction:column;gap:9px;width:100%;max-width:400px;margin-top:4px}
