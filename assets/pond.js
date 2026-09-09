@@ -50,10 +50,11 @@ function doCo() {
   // rải lá cho thưa ra, không đè nhau, để nhìn rõ ếch nhảy từ lá này sang lá kia
   la = [];
   for (let n = 0; n < 5; n++) {
+    const rMax = n === 0 ? rnd(44, 50) : R_LA();        // chắc chắn có một lá đủ rộng cho cả đàn
     for (let thu = 0; thu < 40; thu++) {
-      const l = { x: rnd(W * .12, W * .88), y: rnd(H * .18, H * .88),
-                  r: n === 0 ? rnd(44, 50) : rnd(26, 50),   // chắc chắn có một lá đủ rộng cho cả đàn
-                  goc: rnd(0, 6.28), nhun: 0, lun: 0, chim: 0 };
+      const l = coLa(rnd(W * .12, W * .88), rnd(H * .18, H * .88), rMax,
+                     rnd(.1, .55) * 420000, null);      // tuổi lệch nhau nên không tàn cùng lúc
+      l.r = Math.min(rMax, R_MAM + (rMax - R_MAM) * Math.min(1, l.tuoi / LON));
       const de = la.some(k => Math.hypot(k.x - l.x, k.y - l.y) < (k.r + l.r) * .95);
       if (!de || thu === 39) { la.push(l); break; }
     }
@@ -102,16 +103,22 @@ function veLa(l, t) {
   }
   l.nhun += (nhun - l.nhun) * .18;
   l.lun *= .9;                                          // cú đạp chân của ếch, dập xuống rồi nổi lên
+  const tan = l.chet === null ? 0 : Math.min(1, l.chet / TAN);
+  const ua = Math.max(tan, Math.max(0, l.tuoi / l.doiSong - .78) / .22 * .7);   // sắp hết tuổi thì úa dần
   const dan = soEch(l), qua = dan > suc(l);
   const deo = Math.min(4, dan) * 1.5;                   // chở càng nhiều ếch thì lá càng thấp
   l.chim += ((qua ? 1 : 0) - l.chim) * (qua ? .014 : .05);   // quá sức thì lún dần, vãn bớt thì nổi lên
   const y = l.y + Math.sin(t / 2600 + l.goc) * 2.5 + l.nhun + l.lun + deo + l.chim * 10;
   l.yVe = y;
 
-  ctx.save(); ctx.translate(l.x, y); ctx.rotate(l.goc + l.nhun * .012);
-  ctx.scale(1 - l.chim * .07, 1 - l.chim * .07);
+  ctx.save(); ctx.globalAlpha = 1 - tan * .85;
+  ctx.translate(l.x, y + tan * 7); ctx.rotate(l.goc + l.nhun * .012);
+  const co = (1 - l.chim * .07) * (1 - tan * .16);
+  ctx.scale(co, co);
+  const tron = (a, b) => Math.round(a + (b - a) * ua);
   const g = ctx.createRadialGradient(-l.r * .3, -l.r * .3, l.r * .1, 0, 0, l.r);
-  g.addColorStop(0, 'rgba(70,120,96,.9)'); g.addColorStop(1, 'rgba(32,68,58,.9)');
+  g.addColorStop(0, `rgba(${tron(70,146)},${tron(120,124)},${tron(96,62)},.9)`);
+  g.addColorStop(1, `rgba(${tron(32,86)},${tron(68,64)},${tron(58,34)},.9)`);
   ctx.fillStyle = g;
   ctx.beginPath(); ctx.arc(0, 0, l.r, .42, 6.284); ctx.lineTo(0, 0); ctx.closePath(); ctx.fill();
   ctx.strokeStyle = 'rgba(150,200,170,.22)'; ctx.lineWidth = 1;
@@ -124,6 +131,108 @@ function veLa(l, t) {
     ctx.beginPath(); ctx.arc(0, 0, l.r, .42, 6.284); ctx.lineTo(0, 0); ctx.closePath(); ctx.fill();
   }
   ctx.restore();
+}
+
+/* ---- đời của chiếc lá: nhú ra từ nhánh của lá lớn, lớn dần, già rồi tàn ----
+   Lá không nhích chỗ bao giờ, nên bỏ một chiếc là mọi chỉ số lá của ếch phải dời theo. */
+
+const SO_LA = 8;                                        // đông hơn nữa thì kín mặt nước
+const DOI_LA = () => rnd(240000, 420000);               // một chiếc lá sống 4–7 phút
+const R_LA = () => rnd(26, 50);                         // lớn hết thì được chừng đó
+const R_MAM = 13;                                       // lúc mới nhú
+const LON = 80000;                                      // 80 giây thì lớn hết cỡ
+const TAN = 5000;                                       // tàn trong 5 giây
+
+const coLa = (x, y, rMax, tuoi, cuong) => ({
+  x, y, rMax, r: R_MAM, goc: rnd(0, 6.28), nhun: 0, lun: 0, chim: 0,
+  tuoi, doiSong: DOI_LA(), tNhanh: rnd(30000, 70000), chet: null, cuong,
+});
+
+/* Chỗ nhú lá con: cách mép lá mẹ một quãng, không đè lá nào, không lọt ra ngoài. */
+function choNhu(me) {
+  for (let thu = 0; thu < 24; thu++) {
+    const a = rnd(0, 6.284), d = me.r + rnd(24, 46);
+    const x = me.x + Math.cos(a) * d, y = me.y + Math.sin(a) * d;
+    if (x < W * .1 || x > W * .9 || y < H * .14 || y > H * .9) continue;
+    if (la.some(k => Math.hypot(k.x - x, k.y - y) < (k.r + R_MAM) * .95)) continue;
+    return [x, y];
+  }
+  return null;
+}
+
+/* Bỏ một chiếc lá khỏi mảng, rồi dời chỉ số lá của mọi con ếch cho khớp.
+   Con nào đang ngồi, đang bay tới hay đang bơi tới chiếc lá vừa mất thì cho xuống nước bơi tiếp,
+   nếu không nó sẽ đáp xuống chỗ trống rồi ngồi trên mặt nước. */
+function boLa(i) {
+  const mat = ech.filter(e => e.la === i || e.dich === i);
+  la.splice(i, 1);
+  for (const e of ech) {
+    if (e.la > i) e.la--;
+    if (e.dich > i) e.dich--;
+  }
+  for (const e of mat) {
+    if (e.la === i) e.la = -1;
+    if (e.dich === i) e.dich = -1;
+    if (e.tan !== null) continue;                       // con đang tan thì để nó tan
+    e.boi = true; e.dich = laConCho(-1, e.x, e.y);
+  }
+}
+
+/* Lá bắt đầu tàn: con nào đang ngồi thì nhảy sang lá khác, không còn lá thì xuống nước. */
+function donKhachTro(l, i) {
+  for (const e of ech) {
+    if (!nguoi(e) || la[e.la] !== l) continue;
+    const dich = laConCho(i, e.x, e.y);
+    if (dich >= 0 && dich !== i) nhaySang(e, dich);
+    else tuotXuongNuoc(e, i);
+  }
+}
+
+function buocLa(dt) {
+  for (let i = la.length - 1; i >= 0; i--) {
+    const l = la[i];
+    l.tuoi += dt;
+    l.r = Math.min(l.rMax, R_MAM + (l.rMax - R_MAM) * Math.min(1, l.tuoi / LON));   // lớn dần
+    if (l.cuong) { l.cuong.t += dt; if (l.cuong.t > 20000) l.cuong = null; }        // cuống nhánh rụng đi
+
+    if (l.chet !== null) {                              // đang tàn
+      l.chet += dt;
+      if (l.chet >= TAN) { themSong(l.x, yLa(l), .3); boLa(i); }
+      continue;
+    }
+    if (l.tuoi >= l.doiSong) { l.chet = 0; donKhachTro(l, i); continue; }
+
+    l.tNhanh -= dt;                                     // đủ lớn thì đẻ nhánh ra một lá con
+    if (l.tNhanh <= 0) {
+      l.tNhanh = rnd(50000, 100000);
+      if (l.r >= 34 && la.length < SO_LA) {
+        const cho = choNhu(l);
+        if (cho) {
+          la.push(coLa(cho[0], cho[1], R_LA(), 0, { x: l.x, y: l.y, t: 0 }));
+          themSong(cho[0], cho[1], .16);
+        }
+      }
+    }
+  }
+  if (!la.length) {                                     // hồ trắng: một mầm mọc lên từ gốc dưới đáy
+    la.push(coLa(rnd(W * .2, W * .8), rnd(H * .25, H * .8), R_LA(), 0, null));
+    themSong(la[0].x, la[0].y, .2);
+  }
+}
+
+function veCuong() {                                    // cuống nối lá mẹ với lá con, nhạt dần rồi mất
+  for (const l of la) {
+    if (!l.cuong) continue;
+    const a = (1 - l.cuong.t / 20000) * .3;
+    if (a <= .01) continue;
+    ctx.strokeStyle = `rgba(120,170,130,${a})`;
+    ctx.lineWidth = Math.max(1, l.r * .07);
+    ctx.beginPath();
+    ctx.moveTo(l.cuong.x, l.cuong.y);
+    const gx = (l.cuong.x + l.x) / 2, gy = (l.cuong.y + l.y) / 2;
+    ctx.quadraticCurveTo(gx + (l.y - l.cuong.y) * .12, gy - (l.x - l.cuong.x) * .12, l.x, yLa(l));
+    ctx.stroke();
+  }
 }
 
 /* Đàn ếch: mỗi con ngồi một chỗ trên lá. Chạm đúng vào con nào thì con đó giật mình phóng sang
@@ -142,7 +251,8 @@ const KIET = 220000;                                    // no đầy mà không 
 const BU_MOI = .4;                                      // một con mồi bù được bốn phần mười mức no
 const DU_DE = .6, TON_DE = .3;                          // no hơn 0,6 mới đẻ, đẻ một ổ tốn 0,3
 const soEch = (l) => ech.reduce((n, e) => n + (nguoi(e) && la[e.la] === l ? 1 : 0), 0);
-const suc = (l) => Math.max(2, Math.min(5, 2 + Math.floor((l.r - 26) / 6)));   // 26–31 px chịu 2 con, rồi 3, 4, và từ 44 px là 5
+const suc = (l) => l.r < 22 ? 1                          // mầm mới nhú chỉ chở nổi một con
+  : Math.max(2, Math.min(5, 2 + Math.floor((l.r - 26) / 6)));   // 22–31 px chịu 2 con, rồi 3, 4, và từ 44 px là 5
 
 function datEch() {
   ech = [];
@@ -234,7 +344,7 @@ const laConCho = (tru, x, y) => {
     if (i === tru) return;
     const d = Math.hypot(l.x - x, yLa(l) - y);
     if (d < dGan) { dGan = d; gan = i; }
-    if (soEch(l) < suc(l) && d < dCho) { dCho = d; cho = i; }
+    if (l.chet === null && soEch(l) < suc(l) && d < dCho) { dCho = d; cho = i; }
   });
   return cho >= 0 ? cho : gan;
 };
@@ -291,15 +401,15 @@ function buocMotCon(e, dt) {
     return;
   }
   if (e.boi) {                                          // bơi sang lá khác rồi bám lên
-    const nham = la[e.dich];
-    if (!nham || soEch(nham) >= suc(nham)) {             // lá đang nhắm đã đầy thì đổi lá
+    e.tBoi = (e.tBoi || 0) + dt;
+    if (!la[e.dich] || e.tBoi > 18000) {                 // lá nhắm tới mất rồi, hoặc bơi lâu quá: nhắm lại
       const i = laConCho(-1, e.x, e.y);
-      if (i >= 0) e.dich = i;
+      if (i >= 0) { e.dich = i; e.tBoi = 0; }
     }
     const d0 = la[e.dich];
     if (!d0) return;
     const dx = d0.x - e.x, dy = yLa(d0) - e.y, d = Math.hypot(dx, dy) || 1;
-    if (d < d0.r * .9) { nhaySang(e, e.dich); return; }  // tới mép lá thì trèo lên
+    if (d < d0.r * .9) { e.tBoi = 0; nhaySang(e, e.dich); return; }   // tới mép lá thì trèo lên, đầy cũng trèo
     const v = 54 * dt / 1000;                            // bơi chậm, chừng 54 px mỗi giây
     e.x += dx / d * v; e.y += dy / d * v;
     e.goc = Math.atan2(dy, dx);
@@ -784,8 +894,10 @@ function buoc(t) {
   buocBo(dt); buocCa(dt); buocTrung(dt); buocNong(dt);
 
   for (let i = song.length - 1; i >= 0; i--) { song[i].t += dt; if (!veSong(song[i])) song.splice(i, 1); }
+  buocLa(dt);
   veCa(t);                                              // cá ở sâu nhất, vẽ dưới cùng
   veTrung(t); veNong(t);                                // trứng với nòng nọc ở dưới nước, vẽ trước lá
+  veCuong();
   for (const l of la) veLa(l, t);
   buocEch(dt);
   for (const e of [...ech].sort((a, b) => (a.nhay - b.nhay) || (a.y - b.y))) veEch(e, t);
@@ -817,9 +929,12 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _cham: (x, y) => { themSong(x, y, 1); const con = echTai(x, y); if (con) giatMinh(con, x, y); },
   _trungEch: (x, y) => !!echTai(x, y),
   _ech: () => ech.map(e => ({ la: e.la, nhay: e.nhay, boi: e.boi, dich: e.dich,
+                              tan: e.tan === null ? null : Math.round(e.tan),
                               x: Math.round(e.x), y: Math.round(e.y), goc: +e.goc.toFixed(2) })),
-  _la: () => la.map(l => ({ x: Math.round(l.x), y: Math.round(l.y), r: Math.round(l.r),
-                            ech: soEch(l), suc: suc(l), chim: +l.chim.toFixed(2) })),
+  _la: () => la.map(l => ({ x: Math.round(l.x), y: Math.round(l.y), yVe: Math.round(yLa(l)), r: Math.round(l.r), rMax: Math.round(l.rMax),
+                            ech: soEch(l), suc: suc(l), chim: +l.chim.toFixed(2),
+                            tuoi: Math.round(l.tuoi / 1000), doiSong: Math.round(l.doiSong / 1000),
+                            tan: l.chet === null ? null : Math.round(l.chet), cuong: !!l.cuong })),
   _bo: () => bo.map(b => ({ muoi: b.muoi, x: Math.round(b.x), y: Math.round(b.y), dinh: !!b.dinh })),
   _ca: () => ca.map(c => ({ x: Math.round(c.x), y: Math.round(c.y), noi: +c.noi.toFixed(2) })),
   _themNong: (x, y, n = 1) => { for (let i = 0; i < n; i++) themNong(x + rnd(-8, 8), y + rnd(-8, 8)); return nong.length; },
@@ -835,5 +950,6 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _debug: () => ({ song: song.length, la: la.length, ech: ech.length,
                    bay: ech.filter(e => e.nhay).length, boi: ech.filter(e => e.boi).length,
                    bo: bo.length, ca: ca.length, trung: trung.length, nong: nong.length,
+                   laTan: la.filter(l => l.chet !== null).length, mam: la.filter(l => l.r < 22).length,
                    luoi: ech.filter(e => e.luoi).length, W, H }) };
 })();
