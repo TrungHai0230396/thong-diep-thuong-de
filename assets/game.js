@@ -31,8 +31,8 @@ function dungKhung() {
     <div class="game-hud">
       <div class="g-diem"><span class="g-so">0</span><span class="g-nhan"></span></div>
       <div class="g-mang"></div>
-      <button class="g-dong" aria-label="Đóng">✕</button>
     </div>
+    <button class="g-dong" aria-label="Đóng">✕</button>
     <div class="game-mo">
       <div class="g-dao">
         <svg viewBox="0 0 240 60" aria-hidden="true">
