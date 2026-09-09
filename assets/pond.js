@@ -572,13 +572,17 @@ function veLuoi(e, s) {
 
 /* ---- cá: bơi dưới mặt nước, rượt nòng nọc ---- */
 
-function themCa() {
-  if (ca.length) return;                                // mỗi lần một con cho hồ khỏi thành cái chậu cá
-  const ben = Math.random() < .5;
-  ca.push({ x: ben ? -30 : W + 30, y: rnd(H * .2, H * .9),
-            huong: ben ? rnd(-.4, .4) : Math.PI + rnd(-.4, .4),
-            toc: rnd(40, 58), s: rnd(13, 19), noi: 0, nghi: 0,
-            t: 0, doi: rnd(24000, 44000), pha: rnd(0, 6.28) });
+const SO_CA = 3;                                        // đông hơn nữa thì hồ thành cái chậu cá
+
+function themCa(so) {
+  if (so === undefined) so = Math.random() < .58 ? 1 : (Math.random() < .8 ? 2 : 3);   // phần lớn một con, thỉnh thoảng hai, đôi khi ba
+  for (let n = 0; n < so && ca.length < SO_CA; n++) {
+    const ben = Math.random() < .5;
+    ca.push({ x: ben ? -30 : W + 30, y: rnd(H * .2, H * .9),
+              huong: ben ? rnd(-.4, .4) : Math.PI + rnd(-.4, .4),
+              toc: rnd(40, 58), s: rnd(13, 19), noi: 0, nghi: 0,
+              t: 0, doi: rnd(24000, 44000), pha: rnd(0, 6.28) });
+  }
 }
 
 function buocCa(dt) {
@@ -820,7 +824,7 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _ca: () => ca.map(c => ({ x: Math.round(c.x), y: Math.round(c.y), noi: +c.noi.toFixed(2) })),
   _themNong: (x, y, n = 1) => { for (let i = 0; i < n; i++) themNong(x + rnd(-8, 8), y + rnd(-8, 8)); return nong.length; },
   _nong: () => nong.map(n => ({ x: Math.round(n.x), y: Math.round(n.y), s: +n.s.toFixed(1), vot: Math.round(n.vot) })),
-  _themCa: (x, y) => { ca = []; themCa(); const c = ca[0]; if (c && x !== undefined) { c.x = x; c.y = y; } return !!c; },
+  _themCa: (x, y, so = 1) => { ca = []; themCa(so); const c = ca[0]; if (c && x !== undefined) { c.x = x; c.y = y; } return !!c; },
   _themBo: (x, y) => { themBo(); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
   _dam: () => ({ trung: trung.length, nong: nong.length, an: ech.reduce((n, e) => n + e.an, 0),
                  no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2) }),
