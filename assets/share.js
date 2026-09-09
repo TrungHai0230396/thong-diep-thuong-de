@@ -50,7 +50,7 @@ function chuGian(ctx, chu, x, y, gian) {
   ctx.textAlign = canCu;
 }
 
-async function veAnh({ thongDiep, yNghia, ngayDep, id }) {
+async function veAnh({ thongDiep, yNghia, ngayDep }) {
   await napFont();
   const cv = document.createElement('canvas');
   cv.width = R; cv.height = C;
@@ -97,7 +97,7 @@ async function veAnh({ thongDiep, yNghia, ngayDep, id }) {
   const KHE1 = 96, KHE2 = 54, KHE3 = 62;                 // hoa→chữ, chữ→gạch, gạch→ý nghĩa
   const caoKhoi = caoHoa + KHE1 + caoMsg + KHE2 + KHE3 + caoY;
 
-  const TREN = 150, DUOI = 1700;                          // vùng cho phép đặt khối
+  const TREN = 130, DUOI = 1712;                          // vùng cho phép đặt khối
   let y = TREN + Math.max(0, (DUOI - TREN - caoKhoi) / 2);
 
   // hoa văn mặt trời
@@ -137,19 +137,11 @@ async function veAnh({ thongDiep, yNghia, ngayDep, id }) {
   ctx.fillStyle = 'rgba(202,195,218,.92)';
   for (const d of dongY) { y += 36; ctx.fillText(d, R / 2, y); y += 16; }
 
-  // số lá, đặt trên đầu cho khỏi chạm chân ảnh
-  if (id) {
-    ctx.font = `500 21px ${SANS}`; ctx.fillStyle = 'rgba(232,195,122,.42)';
-    chuGian(ctx, 'LÁ ' + String(id).padStart(2, '0'), R / 2, 156, 6);
-  }
-
   // chân ảnh
   ctx.font = `500 23px ${SANS}`; ctx.fillStyle = 'rgba(232,195,122,.9)';
-  chuGian(ctx, 'THÔNG ĐIỆP CỦA THƯỢNG ĐẾ', R / 2, C - 168, 5);
+  chuGian(ctx, 'THÔNG ĐIỆP CỦA THƯỢNG ĐẾ', R / 2, C - 148, 5);
   ctx.font = `400 25px ${SANS}`; ctx.fillStyle = 'rgba(185,178,204,.75)';
-  ctx.fillText(ngayDep, R / 2, C - 122);
-  ctx.font = `400 21px ${SANS}`; ctx.fillStyle = 'rgba(185,178,204,.45)';
-  ctx.fillText('thong-diep-thuong-de.vercel.app', R / 2, C - 84);
+  ctx.fillText(ngayDep, R / 2, C - 102);
 
   return new Promise(res => cv.toBlob(res, 'image/png'));
 }

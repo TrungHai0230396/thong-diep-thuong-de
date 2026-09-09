@@ -131,22 +131,6 @@ function tick() {
   $('#countdown').textContent = `Thông điệp mới sau ${p(s / 3600 | 0)}:${p((s % 3600) / 60 | 0)}:${p(s % 60)}`;
 }
 
-function copyText() {
-  const c = cardOfToday();
-  const text = `“${c.thong_diep}”\n\n${c.y_nghia}\n\n— Thông điệp của Thượng Đế, ${prettyDate(today).toLowerCase()}`;
-  const done = () => toast('Đã chép vào bộ nhớ tạm');
-  if (navigator.share) { navigator.share({ text }).catch(() => {}); return; }
-  if (navigator.clipboard) { navigator.clipboard.writeText(text).then(done, () => fallback(text, done)); return; }
-  fallback(text, done);
-}
-function fallback(text, done) {
-  const ta = document.createElement('textarea');
-  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
-  document.body.appendChild(ta); ta.select();
-  try { document.execCommand('copy'); done(); } catch (e) { toast('Không chép được'); }
-  document.body.removeChild(ta);
-}
-
 /* Chia sẻ ảnh: vẽ lá thành PNG rồi mở bảng chia sẻ của máy.
    Máy không hỗ trợ chia sẻ tệp thì tải ảnh về. */
 let dangVeAnh = false;
@@ -157,7 +141,7 @@ async function chiaSeAnh() {
   try {
     const c = cardOfToday();
     const blob = await self.TDTD_ANH.veAnh({
-      thongDiep: c.thong_diep, yNghia: c.y_nghia, ngayDep: prettyDate(today), id: c.id,
+      thongDiep: c.thong_diep, yNghia: c.y_nghia, ngayDep: prettyDate(today),
     });
     if (!blob) throw new Error('không tạo được ảnh');
     const ten = `thong-diep-${today}.png`;
@@ -337,7 +321,6 @@ async function init() {
   addEventListener('resize', datLaiNgoiSao);
   addEventListener('orientationchange', datLaiNgoiSao);
   $('#btn-anh').onclick = chiaSeAnh;
-  $('#btn-share').onclick = copyText;
   $('#btn-about').onclick = about;
   $$('[data-close]').forEach(el => el.onclick = closeSheet);
   addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
