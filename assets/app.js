@@ -330,9 +330,31 @@ async function init() {
     if (!PREVIEW && ymd() !== today) { revealed = false; render(); toast('Một ngày mới đã bắt đầu'); }
   }, 1000);
 
-  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
-  }
+  tuCapNhat();
+}
+
+/* Tự nhận bản mới mà không cần xoá cache tay.
+   Trước đây đổi mã xong người dùng phải mở app hai lần mới thấy, vì bản cũ
+   đã nằm trong bộ nhớ đệm của service worker. Giờ khi có bản mới, service worker
+   chiếm quyền ngay rồi trang tự tải lại đúng một lần. */
+function tuCapNhat() {
+  if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
+  const daCoBanCu = !!navigator.serviceWorker.controller;
+  let daTaiLai = false;
+
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!daCoBanCu || daTaiLai) return;   // lần cài đầu tiên thì khỏi tải lại
+    daTaiLai = true;
+    location.reload();
+  });
+
+  navigator.serviceWorker.register('sw.js').then(dk => {
+    dk.update().catch(() => {});
+    setInterval(() => dk.update().catch(() => {}), 30 * 60 * 1000);
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) dk.update().catch(() => {});   // mở lại app là dò bản mới
+    });
+  }).catch(() => {});
 }
 init();
 

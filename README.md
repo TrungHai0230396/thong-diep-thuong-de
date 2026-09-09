@@ -218,6 +218,16 @@ node scripts/test-core.js        # chạy 29 kiểm thử lõi (Node 18+)
 | 94 | "dành cho con lúc nãy" → "dành cho con lúc này" |
 | 47, 60, 70 | "HEBs" → "Các sinh mệnh tiến hóa cao" |
 
+## Tự nhận bản mới
+
+App tự cập nhật, người dùng không phải xoá cache hay thêm `?v=` gì cả.
+
+Khi mở app, và mỗi lần quay lại app sau khi chuyển sang cửa sổ khác, trình duyệt dò xem `sw.js` có đổi không. Nếu có, service worker mới cài rồi chiếm quyền ngay, và trang tự tải lại **đúng một lần**. Lần cài đầu tiên thì không tải lại, vì lúc đó chưa có bản cũ nào để thay.
+
+Kiểm bằng Chrome thật: cài bản `tdtd-v52`, đổi số phiên bản trên máy chủ thành `tdtd-v53`, gọi dò bản mới. Trang tự tải lại, cache chuyển sang `tdtd-v53` và cache cũ bị xoá.
+
+Vẫn phải tăng số phiên bản trong `sw.js` mỗi lần đổi mã, vì đó chính là tín hiệu để trình duyệt biết có bản mới.
+
 ## Đưa lên mạng
 
 Web tĩnh thuần, không cần build. Xem [DEPLOY.md](DEPLOY.md) để biết cách đưa lên Vercel.
