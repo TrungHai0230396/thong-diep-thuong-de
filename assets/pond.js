@@ -1176,7 +1176,13 @@ const tach = (x) => { if (ac && tiengBat) phat(mau.tach, .16, .9 + Math.random()
 const conTrung = () => { if (ac && tiengBat) phat(mau.de[Math.random() < .5 ? 0 : 1], .1, .96 + Math.random() * .09); };
 
 let tua = false;        // đang chạy bù thời gian: tính đủ, nhưng không vẽ và không kêu
-let tAn = 0;            // lúc trang bị ẩn đi
+let tAn = 0;            // lúc trang bị ẩn đi, đo bằng đồng hồ một chiều của trình duyệt
+
+/* Dùng performance.now() chứ không dùng Date.now().
+   Date.now() là đồng hồ treo tường: máy đồng bộ giờ qua mạng, đổi múi giờ hay
+   người dùng chỉnh tay là nó nhảy, và mình sẽ tua nhầm cả tiếng.
+   performance.now() chỉ đi tới, không bao giờ nhảy lùi. */
+const gio = () => performance.now();
 
 function vong(t) {
   raf = requestAnimationFrame(vong);
@@ -1276,10 +1282,10 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classLis
 addEventListener('visibilitychange', () => {
   const dangMo = !!(tam && tam.classList.contains('hien'));
   if (document.hidden) {
-    if (dangMo) tAn = Date.now();                       // nhớ lúc rời đi, chỉ trong bộ nhớ
+    if (dangMo) tAn = gio();                            // nhớ lúc rời đi, chỉ trong bộ nhớ
     if (ac && ac.state === 'running') ac.suspend();     // chuyển tab thì ngưng tiếng, đỡ tốn pin
   } else {
-    if (dangMo && tAn) { buTru(Date.now() - tAn); tAn = 0; }
+    if (dangMo && tAn) { buTru(gio() - tAn); tAn = 0; }
     if (ac && tiengBat && dangMo && ac.state === 'suspended') ac.resume();
   }
 });
