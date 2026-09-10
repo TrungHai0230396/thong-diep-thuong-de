@@ -135,16 +135,22 @@ function veLa(l, t) {
    Lá không nhích chỗ bao giờ, nên bỏ một chiếc là mọi chỉ số lá của ếch phải dời theo. */
 
 const SO_LA = 8;                                        // đông hơn nữa thì kín mặt nước
-const luong = { goc: 0, toc: 1, gocDich: 0, tocDich: 1, t: 0 };  // dòng nước chung, đổi hướng rất chậm
+/* Dòng nước: một hướng gió chung cộng một cái xoáy quanh giữa hồ. Gió phải **đổi chiều thật**,
+   mỗi lần quay 70–150 độ, chứ thổi một chiều thì trước sau gì lá cũng dồn hết vào một góc. */
+const luong = { goc: 0, toc: 1, xoay: 0, gocDich: 0, tocDich: 1, xoayDich: 0, t: 0 };
 
 function buocLuong(dt) {
   luong.t -= dt;
-  if (luong.t <= 0) {                                    // chừng một hai phút lại đổi hướng và sức
-    luong.gocDich = rnd(0, 6.284); luong.tocDich = rnd(.4, 2.6); luong.t = rnd(45000, 95000);
+  if (luong.t <= 0) {                                   // nửa phút tới bốn lăm giây lại trở gió
+    luong.gocDich = luong.goc + (Math.random() < .5 ? 1 : -1) * rnd(1.2, 2.6);
+    luong.tocDich = rnd(.4, 2.4);
+    luong.xoayDich = rnd(-1.5, 1.5);                    // dấu là chiều xoáy, giá trị là sức
+    luong.t = rnd(20000, 45000);
   }
   const lech = Math.atan2(Math.sin(luong.gocDich - luong.goc), Math.cos(luong.gocDich - luong.goc));
-  luong.goc += lech * Math.min(1, dt / 9000);            // quay từ từ, không giật
+  luong.goc += lech * Math.min(1, dt / 7000);           // trở gió từ từ, không giật
   luong.toc += (luong.tocDich - luong.toc) * Math.min(1, dt / 6000);
+  luong.xoay += (luong.xoayDich - luong.xoay) * Math.min(1, dt / 8000);
 }
 const DOI_LA = () => rnd(240000, 420000);               // một chiếc lá sống 4–7 phút
 const R_LA = () => rnd(26, 50);                         // lớn hết thì được chừng đó
@@ -155,6 +161,7 @@ const TAN = 5000;                                       // tàn trong 5 giây
 const coLa = (x, y, rMax, tuoi, cuong) => ({
   x, y, rMax, r: R_MAM, goc: rnd(0, 6.28), nhun: 0, lun: 0, chim: 0,
   vx: 0, vy: 0, quay: rnd(-.03, .03),                   // trôi theo dòng, và quay rất chậm
+  wGoc: rnd(0, 6.284), wToc: rnd(.45, 1.5),             // mỗi chiếc còn tự lượn theo ý nó
   tuoi, doiSong: DOI_LA(), tNhanh: rnd(30000, 70000), chet: null, cuong,
 });
 
@@ -164,12 +171,25 @@ function troiLa(l, dt) {
   const g = dt / 1000;
   const nhe = 1 + (1 - l.r / 50) * .6;                  // lá nhỏ nhẹ hơn nên trôi nhanh hơn một chút
   let ax = Math.cos(luong.goc) * luong.toc * nhe, ay = Math.sin(luong.goc) * luong.toc * nhe;
-  for (const k of la) {
+
+  const qx = l.x - W / 2, qy = l.y - H / 2, qr = Math.hypot(qx, qy) || 1;   // cái xoáy quanh giữa hồ
+  ax += -qy / qr * luong.xoay * nhe;
+  ay += qx / qr * luong.xoay * nhe;
+
+  ax -= qx * .005; ay -= qy * .005 * (W / H);           // lòng hồ hơi trũng: gió đẩy dạt đi thì lá tự về giữa,
+                                                        // nếu không thì trước sau gì cả đám cũng nằm một góc.
+                                                        // Trục dọc hút nhẹ hơn theo tỉ lệ khung, vì hồ cao hơn rộng
+
+  l.wGoc += rnd(-1, 1) * .7 * g;                        // đường lượn riêng của từng chiếc
+  ax += Math.cos(l.wGoc) * l.wToc;
+  ay += Math.sin(l.wGoc) * l.wToc;
+
+  for (const k of la) {                                 // giữ khoảng cách nhau, chứ để chạm mới đẩy thì kết bè
     if (k === l) continue;
-    const dx = l.x - k.x, dy = l.y - k.y, d = Math.hypot(dx, dy) || 1, cham = (l.r + k.r) * .98;
-    if (d < cham) { const f = (cham - d) * .3; ax += dx / d * f; ay += dy / d * f; }
+    const dx = l.x - k.x, dy = l.y - k.y, d = Math.hypot(dx, dy) || 1, cham = (l.r + k.r) * 1.7;
+    if (d < cham) { const f = (cham - d) * .12; ax += dx / d * f; ay += dy / d * f; }   // lực mềm ngang sức gió: cơn gió mạnh dồn được chúng lại một lúc
   }
-  const t = W * .08, ph = W * .92, tr = H * .12, du = H * .92;   // mép hồ
+  const t = W * .06, ph = W * .94, tr = H * .1, du = H * .94;    // mép hồ
   if (l.x < t) ax += (t - l.x) * .5;
   if (l.x > ph) ax += (ph - l.x) * .5;
   if (l.y < tr) ay += (tr - l.y) * .5;
@@ -183,7 +203,7 @@ function troiLa(l, dt) {
 /* Chỗ nhú lá con: cách mép lá mẹ một quãng, không đè lá nào, không lọt ra ngoài. */
 function choNhu(me) {
   for (let thu = 0; thu < 24; thu++) {
-    const a = rnd(0, 6.284), d = me.r + rnd(24, 46);
+    const a = rnd(0, 6.284), d = me.r + rnd(32, 74);      // mầm nhú ra xa lá mẹ một chút cho khỏi kết bè
     const x = me.x + Math.cos(a) * d, y = me.y + Math.sin(a) * d;
     if (x < W * .1 || x > W * .9 || y < H * .14 || y > H * .9) continue;
     if (la.some(k => Math.hypot(k.x - x, k.y - y) < (k.r + R_MAM) * .95)) continue;
@@ -952,7 +972,8 @@ function mo() {
   song = []; tMua = 900;
   bo = []; trung = []; nong = []; ca = []; tBo = rnd(4000, 9000); tCa = rnd(20000, 45000);
   mucBo = MUC_BO(); tDan = rnd(50000, 110000);
-  luong.goc = luong.gocDich = rnd(0, 6.284); luong.toc = luong.tocDich = rnd(.4, 2.6); luong.t = rnd(45000, 95000);
+  luong.goc = luong.gocDich = rnd(0, 6.284); luong.toc = luong.tocDich = rnd(.4, 2.4);
+  luong.xoay = luong.xoayDich = rnd(-1.5, 1.5); luong.t = rnd(20000, 45000);
   tTruoc = performance.now();
   if (!raf) raf = requestAnimationFrame(vong);
 }
@@ -981,7 +1002,7 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _nong: () => nong.map(n => ({ x: Math.round(n.x), y: Math.round(n.y), s: +n.s.toFixed(1), vot: Math.round(n.vot) })),
   _themCa: (x, y, so = 1) => { ca = []; themCa(so); const c = ca[0]; if (c && x !== undefined) { c.x = x; c.y = y; } return !!c; },
   _themBo: (x, y) => { themBo(1); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
-  _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2) }),
+  _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2), xoay: +luong.xoay.toFixed(2) }),
   _dam: () => ({ trung: trung.length, nong: nong.length, an: ech.reduce((n, e) => n + e.an, 0),
                  no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2) }),
   _giaDi: (ms) => { for (const e of ech) { e.tuoi += ms; e.tChuKy += ms; } return ech.length; },
