@@ -414,7 +414,9 @@ Nút **Chia sẻ ảnh** vẽ lá thông điệp thành PNG dọc 1080×1920, đ
 
 Cỡ chữ tự co giãn từ 84 xuống 46 pixel cho vừa khung, và cả khối nội dung được căn giữa theo chiều dọc, nên lá chữ ngắn hay dài đều cân. Font nạp trước tối đa 2,5 giây, mạng hỏng thì rơi về font hệ thống chứ không treo.
 
-Bấm nút sẽ mở bảng chia sẻ của máy kèm ảnh và một dòng chữ. Máy không hỗ trợ chia sẻ tệp thì ảnh tự tải về.
+Bấm nút sẽ mở bảng chia sẻ của máy, **chỉ kèm tấm ảnh, không kèm chữ**. Máy không hỗ trợ chia sẻ tệp thì ảnh tự tải về.
+
+Chỗ này từng hỏng. Bản đầu gọi `navigator.share({ files, text })` — gửi cả ảnh lẫn câu thông điệp. Zalo, Messenger và Facebook nhận được cả hai thì **chỉ lấy chữ rồi bỏ ảnh**: bấm "Chia sẻ ảnh" mà ra mỗi dòng chữ. MDN nói rõ bên nhận có quyền bỏ qua từng phần của dữ liệu chia sẻ. Nay chỉ gửi `files`. Bản thân tấm ảnh đã có sẵn câu thông điệp, ngày tháng và tên app nên bỏ text đi không mất gì.
 
 ## Xem thử ngày khác
 

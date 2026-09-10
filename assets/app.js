@@ -147,9 +147,12 @@ async function chiaSeAnh() {
     if (!blob) throw new Error('không tạo được ảnh');
     const ten = `thong-diep-${today}.png`;
     const tep = new File([blob], ten, { type: 'image/png' });
-    const loi = `“${c.thong_diep}” — Thông điệp của Thượng Đế, ${prettyDate(today).toLowerCase()}`;
+    /* Gửi **mỗi tấm ảnh**, không kèm text. Trước đây gửi kèm cả câu thông điệp, và Zalo,
+       Messenger hay Facebook nhận được cả hai thì chỉ lấy chữ rồi bỏ ảnh — người dùng bấm
+       "Chia sẻ ảnh" mà ra mỗi dòng chữ. Bản thân tấm ảnh đã có sẵn câu thông điệp, ngày
+       tháng và tên app rồi, nên bỏ text đi không mất gì. */
     if (navigator.canShare && navigator.canShare({ files: [tep] })) {
-      try { await navigator.share({ files: [tep], text: loi }); }
+      try { await navigator.share({ files: [tep] }); }
       catch (e) { if (e.name !== 'AbortError') taiAnh(blob, ten); }
     } else {
       taiAnh(blob, ten);
