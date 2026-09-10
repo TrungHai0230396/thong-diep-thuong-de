@@ -250,6 +250,24 @@ Nay cá phóng từ 95 pixel, bơi 46–66 px/s, và nòng nọc vọt xong ph�
 
 Thẻ bọc màn hình lúc đang ẩn có bề rộng bằng 0, mọi toạ độ tính từ đó thành vô định rồi canvas ném lỗi. Cả năm màn hình phủ kín đều đã chặn: lấy tạm kích thước cửa sổ cho tới khi trang bày xong.
 
+## Hồ vẫn sống khi không nhìn tab
+
+Trình duyệt dừng vòng vẽ khi tab bị ẩn, nên trước đây thời gian trong hồ đứng luôn: chuyển tab đi mười phút, quay lại thì ếch vẫn y nguyên.
+
+Nay lúc trang bị ẩn, hồ ghi mốc thời gian **trong bộ nhớ**, không ghi xuống máy. Quay lại thì nó chạy bù quãng đã mất bằng những bước 33 mili giây, đúng bằng bước lúc chạy thật, nên vật lý không lệch. Trong lúc tua thì bỏ toàn bộ phần vẽ và câm tiếng, vì vẽ mấy vạn khung là vô ích còn tiếng thì sẽ dồn cả nghìn cái vào một lúc.
+
+Đo thực tế:
+
+| Quãng ẩn | Số bước chạy bù | Thời gian tốn |
+|---|---|---|
+| 3,2 giây | 96 | 2 ms |
+| 10 phút | 18 181 | 130 ms |
+| 3 tiếng | bị chặn còn 20 phút, 36 363 bước | 197 ms |
+
+Chặn trên 20 phút để tab mở qua đêm không phải tua tám tiếng. Quãng dưới 1,2 giây thì bỏ qua, vì lướt qua lướt lại không đáng tính.
+
+Điều này chỉ đúng khi **trang còn mở**. Đóng hẳn app rồi mở lại thì hồ bắt đầu từ đầu, vì mốc thời gian chỉ nằm trong bộ nhớ. Muốn hồ già cả khi đóng app thì phải ghi mốc xuống máy, nhưng như vậy ngược với nguyên tắc không lưu gì.
+
 ## Chia sẻ ảnh
 
 Nút **Chia sẻ ảnh** vẽ lá thông điệp thành PNG dọc 1080×1920, đúng khổ story của Facebook và Zalo. Mã ở `assets/share.js`.

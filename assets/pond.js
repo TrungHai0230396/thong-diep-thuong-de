@@ -1082,6 +1082,7 @@ function mauTach() {                                    // lưỡi ếch phóng 
 /* --- phát --- */
 
 function phat(b, muc, toc) {
+  if (tua) return false;                                // tua thì câm, kẻo dồn cả nghìn tiếng vào một lúc
   if (!ac || !tiengBat || ac.state !== 'running' || !b || dangVang > 8) return false;
   const s = ac.createBufferSource(); s.buffer = b;
   if (toc) s.playbackRate.value = toc;
@@ -1174,22 +1175,47 @@ const thup = (x) => { if (ac && tiengBat) phat(mau.thup, .3, .9 + Math.random() 
 const tach = (x) => { if (ac && tiengBat) phat(mau.tach, .16, .9 + Math.random() * .3); };
 const conTrung = () => { if (ac && tiengBat) phat(mau.de[Math.random() < .5 ? 0 : 1], .1, .96 + Math.random() * .09); };
 
+let tua = false;        // đang chạy bù thời gian: tính đủ, nhưng không vẽ và không kêu
+let tAn = 0;            // lúc trang bị ẩn đi
+
 function vong(t) {
   raf = requestAnimationFrame(vong);
   buoc(t);
 }
 
+/* Chạy bù quãng thời gian trang bị ẩn, để hồ vẫn sống trong lúc mình nhìn chỗ khác.
+   Không lưu gì xuống máy: chỉ nhớ mốc thời gian trong bộ nhớ, đóng app là mất.
+   Chạy từng bước 33 mili giây cho vật lý y như lúc chạy thật, chỉ bỏ phần vẽ và tiếng.
+   Chặn trên 20 phút, ẩn lâu hơn nữa thì coi như 20 phút, kẻo tua cả đêm. */
+const TUA_TOI_DA = 20 * 60 * 1000;
+
+function buTru(ms) {
+  ms = Math.min(ms, TUA_TOI_DA);
+  if (ms < 1200) return 0;
+  const BUOC = 33, n = Math.floor(ms / BUOC);
+  tua = true;
+  song = [];                                            // gợn sóng chỉ để nhìn, tua thì bỏ
+  let t = tTruoc;
+  for (let i = 0; i < n; i++) { t += BUOC; buoc(t); }
+  tua = false;
+  song = [];
+  tTruoc = performance.now();
+  return n;
+}
+
 function buoc(t) {
   const dt = Math.max(0, Math.min(34, t - tTruoc)); tTruoc = t;
 
-  const g = ctx.createLinearGradient(0, 0, 0, H);
-  g.addColorStop(0, '#0e2430'); g.addColorStop(.5, '#0d1c2c'); g.addColorStop(1, '#080f1c');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  if (!tua) {
+    const g = ctx.createLinearGradient(0, 0, 0, H);
+    g.addColorStop(0, '#0e2430'); g.addColorStop(.5, '#0d1c2c'); g.addColorStop(1, '#080f1c');
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
 
-  // vệt trăng loang trên mặt nước
-  const m = ctx.createRadialGradient(W * .5, H * .2, 10, W * .5, H * .2, Math.max(W, H) * .7);
-  m.addColorStop(0, 'rgba(150,200,230,.10)'); m.addColorStop(1, 'rgba(150,200,230,0)');
-  ctx.fillStyle = m; ctx.fillRect(0, 0, W, H);
+    // vệt trăng loang trên mặt nước
+    const m = ctx.createRadialGradient(W * .5, H * .2, 10, W * .5, H * .2, Math.max(W, H) * .7);
+    m.addColorStop(0, 'rgba(150,200,230,.10)'); m.addColorStop(1, 'rgba(150,200,230,0)');
+    ctx.fillStyle = m; ctx.fillRect(0, 0, W, H);
+  }
 
   tMua -= dt;
   if (tMua <= 0) { themSong(rnd(0, W), rnd(0, H), rnd(.28, .5)); tMua = rnd(1400, 3800); }
@@ -1204,15 +1230,21 @@ function buoc(t) {
   if (tCa <= 0) { themCa(); tCa = rnd(45000, 110000); }
   buocBo(dt); buocCa(dt); buocTrung(dt); buocNong(dt);
 
-  for (let i = song.length - 1; i >= 0; i--) { song[i].t += dt; if (!veSong(song[i])) song.splice(i, 1); }
+  if (tua) { song.length = 0; } else {
+    for (let i = song.length - 1; i >= 0; i--) { song[i].t += dt; if (!veSong(song[i])) song.splice(i, 1); }
+  }
   buocLa(dt);
-  veCa(t);                                              // cá ở sâu nhất, vẽ dưới cùng
-  veTrung(t); veNong(t);                                // trứng với nòng nọc ở dưới nước, vẽ trước lá
-  veCuong();
-  for (const l of la) veLa(l, t);
+  if (!tua) {
+    veCa(t);                                            // cá ở sâu nhất, vẽ dưới cùng
+    veTrung(t); veNong(t);                              // trứng với nòng nọc ở dưới nước, vẽ trước lá
+    veCuong();
+    for (const l of la) veLa(l, t);
+  }
   buocEch(dt);
-  for (const e of [...ech].sort((a, b) => (a.nhay - b.nhay) || (a.y - b.y))) veEch(e, t);
-  veBo(t);                                              // ruồi muỗi bay trên tất cả
+  if (!tua) {
+    for (const e of [...ech].sort((a, b) => (a.nhay - b.nhay) || (a.y - b.y))) veEch(e, t);
+    veBo(t);                                            // ruồi muỗi bay trên tất cả
+  }
 }
 
 function mo() {
@@ -1241,12 +1273,17 @@ function dong() {
 }
 
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
-addEventListener('visibilitychange', () => {            // chuyển tab thì ngưng, đỡ tốn pin
-  if (!ac) return;
-  if (document.hidden) { if (ac.state === 'running') ac.suspend(); }
-  else if (tiengBat && tam && tam.classList.contains('hien') && ac.state === 'suspended') ac.resume();
+addEventListener('visibilitychange', () => {
+  const dangMo = !!(tam && tam.classList.contains('hien'));
+  if (document.hidden) {
+    if (dangMo) tAn = Date.now();                       // nhớ lúc rời đi, chỉ trong bộ nhớ
+    if (ac && ac.state === 'running') ac.suspend();     // chuyển tab thì ngưng tiếng, đỡ tốn pin
+  } else {
+    if (dangMo && tAn) { buTru(Date.now() - tAn); tAn = 0; }
+    if (ac && tiengBat && dangMo && ac.state === 'suspended') ac.resume();
+  }
 });
-self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
+self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _buTru: (ms) => buTru(ms),
   _cham: (x, y) => { themSong(x, y, 1); const con = echTai(x, y); if (con) giatMinh(con, x, y); },
   _trungEch: (x, y) => !!echTai(x, y),
   _ech: () => ech.map(e => ({ la: e.la, nhay: e.nhay, boi: e.boi, dich: e.dich,
