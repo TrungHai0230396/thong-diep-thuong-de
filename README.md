@@ -65,6 +65,8 @@ Miết ngón tay hoặc rê chuột để một vệt nắng đi qua. Nắng ch�
 
 Bản đầu trò này tên **Đồ Long Đao**, người chơi cầm đao chém trái cây và né quả bom. Đổi đi vì cả app không có kẻ thù nào, trong khi tên đao nghĩa là chém rồng. Nắng thay cho đao, trái còn non thay cho bom: chạm vào thì mất một mùa vì vội quá, chứ không ai nổ ai. Màn hình cũng không rung giật và loé đỏ nữa, chỉ sẫm xanh lại một nhịp rồi vài mảnh xanh rơi xuống.
 
+Trái non phải nhìn là biết đừng chạm, nếu không người chơi tưởng nó cũng là trái chín. Ba dấu hiệu tách hẳn nó khỏi trái chín: màu xám xanh đục không bắt sáng, vỏ sần chứ không bóng, và một vòng nét đứt thở đều quanh quả. Trái chín thì căng, bóng, có đốm sáng.
+
 Bấm Esc hoặc nút ✕ để thoát.
 
 ### Sao cam — thả đèn hoa đăng
@@ -239,6 +241,14 @@ Thêm chòm mới chỉ cần thêm một mục vào mảng `CHOM`: tên, lời 
 Vùng bắt điểm khi chạm cũng tự co theo từng chòm: chòm nào có hai ngôi nằm sát nhau ngoài trời thật, như hai sao giữa lưỡi cày cách nhau 33 pixel, thì bán kính bắt nhỏ lại thay vì kéo giãn hình cho dễ bấm.
 
 Một lưu ý về độ chính xác: Hội Thiên văn Việt Nam nêu rõ Thần Nông chỉ là **nhóm sao** do người xưa đặt tên, không trùng khớp với chòm Thiên Yết trong thiên văn học hiện đại. App ghi đúng như vậy trong phần chú thích chứ không gọi nhầm là chòm sao.
+
+## Hồ nước: cân bằng cá và nòng nọc
+
+Cú phóng của cá phải bắt đầu **xa hơn** khoảng nòng nọc cong đuôi chạy. Bản trước cá tăng tốc ở 55 pixel còn nòng nọc bỏ chạy từ 62, nên có một vành đai mà nòng nọc nhanh hơn cá: nó thoát ra, cá chậm lại, rồi lặp mãi, không con nào bị bắt.
+
+Nay cá phóng từ 95 pixel, bơi 46–66 px/s, và nòng nọc vọt xong phải nghỉ hơn nửa giây mới vọt tiếp. Đo thử với 10 nòng nọc và 3 con cá trong 30 giây: cá ăn được 9 tới 10 con. Chạy tự nhiên 4 phút thì hồ vẫn cân, ếch từ 4 lên 9 rồi về 6, nòng nọc không bị quét sạch.
+
+Thẻ bọc màn hình lúc đang ẩn có bề rộng bằng 0, mọi toạ độ tính từ đó thành vô định rồi canvas ném lỗi. Cả năm màn hình phủ kín đều đã chặn: lấy tạm kích thước cửa sổ cho tới khi trang bày xong.
 
 ## Chia sẻ ảnh
 

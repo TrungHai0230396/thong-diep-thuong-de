@@ -45,7 +45,10 @@ function dungKhung() {
 function doCo() {
   if (!cv) return;
   DPR = Math.min(devicePixelRatio || 1, 2);
-  W = tam.clientWidth; H = tam.clientHeight;
+  /* Thẻ bọc đang ẩn thì clientWidth bằng 0, mọi toạ độ tính từ đó thành vô định
+     rồi canvas ném lỗi. Lấy tạm kích thước cửa sổ cho tới khi trang bày xong. */
+  W = tam.clientWidth || innerWidth || 360;
+  H = tam.clientHeight || innerHeight || 640;
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   cv.style.width = W + 'px'; cv.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);

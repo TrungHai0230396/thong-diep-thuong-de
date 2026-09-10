@@ -105,7 +105,10 @@ function ghiChuot(e) {
 function doCo() {
   if (!cv) return;
   DPR = Math.min(devicePixelRatio || 1, 2);
-  W = tam.clientWidth; H = tam.clientHeight;
+  /* Thẻ bọc đang ẩn thì clientWidth bằng 0, mọi toạ độ tính từ đó thành vô định
+     rồi canvas ném lỗi. Lấy tạm kích thước cửa sổ cho tới khi trang bày xong. */
+  W = tam.clientWidth || innerWidth || 360;
+  H = tam.clientHeight || innerHeight || 640;
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   cv.style.width = W + 'px'; cv.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -265,20 +268,40 @@ function veNua(n) {
   ctx.restore();
 }
 
-/* Trái còn non: xanh cứng, cuống còn tươi, có lớp phấn mờ. Chạm vào là mất một mùa. */
-function veNon(o) {
-  ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(o.goc);
-  const g = ctx.createRadialGradient(-o.r * .3, -o.r * .35, o.r * .1, 0, 0, o.r);
-  g.addColorStop(0, '#7fa04d'); g.addColorStop(1, '#2f5228');
+/* Trái còn non phải nhìn là biết đừng chạm, nếu không người chơi tưởng nó cũng là trái chín.
+   Ba dấu hiệu tách hẳn khỏi trái chín: màu xám xanh không bắt sáng, vòng nét đứt thở đều
+   quanh quả, và vỏ sần chứ không bóng. Trái chín thì căng, bóng và có đốm sáng. */
+function veNon(o, t) {
+  const nhip = .5 + Math.sin(t / 380) * .5;
+  ctx.save(); ctx.translate(o.x, o.y);
+
+  ctx.strokeStyle = `rgba(150,190,150,${.30 + nhip * .38})`;   // vòng nét đứt: dấu đừng chạm
+  ctx.lineWidth = 1.6;
+  ctx.setLineDash([5, 7]);
+  ctx.lineDashOffset = -t / 26;
+  ctx.beginPath(); ctx.arc(0, 0, o.r * (1.42 + nhip * .1), 0, 6.284); ctx.stroke();
+  ctx.setLineDash([]);
+
+  ctx.rotate(o.goc);
+  const g = ctx.createRadialGradient(-o.r * .25, -o.r * .3, o.r * .1, 0, 0, o.r);
+  g.addColorStop(0, '#6d8360'); g.addColorStop(1, '#39492f');   // xám xanh, đục, không bắt sáng
   ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, o.r, 0, 6.284); ctx.fill();
-  ctx.fillStyle = 'rgba(230,240,220,.16)';                 // lớp phấn của quả chưa chín
-  ctx.beginPath(); ctx.arc(0, 0, o.r * .92, 0, 6.284); ctx.fill();
-  ctx.strokeStyle = '#5c7a3a'; ctx.lineWidth = Math.max(2, o.r * .1); ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(0, -o.r * .95); ctx.lineTo(o.r * .12, -o.r * 1.35); ctx.stroke();
-  ctx.fillStyle = '#6f9648';                                // lá non ở cuống
-  ctx.beginPath(); ctx.ellipse(o.r * .42, -o.r * 1.2, o.r * .34, o.r * .15, -.5, 0, 6.284); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,.14)';
-  ctx.beginPath(); ctx.ellipse(-o.r * .3, -o.r * .34, o.r * .22, o.r * .13, -.6, 0, 6.284); ctx.fill();
+
+  ctx.fillStyle = 'rgba(214,226,206,.13)';                      // lớp phấn của quả chưa tới
+  ctx.beginPath(); ctx.arc(0, 0, o.r * .93, 0, 6.284); ctx.fill();
+
+  ctx.strokeStyle = 'rgba(40,56,36,.5)'; ctx.lineWidth = 1;     // vỏ sần, không bóng
+  for (let i = 0; i < 5; i++) {
+    const a = i * 1.257 + o.goc * .3;
+    ctx.beginPath();
+    ctx.arc(Math.cos(a) * o.r * .45, Math.sin(a) * o.r * .45, o.r * .17, 0, 6.284);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = '#4d6b39'; ctx.lineWidth = Math.max(2, o.r * .11); ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(0, -o.r * .95); ctx.lineTo(o.r * .1, -o.r * 1.34); ctx.stroke();
+  ctx.fillStyle = '#5f8a3f';
+  ctx.beginPath(); ctx.ellipse(o.r * .4, -o.r * 1.18, o.r * .33, o.r * .14, -.5, 0, 6.284); ctx.fill();
   ctx.restore();
 }
 
@@ -345,7 +368,7 @@ function buoc(t) {
       if (dangChay && !ketThuc) { mang--; combo = 0; veHud(); chop = 180; if (mang <= 0) het(); }
     }
   }
-  for (let i = non.length - 1; i >= 0; i--) { const o = non[i]; buoc(o); veNon(o); if (o.y - o.r > H + 80) non.splice(i, 1); }
+  for (let i = non.length - 1; i >= 0; i--) { const o = non[i]; buoc(o); veNon(o, t); if (o.y - o.r > H + 80) non.splice(i, 1); }
   for (let i = nua.length - 1; i >= 0; i--) { const n = nua[i]; buoc(n); veNua(n); if (n.y - n.r > H + 120) nua.splice(i, 1); }
   for (let i = hat.length - 1; i >= 0; i--) {
     const p = hat[i];

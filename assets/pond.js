@@ -48,7 +48,10 @@ function dungKhung() {
 function doCo() {
   if (!cv) return;
   DPR = Math.min(devicePixelRatio || 1, 2);
-  W = tam.clientWidth; H = tam.clientHeight;
+  /* Thẻ bọc đang ẩn thì clientWidth bằng 0, mọi toạ độ tính từ đó thành vô định
+     rồi canvas ném lỗi. Lấy tạm kích thước cửa sổ cho tới khi trang bày xong. */
+  W = tam.clientWidth || innerWidth || 360;
+  H = tam.clientHeight || innerHeight || 640;
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   cv.style.width = W + 'px'; cv.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -776,7 +779,7 @@ function themCa(so) {
     const ben = Math.random() < .5;
     ca.push({ x: ben ? -30 : W + 30, y: rnd(H * .2, H * .9),
               huong: ben ? rnd(-.4, .4) : Math.PI + rnd(-.4, .4),
-              toc: rnd(40, 58), s: rnd(13, 19), noi: 0, nghi: 0,
+              toc: rnd(46, 66), s: rnd(13, 19), noi: 0, nghi: 0,
               t: 0, doi: rnd(24000, 44000), pha: rnd(0, 6.28) });
   }
 }
@@ -798,9 +801,10 @@ function buocCa(dt) {
       for (const n of nong) { const d = Math.hypot(n.x - c.x, n.y - c.y); if (d < dM) { dM = d; mieng = n; } }
       if (mieng && dM < 130 && c.nghi <= 0) {           // thấy con mồi thì nổi lên rượt
         const nh = Math.atan2(mieng.y - c.y, mieng.x - c.x);
-        c.huong += Math.atan2(Math.sin(nh - c.huong), Math.cos(nh - c.huong)) * (dM < 70 ? .3 : .09);
-        c.noi += (Math.min(1, (130 - dM) / 90) - c.noi) * .06;
-        if (dM < 30) {                                  // đớp
+        const k = Math.min(2, dt / 16.7);              // xoay và nổi theo thời gian thật, không theo số khung hình
+        c.huong += Math.atan2(Math.sin(nh - c.huong), Math.cos(nh - c.huong)) * (dM < 70 ? .3 : .11) * k;
+        c.noi += (Math.min(1, (130 - dM) / 90) - c.noi) * .12 * k;
+        if (dM < 33) {                                  // đớp
           nong.splice(nong.indexOf(mieng), 1);
           themSong(mieng.x, mieng.y, .6); thup(mieng.x);
           c.nghi = rnd(5000, 11000); c.noi = 1;         // đớp xong thì lặn xuống nghỉ một lúc
@@ -814,7 +818,9 @@ function buocCa(dt) {
         }
       }
     }
-    const toc = c.toc * (1 + c.noi * .5) * (dM < 55 ? 2.1 : 1);   // tới gần thì phóng một cú
+    /* Cú phóng phải bắt đầu XA hơn khoảng nòng nọc cong đuôi chạy (62), nếu không
+       thì có một vành đai mà nòng nọc nhanh hơn cá, nó cứ thoát ra rồi vào, không ai bắt được ai. */
+    const toc = c.toc * (1 + c.noi * .5) * (dM < 95 ? 2.3 : 1);
     c.x += Math.cos(c.huong) * toc * g;
     c.y += Math.sin(c.huong) * toc * g;
   }
@@ -889,7 +895,7 @@ function veTrung(t) {
 
 function themNong(x, y) {
   nong.push({ x, y, huong: rnd(0, 6.284), toc: rnd(20, 30), s: 4.4, cho: 0,
-              t: 0, doi: rnd(40000, 55000), pha: rnd(0, 6.28), vot: 0 });
+              t: 0, doi: rnd(40000, 55000), pha: rnd(0, 6.28), vot: 0, moi: 0 });
 }
 
 function buocNong(dt) {
@@ -898,16 +904,18 @@ function buocNong(dt) {
     const n = nong[i];
     n.t += dt;
     n.vot = Math.max(0, n.vot - dt);
+    n.moi = Math.max(0, n.moi - dt);                    // vọt xong thì mỏi, phải lấy hơi mới vọt tiếp
     n.s = 4.4 + (n.t / n.doi) * 4.2;                    // lớn dần lên
     n.huong += rnd(-1, 1) * 2.2 * g;
     if (n.x < 24 || n.x > W - 24 || n.y < H * .08 || n.y > H * .96) {
       const vao = Math.atan2(H * .5 - n.y, W * .5 - n.x);
       n.huong += Math.atan2(Math.sin(vao - n.huong), Math.cos(vao - n.huong)) * .1;
     }
-    for (const c of ca) if (Math.hypot(c.x - n.x, c.y - n.y) < 58) {   // thấy cá tới gần thì cong đuôi chạy
-      n.huong = Math.atan2(n.y - c.y, n.x - c.x); n.vot = 380;
+    for (const c of ca) if (Math.hypot(c.x - n.x, c.y - n.y) < 62) {   // thấy cá tới gần thì cong đuôi chạy
+      n.huong = Math.atan2(n.y - c.y, n.x - c.x);
+      if (n.moi <= 0) { n.vot = 340; n.moi = 340 + 620; }
     }
-    const toc = n.toc * (n.vot > 0 ? 2.5 : 1);          // vọt được một quãng rồi lại chậm, không thắng nổi cú phóng của cá
+    const toc = n.toc * (n.vot > 0 ? 2.2 : 1);          // vọt được một quãng rồi mỏi, không thắng nổi cú phóng của cá
     n.x += Math.cos(n.huong) * toc * g;
     n.y += Math.sin(n.huong) * toc * g;
     if (n.t >= n.doi) {
