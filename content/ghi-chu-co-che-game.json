@@ -501,596 +501,546 @@
  },
  {
   "id": 101,
-  "nguon": "365#1",
-  "co_che_game": "Hệ thống năng lượng: Lựa chọn hành động Tình yêu tăng hào quang, Sợ hãi tăng giáp phòng thủ."
- },
- {
-  "id": 102,
-  "nguon": "365#2",
-  "co_che_game": "Phép thuật năng lượng: Kỹ năng Tình yêu mở rộng tầm nhìn bản đồ, kỹ năng Sợ hãi thu hẹp góc nhìn."
- },
- {
-  "id": 103,
   "nguon": "365#4",
   "co_che_game": "Cơ chế tâm lý: Nhân vật lo sợ sẽ bị tăng tỉ lệ gặp quái vật; khi bình tĩnh quái vật sẽ tự rút lui."
  },
  {
-  "id": 104,
-  "nguon": "365#5",
-  "co_che_game": "Cơ chế thuần hóa: Dùng lời nói ôn hòa với kẻ địch đang giận dữ sẽ làm giảm 50% sức tấn công của họ."
- },
- {
-  "id": 105,
+  "id": 102,
   "nguon": "365#6",
   "co_che_game": "Cơ chế Ân sủng: Nhân vật tự động hồi phục sức khỏe khi dừng lại và nghỉ ngơi mà không tốn bình máu."
  },
  {
-  "id": 106,
+  "id": 103,
   "nguon": "365#7",
   "co_che_game": "Hệ thống điểm kinh nghiệm: Mọi lần thua cuộc đều cộng điểm 'Kinh nghiệm rút ra' để nâng cấp kỹ năng."
  },
  {
-  "id": 107,
+  "id": 104,
   "nguon": "365#8",
   "co_che_game": "Hệ thống Karma: Xóa bỏ điểm tội lỗi, thay bằng thanh 'Tự do nhận thức'."
  },
  {
-  "id": 108,
+  "id": 105,
   "nguon": "365#9",
   "co_che_game": "Nhiệm vụ đồng hành: Cho phép đồng minh tự do di chuyển sẽ tăng 30% hiệu quả chiến đấu của họ."
  },
  {
-  "id": 109,
+  "id": 106,
   "nguon": "365#10",
   "co_che_game": "Cơ chế Giải độc tâm trí: Tự tha thứ giúp xóa bỏ toàn bộ hiệu ứng trúng độc và suy nhược."
  },
  {
-  "id": 110,
+  "id": 107,
   "nguon": "365#11",
   "co_che_game": "Buff nội tại: Khi gạt bỏ nghi ngờ, nhân vật được tăng 20% chỉ số sức mạnh nền."
  },
  {
-  "id": 111,
-  "nguon": "365#12",
-  "co_che_game": "Cơ chế Tương phản: Trong hang tối hoặc đêm đen, sức mạnh kỹ năng của nhân vật tăng gấp đôi."
- },
- {
-  "id": 112,
+  "id": 108,
   "nguon": "365#13",
   "co_che_game": "Tương tác NPC: Lựa chọn giúp đỡ không đòi hỏi thù lao sẽ nhận được phần thưởng ẩn giá trị hơn."
  },
  {
-  "id": 113,
+  "id": 109,
   "nguon": "365#14",
   "co_che_game": "Kỹ năng Nhìn thấu: Hiển thị câu chuyện quá khứ của đối thủ để mở ra phương án hòa giải."
  },
  {
-  "id": 114,
+  "id": 110,
   "nguon": "365#15",
   "co_che_game": "Mở khóa bản đồ: Bước vào vùng đất mới giúp nhân vật tăng tốc độ di chuyển."
  },
  {
-  "id": 115,
+  "id": 111,
   "nguon": "365#16",
   "co_che_game": "Cơ chế Buông bỏ: Bỏ bớt vật phẩm dư thừa trong túi đồ giúp tăng tốc độ đánh và né tránh."
  },
  {
-  "id": 116,
+  "id": 112,
   "nguon": "365#17",
   "co_che_game": "Chỉ số Thiện cảm: Tăng tối đa khi chấp nhận quyết định riêng của các nhân vật đồng hành."
  },
  {
-  "id": 117,
+  "id": 113,
   "nguon": "365#18",
   "co_che_game": "Cơ chế Giảm Bão Hòa: Đứng yên hít thở trong 5 giây giúp làm sạch mọi trạng thái bất lợi."
  },
  {
-  "id": 118,
+  "id": 114,
   "nguon": "365#19",
   "co_che_game": "Tính năng Chăm sóc: Đốt lửa trại và nghỉ ngơi giúp phục hồi năng lượng tối đa."
  },
  {
-  "id": 119,
+  "id": 115,
   "nguon": "365#20",
   "co_che_game": "Chiêu thức Ánh sáng: Phát sáng xung quanh khiến các ảo ảnh sợ hãi tự động tan biến."
  },
  {
-  "id": 120,
+  "id": 116,
   "nguon": "365#21",
   "co_che_game": "Xóa Debuff: Xóa bỏ sự thù hằn giúp làm đầy thanh năng lượng tức thì."
  },
  {
-  "id": 121,
+  "id": 117,
   "nguon": "365#22",
   "co_che_game": "Cơ chế May mắn: Lựa chọn hành động tử tế làm tăng 50% tỉ lệ may mắn ngẫu nhiên."
  },
  {
-  "id": 122,
+  "id": 118,
   "nguon": "365#23",
   "co_che_game": "Giao diện Game: Chuyển đổi nhạc nền sang giai điệu vui tươi khi bước vào trận đấu boss."
  },
  {
-  "id": 123,
+  "id": 119,
   "nguon": "365#24",
   "co_che_game": "Chiêu thức Thủy năng: Dùng nước dập tắt các đòn tấn công lửa bạo lực."
  },
  {
-  "id": 124,
+  "id": 120,
   "nguon": "365#25",
   "co_che_game": "Nội tại Bất tử: Linh hồn không bị tiêu diệt, chỉ chuyển sinh về điểm lưu gần nhất."
  },
  {
-  "id": 125,
+  "id": 121,
   "nguon": "365#26",
   "co_che_game": "Cơ chế Cộng hưởng: Mọi hỗ trợ gieo cho đồng đội đều tự động phục hồi cho bản thân."
  },
  {
-  "id": 126,
+  "id": 122,
   "nguon": "365#27",
   "co_che_game": "Tăng điểm Uy tín: Mọi hành động giúp dân làng đều làm tăng sức mạnh tổng thể của nhóm."
  },
  {
-  "id": 127,
+  "id": 123,
   "nguon": "365#28",
   "co_che_game": "Phản sát thương: Gây sát thương vô lý lên NPC lành tính sẽ khiến nhân vật tự mất máu."
  },
  {
-  "id": 128,
-  "nguon": "365#29",
-  "co_che_game": "Hệ thống Ký ức: Mỗi NPC mới gặp đều bổ sung một trang tri thức vào sổ tay phiêu lưu."
- },
- {
-  "id": 129,
+  "id": 124,
   "nguon": "365#30",
   "co_che_game": "Môi trường mở: Không có bức tường vô hình, người chơi tự do di chuyển khắp cõi giới."
  },
  {
-  "id": 130,
+  "id": 125,
   "nguon": "365#31",
   "co_che_game": "Tính năng Đồng cảm: Hiển thị mức độ cảm xúc của đối phương trong hội thoại."
  },
  {
-  "id": 131,
+  "id": 126,
   "nguon": "365#32",
   "co_che_game": "Nhiệm vụ Hòa bình: Mở khóa kết cục hòa giải bằng cách kết nối các phe phái tranh chấp."
  },
  {
-  "id": 132,
+  "id": 127,
   "nguon": "365#33",
   "co_che_game": "Cơ chế Hiệu ứng Bướm: Lựa chọn nhỏ ở làng đầu tiên ảnh hưởng đến cục diện thành phố cuối."
  },
  {
-  "id": 133,
+  "id": 128,
   "nguon": "365#34",
   "co_che_game": "Hệ thống Môi trường: Trồng cây và làm sạch nguồn nước giúp tăng chỉ số sức sống khu vực."
  },
  {
-  "id": 134,
+  "id": 129,
   "nguon": "365#35",
   "co_che_game": "Tính năng Đội nhóm: Tạo lập tổ đội giúp mở khóa các kỹ năng hợp kích mạnh mẽ."
  },
  {
-  "id": 135,
+  "id": 130,
   "nguon": "365#36",
   "co_che_game": "Cơ chế Chữa lành: Đứng gần đồng đội đang yếu máu giúp tự động hồi phục cho họ."
  },
  {
-  "id": 136,
+  "id": 131,
   "nguon": "365#37",
   "co_che_game": "Cơ chế Soi gương: Boss cuối chính là phiên bản bóng tối của chính người chơi."
  },
  {
-  "id": 137,
+  "id": 132,
   "nguon": "365#38",
   "co_che_game": "Hội thoại Nhập vai: Loại bỏ các tùy chọn phán xét chỉ trích NPC."
  },
  {
-  "id": 138,
+  "id": 133,
   "nguon": "365#39",
   "co_che_game": "Hệ thống Bán hàng: Tặng quà cho thương nhân giúp hạ giá toàn bộ cửa hàng."
  },
  {
-  "id": 139,
+  "id": 134,
   "nguon": "365#40",
   "co_che_game": "Điểm Lưu Game: Tất cả các con đường cuối cùng đều dẫn về Thánh điện Trung tâm."
  },
  {
-  "id": 140,
+  "id": 135,
   "nguon": "365#41",
   "co_che_game": "Giải phóng Phong ấn: Tha thứ cho kẻ phản bội giúp giải phóng nguồn năng lượng ẩn."
  },
  {
-  "id": 141,
+  "id": 136,
   "nguon": "365#42",
   "co_che_game": "Nhiệm vụ Hằng ngày: Hoàn thành 1 việc tốt nhỏ để nhận Lời chúc lành Vũ trụ."
  },
  {
-  "id": 142,
+  "id": 137,
   "nguon": "365#43",
   "co_che_game": "Cơ chế Thân thiện Tự nhiên: Quái vật dại trong rừng không chủ động tấn công người chơi."
  },
  {
-  "id": 143,
+  "id": 138,
   "nguon": "365#44",
   "co_che_game": "Tương tác Không Lời: Chọn biểu cảm mỉm cười để hoàn thành nhiệm vụ mà không cần nói."
  },
  {
-  "id": 144,
+  "id": 139,
   "nguon": "365#45",
   "co_che_game": "Tính năng Xuyên Quốc gia: Tự do giao thương và kết bạn với mọi phe phái trong game."
  },
  {
-  "id": 145,
+  "id": 140,
   "nguon": "365#46",
   "co_che_game": "Túi đồ Tối giản: Giới hạn dung lượng kho giúp người chơi tập trung vào đồ thiết yếu."
  },
  {
-  "id": 146,
+  "id": 141,
   "nguon": "365#47",
   "co_che_game": "Thời tiết Ý thức: Khi nhân vật vui vẻ, trời quang mây tạnh; khi buồn rầu, trời đổ mưa."
  },
  {
-  "id": 147,
+  "id": 142,
   "nguon": "365#48",
   "co_che_game": "Kỹ năng Thương lượng: Tìm điểm chung trong hội thoại giúp giảm 80% độ khó đàm phán."
  },
  {
-  "id": 148,
+  "id": 143,
   "nguon": "365#49",
   "co_che_game": "Mini-game Âm nhạc: Khung cảnh hòa tấu cộng hưởng mở ra cánh cổng bí mật."
  },
  {
-  "id": 149,
+  "id": 144,
   "nguon": "365#50",
   "co_che_game": "Chế độ Co-op: Hỗ trợ người chơi mới giúp cả hai cùng nhận được danh hiệu đặc biệt."
  },
  {
-  "id": 150,
+  "id": 145,
   "nguon": "365#51",
   "co_che_game": "Cơ chế Ngưng đọng Thời gian: Tập trung vào khoảnh khắc hiện tại giúp làm chậm thời gian xung quanh."
  },
  {
-  "id": 151,
+  "id": 146,
   "nguon": "365#52",
   "co_che_game": "Thanh Năng lượng Hiện tại: Chỉ tăng điểm khi nhân vật thực sự hoạt động trong hiện tại."
  },
  {
-  "id": 152,
+  "id": 147,
   "nguon": "365#53",
   "co_che_game": "Cơ chế Reset Kỹ năng: Có thể phân bổ lại điểm tiềm năng bất cứ lúc nào không tốn phí."
  },
  {
-  "id": 153,
+  "id": 148,
   "nguon": "365#54",
   "co_che_game": "Buff Trạng thái: Kích hoạt buff 'Hài lòng' giúp tăng 15% tất cả chỉ số."
  },
  {
-  "id": 154,
+  "id": 149,
   "nguon": "365#55",
   "co_che_game": "Kỹ năng Điều hòa: Hít thở sâu trong 3 giây giúp hồi phục hoàn toàn thanh thể lực."
  },
  {
-  "id": 155,
+  "id": 150,
   "nguon": "365#56",
   "co_che_game": "Thưởng Khám phá: Nhận điểm kinh nghiệm khi đi dạo và ngắm các cảnh đẹp trên bản đồ."
  },
  {
-  "id": 156,
+  "id": 151,
   "nguon": "365#57",
   "co_che_game": "Cơ chế Tự nhiên: Cây trồng và vật phẩm tự sinh trưởng theo chu kỳ thời gian thực."
  },
  {
-  "id": 157,
+  "id": 152,
   "nguon": "365#58",
   "co_che_game": "Giảm Debuff: Buông bỏ lo âu giúp xóa trạng thái mệt mỏi thể xác."
  },
  {
-  "id": 158,
+  "id": 153,
   "nguon": "365#59",
   "co_che_game": "Vật phẩm Hằng ngày: Mỗi ngày đăng nhập nhận được một 'Món quà Hiện tại' ngẫu nhiên."
  },
  {
-  "id": 159,
+  "id": 154,
   "nguon": "365#60",
   "co_che_game": "Bonus Chuyên tâm: Làm một công việc không bị gián đoạn giúp tăng 50% hiệu suất."
  },
  {
-  "id": 160,
+  "id": 155,
   "nguon": "365#61",
   "co_che_game": "Thoại Độc bản: Mỗi cuộc hội thoại với NPC chỉ diễn ra một lần duy nhất."
  },
  {
-  "id": 161,
+  "id": 156,
   "nguon": "365#62",
   "co_che_game": "Kỹ năng Tĩnh lặng: Kích hoạt vùng bình an giúp vô hiệu hóa mọi tiếng ồn và sát thương."
  },
  {
-  "id": 162,
+  "id": 157,
   "nguon": "365#63",
   "co_che_game": "Lưu Game Mới: Mở trang lưu game mới giúp xóa bỏ mọi lựa chọn sai lầm cũ."
  },
  {
-  "id": 163,
+  "id": 158,
   "nguon": "365#64",
   "co_che_game": "Âm thanh Trực giác: Tiếng chuông nhỏ vang lên báo hiệu hướng đi đúng."
  },
  {
-  "id": 164,
+  "id": 159,
   "nguon": "365#65",
   "co_che_game": "Nhiệm vụ Tức thì: Hoàn thành nhiệm vụ trong vòng 5 phút để nhận thêm phần thưởng."
  },
  {
-  "id": 165,
+  "id": 160,
   "nguon": "365#66",
   "co_che_game": "Tốc độ Tự do: Không có đếm ngược thời gian trong các nhiệm vụ khám phá."
  },
  {
-  "id": 166,
+  "id": 161,
   "nguon": "365#67",
   "co_che_game": "Cơ chế Chấp nhận: Chấp nhận kết quả thử thách giúp mở ra nhánh kịch bản mới."
  },
  {
-  "id": 167,
+  "id": 162,
   "nguon": "365#68",
   "co_che_game": "Góc nhìn Trẻ thơ: Mở chế độ màu sắc rực rỡ cho thế giới game."
  },
  {
-  "id": 168,
-  "nguon": "365#69",
-  "co_che_game": "Cơ chế Phản chiếu: Tâm trạng nhân vật thay đổi cảnh quan môi trường xung quanh."
- },
- {
-  "id": 169,
+  "id": 163,
   "nguon": "365#70",
   "co_che_game": "Chế độ Chậm rãi: Bật chế độ đi bộ để phát hiện các báu vật ẩn dưới đất."
  },
  {
-  "id": 170,
+  "id": 164,
   "nguon": "365#71",
   "co_che_game": "Giao diện Tra cứu: Mở menu Tri thức để xem giải đáp cho mọi thắc mắc."
  },
  {
-  "id": 171,
+  "id": 165,
   "nguon": "365#72",
   "co_che_game": "Mini-game Quan sát: Điểm tập trung tăng khi giữ tâm trí không bị xao nhãng."
  },
  {
-  "id": 172,
+  "id": 166,
   "nguon": "365#73",
   "co_che_game": "Cõi Vĩnh cửu: Bước vào không gian đặc biệt nơi thể lực không bị hao mòn."
  },
  {
-  "id": 173,
+  "id": 167,
   "nguon": "365#74",
   "co_che_game": "Cơ chế Tái sinh: Chuyển hóa các đòn đánh cũ thành giáp bảo vệ hiện tại."
  },
  {
-  "id": 174,
+  "id": 168,
   "nguon": "365#75",
   "co_che_game": "Lời chúc Buổi sáng: Nhận buff may mắn mỗi khi bắt đầu một ngày mới trong game."
  },
  {
-  "id": 175,
+  "id": 169,
   "nguon": "365#76",
   "co_che_game": "Hệ thống Tự do: Game hoàn toàn không có kịch bản ép buộc, người chơi tự viết kết thúc."
  },
  {
-  "id": 176,
+  "id": 170,
   "nguon": "365#77",
   "co_che_game": "Cơ chế Be-Do-Have: Chọn thuộc tính tâm lý trước để mở khóa bộ kỹ năng tương ứng."
  },
  {
-  "id": 177,
+  "id": 171,
   "nguon": "365#78",
   "co_che_game": "Cơ chế Ý tưởng: Chọn hướng suy nghĩ tích cực giúp thế giới sinh ra nhiều tài nguyên hơn."
  },
  {
-  "id": 178,
+  "id": 172,
   "nguon": "365#79",
   "co_che_game": "Khẩu lệnh Quyền năng: Dùng phím tắt tuyên bố trạng thái để nhận hiệu ứng tức thì."
  },
  {
-  "id": 179,
+  "id": 173,
   "nguon": "365#80",
   "co_che_game": "Cơ chế Cầu nguyện: Nút 'Cảm ơn' giúp nhân vật nhận được sự hỗ trợ bất ngờ."
  },
  {
-  "id": 180,
+  "id": 174,
   "nguon": "365#81",
   "co_che_game": "Tạo nhân vật: Tự do tùy chỉnh ngoại hình và phẩm chất không giới hạn."
  },
  {
-  "id": 181,
+  "id": 175,
   "nguon": "365#82",
   "co_che_game": "Cây kịch bản: Mọi nhánh lựa chọn đều dẫn đến các nội dung chơi hấp dẫn."
  },
  {
-  "id": 182,
+  "id": 176,
   "nguon": "365#83",
   "co_che_game": "Xóa bỏ Trạng thái Nạn nhân: Chọn nhận trách nhiệm giúp tăng 100% sức mạnh nội tại."
  },
  {
-  "id": 183,
+  "id": 177,
   "nguon": "365#84",
   "co_che_game": "Cơ chế Hòa giải: Ngừng chống cự giúp vô hiệu hóa các đòn tấn công của đối thủ."
  },
  {
-  "id": 184,
+  "id": 178,
   "nguon": "365#85",
   "co_che_game": "Cơ chế Đổi đĩa phim: Thay đổi góc nhìn giúp biến bản đồ u tăm thành đồng cỏ xanh."
  },
  {
-  "id": 185,
+  "id": 179,
   "nguon": "365#86",
   "co_che_game": "Cơ chế Đột phá: Bất ngờ chuyển đổi hệ phái kỹ năng ngay trong trận đấu."
  },
  {
-  "id": 186,
+  "id": 180,
   "nguon": "365#87",
   "co_che_game": "Tác động Diện rộng: Mức độ bình an của người chơi giúp xua tan sương mù toàn bản đồ."
  },
  {
-  "id": 187,
+  "id": 181,
   "nguon": "365#88",
   "co_che_game": "Cơ chế Đón nhận: Thu thập cả vật phẩm hỏng để chế tạo thành công cụ cao cấp."
  },
  {
-  "id": 188,
+  "id": 182,
   "nguon": "365#89",
   "co_che_game": "La bàn Trái tim: Kim la bàn chỉ hướng về nhiệm vụ mang lại niềm vui lớn nhất."
  },
  {
-  "id": 189,
-  "nguon": "365#90",
-  "co_che_game": "Chế độ An toàn: Không bao giờ bị Game Over vĩnh viễn, luôn có cơ hội thử lại."
- },
- {
-  "id": 190,
+  "id": 183,
   "nguon": "365#91",
   "co_che_game": "Thử nghiệm Tự do: Tự do kết hợp các nguyên liệu để sáng tạo công thức mới."
  },
  {
-  "id": 191,
+  "id": 184,
   "nguon": "365#92",
   "co_che_game": "Nhạc nền Sân chơi: Nhạc rộn rã kích thích tinh thần khám phá."
  },
  {
-  "id": 192,
+  "id": 185,
   "nguon": "365#93",
   "co_che_game": "Kỹ năng Niềm tin: Biến các cây cầu gãy thành đường đi vững chắc."
  },
  {
-  "id": 193,
+  "id": 186,
   "nguon": "365#94",
   "co_che_game": "Thành tựu Làm chủ: Mở khóa danh hiệu 'Đấng Tự chủ' khi không đổ lỗi cho NPC."
  },
  {
-  "id": 194,
+  "id": 187,
   "nguon": "365#95",
   "co_che_game": "Sổ tay Phiêu lưu: Tự do ghi chép và lưu lại những khoảnh khắc đáng nhớ."
  },
  {
-  "id": 195,
+  "id": 188,
   "nguon": "365#96",
   "co_che_game": "Lựa chọn Độc lập:Từ chối các yêu cầu vô lý của NPC để giữ vững định hướng cá nhân."
  },
  {
-  "id": 196,
+  "id": 189,
   "nguon": "365#97",
   "co_che_game": "Cơ chế Đổi góc nhìn: Chuyển đổi ý nghĩa sự kiện từ 'Thất bại' sang 'Bài học'."
  },
  {
-  "id": 197,
+  "id": 190,
   "nguon": "365#98",
   "co_che_game": "Con đường Ẩn: Khám phá các lối đi riêng không có trên bản đồ tiêu chuẩn."
  },
  {
-  "id": 198,
+  "id": 191,
   "nguon": "365#99",
   "co_che_game": "Lựa chọn Tuyệt đối: Có thể bỏ qua mọi lời khuyên của thần linh để tự đi đường riêng."
  },
  {
-  "id": 199,
+  "id": 192,
   "nguon": "365#100",
   "co_che_game": "Biểu cảm Mỉm cười: Bấm nút mỉm cười để lan tỏa niềm vui cho tất cả sinh linh xung quanh."
  },
  {
-  "id": 200,
+  "id": 193,
   "nguon": "365#101",
   "co_che_game": "Kích hoạt trạng thái Quan Sát giúp phát hiện bẫy và bí mật."
  },
  {
-  "id": 201,
+  "id": 194,
   "nguon": "365#102",
   "co_che_game": "Lời tuyên bố tích cực gia tăng sức mạnh tấn công và phòng thủ."
  },
  {
-  "id": 202,
+  "id": 195,
   "nguon": "365#103",
   "co_che_game": "Bấm nút 'Biết ơn' để nhận lượng tài nguyên ngẫu nhiên mỗi ngày."
  },
  {
-  "id": 203,
+  "id": 196,
   "nguon": "365#104",
   "co_che_game": "Bật La bàn Trực giác để hiển thị đường ngắn nhất tới mục tiêu."
  },
  {
-  "id": 204,
+  "id": 197,
   "nguon": "365#105",
   "co_che_game": "Tắt phán xét giúp vô hiệu hóa các chiêu thức khiêu khích của kẻ địch."
  },
  {
-  "id": 205,
+  "id": 198,
   "nguon": "365#106",
   "co_che_game": "Tự do thay đổi màu sắc và thời tiết trong thế giới game."
  },
  {
-  "id": 206,
+  "id": 199,
   "nguon": "365#107",
   "co_che_game": "Tặng quà cho người nghèo làm tăng điểm hào quang uy tín."
  },
  {
-  "id": 207,
+  "id": 200,
   "nguon": "365#108",
   "co_che_game": "Tái sinh ngay tại điểm ngã gục mà không mất hành trang."
  },
  {
-  "id": 208,
+  "id": 201,
   "nguon": "365#109",
   "co_che_game": "Đón nhận thử thách giúp nhân vật hồi phục thể lực tức thì."
  },
  {
-  "id": 209,
+  "id": 202,
   "nguon": "365#110",
   "co_che_game": "Bấm biểu cảm 'Cười' để giải trừ trạng thái u ủ cho cả đội."
  },
  {
-  "id": 210,
+  "id": 203,
   "nguon": "365#111",
   "co_che_game": "Kích hoạt trạng thái Quan Sát giúp phát hiện bẫy và bí mật."
  },
  {
-  "id": 211,
-  "nguon": "365#112",
-  "co_che_game": "Lời tuyên bố tích cực gia tăng sức mạnh tấn công và phòng thủ."
- },
- {
-  "id": 212,
+  "id": 204,
   "nguon": "365#113",
   "co_che_game": "Bấm nút 'Biết ơn' để nhận lượng tài nguyên ngẫu nhiên mỗi ngày."
  },
  {
-  "id": 213,
-  "nguon": "365#114",
-  "co_che_game": "Bật La bàn Trực giác để hiển thị đường ngắn nhất tới mục tiêu."
- },
- {
-  "id": 214,
+  "id": 205,
   "nguon": "365#115",
   "co_che_game": "Tắt phán xét giúp vô hiệu hóa các chiêu thức khiêu khích của kẻ địch."
  },
  {
-  "id": 215,
+  "id": 206,
   "nguon": "365#116",
   "co_che_game": "Tự do thay đổi màu sắc và thời tiết trong thế giới game."
  },
  {
-  "id": 216,
+  "id": 207,
   "nguon": "365#117",
   "co_che_game": "Tặng quà cho người nghèo làm tăng điểm hào quang uy tín."
  },
  {
-  "id": 217,
+  "id": 208,
   "nguon": "365#118",
   "co_che_game": "Tái sinh ngay tại điểm ngã gục mà không mất hành trang."
  },
  {
-  "id": 218,
-  "nguon": "365#119",
-  "co_che_game": "Đón nhận thử thách giúp nhân vật hồi phục thể lực tức thì."
- },
- {
-  "id": 219,
+  "id": 209,
   "nguon": "365#120",
   "co_che_game": "Bấm biểu cảm 'Cười' để giải trừ trạng thái u ủ cho cả đội."
  }

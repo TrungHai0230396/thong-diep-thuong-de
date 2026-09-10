@@ -80,12 +80,51 @@ LOI_GIANG = {
 }
 
 
+# Sửa câu chữ sau khi đọc lại tay từng lá. Khoá bằng câu gốc, áp cho cả hai nguồn.
+SUA_CAU = {
+    # lỗi chính tả: "gông cồng" -> "gông cùm"; và bỏ luôn phép ví lộn xộn cửa với gông
+    "Sự tha thứ là chìa khóa mở cánh cửa gông cồng chia rẽ.":
+        "Sự tha thứ là chìa khóa mở gông cùm của sự chia rẽ.",
+    # chơi chữ present/món quà chỉ có trong tiếng Anh, phải nói rõ ra chứ không chèn nguyên chữ
+    "Đó là lý do người ta gọi hiện tại là Present (Món quà).":
+        "Tiếng Anh gọi hiện tại là present, cũng chính là từ chỉ món quà.",
+    # mũi tên gõ bằng gạch ngang và dấu lớn hơn, đổi sang mũi tên thật
+    "Mô hình kiến tạo đúng đắn là: Là -> Làm -> Có.":
+        "Thứ tự đúng của kiến tạo là: Là \u2192 Làm \u2192 Có.",
+    # con số phần trăm lạc giọng giữa một lá bài tĩnh tâm
+    "Hãy chịu trách nhiệm 100% cho cuộc đời của mình.":
+        "Hãy chịu trách nhiệm trọn vẹn cho cuộc đời của mình.",
+    "Mọi trải nghiệm chỉ là bài thử nghiệm để con biết mình thích gì hơn.":
+        "Mọi trải nghiệm chỉ là một phép thử để con biết mình thích gì hơn.",
+    # máy chiếu phim thì chạy cuộn phim, không có đĩa
+    "Muốn đổi phim trên màn ảnh, hãy đổi đĩa phim trong máy chiếu.":
+        "Muốn đổi cảnh trên màn ảnh, phải đổi cuộn phim trong máy chiếu.",
+}
+
+
 def clean(s):
     return re.sub(r"\s+", " ", (s or "").strip())
 
 
+NHAY = re.compile(r"'([^']{2,60})'")
+
+
+def sua(s):
+    return SUA_CAU.get(s, s)
+
+
+def nhay(s):
+    """Nháy đơn thẳng của bàn phím nhìn rẻ tiền trên phông serif của lá bài. Đổi sang nháy kép cong."""
+    return NHAY.sub(lambda m: "\u201c" + m.group(1) + "\u201d", s)
+
+
 def cham(s):
-    return s if not s or s.endswith((".", "!", "?", "…")) else s + "."
+    """Thêm dấu chấm nếu câu chưa có. Ngoặc kép đóng ở cuối thì phải nhìn qua nó để xem
+       bên trong đã có dấu chưa, kẻo ra "...lúc này?”." — thừa một dấu chấm."""
+    if not s:
+        return s
+    loi = s[:-1] if s.endswith(("\u201d", "\u2019", '"', "'")) else s
+    return s if loi.endswith((".", "!", "?", "…")) else s + "."
 
 
 def tu(s):
@@ -93,8 +132,17 @@ def tu(s):
     return set(re.sub(r"[^\w\s]", "", unicodedata.normalize("NFC", s.lower())).split())
 
 
+NGUONG_TRUNG = .40
+"""Ngưỡng coi hai câu là một. Lúc đầu để 0,6 thì lọt 9 cặp nói lại y hệt điều đã có —
+"Con không bao giờ có thể thua trong trò chơi cuộc đời này" nằm cạnh "Con không bao giờ có
+thể thất bại hoàn toàn trong cuộc chơi này". Hạ dần rồi soi từng câu bị bỏ: tới 0,40 thì
+sạch hết mấy câu nói lại, mà xuống 0,35 là bắt đầu cắt nhầm — "Tâm trí con là chiếc máy
+chiếu, thế giới là màn ảnh" bị coi là trùng với "Thế giới bên ngoài chỉ là tấm gương phản
+chiếu tâm trí", trong khi đó là hai hình ảnh riêng."""
+
+
 def giong_nhau(a, b):
-    """Jaccard trên bộ từ. Từ 0,6 trở lên thì coi như cùng một câu nói khác chữ."""
+    """Jaccard trên bộ từ."""
     A, B = tu(a), tu(b)
     return len(A & B) / max(1, len(A | B))
 
@@ -109,7 +157,7 @@ cards, notes, warn = [], [], []
 # ---- nguồn 1: bộ 100 lá đang chạy, giữ nguyên thứ tự và nội dung ----
 for r in doc_csv(CU):
     cid = int(r["ID"])
-    msg, mean = clean(r["Thông điệp"]), clean(r["Ý nghĩa"])
+    msg, mean = nhay(sua(clean(r["Thông điệp"]))), nhay(sua(clean(r["Ý nghĩa"])))
     for find, rep in FIXES.get(cid, []):
         msg, mean = msg.replace(find, rep), mean.replace(find, rep)
     cards.append({"id": len(cards) + 1, "thong_diep": cham(msg), "y_nghia": cham(mean)})
@@ -131,16 +179,17 @@ for r in doc_csv(MOI):
         bo_dup += 1
         continue
     seen.add(key)
-    if any(giong_nhau(msg, c) >= .6 for c in da_co):
+    if any(giong_nhau(msg, c) >= NGUONG_TRUNG for c in da_co):
         bo_trung += 1
         continue
-    mean = clean(r["Ý nghĩa"])
+    msg, mean = nhay(sua(msg)), nhay(sua(clean(r["Ý nghĩa"])))
     if MAU_TINH_THUC in mean:
         rieng = LOI_GIANG.get(cham(msg)) or LOI_GIANG.get(msg)
         if not rieng:
             warn.append(f"nguồn 2 #{r['ID']} lời giảng bị dán mẫu mà chưa có bản viết riêng: {msg}")
             continue
         mean, thay_giang = rieng, thay_giang + 1
+    da_co.append(msg)                                   # lá mới cũng vào danh sách, để lá sau so với nó
     cards.append({"id": len(cards) + 1, "thong_diep": cham(msg), "y_nghia": cham(mean)})
     notes.append({"id": len(cards), "nguon": f"365#{r['ID']}", "co_che_game": clean(r.get("Cơ chế game", ""))})
 

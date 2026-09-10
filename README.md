@@ -31,8 +31,8 @@ Cách chọn lá:
 - Hạt giống của máy quyết định thứ tự bộ bài. **Hai người mở cùng một ngày nhận hai thông điệp khác nhau.**
 - `cardFor(ngày, hạt giống)` đếm số ngày kể từ mốc 01/01/2026 rồi tra vào bộ bài đó. Cùng một người trong cùng một ngày thì luôn ra cùng một lá.
 - Đã nhận thông điệp hôm nay rồi thì mở lại app sẽ thấy ngay lá đó, mặt ngửa, không còn nút nhận. Sang ngày mới lá tự úp lại.
-- Mỗi vòng 219 ngày đi trọn bộ 219 thông điệp, không lá nào lặp trong vòng đó. Sang vòng mới bộ bài xáo lại.
-- Vòng sau được sắp sao cho nửa cuối vòng trước rơi vào nửa sau vòng này, nên hai lần gặp cùng một lá luôn cách nhau ít nhất **110 ngày**. Không bao giờ trùng thông điệp hai hôm liền.
+- Mỗi vòng 209 ngày đi trọn bộ 209 thông điệp, không lá nào lặp trong vòng đó. Sang vòng mới bộ bài xáo lại.
+- Vòng sau được sắp sao cho nửa cuối vòng trước rơi vào nửa sau vòng này, nên hai lần gặp cùng một lá luôn cách nhau ít nhất **106 ngày**. Không bao giờ trùng thông điệp hai hôm liền.
 - Trình duyệt chặn lưu trữ (chế độ ẩn danh) thì hạt giống chỉ sống trong phiên đó. App vẫn chạy, chỉ là mở lại sẽ ra bộ bài khác.
 - Nút **Xáo lại bộ bài của tôi** trong phần giới thiệu sinh hạt giống mới nếu người dùng muốn đổi.
 
@@ -329,7 +329,7 @@ Nay cá phóng từ 95 pixel, bơi 46–66 px/s, và nòng nọc vọt xong ph�
 
 Thẻ bọc màn hình lúc đang ẩn có bề rộng bằng 0, mọi toạ độ tính từ đó thành vô định rồi canvas ném lỗi. Cả năm màn hình phủ kín đều đã chặn: lấy tạm kích thước cửa sổ cho tới khi trang bày xong.
 
-## Bộ bài: 219 lá, gộp từ hai nguồn
+## Bộ bài: 209 lá, gộp từ hai nguồn
 
 Bộ đầu là 100 lá đã chạy từ ngày đầu, qua ba lượt sửa v3 → v5 → v6. Sau đó có thêm một file mang tên **365 thông điệp** — nhưng đọc kỹ thì nó chỉ có **120 câu**.
 
@@ -341,9 +341,13 @@ Dòng 101 tới 365, tức 265 dòng, là phần đệm:
 
 Bê nguyên vào thì người dùng gặp lại đúng một câu sau mỗi 20 ngày, kèm một lời giảng chẳng liên quan. Nên `scripts/build-data.py` bóc cái đuôi ngày ra, gom các dòng trùng ruột về một, bỏ câu đã có trong bộ cũ (so bằng Jaccard trên bộ từ, từ 0,6 trở lên coi như cùng một câu nói khác chữ), và **viết lại 20 lời giảng bị dán mẫu** — bảng `LOI_GIANG` trong script, mỗi câu một lời riêng theo giọng của bộ cũ.
 
-Kết quả: 100 + 119 = **219 lá**. Khoảng cách gần nhất giữa hai lần gặp lại cùng một lá tăng từ 51 lên **110 ngày** (đo 5 hạt giống × 3000 ngày trong `test-core.js`).
+Kết quả: 100 + 109 = **209 lá**. Khoảng cách gần nhất giữa hai lần gặp lại cùng một lá tăng từ 51 lên **106 ngày** (đo 5 hạt giống × 3000 ngày trong `test-core.js`).
 
-Bốn phép thử mới giữ chỗ này: không lá nào lọt đuôi `(Thông điệp ngày N)`, không lá nào lọt lời giảng dán mẫu, không lời giảng nào bị dùng cho hai lá, và bộ bài đủ 219 lá.
+**Ngưỡng lọc trùng phải hạ xuống 0,40.** Lúc đầu để 0,6, đọc lại thì thấy lọt 9 cặp nói y hệt điều đã có, chỉ khác chữ: *"Con không bao giờ có thể thua trong trò chơi cuộc đời này"* nằm cạnh *"Con không bao giờ có thể thất bại hoàn toàn trong cuộc chơi này"*. Hạ dần rồi soi từng câu bị bỏ — tới 0,40 thì sạch, mà xuống 0,35 là bắt đầu cắt nhầm: *"Tâm trí con là chiếc máy chiếu, thế giới là màn ảnh"* bị coi là trùng với *"Thế giới bên ngoài chỉ là tấm gương phản chiếu tâm trí"*, trong khi đó là hai hình ảnh riêng. Lá mới cũng phải so với lá mới đã nhận chứ không chỉ so với bộ cũ — hai câu trùng nhau đều nằm trong nguồn mới thì cách so cũ không thấy.
+
+**Đọc tay lại từng lá** thì ra thêm sáu chỗ, sửa trong bảng `SUA_CAU`: lỗi chính tả *"gông cồng"* → *"gông cùm"*; chơi chữ *"Present (Món quà)"* chỉ có trong tiếng Anh nên phải nói rõ ra; mũi tên gõ bằng `->` đổi thành `→`; *"chịu trách nhiệm 100%"* lạc giọng giữa một lá tĩnh tâm nên đổi thành *"trọn vẹn"*; và máy chiếu phim thì chạy cuộn phim chứ không có đĩa. Sáu lá dùng nháy đơn thẳng `'…'` cũng đổi sang nháy kép cong `“…”` cho hợp phông serif.
+
+Chín phép thử giữ chỗ này: đủ 209 lá, không lọt đuôi `(Thông điệp ngày N)`, không lọt lời giảng dán mẫu, không lời giảng nào dùng cho hai lá, không hai lá nào nói lại cùng một điều, không nháy đơn thẳng, không thừa dấu chấm sau ngoặc kép, không mũi tên gõ tay, không con số phần trăm.
 
 ## Gõ từ tiếng Anh
 
@@ -435,10 +439,10 @@ index.html                 giao diện, một màn hình duy nhất
 assets/core.js             lõi thuần: ngày tháng, xáo bài, chọn lá của ngày (test bằng Node)
 assets/app.js              điều khiển giao diện
 assets/app.css             giao diện
-data/cards.json            219 lá dùng trong app (51 KB)
+data/cards.json            209 lá dùng trong app (49 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
-scripts/test-core.js       32 kiểm thử lõi
+scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
@@ -451,7 +455,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 32 kiểm thử lõi (Node 18+)
+node scripts/test-core.js        # chạy 37 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 ```

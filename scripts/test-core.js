@@ -62,7 +62,9 @@ ok(`5 hạt giống × 3000 ngày: khoảng cách trùng lá > ${Math.floor(IDS.
    minGap > IDS.length / 2, `nhỏ nhất ${minGap} ngày (${when})`);
 
 console.log('\n— Dữ liệu —');
-ok('đủ 219 lá sau khi gộp hai nguồn', cards.length === 219, `${cards.length} lá`);
+ok('đủ 209 lá sau khi gộp hai nguồn', cards.length === 209, `${cards.length} lá`);
+ok('không lá nào dùng mũi tên gõ tay "->"', !cards.some(c => /->/.test(c.thong_diep + c.y_nghia)));
+ok('không lá nào có con số phần trăm', !cards.some(c => /\d+\s*%/.test(c.thong_diep + c.y_nghia)));
 ok(`ID liên tục 1–${cards.length}`, IDS.every((v, i) => v === i + 1));
 ok('không lá nào thiếu thông điệp', cards.every(c => c.thong_diep && c.thong_diep.length > 30));
 ok('không lá nào thiếu ý nghĩa', cards.every(c => c.y_nghia && c.y_nghia.length > 15));
@@ -75,6 +77,23 @@ ok('không lọt lời giảng dán mẫu',
    !cards.some(c => c.y_nghia.includes('Hãy áp dụng sự tỉnh thức này')));
 ok('không lời giảng nào bị dùng lại cho hai lá',
    new Set(cards.map(c => c.y_nghia.toLowerCase())).size === cards.length);
+/* Nguồn 365 có nhiều câu nói lại y hệt điều bộ cũ đã nói, chỉ khác chữ. Ngưỡng lọc trùng
+   để 0,6 thì lọt 9 cặp; nay 0,40. Không cặp nào được vượt quá ngưỡng đó. */
+ok('không hai lá nào nói lại cùng một điều', (() => {
+  const tu = s => new Set(s.toLowerCase().replace(/[^\p{L}\p{N}\s]/gu, '').split(/\s+/).filter(Boolean));
+  for (let i = 0; i < cards.length; i++) for (let j = i + 1; j < cards.length; j++) {
+    const A = tu(cards[i].thong_diep), B = tu(cards[j].thong_diep);
+    let chung = 0; for (const w of A) if (B.has(w)) chung++;
+    if (chung / (A.size + B.size - chung) >= .40) return false;
+  }
+  return true;
+})());
+ok('không lá nào dùng nháy đơn thẳng',
+   !cards.some(c => /'/.test(c.thong_diep + c.y_nghia)));
+/* Chỉ ?" và !" mới là thừa. Còn "...". thì đúng: ba chấm trong ngoặc là dấu lửng,
+   dấu chấm ngoài ngoặc là chấm hết câu. */
+ok('không lá nào thừa dấu chấm sau ngoặc kép',
+   !cards.some(c => /[?!]["\u201d]\./.test(c.thong_diep + c.y_nghia)));
 ok('không lọt "HEBs"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('HEBs')));
 ok('không lọt tên riêng "Kiên"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('Kiên')));
 ok('không còn ghi chú cơ chế game trong bundle', !cards.some(c => 'ghi_chu_thiet_ke' in c || 'co_che_game' in c));

@@ -106,7 +106,7 @@
  },
  {
   "id": 22,
-  "thong_diep": "Khi con khẳng định 'Tôi là...', con đang bắt đầu tạo ra điều đó.",
+  "thong_diep": "Khi con khẳng định “Tôi là...”, con đang bắt đầu tạo ra điều đó.",
   "y_nghia": "Lời nói có sức mạnh rất lớn. Đừng tự dán nhãn mình là kẻ thất bại hay yếu đuối."
  },
  {
@@ -122,7 +122,7 @@
  {
   "id": 25,
   "thong_diep": "Đừng cầu xin vì thiếu thốn. Hãy cảm ơn vì mọi thứ đã sẵn sàng.",
-  "y_nghia": "Thay vì than vãn 'tôi thiếu tiền/sức khỏe', hãy biết ơn vì vũ trụ luôn có sẵn giải pháp cho con."
+  "y_nghia": "Thay vì than vãn “tôi thiếu tiền/sức khỏe”, hãy biết ơn vì vũ trụ luôn có sẵn giải pháp cho con."
  },
  {
   "id": 26,
@@ -211,7 +211,7 @@
  },
  {
   "id": 43,
-  "thong_diep": "Khi bối rối, hãy tự hỏi: 'Nếu là tình yêu thương, mình sẽ làm gì lúc này?'.",
+  "thong_diep": "Khi bối rối, hãy tự hỏi: “Nếu là tình yêu thương, mình sẽ làm gì lúc này?”",
   "y_nghia": "Tình thương luôn là kim chỉ nam đúng đắn nhất để giải quyết mọi rắc rối trong các mối quan hệ."
  },
  {
@@ -307,7 +307,7 @@
  {
   "id": 62,
   "thong_diep": "Thời gian tuyến tính chỉ là ảo ảnh. Quá khứ và tương lai đều nằm ở hiện tại.",
-  "y_nghia": "Mọi sự tiếc nuối hay lo lắng đều vô nghĩa. Chỉ có khoảnh khắc 'Bây giờ' mới là thực sự có thật."
+  "y_nghia": "Mọi sự tiếc nuối hay lo lắng đều vô nghĩa. Chỉ có khoảnh khắc “Bây giờ” mới là thực sự có thật."
  },
  {
   "id": 63,
@@ -501,596 +501,546 @@
  },
  {
   "id": 101,
-  "thong_diep": "Mọi hành động của con chỉ đến từ hai nguồn: Tình yêu hoặc Sợ hãi.",
-  "y_nghia": "Mỗi lựa chọn trong đời đều là chọn mở lòng ra hay co rút lại."
- },
- {
-  "id": 102,
-  "thong_diep": "Tình yêu mở rộng và sẻ chia, còn sợ hãi co rút và giấu giếm.",
-  "y_nghia": "Khi yêu thương con thấy tự do, khi sợ hãi con thấy ngột ngạt."
- },
- {
-  "id": 103,
   "thong_diep": "Sợ hãi chỉ thu hút đúng những gì con đang lo sợ.",
   "y_nghia": "Càng lo lắng về điều xấu, con càng vô tình kéo nó về phía mình."
  },
  {
-  "id": 104,
-  "thong_diep": "Sự tức giận thực ra chỉ là nỗi sợ hãi đang đeo mặt nạ.",
-  "y_nghia": "Khi ai đó nổi giận, họ đang hoảng sợ và cần được thấu hiểu."
- },
- {
-  "id": 105,
+  "id": 102,
   "thong_diep": "Con không cần phải làm gì để trở nên xứng đáng được yêu thương.",
   "y_nghia": "Tình yêu thương là bản chất tự nhiên, không phải phần thưởng phải tranh đoạt."
  },
  {
-  "id": 106,
+  "id": 103,
   "thong_diep": "Đừng sợ thất bại, chẳng có sai lầm nào là vĩnh viễn cả.",
-  "y_nghia": "Mọi trải nghiệm chỉ là bài thử nghiệm để con biết mình thích gì hơn."
+  "y_nghia": "Mọi trải nghiệm chỉ là một phép thử để con biết mình thích gì hơn."
  },
  {
-  "id": 107,
+  "id": 104,
   "thong_diep": "Thượng đế không bao giờ trừng phạt con vì những lỡ vội.",
   "y_nghia": "Sự trừng phạt duy nhất là cảm giác dằn vặt do chính con tự tạo ra."
  },
  {
-  "id": 108,
+  "id": 105,
   "thong_diep": "Tình yêu thực sự luôn trao đi sự tự do tuyệt đối.",
   "y_nghia": "Yêu ai đó là để họ làm chính họ, chứ không phải ép họ theo ý mình."
  },
  {
-  "id": 109,
+  "id": 106,
   "thong_diep": "Hãy tha thứ cho chính mình trước khi muốn tha thứ cho người khác.",
   "y_nghia": "Con không thể cho đi thứ mà bên trong con đang thiếu hụt."
  },
  {
-  "id": 110,
+  "id": 107,
   "thong_diep": "Nỗi sợ lớn nhất là sợ mình không đủ giỏi.",
   "y_nghia": "Con vốn dĩ đã trọn vẹn, chỉ là con quên mất sức mạnh của mình thôi."
  },
  {
-  "id": 111,
-  "thong_diep": "Không có bóng tối, con sẽ chẳng thể nhận ra ánh sáng rực rỡ.",
-  "y_nghia": "Khó khăn xuất hiện chỉ để làm nổi bật sự mạnh mẽ bên trong con."
- },
- {
-  "id": 112,
+  "id": 108,
   "thong_diep": "Tình yêu không phải là sự đánh đổi hay hy sinh cay đắng.",
   "y_nghia": "Khi yêu thương đúng nghĩa, cả hai bên đều cảm thấy tràn đầy."
  },
  {
-  "id": 113,
+  "id": 109,
   "thong_diep": "Bao dung là nhìn thấu vẻ đẹp đằng sau những vụng dại.",
   "y_nghia": "Người làm tổn thương kẻ khác thường là người đang mang nhiều vết thương nhất."
  },
  {
-  "id": 114,
+  "id": 110,
   "thong_diep": "Nỗi sợ khiến con thu mình, tình yêu chắp cánh cho con bay.",
   "y_nghia": "Hãy can đảm bước ra khỏi vùng an toàn để khám phá thế giới."
  },
  {
-  "id": 115,
+  "id": 111,
   "thong_diep": "Đừng bám chặt lấy mọi thứ vì sợ mất mát.",
   "y_nghia": "Càng nắm chặt cát trong tay, cát càng trôi qua kẽ tay nhanh hơn."
  },
  {
-  "id": 116,
-  "thong_diep": "Tình yêu vô điều kiện không bao giờ đặt ra điều kiện 'nếu... thì...'.",
+  "id": 112,
+  "thong_diep": "Tình yêu vô điều kiện không bao giờ đặt ra điều kiện “nếu... thì...”.",
   "y_nghia": "Yêu là đón nhận trọn vẹn mà không bắt đối phương phải thay đổi."
  },
  {
-  "id": 117,
+  "id": 113,
   "thong_diep": "Căng thẳng xuất hiện khi con cố kiểm soát những thứ không thuộc về mình.",
   "y_nghia": "Hãy thả lỏng và tin tưởng vào dòng chảy tự nhiên của cuộc sống."
  },
  {
-  "id": 118,
+  "id": 114,
   "thong_diep": "Hãy đối xử với bản thân bằng sự dịu dàng mà con dành cho người bạn thân.",
   "y_nghia": "Con xứng đáng nhận được sự chăm sóc từ chính mình."
  },
  {
-  "id": 119,
+  "id": 115,
   "thong_diep": "Sợ hãi chỉ là một ảo giác do trí óc tự vẽ ra.",
   "y_nghia": "Nó giống như bóng đen trên tường, biến mất ngay khi con bật đèn lên."
  },
  {
-  "id": 120,
+  "id": 116,
   "thong_diep": "Sự ghét bỏ là liều thuốc độc con uống nhưng mong người khác đổ gục.",
   "y_nghia": "Hãy buông bỏ giận hờn để tự giải thoát cho chính mình."
  },
  {
-  "id": 121,
+  "id": 117,
   "thong_diep": "Khi con chọn tình yêu, cả vũ trụ sẽ đứng về phía con.",
   "y_nghia": "Năng lượng tích cực luôn thu hút những điều tốt đẹp tương ứng."
  },
  {
-  "id": 122,
+  "id": 118,
   "thong_diep": "Hãy nhìn mọi thử thách như một trò chơi đố vui thú vị.",
   "y_nghia": "Đừng biến cuộc đời thành một bản án nặng nề."
  },
  {
-  "id": 123,
+  "id": 119,
   "thong_diep": "Lòng nhân từ là sức mạnh lớn nhất, không phải là sự yếu đuối.",
   "y_nghia": "Mềm mại như nước nhưng có thể làm mòn cả đá cứng."
  },
  {
-  "id": 124,
+  "id": 120,
   "thong_diep": "Con luôn an toàn trong vòng tay của cuộc sống.",
   "y_nghia": "Không có gì có thể hủy hoại được bản chất tinh thần của con."
  },
  {
-  "id": 125,
+  "id": 121,
   "thong_diep": "Chúng ta chỉ là Một, không hề có sự chia rẽ thực sự.",
   "y_nghia": "Mọi người xung quanh đều là những mảnh ghép khác của chính con."
  },
  {
-  "id": 126,
+  "id": 122,
   "thong_diep": "Giúp đỡ người khác chính là đang giúp đỡ chính mình.",
   "y_nghia": "Khi con trao đi nụ cười, người nhận được niềm vui đầu tiên là con."
  },
  {
-  "id": 127,
+  "id": 123,
   "thong_diep": "Đừng làm tổn thương ai, vì nỗi đau đó sẽ dội ngược lại con.",
   "y_nghia": "Làm đau người khác giống như tay trái tự đánh vào tay phải."
  },
  {
-  "id": 128,
-  "thong_diep": "Những người con gặp hôm nay đều mang đến một bài học.",
-  "y_nghia": "Không có sự gặp gỡ nào là ngẫu nhiên hay vô nghĩa cả."
- },
- {
-  "id": 129,
+  "id": 124,
   "thong_diep": "Con người phân chia ranh giới, còn tự nhiên thì không.",
   "y_nghia": "Mặt trời chiếu sáng cho tất cả mọi người không phân biệt."
  },
  {
-  "id": 130,
+  "id": 125,
   "thong_diep": "Hãy nhìn người đối diện như một phiên bản khác của con.",
   "y_nghia": "Họ cũng có những lo âu, ước mơ và tổn thương giống hệt con."
  },
  {
-  "id": 131,
+  "id": 126,
   "thong_diep": "Chiến tranh và xung đột sinh ra từ ảo tưởng chia rẽ.",
   "y_nghia": "Khi nghĩ mình tách biệt, con người mới dễ dàng tấn công nhau."
  },
  {
-  "id": 132,
+  "id": 127,
   "thong_diep": "Con là một giọt nước trong đại dương, và cũng chính là cả đại dương.",
   "y_nghia": "Một hành động nhỏ của con cũng tạo ra sóng lan tỏa khắp nơi."
  },
  {
-  "id": 133,
+  "id": 128,
   "thong_diep": "Trái Đất này là ngôi nhà chung của tất cả sinh linh.",
   "y_nghia": "Hãy bảo vệ thiên nhiên như bảo vệ chính căn nhà của con."
  },
  {
-  "id": 134,
+  "id": 129,
   "thong_diep": "Không ai là một hòn đảo cô độc giữa đại dương.",
   "y_nghia": "Chúng ta cần có nhau để hoàn thiện những trải nghiệm cuộc đời."
  },
  {
-  "id": 135,
+  "id": 130,
   "thong_diep": "Lòng trắc ẩn xuất hiện khi con thấy mình trong nỗi đau người khác.",
   "y_nghia": "Sự thấu hiểu xóa tan mọi khoảng cách giữa người với người."
  },
  {
-  "id": 136,
+  "id": 131,
   "thong_diep": "Kẻ thù lớn nhất thực ra chỉ là chiếc gương phản chiếu nỗi sợ của con.",
   "y_nghia": "Đối diện với kẻ thù là cơ hội để con chiến thắng bản ngã."
  },
  {
-  "id": 137,
+  "id": 132,
   "thong_diep": "Đừng phán xét con đường của người khác.",
   "y_nghia": "Con không đi trong đôi giày của họ, sao biết họ đã trải qua những gì."
  },
  {
-  "id": 138,
+  "id": 133,
   "thong_diep": "Chia sẻ sự đủ đầy làm cho sự đủ đầy nhân lên gấp bội.",
   "y_nghia": "Cho đi không mất đi, mà là mở rộng dòng chảy tích cực."
  },
  {
-  "id": 139,
+  "id": 134,
   "thong_diep": "Tất cả chúng ta đều đang trên đường trở về Nhà.",
   "y_nghia": "Mỗi người đi với tốc độ khác nhau, nhưng đích đến là một."
  },
  {
-  "id": 140,
-  "thong_diep": "Sự tha thứ là chìa khóa mở cánh cửa gông cồng chia rẽ.",
+  "id": 135,
+  "thong_diep": "Sự tha thứ là chìa khóa mở gông cùm của sự chia rẽ.",
   "y_nghia": "Khi buông hận thù, con mới thực sự được tự do."
  },
  {
-  "id": 141,
+  "id": 136,
   "thong_diep": "Hãy sống sao cho thế giới tốt đẹp hơn nhờ sự hiện diện của con.",
   "y_nghia": "Mỗi ngày hãy gieo ít nhất một hạt giống tử tế."
  },
  {
-  "id": 142,
+  "id": 137,
   "thong_diep": "Muôn loài đều thở chung một bầu khí quyển.",
   "y_nghia": "Mọi sự sống đều thiêng liêng và đáng được tôn trọng."
  },
  {
-  "id": 143,
+  "id": 138,
   "thong_diep": "Sự gắn kết không nằm ở lời nói mà ở sự cộng hưởng tâm hồn.",
   "y_nghia": "Đôi khi chỉ cần một ánh mắt thấu hiểu là đủ."
  },
  {
-  "id": 144,
+  "id": 139,
   "thong_diep": "Mọi ranh giới phe phái đều do con người tự vẽ ra.",
   "y_nghia": "Xóa bỏ ranh giới là bước đầu tiên của sự trưởng thành."
  },
  {
-  "id": 145,
+  "id": 140,
   "thong_diep": "Tự nhiên không bao giờ tích trữ quá mức cần thiết.",
   "y_nghia": "Hãy sống đơn giản để mọi người cùng có đủ."
  },
  {
-  "id": 146,
+  "id": 141,
   "thong_diep": "Khi con vui, cả vũ trụ cùng mỉm cười với con.",
   "y_nghia": "Trạng thái cảm xúc của con ảnh hưởng đến năng lượng xung quanh."
  },
  {
-  "id": 147,
+  "id": 142,
   "thong_diep": "Đừng tìm kiếm sự khác biệt để tranh chấp, hãy tìm điểm chung để gắn kết.",
   "y_nghia": "Tập trung vào những gì nối liền chúng ta."
  },
  {
-  "id": 148,
+  "id": 143,
   "thong_diep": "Con là một nốt nhạc độc đáo trong bản hòa tấu vũ trụ.",
   "y_nghia": "Hãy chơi đúng nốt nhạc của mình để bản nhạc được trọn vẹn."
  },
  {
-  "id": 149,
+  "id": 144,
   "thong_diep": "Chúng ta cùng chung một nguồn gốc và cùng chung một tương lai.",
   "y_nghia": "Hãy nắm tay nhau cùng bước tiếp trên hành trình này."
  },
  {
-  "id": 150,
+  "id": 145,
   "thong_diep": "Sức mạnh tối thượng chỉ tồn tại trong khoảnh khắc Bây giờ.",
   "y_nghia": "Quá khứ đã qua, tương lai chưa tới, chỉ có hiện tại là thật."
  },
  {
-  "id": 151,
+  "id": 146,
   "thong_diep": "Đừng sống trong hoài niệm quá khứ hay lo âu tương lai.",
   "y_nghia": "Con đang bỏ lỡ vẻ đẹp của chính giây phút này."
  },
  {
-  "id": 152,
+  "id": 147,
   "thong_diep": "Mỗi khoảnh khắc là một sự khởi đầu mới tinh khôi.",
   "y_nghia": "Con có quyền chọn lại phiên bản của mình ngay lúc này."
  },
  {
-  "id": 153,
+  "id": 148,
   "thong_diep": "Chờ đợi điều kiện hoàn hảo mới hạnh phúc là một cái bẫy.",
   "y_nghia": "Hãy chọn hạnh phúc ngay bây giờ với những gì đang có."
  },
  {
-  "id": 154,
+  "id": 149,
   "thong_diep": "Thở một hơi thật sâu và nhận biết con đang sống.",
   "y_nghia": "Hơi thở là chiếc neo đưa con trở về với hiện tại."
  },
  {
-  "id": 155,
+  "id": 150,
   "thong_diep": "Cuộc đời không phải là chuyến đi đến đích, mà là chuyến thưởng ngoạn.",
   "y_nghia": "Hãy tận hưởng từng bước chân trên con đường đi."
  },
  {
-  "id": 156,
+  "id": 151,
   "thong_diep": "Đừng vội vã, mọi thứ đều diễn ra đúng thời điểm của nó.",
   "y_nghia": "Hoa nở đúng mùa, trái chín đúng cây, hãy kiên nhẫn."
  },
  {
-  "id": 157,
+  "id": 152,
   "thong_diep": "Sự lo lắng không làm cho ngày mai tốt hơn, nó chỉ làm hôm nay tệ đi.",
   "y_nghia": "Hãy trút bỏ gánh nặng suy nghĩ không cần thiết."
  },
  {
-  "id": 158,
+  "id": 153,
   "thong_diep": "Hiện tại là món quà duy nhất mà vũ trụ trao cho con.",
-  "y_nghia": "Đó là lý do người ta gọi hiện tại là Present (Món quà)."
+  "y_nghia": "Tiếng Anh gọi hiện tại là present, cũng chính là từ chỉ món quà."
  },
  {
-  "id": 159,
+  "id": 154,
   "thong_diep": "Tập trung trọn vẹn vào việc con đang làm.",
   "y_nghia": "Khi ăn hãy ăn, khi làm hãy làm, đó là thiền định."
  },
  {
-  "id": 160,
+  "id": 155,
   "thong_diep": "Mỗi giây phút trôi qua đều không bao giờ lặp lại.",
   "y_nghia": "Hãy trân trọng từng khoảnh khắc gặp gỡ trong đời."
  },
  {
-  "id": 161,
+  "id": 156,
   "thong_diep": "Sự bình an không nằm ở nơi chốn, mà nằm ở tâm trí tĩnh lặng.",
   "y_nghia": "Con có thể tìm thấy sự tĩnh lặng ngay giữa đám đông náo nhiệt."
  },
  {
-  "id": 162,
+  "id": 157,
   "thong_diep": "Đừng để những tiếc nuối quá khứ làm mù mắt con trước hiện tại.",
   "y_nghia": "Hôm nay là một trang sách trắng tinh đang chờ con viết."
  },
  {
-  "id": 163,
+  "id": 158,
   "thong_diep": "Lắng nghe tiếng nói tĩnh lặng bên trong con ngay lúc này.",
   "y_nghia": "Trực giác luôn thì thầm câu trả lời chính xác nhất."
  },
  {
-  "id": 164,
+  "id": 159,
   "thong_diep": "Nơi duy nhất con có thể thay đổi cuộc đời là Ngay Bây Giờ.",
   "y_nghia": "Đừng hứa hẹn ngày mai, hãy hành động ngay hôm nay."
  },
  {
-  "id": 165,
+  "id": 160,
   "thong_diep": "Mỗi bước đi đều là điểm đến nếu con đi trong tỉnh thức.",
   "y_nghia": "Không cần phải vội vã chạy đua với ai cả."
  },
  {
-  "id": 166,
+  "id": 161,
   "thong_diep": "Chấp nhận giây phút hiện tại như nó vốn là.",
   "y_nghia": "Kháng cự lại thực tại chỉ tạo ra sự đau khổ."
  },
  {
-  "id": 167,
+  "id": 162,
   "thong_diep": "Hãy sống như thể hôm nay là ngày cuối cùng, và cũng là ngày đầu tiên.",
   "y_nghia": "Trân trọng từng trải nghiệm với sự ngạc nhiên của trẻ thơ."
  },
  {
-  "id": 168,
-  "thong_diep": "Thế giới bên ngoài chỉ là phản chiếu trạng thái nội tâm hiện tại.",
-  "y_nghia": "Muốn thế giới bình an, hãy làm cho tâm mình bình an trước."
- },
- {
-  "id": 169,
+  "id": 163,
   "thong_diep": "Hãy chậm lại một chút để cảm nhận nhịp đập của sự sống.",
   "y_nghia": "Sự vội vã khiến con bỏ lỡ những điều kỳ diệu nhỏ bé."
  },
  {
-  "id": 170,
+  "id": 164,
   "thong_diep": "Mọi câu trả lời con tìm kiếm đều đang có sẵn trong khoảnh khắc này.",
   "y_nghia": "Hãy ngừng tìm kiếm bên ngoài và quay về bên trong."
  },
  {
-  "id": 171,
+  "id": 165,
   "thong_diep": "Đừng để suy nghĩ kéo con về quá khứ hay đẩy con tới tương lai.",
   "y_nghia": "Hãy là người quan sát tĩnh lặng những suy nghĩ trôi qua."
  },
  {
-  "id": 172,
+  "id": 166,
   "thong_diep": "Hiện tại chính là cổng vào của cõi vĩnh cửu.",
   "y_nghia": "Khi con hiện diện trọn vẹn, thời gian dường như dừng lại."
  },
  {
-  "id": 173,
+  "id": 167,
   "thong_diep": "Mỗi vết thương trong quá khứ đều là một bài học đã hoàn thành.",
   "y_nghia": "Hãy cảm ơn nó và để nó lùi vào quá khứ."
  },
  {
-  "id": 174,
+  "id": 168,
   "thong_diep": "Hãy bắt đầu ngày mới bằng lòng biết ơn đơn sơ.",
   "y_nghia": "Biết ơn vì con lại có thêm một ngày để trải nghiệm cuộc sống."
  },
  {
-  "id": 175,
+  "id": 169,
   "thong_diep": "Con là đấng đồng sáng tạo nên cuộc đời của chính mình.",
   "y_nghia": "Không có số phận cố định, con vẽ nên tương lai bằng từng lựa chọn."
  },
  {
-  "id": 176,
-  "thong_diep": "Mô hình kiến tạo đúng đắn là: Là -> Làm -> Có.",
+  "id": 170,
+  "thong_diep": "Thứ tự đúng của kiến tạo là: Là → Làm → Có.",
   "y_nghia": "Hãy định hình bản thân (Là) trước, rồi hành động (Làm) sẽ tự nhiên dẫn đến kết quả (Có)."
  },
  {
-  "id": 177,
+  "id": 171,
   "thong_diep": "Suy nghĩ của con là những hạt giống sáng tạo mạnh mẽ.",
   "y_nghia": "Những gì con nghĩ nhiều nhất sẽ trở thành thực tại của con."
  },
  {
-  "id": 178,
+  "id": 172,
   "thong_diep": "Lời nói của con có quyền năng ra lệnh cho vũ trụ.",
-  "y_nghia": "Khi con tuyên bố 'Tôi là...', con đang kích hoạt sức mạnh sáng tạo."
+  "y_nghia": "Khi con tuyên bố “Tôi là...”, con đang kích hoạt sức mạnh sáng tạo."
  },
  {
-  "id": 179,
+  "id": 173,
   "thong_diep": "Đừng xin điều con thiếu, hãy cảm ơn như thể con đã có nó.",
   "y_nghia": "Cầu xin khẳng định sự thiếu thốn, biết ơn khẳng định sự đủ đầy."
  },
  {
-  "id": 180,
+  "id": 174,
   "thong_diep": "Con hoàn toàn tự do lựa chọn phiên bản vĩ đại nhất của mình.",
   "y_nghia": "Không ai có quyền hạn chế ước mơ và tiềm năng của con."
  },
  {
-  "id": 181,
+  "id": 175,
   "thong_diep": "Không có quyết định nào là sai, chỉ có những trải nghiệm khác nhau.",
   "y_nghia": "Mọi con đường đều mang đến những bài học quý giá."
  },
  {
-  "id": 182,
+  "id": 176,
   "thong_diep": "Hãy chấm dứt lối sống vô ý thức như một nạn nhân.",
   "y_nghia": "Con không phải là nạn nhân của hoàn cảnh, con là người chọn cách ứng xử."
  },
  {
-  "id": 183,
+  "id": 177,
   "thong_diep": "Những gì con chống cự sẽ tiếp tục tồn tại.",
   "y_nghia": "Khi con kháng cự điều gì, con đang vô tình trao năng lượng cho nó."
  },
  {
-  "id": 184,
+  "id": 178,
   "thong_diep": "Tâm trí con là chiếc máy chiếu, thế giới là màn ảnh.",
-  "y_nghia": "Muốn đổi phim trên màn ảnh, hãy đổi đĩa phim trong máy chiếu."
+  "y_nghia": "Muốn đổi cảnh trên màn ảnh, phải đổi cuộn phim trong máy chiếu."
  },
  {
-  "id": 185,
+  "id": 179,
   "thong_diep": "Mỗi khoảnh khắc là cơ hội để con tự định nghĩa lại bản thân.",
   "y_nghia": "Con không bị ràng buộc bởi những gì con đã từng làm trong quá khứ."
  },
  {
-  "id": 186,
+  "id": 180,
   "thong_diep": "Sự thay đổi thế giới bắt đầu từ sự chuyển dịch bên trong con.",
   "y_nghia": "Muốn thế giới hòa bình, hãy làm cho tâm mình bình an."
  },
  {
-  "id": 187,
+  "id": 181,
   "thong_diep": "Con không thể sáng tạo ra cái mà con đang chối bỏ.",
   "y_nghia": "Hãy chấp nhận tất cả rồi mới tự do chọn lựa điều tốt nhất."
  },
  {
-  "id": 188,
+  "id": 182,
   "thong_diep": "Hãy lắng nghe trái tim thay vì chỉ nghe theo lý trí phân tích.",
   "y_nghia": "Trái tim biết những điều mà lý trí chưa từng hiểu được."
  },
  {
-  "id": 189,
-  "thong_diep": "Con không bao giờ có thể thua trong trò chơi cuộc đời này.",
-  "y_nghia": "Đích đến cuối cùng là sự trở về, và điều đó đã được đảm bảo."
- },
- {
-  "id": 190,
+  "id": 183,
   "thong_diep": "Chân lý không phải là thứ cố định, nó là sự trải nghiệm sống động.",
   "y_nghia": "Hãy tự mình trải nghiệm thay vì chỉ tin vào lời người khác."
  },
  {
-  "id": 191,
+  "id": 184,
   "thong_diep": "Cuộc đời là sân chơi sáng tạo, không phải trường thi căng thẳng.",
   "y_nghia": "Hãy chơi hết mình với niềm vui và sự háo hức."
  },
  {
-  "id": 192,
+  "id": 185,
   "thong_diep": "Khi con tuyên bố điều gì với niềm tin tuyệt đối, nó sẽ hiện hữu.",
   "y_nghia": "Sức mạnh của niềm tin có thể dời sông lấp núi."
  },
  {
-  "id": 193,
-  "thong_diep": "Hãy chịu trách nhiệm 100% cho cuộc đời của mình.",
+  "id": 186,
+  "thong_diep": "Hãy chịu trách nhiệm trọn vẹn cho cuộc đời của mình.",
   "y_nghia": "Đó là bước đầu tiên để lấy lại quyền năng làm chủ."
  },
  {
-  "id": 194,
+  "id": 187,
   "thong_diep": "Con là tác giả cuốn sách cuộc đời mình, hãy viết nên câu chuyện đẹp.",
   "y_nghia": "Mỗi ngày là một trang sách mới đầy hứa hẹn."
  },
  {
-  "id": 195,
+  "id": 188,
   "thong_diep": "Đừng sống theo kỳ vọng của người khác, hãy sống chân thật với mình.",
   "y_nghia": "Con đến đây để làm con, không phải để làm bản sao của ai."
  },
  {
-  "id": 196,
+  "id": 189,
   "thong_diep": "Mọi hoàn cảnh đều là vô hại cho đến khi con gán ý nghĩa cho nó.",
   "y_nghia": "Con có quyền chọn cách nhìn nhận mọi sự việc."
  },
  {
-  "id": 197,
+  "id": 190,
   "thong_diep": "Sự sáng tạo thực sự bắt đầu khi con dám nghĩ khác đi.",
   "y_nghia": "Đừng ngại bước đi trên con đường chưa ai đi."
  },
  {
-  "id": 198,
+  "id": 191,
   "thong_diep": "Ý chí tự do là món quà thiêng liêng nhất con được ban tặng.",
   "y_nghia": "Không ai, kể cả Thượng đế, ép buộc lựa chọn của con."
  },
  {
-  "id": 199,
+  "id": 192,
   "thong_diep": "Hãy mỉm cười và tận hưởng từng bước đi trên hành trình này.",
   "y_nghia": "Trò chơi này được tạo ra là để con chung vui!"
  },
  {
-  "id": 200,
+  "id": 193,
   "thong_diep": "Hãy nhớ rằng con luôn được nâng đỡ trong từng bước đi.",
   "y_nghia": "Việc khó đến mấy cũng không phải một mình con gánh. Cứ bước đi, sẽ có chỗ đỡ chân."
  },
  {
-  "id": 201,
+  "id": 194,
   "thong_diep": "Sự bình an thật sự không đến từ bên ngoài, nó bắt đầu từ bên trong.",
   "y_nghia": "Đừng chờ hoàn cảnh yên rồi mới thấy yên. Bên trong lặng thì ngoài kia ồn cũng không sao."
  },
  {
-  "id": 202,
+  "id": 195,
   "thong_diep": "Đừng lo lắng về tương lai, hãy làm tốt việc của khoảnh khắc này.",
   "y_nghia": "Tương lai chưa tới, lo cũng không đổi được gì. Làm cho xong việc trước mắt là đủ."
  },
  {
-  "id": 203,
+  "id": 196,
   "thong_diep": "Con là một biểu hiện tuyệt đẹp và độc bản của sự sống.",
   "y_nghia": "Không ai trên đời giống con. Đừng cố sửa mình thành bản sao của người khác."
  },
  {
-  "id": 204,
+  "id": 197,
   "thong_diep": "Mọi rào cản chỉ là cơ hội để con rèn luyện sức mạnh nội tâm.",
   "y_nghia": "Chỗ khó là chỗ con lớn lên. Qua được một lần thì lần sau nhẹ hơn."
  },
  {
-  "id": 205,
+  "id": 198,
   "thong_diep": "Hãy đối xử nhẹ nhàng với bản thân khi gặp khó khăn.",
   "y_nghia": "Lúc vấp ngã, hãy nói với mình như nói với một người bạn đang buồn."
  },
  {
-  "id": 206,
+  "id": 199,
   "thong_diep": "Không có lỗi lầm nào không thể chuyển hóa thành bài học.",
   "y_nghia": "Sai rồi thì sửa. Cái sai chỉ thành mất mát khi con không học được gì từ nó."
  },
  {
-  "id": 207,
+  "id": 200,
   "thong_diep": "Hãy để tình yêu dẫn dắt mọi lời nói và việc làm hôm nay.",
   "y_nghia": "Trước khi nói hay làm điều gì, thử hỏi: điều này đến từ thương hay từ sợ?"
  },
  {
-  "id": 208,
+  "id": 201,
   "thong_diep": "Cuộc đời là một món quà, hãy mở nó ra với sự háo hức.",
   "y_nghia": "Ngày hôm nay không ai hứa trước với con. Nhận lấy nó như nhận một món quà."
  },
  {
-  "id": 209,
+  "id": 202,
   "thong_diep": "Hãy tin vào hành trình của riêng con, đừng so sánh với ai.",
   "y_nghia": "Mỗi người một nhịp. So với người khác chỉ làm con quên mất đường của mình."
  },
  {
-  "id": 210,
+  "id": 203,
   "thong_diep": "Sự tĩnh lặng giúp con kết nối lại với sức mạnh sâu thẳm.",
   "y_nghia": "Tắt bớt tiếng ồn đi, ngồi yên một lát. Câu trả lời thường đến trong lúc đó."
  },
  {
-  "id": 211,
-  "thong_diep": "Mọi câu trả lời con cần đều đã có sẵn trong tim con.",
-  "y_nghia": "Đừng hỏi mãi bên ngoài. Cái con thật sự biết nằm sâu hơn cái con nghĩ."
- },
- {
-  "id": 212,
+  "id": 204,
   "thong_diep": "Hãy dũng cảm sống là chính mình mà không cần xin lỗi ai.",
   "y_nghia": "Sống thật thì sẽ có người không ưa. Đó là cái giá của việc không phải giả vờ."
  },
  {
-  "id": 213,
-  "thong_diep": "Mỗi ngày là một cơ hội để con bắt đầu lại từ đầu.",
-  "y_nghia": "Hôm qua thế nào thì cũng đã qua rồi. Sáng nay là một trang còn trắng."
- },
- {
-  "id": 214,
+  "id": 205,
   "thong_diep": "Hãy tha thứ và giải phóng cho quá khứ lùi vào quên lãng.",
   "y_nghia": "Giữ mối hận là tự xích mình vào chuyện cũ. Buông ra thì con mới đi tiếp được."
  },
  {
-  "id": 215,
+  "id": 206,
   "thong_diep": "Niềm vui đơn sơ đến từ việc trân trọng những gì đang có.",
   "y_nghia": "Không cần đợi điều lớn lao. Bữa cơm còn nóng, một câu hỏi thăm, đã là nhiều rồi."
  },
  {
-  "id": 216,
+  "id": 207,
   "thong_diep": "Hãy mở lòng đón nhận những điều bất ngờ dễ thương của cuộc sống.",
   "y_nghia": "Đừng xếp kín lịch quá. Chừa một khoảng trống cho điều chưa đoán trước được."
  },
  {
-  "id": 217,
+  "id": 208,
   "thong_diep": "Con không một mình, vũ trụ luôn đồng hành cùng con.",
   "y_nghia": "Những lúc thấy trơ trọi nhất, thật ra vẫn có nhiều thứ đang lặng lẽ đỡ lấy con."
  },
  {
-  "id": 218,
-  "thong_diep": "Hãy sống chậm lại để cảm nhận sự kỳ diệu quanh con.",
-  "y_nghia": "Đi chậm lại một nhịp thôi. Nhiều thứ đẹp chỉ hiện ra khi con không vội."
- },
- {
-  "id": 219,
+  "id": 209,
   "thong_diep": "Sức mạnh của con nằm ở sự lựa chọn cách ứng xử hôm nay.",
   "y_nghia": "Chuyện xảy đến thì con không chọn được, nhưng cách con đáp lại thì có."
  }
