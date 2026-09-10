@@ -417,7 +417,15 @@ function echTai(x, y) {
 
 function giatMinh(e, x, y) {
   if (!e || e.nhay || e.nghi > 0 || !la.length) return;
-  if (e.boi) { const i = laConCho(-1, e.x, e.y); if (i >= 0) { nhaySang(e, i); return; } }   // đang bơi thì phóng lên lá gần nhất
+  if (e.boi) {                                          // đang dưới nước: có lá trống thì phóng lên, không thì rẽ nước tránh ra
+    const i = laConCho(-1, e.x, e.y);
+    if (i >= 0) { nhaySang(e, i); return; }
+    e.goc = Math.atan2(e.y - y, e.x - x);
+    e.x = Math.max(12, Math.min(W - 12, e.x + Math.cos(e.goc) * 16));
+    e.y = Math.max(H * .11, Math.min(H * .96, e.y + Math.sin(e.goc) * 16));
+    themSong(e.x, e.y, .4);
+    return;
+  }
   const gx = e.x - x, gy = e.y - y, cx = Math.hypot(gx, gy) || 1;   // hướng tránh ngón tay
   const cu = e.la;
   let diem = -Infinity, dich = -1;
@@ -437,17 +445,51 @@ function giatMinh(e, x, y) {
   themSong(e.x0, e.y0, .75, 'im');                      // sóng to hơn, còn tiếng đạp đã kêu ở nhaySang
 }
 
-/* Lá gần nhất còn chỗ. Không lá nào còn chỗ thì đành lấy lá gần nhất. */
+/* Lá gần nhất còn chỗ ngồi, hoặc -1 nếu cả hồ không lá nào nhận thêm.
+   Trước đây hết chỗ thì trả về lá gần nhất và con ếch cứ trèo lên chiếc lá đã đầy,
+   lá lún, nó tuột xuống, lại trèo lên — quẩn mãi một vòng. Giờ hết chỗ là ở lại dưới nước. */
 const laConCho = (tru, x, y) => {
-  let cho = -1, dCho = Infinity, gan = -1, dGan = Infinity;
+  let cho = -1, dCho = Infinity;
   la.forEach((l, i) => {
-    if (i === tru) return;
+    if (i === tru || l.chet !== null || soEch(l) >= suc(l)) return;
     const d = Math.hypot(l.x - x, yLa(l) - y);
-    if (d < dGan) { dGan = d; gan = i; }
-    if (l.chet === null && soEch(l) < suc(l) && d < dCho) { dCho = d; cho = i; }
+    if (d < dCho) { dCho = d; cho = i; }
   });
-  return cho >= 0 ? cho : gan;
+  return cho;
 };
+
+/* Hai con dưới nước thì đừng đè lên nhau. Đẩy nhẹ thôi, không phải va chạm cứng:
+   chỉ cần đủ để nhìn ra hai con chứ không thành một đống xanh. */
+function giuKhoang(e, dt) {
+  const gan = e.s * 1.2;
+  for (const k of ech) {
+    if (k === e || !k.boi || k.tan !== null) continue;
+    const ax = e.x - k.x, ay = e.y - k.y, d = Math.hypot(ax, ay);
+    if (d >= gan) continue;
+    const g = d < .001 ? rnd(0, 6.284) : Math.atan2(ay, ax);   // trùng khít nhau thì đẩy ra một hướng bất kỳ
+    const day = (gan - Math.max(d, .001)) / gan * 42 * dt / 1000;
+    e.x = Math.max(12, Math.min(W - 12, e.x + Math.cos(g) * day));
+    e.y = Math.max(H * .11, Math.min(H * .96, e.y + Math.sin(g) * day));
+  }
+}
+
+/* Nổi giữa hồ. Lá kín chỗ hết thì con ếch ở lại dưới nước: khua chân giữ mình khỏi trôi dạt,
+   vẫn rình con bọ nào bay thấp ngang qua, và vẫn đói vẫn già như mọi con trên lá. */
+function troiNoi(e, dt) {
+  const g = dt / 1000;
+  e.goc += rnd(-1, 1) * 1.6 * g;                        // đầu đảo qua đảo lại, không theo hướng nào
+  if (e.x < 26 || e.x > W - 26 || e.y < H * .13 || e.y > H * .94) {
+    const vao = Math.atan2(H * .55 - e.y, W * .5 - e.x);   // ra sát bờ thì quay mũi về giữa hồ
+    e.goc += Math.atan2(Math.sin(vao - e.goc), Math.cos(vao - e.goc)) * Math.min(1, dt / 240);
+  }
+  const v = 16 * g;                                     // trôi chậm hơn hẳn lúc bơi có đích
+  e.x = Math.max(12, Math.min(W - 12, e.x + Math.cos(e.goc) * v));
+  e.y = Math.max(H * .11, Math.min(H * .96, e.y + Math.sin(e.goc) * v));
+  giuKhoang(e, dt);
+  e.song -= dt;
+  if (e.song <= 0) { themSong(e.x, e.y, .09); e.song = 950; }   // gợn nhỏ thôi, nó chỉ đang nổi
+  ngamVaPhong(e, dt);                                   // nổi ngay mặt nước thì vẫn với tới con bọ bay thấp
+}
 
 function tuotXuongNuoc(e, tru) {                        // lá lún quá, con này tuột xuống nước
   e.boi = true; e.la = -1; e.dich = laConCho(tru, e.x, e.y);
@@ -471,7 +513,9 @@ function buocMotCon(e, dt) {
   }
   e.nl -= dt / KIET;                                    // sống là tiêu, không ăn thì mức no cứ rút
   const het = e.nl <= 0, giaRoi = e.tuoi >= e.doiSong;
-  if ((het || giaRoi) && nguoi(e) && !e.luoi) { chetGia(e); return; }   // hồ có quyền tuyệt chủng, không đỡ
+  // ngồi trên lá hay đang nổi dưới nước đều chết được — nếu chỉ con trên lá mới chết thì
+  // con nổi mãi ngoài nước sẽ thành bất tử. Hồ có quyền tuyệt chủng, không đỡ.
+  if ((het || giaRoi) && !e.nhay && e.tan === null && !e.luoi) { chetGia(e); return; }
 
   e.tChuKy += dt;
   if (e.tChuKy >= e.chuKy) {                            // tới lần xét chuyện đẻ
@@ -500,19 +544,29 @@ function buocMotCon(e, dt) {
     }
     return;
   }
-  if (e.boi) {                                          // bơi sang lá khác rồi bám lên
+  if (e.boi) {                                          // dưới nước: hoặc đang bơi tới một chiếc lá, hoặc thả nổi
     e.tBoi = (e.tBoi || 0) + dt;
-    if (!la[e.dich] || e.tBoi > 18000) {                 // lá nhắm tới mất rồi, hoặc bơi lâu quá: nhắm lại
-      const i = laConCho(-1, e.x, e.y);
-      if (i >= 0) { e.dich = i; e.tBoi = 0; }
+    e.tTim = (e.tTim || 0) - dt;
+    if (!la[e.dich] || e.tBoi > 18000) {                 // chưa nhắm được lá nào, hoặc lá nhắm tới mất rồi
+      if (e.tTim <= 0) {                                 // hai giây rưỡi ngó quanh một lần, chứ không dò từng khung
+        e.tTim = 2500;
+        const i = laConCho(-1, e.x, e.y);
+        e.dich = i; if (i >= 0) e.tBoi = 0;
+      }
     }
     const d0 = la[e.dich];
-    if (!d0) return;
+    if (!d0) { troiNoi(e, dt); return; }                 // hồ hết chỗ ngồi thì cứ nổi, không chen
     const dx = d0.x - e.x, dy = yLa(d0) - e.y, d = Math.hypot(dx, dy) || 1;
-    if (d < d0.r * .9) { e.tBoi = 0; nhaySang(e, e.dich); return; }   // tới mép lá thì trèo lên, đầy cũng trèo
+    if (d < d0.r * .9) {                                 // tới mép lá rồi
+      if (soEch(d0) >= suc(d0)) {                        // lúc nhắm thì còn chỗ, bơi tới nơi đã có con khác ngồi mất
+        e.dich = -1; e.tTim = 2500; troiNoi(e, dt); return;
+      }
+      e.tBoi = 0; nhaySang(e, e.dich); return;
+    }
     const v = 54 * dt / 1000;                            // bơi chậm, chừng 54 px mỗi giây
     e.x += dx / d * v; e.y += dy / d * v;
     e.goc = Math.atan2(dy, dx);
+    giuKhoang(e, dt);
     e.song -= dt;
     if (e.song <= 0) { themSong(e.x, e.y, .13); e.song = 420; }   // vệt nước sau lưng
     return;
@@ -527,10 +581,11 @@ function buocMotCon(e, dt) {
   if (e.luoi) return;                                   // đang phóng lưỡi thì chưa nhảy đi đâu
   const gia = Math.min(1, e.tuoi / e.doiSong);
   e.tuNhay -= dt * (l && soEch(l) > 1 ? .5 : 1) * (1 - gia * .45);   // ngồi cùng bạn, hoặc già rồi, thì nhảy lười hơn
-  if (e.tuNhay <= 0) {                                  // đến giờ thì tự nhảy sang lá bất kỳ
-    let i = e.la;
-    if (la.length > 1) while (i === e.la) i = Math.floor(Math.random() * la.length);
-    nhaySang(e, i);
+  if (e.tuNhay <= 0) {                                  // đến giờ thì tự nhảy sang lá khác, nhưng phải là lá còn chỗ
+    const cho = [];
+    la.forEach((l, i) => { if (i !== e.la && l.chet === null && soEch(l) < suc(l)) cho.push(i); });
+    if (cho.length) nhaySang(e, cho[Math.floor(Math.random() * cho.length)]);
+    else e.tuNhay = rnd(4000, 9000);                    // cả hồ không còn chỗ trống thì ngồi yên, lát nữa xét lại
   }
 }
 
@@ -1205,6 +1260,22 @@ function hienNhanh(bat) {
     tam.appendChild(n);
   } else if (!bat && n) n.remove();
 }
+
+/* Số ếch đang có trong hồ, và trong đó mấy con đang ở dưới nước vì lá hết chỗ ngồi.
+   Chỉ đụng vào DOM khi con số thật sự đổi, chứ ghi mỗi khung hình thì phí. */
+let demHien = '';
+
+function hienDem() {
+  if (!tam) return;
+  const con = ech.reduce((k, e) => k + (e.tan === null ? 1 : 0), 0);
+  const duoi = ech.reduce((k, e) => k + (e.tan === null && e.boi ? 1 : 0), 0);
+  const chu = !con ? 'hồ vắng ếch' : duoi ? `${con} ếch · ${duoi} dưới nước` : `${con} ếch`;
+  if (chu === demHien) return;
+  demHien = chu;
+  let d = tam.querySelector('.ho-dem');
+  if (!d) { d = document.createElement('p'); d.className = 'ho-dem'; tam.appendChild(d); }
+  d.textContent = chu;
+}
 let tAn = 0;            // lúc trang bị ẩn đi, đo bằng đồng hồ một chiều của trình duyệt
 
 /* Dùng performance.now() chứ không dùng Date.now().
@@ -1220,6 +1291,7 @@ function vong(t) {
 
 /* Một khung hình đầy đủ: mấy bước ngầm nếu đang tua nhanh, rồi một bước có vẽ. */
 function khung(t) {
+  traNo();                                              // trả bớt phần thời gian còn nợ
   const dt = Math.max(0, Math.min(34, t - tTruoc));
   if (nhanh > 1 && dt > 0) {
     tua = true;                                           // mấy bước ngầm: tính đủ, không vẽ, không kêu
@@ -1233,21 +1305,37 @@ function khung(t) {
 /* Chạy bù quãng thời gian trang bị ẩn, để hồ vẫn sống trong lúc mình nhìn chỗ khác.
    Không lưu gì xuống máy: chỉ nhớ mốc thời gian trong bộ nhớ, đóng app là mất.
    Chạy từng bước 33 mili giây cho vật lý y như lúc chạy thật, chỉ bỏ phần vẽ và tiếng.
-   Chặn trên 20 phút, ẩn lâu hơn nữa thì coi như 20 phút, kẻo tua cả đêm. */
-const TUA_TOI_DA = 20 * 60 * 1000;
+   Không đặt trần nữa: rời đi bao lâu thì hồ đi tới bấy nhiêu, kể cả mấy ngày.
+   Hồ chết vì hết ếch cũng là một kết cục hợp lệ của thế giới đó.
+   Nhưng không chạy hết trong một nhịp, vì tính 24 tiếng mất gần 7 giây và máy sẽ đơ.
+   Chia ra: mỗi nhịp vẽ chỉ dành chừng 10 mili giây để tính, xong bao nhiêu hay bấy nhiêu,
+   nhịp sau tính tiếp, và vẫn vẽ bình thường nên người dùng thấy hồ đang chạy đuổi. */
+let noTua = 0;                                          // số mili giây còn nợ, chưa chạy bù xong
 
 function buTru(ms) {
-  ms = Math.min(ms, TUA_TOI_DA);
   if (ms < 1200) return 0;
-  const BUOC = 33, n = Math.floor(ms / BUOC);
-  tua = true;
-  song = [];                                            // gợn sóng chỉ để nhìn, tua thì bỏ
-  let t = tTruoc;
-  for (let i = 0; i < n; i++) { t += BUOC; buoc(t); }
-  tua = false;
+  noTua += ms;
+  hienNhanh(true);
+  return Math.floor(ms / 33);
+}
+
+/* Trả bớt phần còn nợ, gói gọn trong ngân sách mười mili giây của một nhịp vẽ.
+   Xong thì trả tTruoc về đúng chỗ cũ, để bước vẽ ngay sau đây vẫn tiến một nhịp bình thường:
+   người dùng thấy hồ vẫn đang sống và đang đuổi theo, chứ không đứng hình mấy giây. */
+function traNo() {
+  if (noTua <= 0) return;
+  const BUOC = 33, han = performance.now() + 10;
+  const moc = tTruoc, giu = song;                       // giữ lại mốc thời gian và mấy gợn đang lan dở
   song = [];
-  tTruoc = performance.now();
-  return n;
+  tua = true;
+  let t = tTruoc;
+  while (noTua > 0 && performance.now() < han) {
+    t += BUOC; buoc(t); noTua -= BUOC;
+  }
+  tua = false;
+  song = giu;                                           // gợn sinh ra trong lúc tính thầm thì bỏ, dồn một lúc là loá cả hồ
+  tTruoc = moc;
+  if (noTua <= 0) { noTua = 0; if (nhanh <= 1) hienNhanh(false); }
 }
 
 function buoc(t) {
@@ -1291,6 +1379,7 @@ function buoc(t) {
   if (!tua) {
     for (const e of [...ech].sort((a, b) => (a.nhay - b.nhay) || (a.y - b.y))) veEch(e, t);
     veBo(t);                                            // ruồi muỗi bay trên tất cả
+    hienDem();
   }
 }
 
@@ -1306,6 +1395,7 @@ function mo() {
   luong.quay = luong.quayDich = (Math.random() < .5 ? -1 : 1) * rnd(.018, .05);
   luong.xoay = luong.xoayDich = rnd(-1.2, 1.2); luong.t = rnd(25000, 60000);
   tConTrung = rnd(8000, 20000);
+  demHien = '';
   if (tiengBat) moTieng();
   tTruoc = performance.now();
   if (!raf) raf = requestAnimationFrame(vong);
@@ -1313,7 +1403,7 @@ function mo() {
 
 function dong() {
   dongTieng();
-  nhanh = 1; hienNhanh(false);
+  nhanh = 1; noTua = 0; tAn = 0; hienNhanh(false);
   if (raf) { cancelAnimationFrame(raf); raf = null; }
   if (tam) tam.classList.remove('hien');
   song = [];
@@ -1365,13 +1455,17 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTr
   _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2), quay: +luong.quay.toFixed(3), xoay: +luong.xoay.toFixed(2) }),
   _dam: () => ({ trung: trung.length, nong: nong.length, an: ech.reduce((n, e) => n + e.an, 0),
                  no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2) }),
+  _themEch: (x, y, so = 1) => { for (let i = 0; i < so; i++) thanhEch({ x, y, huong: rnd(0, 6.284) }); return ech.length; },
   _giaDi: (ms) => { for (const e of ech) { e.tuoi += ms; e.tChuKy += ms; } return ech.length; },
   _tuoi: () => ech.map(e => ({ tuoi: `${Math.round(e.tuoi / 1000)}/${Math.round(e.doiSong / 1000)}s`,
                                hen: `${Math.round(e.tChuKy / 1000)}/${Math.round(e.chuKy / 1000)}s`,
                                no: +e.nl.toFixed(2), an: e.an, tan: e.tan === null ? null : Math.round(e.tan) })),
+  _dem: () => (hienDem(), tam && tam.querySelector('.ho-dem') ? tam.querySelector('.ho-dem').textContent : null),
   _debug: () => ({ song: song.length, la: la.length, ech: ech.length,
                    bay: ech.filter(e => e.nhay).length, boi: ech.filter(e => e.boi).length,
                    bo: bo.length, ca: ca.length, trung: trung.length, nong: nong.length,
                    laTan: la.filter(l => l.chet !== null).length, mam: la.filter(l => l.r < 22).length,
-                   luoi: ech.filter(e => e.luoi).length, W, H }) };
+                   luoi: ech.filter(e => e.luoi).length,
+                   cho: la.reduce((n, l) => n + (l.chet === null ? suc(l) : 0), 0),   // tổng chỗ ngồi trên lá
+                   noTua: Math.round(noTua), W, H }) };
 })();

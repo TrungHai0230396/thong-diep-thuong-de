@@ -201,6 +201,12 @@ Nguồn: [Minnaert resonance](https://en.wikipedia.org/wiki/Minnaert_resonance),
 
 Thang thời gian đặt cho **một phiên chơi 5 phút thấy trọn vòng**. Đo ba phiên: con bọ đầu tiên hiện ở giây thứ 6–9, ếch phóng lưỡi ở giây 9–17, ổ trứng đầu tiên ở giây 44–59, nòng nọc ở giây 68–83, con ếch mới ở phút thứ **1,8–2,1**, và con đầu tiên chết ở phút thứ 2–2,8. Nghĩa là chơi hai phút là đã thấy hết chuỗi, năm phút thì thấy sang lứa sau.
 
+**Hết chỗ trên lá thì ở lại dưới nước.** Mỗi chiếc lá chỉ chở được vài con: mầm mới nhú một con, lá 22–31 px hai con, lớn dần lên ba, bốn, và từ 44 px là năm. Trước đây hết chỗ thì con ếch vẫn cứ trèo lên chiếc lá đã đầy — lá lún xuống, nó tuột ra, lại trèo lên, quẩn mãi một vòng. Nay hết chỗ là **ở lại dưới nước**: nó nổi giữa hồ, khua chân giữ mình khỏi trôi dạt, giữ khoảng với mấy con nổi bên cạnh, hai giây rưỡi ngó quanh một lần xem có lá nào trống ra chưa. Nổi ngay mặt nước nên vẫn với tới con bọ bay thấp, và vẫn đói vẫn già vẫn chết như mọi con trên lá.
+
+Đi kèm hai điều: con ngồi trên lá đến giờ **nhảy chơi** thì chỉ nhảy sang lá còn chỗ, không còn nhảy bừa lên lá đầy để rồi hất con khác xuống — đo thử với hơn ba mươi con trong hồ, số cú nhảy trong 30 giây giảm từ 39 xuống 16–27. Còn **giật mình** vì ngón tay thì vẫn nhảy bừa: hoảng thì không kịp phép tắc. Lá đầy vẫn lún, và con lên sau cùng vẫn bị hất xuống nước như cũ.
+
+Trên đầu màn hình có dòng chữ mờ đếm số con: `9 ếch`, và khi có con phải ở dưới nước thì `9 ếch · 2 dưới nước`.
+
 **Đói và chết.** Mỗi con có mức no từ 0 tới 1. Sống là tiêu: no đầy mà không ăn gì thì gần 4 phút là kiệt. Một con mồi bù lại 0,4. Đói thì **trước hết là không đẻ**, cạn hẳn mới chết; ngoài ra mỗi con có tuổi thọ riêng 3,5–6 phút, hết tuổi cũng chết. Chết thì ngồi yên, nhắm mắt, màu bạc dần rồi lịm xuống tan vào nước trong 2,6 giây, để lại một vòng sóng — không có xác nổi. Càng đói hoặc càng già thì màu càng bạc, nên nhìn là biết con nào đang yếu.
 
 **Cá.** Mỗi 45–110 giây có một chuyến cá ghé hồ, số con **ngẫu nhiên**: phần lớn một con, chừng ba lần trên mười thì hai con, thỉnh thoảng ba con. Nhiều nhất ba con cùng lúc, đông hơn nữa thì hồ thành cái chậu cá. Đếm 69 chuyến trong lúc chạy thử: 44 chuyến một con, 21 chuyến hai con, 4 chuyến ba con. Mỗi con ở lại 24–44 giây rồi bơi ra mép mà biến. Cá bơi dưới mặt nước nên chỉ là cái bóng mờ, nổi rõ dần khi nó rượt. Thấy nòng nọc trong 130 px thì đuổi, vào 55 px thì phóng một cú nhanh gấp đôi, tới 30 px là đớp; đớp xong lặn xuống nghỉ 5–11 giây. Nòng nọc thấy cá trong 58 px thì cong đuôi chạy, nhưng chỉ vọt được một quãng nên không thắng nổi cú phóng. Mỗi con cá trong một chuyến thường ăn 0–3 con nòng nọc, nên chuyến ba con là một mẻ nòng nọc gần như không con nào qua được.
@@ -274,15 +280,20 @@ Trình duyệt dừng vòng vẽ khi tab bị ẩn, nên trước đây thời g
 
 Nay lúc trang bị ẩn, hồ ghi mốc thời gian **trong bộ nhớ**, không ghi xuống máy. Mốc lấy từ `performance.now()` chứ không phải `Date.now()`: đồng hồ treo tường nhảy khi máy đồng bộ giờ qua mạng, đổi múi giờ hay người dùng chỉnh tay, còn `performance.now()` chỉ đi tới và không bao giờ lùi. Quay lại thì nó chạy bù quãng đã mất bằng những bước 33 mili giây, đúng bằng bước lúc chạy thật, nên vật lý không lệch. Trong lúc tua thì bỏ toàn bộ phần vẽ và câm tiếng, vì vẽ mấy vạn khung là vô ích còn tiếng thì sẽ dồn cả nghìn cái vào một lúc.
 
-Đo thực tế:
+**Không chặn quãng ẩn nữa.** Trước đây chặn trên 20 phút, ẩn lâu hơn cũng chỉ tua 20 phút. Nay rời đi bao lâu thì hồ đi tới bấy nhiêu, kể cả mấy tiếng: hồ chết vì hết ếch cũng là một kết cục hợp lệ của thế giới đó.
 
-| Quãng ẩn | Số bước chạy bù | Thời gian tốn |
+Cái phải giải là máy đơ. Tính tám tiếng liền một mạch mất gần ba giây, và trong ba giây đó trang treo cứng. Nên quãng phải bù được ghi thành một khoản **nợ** (`noTua`), rồi mỗi khung hình chỉ dành **mười mili giây** để trả bớt, xong bao nhiêu hay bấy nhiêu, khung sau trả tiếp. Trả xong mới thôi. Trong lúc trả, khung vẽ vẫn tiến một nhịp bình thường, nên nhìn vào thấy hồ đang sống và đang đuổi theo, chứ không đứng hình.
+
+Đo thực tế (tám tiếng ẩn tab):
+
+| Quãng ẩn | Cách cũ | Cách mới |
 |---|---|---|
-| 3,2 giây | 96 | 2 ms |
-| 10 phút | 18 181 | 130 ms |
-| 3 tiếng | bị chặn còn 20 phút, 36 363 bước | 197 ms |
+| 3,2 giây | 96 bước, 2 ms | như cũ, dưới 1,2 giây thì bỏ qua |
+| 10 phút | 18 181 bước, 130 ms — một cục | ~13 khung, mỗi khung ≤ 10 ms |
+| 3 tiếng | bị chặn còn 20 phút | chạy đủ 3 tiếng |
+| 8 tiếng | bị chặn còn 20 phút | ~390 khung, tổng ~4 giây, khung nặng nhất 15 ms |
 
-Chặn trên 20 phút để tab mở qua đêm không phải tua tám tiếng. Quãng dưới 1,2 giây thì bỏ qua, vì lướt qua lướt lại không đáng tính.
+Quãng dưới 1,2 giây vẫn bỏ qua, vì lướt qua lướt lại không đáng tính.
 
 Điều này chỉ đúng khi **trang còn mở**. Đóng hẳn app rồi mở lại thì hồ bắt đầu từ đầu, vì mốc thời gian chỉ nằm trong bộ nhớ. Muốn hồ già cả khi đóng app thì phải ghi mốc xuống máy, nhưng như vậy ngược với nguyên tắc không lưu gì.
 
@@ -333,6 +344,7 @@ data/cards.json            100 lá dùng trong app (31 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      CSV -> data/cards.json
 scripts/test-core.js       29 kiểm thử lõi
+scripts/test-pond.js       26 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 content/raw/               CSV nguồn (v3 và v5)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
@@ -344,6 +356,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 29 kiểm thử lõi (Node 18+)
+node scripts/test-pond.js        # chạy 26 kiểm thử hồ, gồm một tiếng mô phỏng
 ```
 
 ## Sửa chính tả trong nguồn
