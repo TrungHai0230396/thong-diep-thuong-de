@@ -96,7 +96,7 @@ console.log('\n— Lá hết chỗ thì ếch ở lại dưới nước —');
 HO.mo(); chay(3);
 const chuaNhoi = HO._debug();
 HO._themEch(190, 400, chuaNhoi.cho + 10);               // nhồi nhiều hơn hẳn tổng chỗ ngồi
-chay(45);
+chay(60);                                               // nhồi cả đàn vào một điểm, cho chúng tản ra đã
 let d = HO._debug();
 ok('có ếch nổi dưới nước', d.boi > 0, `${d.boi}/${d.ech} con`);
 ok('số con ngồi không vượt tổng chỗ', d.ech - d.boi - d.bay <= d.cho + 2, `ngồi ${d.ech - d.boi - d.bay} / chỗ ${d.cho}`);
@@ -104,9 +104,17 @@ ok('số con ngồi không vượt tổng chỗ', d.ech - d.boi - d.bay <= d.cho
    ở đó là đúng — như một đám chen lên bến, không phải lỗi. */
 ok('mấy con thả nổi không chồng lên nhau', (() => {
   const n = HO._ech().filter(e => e.boi && e.dich < 0 && e.tan === null);
-  const de = n.filter(a => n.some(b => b !== a && Math.hypot(a.x - b.x, a.y - b.y) < 12));
-  return de.length === 0;
-})(), `${HO._ech().filter(e => e.boi && e.dich < 0).length} con đang thả nổi`);
+  if (n.length < 2) return true;
+  const gan = Math.min(...n.map(a => Math.min(...n.filter(b => b !== a)
+    .map(b => Math.hypot(a.x - b.x, a.y - b.y)))));
+  return gan >= 12;
+})(), (() => {
+  const n = HO._ech().filter(e => e.boi && e.dich < 0 && e.tan === null);
+  if (n.length < 2) return `${n.length} con thả nổi`;
+  const gan = Math.min(...n.map(a => Math.min(...n.filter(b => b !== a)
+    .map(b => Math.hypot(a.x - b.x, a.y - b.y)))));
+  return `${n.length} con, gần nhau nhất ${Math.round(gan)} px`;
+})());
 soatBatBien('bất biến sau khi nhồi ếch', true);
 ok('chỗ đếm ghi đúng số ếch', HO._dem() === String(d.ech), `"${HO._dem()}" / ${d.ech} con`);
 
@@ -179,6 +187,65 @@ let khungNgay = 0;
 while (HO._debug().noTua > 0 && khungNgay < 500000) { chay(1 / 60, 33); khungNgay++; }
 gioThuc(false);
 ok('một ngày nợ trả xong trong vài trăm khung', khungNgay < 600, `${khungNgay} khung`);
+
+console.log('\n— Đàn bọ là một quần thể, không phải cái vòi phun —');
+HO.mo(); chay(60);
+HO._donSach();                                          // dọn sạch ếch, nòng nọc, trứng
+/* Mốc chắc chắn: đàn đang dưới sức chứa thì bước nào cũng phải dày thêm, không cần chờ mùa. */
+HO._datDamBo(.4);
+const boA = HO._dam().damBo;
+chay(1);
+ok('không ai ăn thì đàn bọ dày lên ngay', HO._dam().damBo > boA, `${boA} → ${HO._dam().damBo}`);
+/* Mốc theo thời gian: mùa đổi 50–110 giây một lần nên phải nhìn cả quãng dài, và nhìn đỉnh
+   chứ không nhìn lúc cuối — cuối quãng có thể rơi đúng mùa vắng. */
+let dinhBo = HO._dam().damBo;
+for (let i = 0; i < 24; i++) { chay(15); dinhBo = Math.max(dinhBo, HO._dam().damBo); }
+/* Nói cho đúng: chỉ trống được chừng một phút thôi, rồi có con lạc tới ăn. Nên nhìn đỉnh
+   của quãng — đỉnh là lúc hồ còn trống — chứ không nhìn con số lúc cuối. */
+ok('hồ trống thì đàn bọ lên rõ trước khi ếch quay lại', dinhBo >= 2, `đỉnh ${dinhBo.toFixed(2)}`);
+ok('đàn bọ không vượt quá sức chứa của mùa', HO._dam().damBo <= HO._dam().sucBo * 1.45,
+   `${HO._dam().damBo} / sức chứa ${HO._dam().sucBo}`);
+/* Bản đầu tôi làm tròn thay vì lấy phần nguyên: đàn 0,5 con vẫn thả một con bay ra, ếch nuốt
+   xong trừ một thành âm rồi bị kéo về 0 — hồ đẻ mồi từ không khí và đàn ếch không bao giờ đói. */
+/* Mở lại hồ cho trời quang đã: hạ số đàn không làm mấy con đang bay biến mất, chúng chỉ
+   mất khi bị ăn hoặc hết đời — đúng như phải thế, nên phải bắt đầu từ hồ chưa có con nào. */
+HO.mo(); HO._datDamBo(0.5); chay(1 / 30, 33);
+ok('đàn dưới một con thì không thả con nào bay', HO._debug().bo === 0, `${HO._debug().bo} con bay`);
+/* Đặt trong sức chứa của mùa hiện tại: đặt cao hơn thì code kéo về đúng sức chứa — đúng như
+   phải thế — và phép thử hoá ra đi đòi cái mùa vắng không có. */
+const dat = Math.max(1, Math.floor(HO._dam().sucBo));
+HO._datDamBo(dat); chay(1 / 30, 33);
+ok('đàn có mấy con thì thả ra bấy nhiêu', HO._debug().bo === dat, `đặt ${dat}, thả ${HO._debug().bo}`);
+
+console.log('\n— Hồ trống thì có ếch lạc tới —');
+HO.mo(); chay(30);
+HO._donSach();
+let toi = 0;
+for (let g = 0; g < 300 && HO._debug().ech === 0; g++) { chay(1); toi = g + 1; }
+ok('hồ trống thì lâu lâu có một con lạc vào', HO._debug().ech > 0, `tới ở giây ${toi}`);
+chay(420);
+const hoiLai = HO._debug();
+ok('từ một con gây lại được cả đàn', hoiLai.ech >= 3,
+   `${hoiLai.ech} ếch, ${hoiLai.nong} nòng nọc sau bảy phút`);
+/* Đếm thẳng số lần con lạ tới, chứ đếm đầu ếch thì không phân biệt được với đẻ. */
+HO.mo(); chay(120);
+const khachTruoc = HO._soKhach();
+chay(300);
+ok('hồ còn ếch thì không con lạ nào chen vào', HO._soKhach() === khachTruoc,
+   `${HO._soKhach() - khachTruoc} lần trong năm phút, hồ đang có ${HO._debug().ech} con`);
+
+console.log('\n— Rời tab lâu rồi quay lại vẫn còn ếch —');
+let chetHo = 0;
+for (let i = 0; i < 6; i++) {
+  HO.mo(); chay(30);
+  HO._buTru(24 * 3600 * 1000);
+  gioThuc(true);
+  let n = 0;
+  while (HO._debug().noTua > 0 && n < 400000) { chay(1 / 60, 33); n++; }
+  gioThuc(false);
+  if (HO._debug().ech === 0) chetHo++;
+}
+ok('ẩn tab một ngày rồi quay lại, hồ không chết sạch', chetHo <= 1, `${chetHo}/6 hồ trống`);
 
 console.log('\n— Chạy dài một tiếng —');
 HO.mo(); chay(3);

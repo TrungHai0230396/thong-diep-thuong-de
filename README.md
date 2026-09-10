@@ -234,7 +234,39 @@ Góc phải trên, ngay bên trái nút chép link và dấu x, có một con s�
 
 **Cá.** Mỗi 45–110 giây có một chuyến cá ghé hồ, số con **ngẫu nhiên**: phần lớn một con, chừng ba lần trên mười thì hai con, thỉnh thoảng ba con. Nhiều nhất ba con cùng lúc, đông hơn nữa thì hồ thành cái chậu cá. Đếm 69 chuyến trong lúc chạy thử: 44 chuyến một con, 21 chuyến hai con, 4 chuyến ba con. Mỗi con ở lại 24–44 giây rồi bơi ra mép mà biến. Cá bơi dưới mặt nước nên chỉ là cái bóng mờ, nổi rõ dần khi nó rượt. Thấy nòng nọc trong 130 px thì đuổi, vào 55 px thì phóng một cú nhanh gấp đôi, tới 30 px là đớp; đớp xong lặn xuống nghỉ 5–11 giây. Nòng nọc thấy cá trong 58 px thì cong đuôi chạy, nhưng chỉ vọt được một quãng nên không thắng nổi cú phóng. Mỗi con cá trong một chuyến thường ăn 0–3 con nòng nọc, nên chuyến ba con là một mẻ nòng nọc gần như không con nào qua được.
 
-**Mùa con trùng.** Cứ 50–110 giây hồ đổi mức mùa, ngẫu nhiên từ 0,35 tới 1,9 lần. Mùa rộ thì 8–18 giây một tốp và cùng lúc có tới bốn con; mùa vắng thì gần hai phút mới có một con. Đó là cái làm đàn ếch phồng lên rồi xẹp xuống.
+**Đàn bọ là một quần thể, không phải cái vòi phun.** Trước đây cứ mấy giây hồ lại phun ra một con bọ theo đồng hồ, ăn hay không ăn cũng vậy. Nay đàn bọ có số của nó (`damBo`, để dạng số thực nên lớn lên từng chút):
+
+```
+đàn dày thêm = sinh sôi (chậm dần khi gần đầy hồ) + lâu lâu một con bay từ nơi khác tới
+đàn vơi đi   = mỗi lần một con ếch nuốt một con
+```
+
+Mùa vẫn còn — cứ 50–110 giây hồ đổi mức, ngẫu nhiên 0,35 tới 1,9 lần — nhưng giờ mùa quyết định **sức chứa** của đàn bọ chứ không quyết định thẳng số con bay ra. Nhờ vậy hồ tự có vòng của nó, không chỗ nào gõ tay con số "hồ nuôi nổi mấy con ếch":
+
+> ếch đông → bọ bị ăn sạch → ếch đói, chết bớt → bọ không ai ăn nên dày trở lại → ếch no, đẻ liên tục → lại đông
+
+Số con bay trên mặt nước lấy **phần nguyên** của đàn, không làm tròn. Chỗ này tôi làm sai một lần: làm tròn thì đàn 0,5 con vẫn thả ra một con bay, ếch nuốt xong trừ đi một thành âm rồi bị kéo về 0 — hoá ra hồ đẻ mồi từ không khí và đàn ếch không bao giờ đói.
+
+**Hồ trống thì có ếch lạc tới.** Sạch bóng ếch không phải là hết chuyện: ngoài kia còn hồ khác, còn mương, còn ruộng. Khi hồ không còn mống nào — hết cả ếch lẫn nòng nọc lẫn trứng — thì cứ 40–110 giây có một con lạc đường bơi vào từ mép màn hình. Nó tới đúng lúc đàn bọ đã dày lên vì lâu nay không ai ăn, nên no nhanh và đẻ liên tục.
+
+Đo một lượt: dọn sạch hồ, rồi ngồi xem.
+
+| | |
+|---|---|
+| giây 15 | 0 ếch, đàn bọ 1,5 |
+| giây 45 | 0 ếch, đàn bọ 3,2 |
+| giây 60 | **một con lạc bơi vào** |
+| giây 150 | 1 ếch, đàn bọ 5,6 — một mình ăn không xuể |
+| phút 5 | 23 ếch |
+| phút 7 | 6 ếch, bọ cạn — đông quá, hết mồi, rụng bớt |
+
+**Chỗ này chữa một lỗi thật.** Sau khi bỏ trần 20 phút, mỗi lần để tab qua đêm là hồ chạy đủ một ngày, và một ngày thì hồ luôn chết — mở lại lúc nào cũng thấy con số 0. Đo 12 hồ mỗi mốc, trước và sau khi đàn bọ biết sinh sôi và có ếch lạc:
+
+| Rời tab | Cũ: hồ thấy 0 ếch | Mới |
+|---|---|---|
+| 2 tiếng | 3/12 | 0/12 |
+| 8 tiếng | 9/12 | 0/12 |
+| 24 tiếng | **12/12** | **0/12**, trung bình 12,2 con |
 
 Số con mỗi tốp cũng **ngẫu nhiên và ăn theo mùa**: mỗi con thêm vào có xác suất `0,34 × mức mùa`, tối đa bốn con. Đếm 177 tốp trong hơn một giờ chạy thử: 102 tốp một con, 51 tốp hai con, 21 tốp ba con, 3 tốp bốn con. Chia theo mùa thì rõ hơn — mùa vắng gần như tốp nào cũng một con (28 tốp một con, 1 tốp hai con), mùa rộ thì 36 tốp một con nhưng có tới 30 tốp hai, 17 tốp ba và 3 tốp bốn.
 
@@ -391,7 +423,7 @@ data/cards.json            100 lá dùng trong app (31 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      CSV -> data/cards.json
 scripts/test-core.js       29 kiểm thử lõi
-scripts/test-pond.js       26 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
+scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 content/raw/               CSV nguồn (v3 và v5)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
@@ -404,7 +436,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 29 kiểm thử lõi (Node 18+)
-node scripts/test-pond.js        # chạy 26 kiểm thử hồ, gồm một tiếng mô phỏng
+node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 ```
 

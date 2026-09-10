@@ -497,6 +497,15 @@ function tuotXuongNuoc(e, tru) {                        // lá lún quá, con n�
   themSong(e.x, e.y, .5);
 }
 
+/* Một con từ ngoài nhảy vào, bơi từ mép hồ vô. */
+function echLac() {
+  soKhach++;
+  const ben = Math.random() < .5;
+  const x = ben ? -22 : W + 22, y = rnd(H * .3, H * .86);
+  thanhEch({ x, y, huong: ben ? 0 : Math.PI });
+  themSong(ben ? 10 : W - 10, y, .55);
+}
+
 function chetGia(e) {                                   // hết tuổi hoặc hết cái ăn: nhắm mắt, lịm xuống nước
   e.tan = 0; e.nhamMat = 4000;
   if (e.luoi) { if (e.luoi.con) e.luoi.con.dinh = null; e.luoi = null; }
@@ -711,25 +720,57 @@ function veEch(e, t) {
    một ổ trứng bên mép lá, trứng nở ra nòng nọc, nòng nọc lớn dần rồi thành ếch con, bơi tới
    chiếc lá còn chỗ mà bám lên. Ngồi chơi lâu thì thấy trọn cả vòng. */
 
-let bo = [], trung = [], nong = [], ca = [], tBo = 0, tCa = 0, mucBo = 1, tDan = 0;
+let bo = [], trung = [], nong = [], ca = [], tCa = 0, mucBo = 1, tDan = 0;
+
+/* Đàn bọ là một quần thể thật, không phải cái vòi cứ mấy giây phun ra một con.
+   damBo là số con của đàn, để dạng số thực nên nó lớn lên từng chút một:
+
+     đàn dày thêm = sinh sôi (chậm dần khi gần đầy hồ) + lâu lâu một con bay từ nơi khác tới
+     đàn vơi đi   = mỗi lần một con ếch nuốt một con
+
+   Nhờ vậy hồ tự có vòng của nó: ếch đông thì bọ bị ăn sạch, ếch đói rồi chết bớt, bọ không ai
+   ăn nên dày trở lại, con ếch nào tới lúc đó thì gặp bữa no và đẻ liên tục — rồi lại đông, lại
+   hết mồi. Không chỗ nào trong đây gõ tay con số "hồ nuôi nổi mấy con ếch" cả, nó tự ra.
+   Mùa nhiều mùa ít vẫn còn, nhưng giờ mùa quyết định **sức chứa** của đàn bọ chứ không quyết
+   định thẳng số con bay ra. */
+let damBo = 1.5;
+/* Hồ sạch bóng ếch không phải là hết chuyện. Ngoài kia còn hồ khác, còn mương, còn ruộng;
+   lâu lâu có một con lạc đường nhảy vào. Nó tới đúng lúc đàn bọ đã dày lên vì mấy tháng
+   không ai ăn, nên no nhanh, đẻ liên tục, và hồ đông trở lại từ một con. */
+let tKhach = 0, soKhach = 0;
+const KHACH = () => rnd(40000, 110000);                 // hồ trống thì trên dưới một phút có một con ghé
+
+const SUC_BO = () => 3.4 * mucBo;                       // mùa vắng chứa hơn một con, mùa rộ tới sáu
+const SINH_BO = 1 / 9700;                               // đàn nửa đầy thì chừng mười giây thêm một con
+const NHAP_BO = 1 / 120000;                             // hai phút mới có một con bay từ ngoài tới
 
 const demCon = () => ech.length + nong.length + trung.reduce((n, o) => n + o.n, 0);
 const tongCho = () => la.reduce((n, l) => n + (l.chet === null ? suc(l) : 0), 0);   // hồ này nuôi nổi mấy con
 
 /* ---- ruồi và muỗi ---- */
 
-function themBo(so) {
-  if (so === undefined) { so = 1; while (so < 4 && Math.random() < .34 * mucBo) so++; }   // vào theo tốp, mùa rộ thì tốp đông
-  const tran = Math.max(1, Math.round(mucBo * 2));      // mùa rộ thì cùng lúc có tới bốn con
-  for (let n = 0; n < so && bo.length < tran; n++) {
-    const muoi = Math.random() < .45;
-    const ben = Math.random() < .5;
-    bo.push({ muoi, x: ben ? -18 - n * 14 : W + 18 + n * 14, y: rnd(H * .16, H * .9),
-              huong: ben ? rnd(-.5, .5) : Math.PI + rnd(-.5, .5),
-              toc: muoi ? rnd(30, 46) : rnd(40, 62),
-              cao: rnd(11, 20), pha: rnd(0, 6.28), to: muoi ? 1.05 : 1.45,
-              t: 0, doi: rnd(24000, 32000), dinh: null });
-  }
+function themMotBo() {
+  const muoi = Math.random() < .45;
+  const ben = Math.random() < .5;
+  bo.push({ muoi, x: ben ? -18 - rnd(0, 20) : W + 18 + rnd(0, 20), y: rnd(H * .16, H * .9),
+            huong: ben ? rnd(-.5, .5) : Math.PI + rnd(-.5, .5),
+            toc: muoi ? rnd(30, 46) : rnd(40, 62),
+            cao: rnd(11, 20), pha: rnd(0, 6.28), to: muoi ? 1.05 : 1.45,
+            t: 0, doi: rnd(24000, 32000), dinh: null });
+}
+
+/* Đàn dày lên hay vơi đi, rồi số con bay trên mặt nước đuổi theo cho khớp.
+   Con bay hết đời hoặc bay khuất mép hồ thì không trừ vào đàn: đó chỉ là con này khuất con kia
+   ra, đàn vẫn thế. Chỉ khi bị ếch nuốt thì đàn mới hụt đi một. */
+function buocDanBo(dt) {
+  const tran = SUC_BO();
+  damBo += dt * (SINH_BO * damBo * (1 - damBo / tran) + NHAP_BO);
+  damBo = Math.max(0, Math.min(damBo, tran * 1.4));
+  /* Lấy phần nguyên chứ không làm tròn. Làm tròn thì đàn 0,5 con vẫn thả ra một con bay,
+     ếch nuốt xong trừ đi một thành âm rồi bị kéo về 0 — hoá ra hồ đẻ mồi từ không khí và
+     đàn ếch không bao giờ đói. Lấy phần nguyên thì có đủ một con mới thả một con. */
+  let thieu = Math.floor(damBo) - bo.length;
+  while (thieu-- > 0 && bo.length < 12) themMotBo();
 }
 
 function buocBo(dt) {
@@ -825,6 +866,7 @@ function buocLuoi(e, dt) {
       const i = bo.indexOf(L.con);
       if (i >= 0) bo.splice(i, 1);
       e.an++; e.nhaiT = 420;
+      damBo = Math.max(0, damBo - 1);                   // đàn bọ hụt đi đúng một con
       e.nl = Math.min(1, e.nl + BU_MOI);                // ăn thì bù mức no, chuyện đẻ để tới hẹn mới xét
     }
     e.luoi = null; e.nghiLuoi = 1400;
@@ -1373,8 +1415,11 @@ function buoc(t) {
 
   tDan -= dt;
   if (tDan <= 0) { mucBo = MUC_BO(); tDan = rnd(50000, 110000); }   // chừng một hai phút lại đổi mùa
-  tBo -= dt;
-  if (tBo <= 0) { themBo(); tBo = rnd(16000, 34000) / mucBo; }      // mùa rộ 8–18 giây một con, mùa vắng gần hai phút
+  buocDanBo(dt);
+  if (demCon() === 0) {                                 // hồ không còn mống nào: chờ một con lạc tới
+    tKhach -= dt;
+    if (tKhach <= 0) { echLac(); tKhach = KHACH(); }
+  } else tKhach = KHACH();
   tConTrung -= dt;
   if (tConTrung <= 0) { conTrung(); tConTrung = rnd(18000, 45000); }
   tCa -= dt;
@@ -1405,7 +1450,8 @@ function mo() {
   tam.classList.add('hien');
   doCo();
   song = []; tMua = 900;
-  bo = []; trung = []; nong = []; ca = []; tBo = rnd(4000, 9000); tCa = rnd(20000, 45000);
+  bo = []; trung = []; nong = []; ca = []; tCa = rnd(20000, 45000);
+  damBo = rnd(1, 2.5); tKhach = KHACH(); soKhach = 0;
   mucBo = MUC_BO(); tDan = rnd(50000, 110000);
   luong.goc = rnd(0, 6.284); luong.toc = luong.tocDich = rnd(.4, 2.4);
   luong.quay = luong.quayDich = (Math.random() < .5 ? -1 : 1) * rnd(.018, .05);
@@ -1453,7 +1499,12 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTr
   _themNong: (x, y, n = 1) => { for (let i = 0; i < n; i++) themNong(x + rnd(-8, 8), y + rnd(-8, 8)); return nong.length; },
   _nong: () => nong.map(n => ({ x: Math.round(n.x), y: Math.round(n.y), s: +n.s.toFixed(1), vot: Math.round(n.vot) })),
   _themCa: (x, y, so = 1) => { ca = []; themCa(so); const c = ca[0]; if (c && x !== undefined) { c.x = x; c.y = y; } return !!c; },
-  _themBo: (x, y) => { themBo(1); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
+  _themBo: (x, y) => { themMotBo(); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
+  _damBo: () => +damBo.toFixed(2),
+  _datDamBo: (v) => { damBo = v; return damBo; },
+  _echLac: () => echLac(),
+  _soKhach: () => soKhach,
+  _donSach: () => { ech = []; nong = []; trung = []; return demCon(); },
   _pho: () => {                                         // gắn máy phân tích để đo phổ lúc kiểm thử
     if (!ac) return null;
     if (!phanTich) { phanTich = ac.createAnalyser(); phanTich.fftSize = 2048; phanTich.smoothingTimeConstant = 0; chung.connect(phanTich); }
@@ -1470,7 +1521,8 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTr
   _batTat: () => batTat(),
   _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2), quay: +luong.quay.toFixed(3), xoay: +luong.xoay.toFixed(2) }),
   _dam: () => ({ trung: trung.length, nong: nong.length, an: ech.reduce((n, e) => n + e.an, 0),
-                 no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2) }),
+                 no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2),
+                 damBo: +damBo.toFixed(2), sucBo: +SUC_BO().toFixed(2) }),
   _themEch: (x, y, so = 1) => { for (let i = 0; i < so; i++) thanhEch({ x, y, huong: rnd(0, 6.284) }); return ech.length; },
   _giaDi: (ms) => { for (const e of ech) { e.tuoi += ms; e.tChuKy += ms; } return ech.length; },
   _tuoi: () => ech.map(e => ({ tuoi: `${Math.round(e.tuoi / 1000)}/${Math.round(e.doiSong / 1000)}s`,
