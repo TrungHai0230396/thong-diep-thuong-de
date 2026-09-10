@@ -18,7 +18,7 @@ ok('dayIndex qua năm', C.dayIndex('2027-01-01') - C.dayIndex('2026-01-01') === 
 console.log('\n— Xáo bài có hạt giống —');
 ok('cùng seed cho cùng kết quả', JSON.stringify(C.shuffle(IDS, 7)) === JSON.stringify(C.shuffle(IDS, 7)));
 ok('seed khác cho kết quả khác', JSON.stringify(C.shuffle(IDS, 7)) !== JSON.stringify(C.shuffle(IDS, 8)));
-ok('giữ đủ 100 lá', new Set(C.shuffle(IDS, 7)).size === 100);
+ok(`giữ đủ ${IDS.length} lá`, new Set(C.shuffle(IDS, 7)).size === IDS.length);
 ok('thực sự đảo thứ tự', JSON.stringify(C.shuffle(IDS, 7)) !== JSON.stringify(IDS));
 
 const S1 = 123456, S2 = 987654;
@@ -31,18 +31,20 @@ let khac = 0;
 for (let k = 0; k < 200; k++) if (C.cardFor(IDS, '2026-09-08', k * 7919 + 13) !== C.cardFor(IDS, '2026-09-08', S1)) khac++;
 ok('200 người khác hạt giống: đa số nhận lá khác nhau', khac > 190, `${khac}/200 khác`);
 const spread = new Set(Array.from({ length: 500 }, (_, k) => C.cardFor(IDS, '2026-09-08', C.mulberry32(k)() * 2 ** 31 | 0)));
-ok('500 người trải đều trên nhiều lá', spread.size > 60, `chạm ${spread.size}/100 lá`);
+ok('500 người trải đều trên nhiều lá', spread.size > IDS.length * .6,
+   `chạm ${spread.size}/${IDS.length} lá`);
 ok('newSeed sinh giá trị khác nhau', C.newSeed() !== C.newSeed());
 
-console.log('\n— Mỗi vòng 100 ngày đi trọn bộ bài —');
+const VONG = IDS.length;                                  // một vòng đi trọn bộ bài, dài bằng số lá
+console.log(`\n— Mỗi vòng ${VONG} ngày đi trọn bộ bài —`);
 let allFull = true, worst = '';
 for (const sd of [S1, S2, 0, -991, 2 ** 30]) {
   for (let r = 0; r < 20; r++) {
-    const blk = Array.from({ length: 100 }, (_, i) => C.cardFor(IDS, C.addDays('2026-01-01', r * 100 + i), sd));
-    if (new Set(blk).size !== 100) { allFull = false; worst = `hạt giống ${sd}, vòng ${r}`; }
+    const blk = Array.from({ length: VONG }, (_, i) => C.cardFor(IDS, C.addDays('2026-01-01', r * VONG + i), sd));
+    if (new Set(blk).size !== VONG) { allFull = false; worst = `hạt giống ${sd}, vòng ${r}`; }
   }
 }
-ok('5 hạt giống × 20 vòng: vòng nào cũng đủ 100 lá khác nhau', allFull, worst);
+ok(`5 hạt giống × 20 vòng: vòng nào cũng đủ ${VONG} lá khác nhau`, allFull, worst);
 
 console.log('\n— Không gặp lại lá quá sớm —');
 let minGap = Infinity, when = '';
@@ -54,14 +56,25 @@ for (const sd of [S1, S2, 7, -3, 2 ** 29]) {
     last[id] = k; d = C.addDays(d, 1);
   }
 }
-ok('5 hạt giống × 3000 ngày: khoảng cách trùng lá > 50 ngày', minGap > 50, `nhỏ nhất ${minGap} ngày (${when})`);
+/* Bộ bài xáo theo vòng, hai vòng liền nhau được nối sao cho lá cuối vòng này không
+   đứng sát lá đầu vòng sau — nên khoảng cách gần nhất luôn hơn nửa bộ. */
+ok(`5 hạt giống × 3000 ngày: khoảng cách trùng lá > ${Math.floor(IDS.length / 2)} ngày`,
+   minGap > IDS.length / 2, `nhỏ nhất ${minGap} ngày (${when})`);
 
 console.log('\n— Dữ liệu —');
-ok('đúng 100 lá', cards.length === 100);
-ok('ID liên tục 1–100', IDS.every((v, i) => v === i + 1));
-ok('không lá nào thiếu thông điệp', cards.every(c => c.thong_diep && c.thong_diep.length > 40));
+ok('đủ 219 lá sau khi gộp hai nguồn', cards.length === 219, `${cards.length} lá`);
+ok(`ID liên tục 1–${cards.length}`, IDS.every((v, i) => v === i + 1));
+ok('không lá nào thiếu thông điệp', cards.every(c => c.thong_diep && c.thong_diep.length > 30));
 ok('không lá nào thiếu ý nghĩa', cards.every(c => c.y_nghia && c.y_nghia.length > 15));
-ok('không trùng thông điệp', new Set(cards.map(c => c.thong_diep.toLowerCase())).size === 100);
+ok('không trùng thông điệp', new Set(cards.map(c => c.thong_diep.toLowerCase())).size === cards.length);
+/* Nguồn 365 dán đuôi "(Thông điệp ngày N)" vào 265 dòng cho chúng trông khác nhau, và
+   dán chung một lời giảng mẫu cho 265 dòng đó. Cả hai thứ không được lọt vào bundle. */
+ok('không lọt đuôi "(Thông điệp ngày N)"',
+   !cards.some(c => /\(Thông điệp ngày \d+\)/.test(c.thong_diep + c.y_nghia)));
+ok('không lọt lời giảng dán mẫu',
+   !cards.some(c => c.y_nghia.includes('Hãy áp dụng sự tỉnh thức này')));
+ok('không lời giảng nào bị dùng lại cho hai lá',
+   new Set(cards.map(c => c.y_nghia.toLowerCase())).size === cards.length);
 ok('không lọt "HEBs"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('HEBs')));
 ok('không lọt tên riêng "Kiên"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('Kiên')));
 ok('không còn ghi chú cơ chế game trong bundle', !cards.some(c => 'ghi_chu_thiet_ke' in c || 'co_che_game' in c));

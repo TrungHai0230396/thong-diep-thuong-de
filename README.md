@@ -31,8 +31,8 @@ Cách chọn lá:
 - Hạt giống của máy quyết định thứ tự bộ bài. **Hai người mở cùng một ngày nhận hai thông điệp khác nhau.**
 - `cardFor(ngày, hạt giống)` đếm số ngày kể từ mốc 01/01/2026 rồi tra vào bộ bài đó. Cùng một người trong cùng một ngày thì luôn ra cùng một lá.
 - Đã nhận thông điệp hôm nay rồi thì mở lại app sẽ thấy ngay lá đó, mặt ngửa, không còn nút nhận. Sang ngày mới lá tự úp lại.
-- Mỗi vòng 100 ngày đi trọn bộ 100 thông điệp, không lá nào lặp trong vòng đó. Sang vòng mới bộ bài xáo lại.
-- Vòng sau được sắp sao cho nửa cuối vòng trước rơi vào nửa sau vòng này, nên hai lần gặp cùng một lá luôn cách nhau ít nhất 51 ngày. Không bao giờ trùng thông điệp hai hôm liền.
+- Mỗi vòng 219 ngày đi trọn bộ 219 thông điệp, không lá nào lặp trong vòng đó. Sang vòng mới bộ bài xáo lại.
+- Vòng sau được sắp sao cho nửa cuối vòng trước rơi vào nửa sau vòng này, nên hai lần gặp cùng một lá luôn cách nhau ít nhất **110 ngày**. Không bao giờ trùng thông điệp hai hôm liền.
 - Trình duyệt chặn lưu trữ (chế độ ẩn danh) thì hạt giống chỉ sống trong phiên đó. App vẫn chạy, chỉ là mở lại sẽ ra bộ bài khác.
 - Nút **Xáo lại bộ bài của tôi** trong phần giới thiệu sinh hạt giống mới nếu người dùng muốn đổi.
 
@@ -329,6 +329,22 @@ Nay cá phóng từ 95 pixel, bơi 46–66 px/s, và nòng nọc vọt xong ph�
 
 Thẻ bọc màn hình lúc đang ẩn có bề rộng bằng 0, mọi toạ độ tính từ đó thành vô định rồi canvas ném lỗi. Cả năm màn hình phủ kín đều đã chặn: lấy tạm kích thước cửa sổ cho tới khi trang bày xong.
 
+## Bộ bài: 219 lá, gộp từ hai nguồn
+
+Bộ đầu là 100 lá đã chạy từ ngày đầu, qua ba lượt sửa v3 → v5 → v6. Sau đó có thêm một file mang tên **365 thông điệp** — nhưng đọc kỹ thì nó chỉ có **120 câu**.
+
+Dòng 101 tới 365, tức 265 dòng, là phần đệm:
+
+- mỗi dòng bị dán thêm đuôi `(Thông điệp ngày N)` vào cuối câu cho trông khác nhau, còn ruột thì chạy vòng lặp **chu kỳ đúng 20 ngày** — câu "Đừng lo lắng về tương lai…" rơi vào ngày 103, 123, 143, … tới 363, mười bốn lần
+- cột Ý nghĩa của 265 dòng đó chỉ có **10 câu**, mỗi câu 26–27 lần, đều kết bằng "Hãy áp dụng sự tỉnh thức này vào ngày hôm nay"
+- và lời giảng gán **không ăn nhập** với câu: ngày 104 nói "Con là một biểu hiện tuyệt đẹp và độc bản của sự sống", lời giảng lại là "Tiếng nói nhỏ nhẹ bên trong luôn chỉ đúng hướng"
+
+Bê nguyên vào thì người dùng gặp lại đúng một câu sau mỗi 20 ngày, kèm một lời giảng chẳng liên quan. Nên `scripts/build-data.py` bóc cái đuôi ngày ra, gom các dòng trùng ruột về một, bỏ câu đã có trong bộ cũ (so bằng Jaccard trên bộ từ, từ 0,6 trở lên coi như cùng một câu nói khác chữ), và **viết lại 20 lời giảng bị dán mẫu** — bảng `LOI_GIANG` trong script, mỗi câu một lời riêng theo giọng của bộ cũ.
+
+Kết quả: 100 + 119 = **219 lá**. Khoảng cách gần nhất giữa hai lần gặp lại cùng một lá tăng từ 51 lên **110 ngày** (đo 5 hạt giống × 3000 ngày trong `test-core.js`).
+
+Bốn phép thử mới giữ chỗ này: không lá nào lọt đuôi `(Thông điệp ngày N)`, không lá nào lọt lời giảng dán mẫu, không lời giảng nào bị dùng cho hai lá, và bộ bài đủ 219 lá.
+
 ## Gõ từ tiếng Anh
 
 Một ngôi sao hồng nhạt, `#go-tu`. Chọn cấp rồi gõ luôn, mỗi lượt hai mươi từ. Một từ tiếng Anh hiện giữa màn hình, nghĩa tiếng Việt ngay dưới; gõ đúng chữ nào thì chữ đó sáng hồng, chữ đang tới có gạch chân nhấp nháy. **Gõ sai thì chữ không chạy**, chỉ rung một cái — không chặn đường, gõ lại chữ đúng là qua, nên không ai kẹt ở một từ. Hết hai mươi từ thì xem lại: ký tự mỗi phút, từ mỗi phút, tỉ lệ gõ đúng, và **mấy từ vấp nhiều nhất kèm nghĩa** để ngó lại một lượt trước khi gõ tiếp.
@@ -419,13 +435,13 @@ index.html                 giao diện, một màn hình duy nhất
 assets/core.js             lõi thuần: ngày tháng, xáo bài, chọn lá của ngày (test bằng Node)
 assets/app.js              điều khiển giao diện
 assets/app.css             giao diện
-data/cards.json            100 lá dùng trong app (31 KB)
+data/cards.json            219 lá dùng trong app (51 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
-scripts/build-data.py      CSV -> data/cards.json
-scripts/test-core.js       29 kiểm thử lõi
+scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
+scripts/test-core.js       32 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
-content/raw/               CSV nguồn (v3 và v5)
+content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
 scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
@@ -435,7 +451,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 29 kiểm thử lõi (Node 18+)
+node scripts/test-core.js        # chạy 32 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 ```
