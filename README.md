@@ -86,14 +86,27 @@ Trên lá có bốn con ếch lúc mở màn. Chạm đúng vào con nào thì c
 
 **Lá trôi.** Lá không đứng một chỗ. Nước có ba thành phần, cộng lại mới ra kiểu trôi tự nhiên:
 
-- **Gió**: một hướng chung cho cả hồ, sức 0,4–2,4 px mỗi giây. Cứ 20–45 giây là **trở gió**, mỗi lần quay 70–150 độ so với hướng đang thổi, và quay từ từ trong chừng bảy giây chứ không giật. Chỗ này quan trọng: bản đầu tôi cho gió đổi sang một hướng ngẫu nhiên bất kỳ mỗi 45–95 giây, đo ra thì **80% thời gian cả đám lá nằm gọn một góc** vì gió thổi một chiều quá lâu.
-- **Xoáy**: một vòng quay quanh giữa hồ, sức và chiều ngẫu nhiên trong khoảng ±1,5 px/giây, nên lá đi vòng chứ không đi thẳng một mạch.
+- **Gió**: một hướng chung cho cả hồ, sức 0,4–2,4 px mỗi giây, và **hướng gió quay đều** với tốc độ 0,018–0,05 radian mỗi giây (tức một vòng mất 2–6 phút), chiều quay đổi ngẫu nhiên mỗi 25–60 giây.
+- **Xoáy**: một vòng quay quanh giữa hồ, sức và chiều ngẫu nhiên trong khoảng ±1,2 px/giây, nên lá đi vòng chứ không đi thẳng một mạch.
 - **Đường lượn riêng**: mỗi chiếc lá tự đi theo một hướng của nó, 0,45–1,5 px/giây, hướng đó tự đổi lai rai. Nhờ vế này mà đám lá không trôi thành một cái bè cứng.
 
-Thêm hai lực giữ cho hồ khỏi dồn cục:
+Vì sao gió phải **quay đều** chứ không phải đổi hướng ngẫu nhiên: gió quay hết một vòng thì lá cũng đi hết một vòng rồi về gần chỗ cũ, nên **không tích luỹ dạt về phía nào**. Bán kính vòng đi bằng sức gió chia tốc độ quay, cỡ 50–130 px.
 
-- **Lòng hồ hơi trũng**: lá càng xa giữa hồ càng bị hút về, hệ số 0,005 mỗi pixel (trục dọc nhẹ hơn theo tỉ lệ khung vì hồ cao hơn rộng). Gió đẩy dạt đi thì lá tự về, không nằm hoài ở mép.
-- **Lá đẩy nhau**: từ khoảng cách 1,7 lần tổng bán kính, mỗi pixel xích lại gần sinh 0,12 px/giây đẩy ngược. Lực này **cố ý để mềm, ngang sức gió** — cơn gió mạnh dồn được chúng lại kề nhau một lúc, hết gió thì chúng tự giãn ra. Đẩy mạnh hơn thì lá không bao giờ lại gần nhau (đo được tỉ lệ có cặp kề nhau tụt còn 2,6%), đẩy yếu hơn thì kết bè.
+Thêm hai lực nữa:
+
+- **Vành ngoài kéo về**: lòng hồ là một hình bầu dục bằng 0,4 lần khung; **bên trong không kéo gì cả** nên lá tha hồ tản ra, chỉ khi dạt ra ngoài vành đó mới bị kéo về, càng xa càng mạnh.
+- **Lá đẩy nhau**: từ khoảng cách 1,7 lần tổng bán kính, mỗi pixel xích lại gần sinh 0,12 px/giây đẩy ngược. Lực này **cố ý để mềm, ngang sức gió** — cơn gió mạnh dồn được chúng kề nhau một lúc, hết gió thì chúng tự giãn ra.
+
+Bộ số này tôi phải đo bốn lần mới ra, vì hai đầu đều sai:
+
+| Cách làm | Kết bè | Có cặp kề nhau | Dạt ra vành ngoài | Phủ mặt hồ |
+|---|---|---|---|---|
+| Gió một chiều, đẩy nhau ở tầm chạm | 0% | 80% | rất nhiều, tâm đám ra sát bờ | — |
+| Thêm lực hút về giữa ở **mọi chỗ** | 0% | 85% | 0% | **13%**, co thành một cục giữa hồ |
+| Đẩy nhau mạnh và xa | 0% | **2,6%** | ít | 24%, nhưng lá không bao giờ lại gần nhau |
+| **Gió quay đều + chỉ vành ngoài kéo về** | **0%** | 4–20% | **22,5%** | **34%** |
+
+Đo dòng cuối trong 40 phút: tâm đám lệch khỏi giữa hồ trung bình 178 px, xa nhất 339 px, và không lúc nào cả đám kết bè.
 
 Ếch ngồi trên lá tự trôi theo, vì mỗi khung hình nó được đặt lại theo tâm lá cộng với chỗ đậu của nó. Cuống nối lá con với lá mẹ giữ **tham chiếu tới lá mẹ** chứ không giữ toạ độ chết, nên lá mẹ trôi thì cuống vẫn dính đúng chỗ; lá mẹ tàn thì cuống rụng theo.
 
