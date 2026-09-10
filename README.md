@@ -280,18 +280,24 @@ Trình duyệt dừng vòng vẽ khi tab bị ẩn, nên trước đây thời g
 
 Nay lúc trang bị ẩn, hồ ghi mốc thời gian **trong bộ nhớ**, không ghi xuống máy. Mốc lấy từ `performance.now()` chứ không phải `Date.now()`: đồng hồ treo tường nhảy khi máy đồng bộ giờ qua mạng, đổi múi giờ hay người dùng chỉnh tay, còn `performance.now()` chỉ đi tới và không bao giờ lùi. Quay lại thì nó chạy bù quãng đã mất bằng những bước 33 mili giây, đúng bằng bước lúc chạy thật, nên vật lý không lệch. Trong lúc tua thì bỏ toàn bộ phần vẽ và câm tiếng, vì vẽ mấy vạn khung là vô ích còn tiếng thì sẽ dồn cả nghìn cái vào một lúc.
 
-**Không chặn quãng ẩn nữa.** Trước đây chặn trên 20 phút, ẩn lâu hơn cũng chỉ tua 20 phút. Nay rời đi bao lâu thì hồ đi tới bấy nhiêu, kể cả mấy tiếng: hồ chết vì hết ếch cũng là một kết cục hợp lệ của thế giới đó.
+**Bỏ trần 20 phút.** Trước đây ẩn lâu hơn 20 phút cũng chỉ tua 20 phút, nên hồ gần như không già đi. Nay rời đi bao lâu thì hồ đi tới bấy nhiêu: hồ chết vì hết ếch cũng là một kết cục hợp lệ của thế giới đó.
 
-Cái phải giải là máy đơ. Tính tám tiếng liền một mạch mất gần ba giây, và trong ba giây đó trang treo cứng. Nên quãng phải bù được ghi thành một khoản **nợ** (`noTua`), rồi mỗi khung hình chỉ dành **mười mili giây** để trả bớt, xong bao nhiêu hay bấy nhiêu, khung sau trả tiếp. Trả xong mới thôi. Trong lúc trả, khung vẽ vẫn tiến một nhịp bình thường, nên nhìn vào thấy hồ đang sống và đang đuổi theo, chứ không đứng hình.
+Cái phải giải là máy đơ. Tính tám tiếng liền một mạch mất gần ba giây, và trong ba giây đó trang treo cứng. Nên quãng phải bù được ghi thành một khoản **nợ** (`noTua`), rồi mỗi khung hình chỉ dành một ít thời gian để trả bớt, xong bao nhiêu hay bấy nhiêu, khung sau trả tiếp. Ngân sách là **10 mili giây** một khung, nợ dày quá mười phút thì nới lên **40** — khung hình giật xuống chừng 25 hình một giây trong vài giây, đổi lại không lê thê. Trong lúc trả, khung vẽ vẫn tiến một nhịp bình thường, nên nhìn vào thấy hồ đang sống và đang đuổi theo, chứ không đứng hình.
 
-Đo thực tế (tám tiếng ẩn tab):
+**Vẫn phải chặn cái đuôi nợ, ở một ngày.** Khác với trần cũ: cũ chặn *quãng ẩn*, đây chặn *khoản chưa trả kịp*. Lý do là nợ cộng vào theo giờ giấc ngoài đời, còn trả nợ thì chỉ trả được lúc người ta đang nhìn — hai bên không cùng một nhịp. Để hồ mở suốt, ẩn một ngày rồi ghé nhìn năm giây, ngày nào cũng vậy: đo thấy nợ dày thêm chừng sáu tiếng mỗi lần, 24 h → 32 h → 38 h → … → 80 h sau mười lần, dòng chữ "thời gian đang trôi nhanh" không bao giờ tắt và mỗi khung hình vĩnh viễn mất ngân sách cho một khoản không đời nào trả xong. Chặn ở một ngày thì hết dồn: cùng phép thử đó, nợ đứng yên ở 24 h và mỗi lần ghé trả được chừng 18 h.
 
-| Quãng ẩn | Cách cũ | Cách mới |
-|---|---|---|
-| 3,2 giây | 96 bước, 2 ms | như cũ, dưới 1,2 giây thì bỏ qua |
-| 10 phút | 18 181 bước, 130 ms — một cục | ~13 khung, mỗi khung ≤ 10 ms |
-| 3 tiếng | bị chặn còn 20 phút | chạy đủ 3 tiếng |
-| 8 tiếng | bị chặn còn 20 phút | ~390 khung, tổng ~4 giây, khung nặng nhất 15 ms |
+Một ngày là đủ vì ếch sống 3,5–6 phút, nên một ngày trong hồ là chừng **ba trăm đời ếch**. Qua ngần ấy lứa thì hồ đã ngã ngũ từ lâu, thêm nữa cũng không ra cảnh nào mới. Trần cũ 20 phút thì chỉ có bốn đời — đó mới là chỗ khác nhau.
+
+Đo thực tế:
+
+| Quãng ẩn | Cách cũ | Cách mới | Phải nhìn bao lâu để trả xong |
+|---|---|---|---|
+| 3,2 giây | 96 bước, 2 ms | như cũ, dưới 1,2 giây thì bỏ qua | — |
+| 10 phút | 18 181 bước, 130 ms — một cục | 19 khung, khung nặng nhất 11 ms | 0,2 giây |
+| 1 tiếng | bị chặn còn 20 phút | 20 khung | 0,6 giây |
+| 8 tiếng | bị chặn còn 20 phút | 85 khung | 3,3 giây |
+| 24 tiếng | bị chặn còn 20 phút | 199 khung | 7,9 giây |
+| 3 ngày | bị chặn còn 20 phút | gom về 24 tiếng, 197 khung | 7,8 giây |
 
 Quãng dưới 1,2 giây vẫn bỏ qua, vì lướt qua lướt lại không đáng tính.
 

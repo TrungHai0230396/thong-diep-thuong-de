@@ -1312,9 +1312,19 @@ function khung(t) {
    nhịp sau tính tiếp, và vẫn vẽ bình thường nên người dùng thấy hồ đang chạy đuổi. */
 let noTua = 0;                                          // số mili giây còn nợ, chưa chạy bù xong
 
+/* Trần cho khoản **còn nợ**, không phải trần cho quãng ẩn. Khác nhau ở chỗ: cũ là chặn 20 phút
+   rồi thôi, hồ gần như không già đi; đây là chặn cái đuôi nợ chưa trả kịp.
+   Vì sao một ngày là đủ: ếch sống 3,5–6 phút, nên một ngày trong hồ là chừng ba trăm đời ếch,
+   qua ngần ấy lứa thì hồ đã ngã ngũ từ lâu — thêm nữa cũng không ra cảnh nào mới.
+   Vì sao phải có trần: nợ cộng vào theo giờ giấc ngoài đời, còn trả nợ thì chỉ trả được lúc
+   người ta đang nhìn. Để hồ mở suốt, ẩn một ngày ghé nhìn năm giây, ngày nào cũng vậy, thì nợ
+   cứ dày thêm chừng sáu tiếng mỗi lần: dòng chữ "thời gian đang trôi nhanh" không bao giờ tắt,
+   và mỗi khung hình vĩnh viễn mất mười mili giây cho một khoản nợ không đời nào trả xong. */
+const NO_TOI_DA = 24 * 3600 * 1000;
+
 function buTru(ms) {
   if (ms < 1200) return 0;
-  noTua += ms;
+  noTua = Math.min(noTua + ms, NO_TOI_DA);
   hienNhanh(true);
   return Math.floor(ms / 33);
 }
@@ -1324,7 +1334,11 @@ function buTru(ms) {
    người dùng thấy hồ vẫn đang sống và đang đuổi theo, chứ không đứng hình mấy giây. */
 function traNo() {
   if (noTua <= 0) return;
-  const BUOC = 33, han = performance.now() + 10;
+  const BUOC = 33;
+  /* Nợ ít thì trả thong thả mười mili giây một nhịp, hồ vẫn mượt. Nợ dày quá mười phút thì
+     nới lên bốn mươi: khung hình giật xuống chừng 25 hình một giây trong vài giây, đổi lại
+     một ngày nợ trả xong trong khoảng mười giây nhìn, chứ không lê thê. */
+  const han = performance.now() + (noTua > 600000 ? 40 : 10);
   const moc = tTruoc, giu = song;                       // giữ lại mốc thời gian và mấy gợn đang lan dở
   song = [];
   tua = true;
