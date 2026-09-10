@@ -1,4 +1,8 @@
-/* Chém Trái Cây — Đồ Long Đao. Game xả stress, không lưu điểm, đóng là hết. */
+/* Mùa Chín — miết ngón tay để một vệt nắng đi qua, trái chín tới đó rồi tách ra.
+   Trước đây trò này tên Đồ Long Đao, lưỡi đao chém trái cây và né quả bom.
+   Đổi đi vì cả app không có kẻ thù nào, mà tên đao nghĩa là chém rồng.
+   Nắng thay cho đao, trái còn non thay cho bom: vội quá thì hỏng, chứ không ai nổ ai.
+   Không lưu điểm, đóng là hết. */
 (() => {
 'use strict';
 
@@ -13,7 +17,7 @@ const TRAI = [
 ];
 
 let cv, ctx, W, H, DPR, raf = null, dangChay = false, tam = null;
-let trai = [], nua = [], hat = [], vet = [], bom = [];
+let trai = [], nua = [], hat = [], vet = [], non = [];   // non: trái chưa tới lúc, chạm vào là mất một mùa
 let diem = 0, mang = 3, combo = 0, tCombo = 0, tSpawn = 0, rung = 0, chop = 0, ketThuc = false;
 let chuot = { x: 0, y: 0, xuong: false, chuot_that: false };
 let tTruoc = 0;
@@ -35,25 +39,37 @@ function dungKhung() {
     <button class="g-dong" aria-label="Đóng">✕</button>
     <div class="game-mo">
       <div class="g-dao">
-        <svg viewBox="0 0 240 60" aria-hidden="true">
-          <defs><linearGradient id="ldao" x1="0" x2="1">
-            <stop offset="0" stop-color="#8a7a4a"/><stop offset=".45" stop-color="#f5e6b8"/>
-            <stop offset=".7" stop-color="#e8c37a"/><stop offset="1" stop-color="#7a6636"/>
-          </linearGradient></defs>
-          <path d="M14 40q70-26 176-32l38 6q-16 14-44 20Q96 46 20 47z" fill="url(#ldao)"/>
-          <path d="M20 47q76-1 164-13" fill="none" stroke="#fff8e0" stroke-opacity=".7" stroke-width="1.4"/>
-          <rect x="4" y="34" width="20" height="15" rx="4" fill="#3a2a12" stroke="#c9a24d" stroke-width="1.2"/>
+        <svg viewBox="0 0 240 96" aria-hidden="true">
+          <defs>
+            <radialGradient id="gnang" cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#fff6dd"/>
+              <stop offset=".5" stop-color="#f0cf8a" stop-opacity=".85"/>
+              <stop offset="1" stop-color="#e8c37a" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="gtia" x1="0" x2="1">
+              <stop offset="0" stop-color="#e8c37a" stop-opacity="0"/>
+              <stop offset=".55" stop-color="#f7e6b8" stop-opacity=".8"/>
+              <stop offset="1" stop-color="#fffdf4"/>
+            </linearGradient>
+          </defs>
+          <circle cx="146" cy="40" r="42" fill="url(#gnang)"/>
+          <circle cx="146" cy="40" r="13" fill="#fdf1cf"/>
+          <g stroke="#e8c37a" stroke-opacity=".65" stroke-width="2" stroke-linecap="round">
+            <path d="M146 11v-8M146 69v8M117 40h-8M175 40h8M126 20l-6-6M166 60l6 6M166 20l6-6M126 60l-6 6"/>
+          </g>
+          <path d="M6 88q70-14 132-30" fill="none" stroke="url(#gtia)" stroke-width="5" stroke-linecap="round"/>
+          <path d="M18 94q64-10 118-24" fill="none" stroke="url(#gtia)" stroke-width="2" stroke-opacity=".5" stroke-linecap="round"/>
         </svg>
       </div>
-      <h2>Đồ Long Đao</h2>
-      <p class="g-phu">Đao này chém trái cây. Xả cho nhẹ người.</p>
-      <button class="primary g-batdau">Rút đao</button>
+      <h2>Mùa Chín</h2>
+      <p class="g-phu">Nắng đi qua tới đâu, trái chín tới đó.</p>
+      <button class="primary g-batdau">Đón nắng</button>
       <p class="g-cach"></p>
     </div>
     <div class="game-het" hidden>
-      <h2>Hết mạng</h2>
+      <h2>Hết mùa</h2>
       <p class="g-tong"></p>
-      <button class="primary g-lai">Chém tiếp</button>
+      <button class="primary g-lai">Mùa nữa</button>
       <button class="ghost g-thoi">Thôi, đủ rồi</button>
     </div>`;
   document.body.appendChild(tam);
@@ -66,8 +82,8 @@ function dungKhung() {
   tam.querySelector('.g-lai').onclick = batDau;
   tam.querySelector('.g-thoi').onclick = dong;
   tam.querySelector('.g-cach').textContent = matchMedia('(pointer:coarse)').matches
-    ? 'Miết ngón tay qua trái cây. Tránh quả bom.'
-    : 'Rê chuột qua trái cây. Tránh quả bom.';
+    ? 'Miết ngón tay để nắng đi qua. Đừng chạm trái còn non.'
+    : 'Rê chuột để nắng đi qua. Đừng chạm trái còn non.';
 
   cv.addEventListener('pointerdown', e => { chuot.xuong = true; ghiChuot(e); cv.setPointerCapture(e.pointerId); });
   cv.addEventListener('pointerup', () => { chuot.xuong = false; vet.length = 0; });
@@ -97,7 +113,7 @@ function doCo() {
 
 /* ---------- vòng đời ---------- */
 function batDau() {
-  trai = []; nua = []; hat = []; bom = []; vet = [];
+  trai = []; nua = []; hat = []; non = []; vet = [];
   diem = 0; mang = 3; combo = 0; tCombo = 0; tSpawn = 0; rung = 0; chop = 0;
   ketThuc = false; dangChay = true;
   tam.querySelector('.game-mo').hidden = true;
@@ -110,7 +126,7 @@ function batDau() {
 function het() {
   ketThuc = true; dangChay = false;
   const h = tam.querySelector('.game-het');
-  tam.querySelector('.g-tong').textContent = `Chém được ${diem} điểm.`;
+  tam.querySelector('.g-tong').textContent = `Mùa này con làm chín được ${diem} điểm.`;
   h.hidden = false;
   tam.querySelector('.game-mo').hidden = true;
 }
@@ -137,14 +153,14 @@ function dong() {
 function sinh() {
   const soLuong = Math.random() < .18 ? 3 : Math.random() < .45 ? 2 : 1;
   for (let i = 0; i < soLuong; i++) {
-    const laBom = Math.random() < .13;
+    const laNon = Math.random() < .13;
     const cao = rnd(H * .52, H * .82);
     const x = rnd(W * .12, W * .88);
     const g = 1.25e-6 * H;                      // px/ms²: bay lên ~1 giây rồi rơi
     const vy = -Math.sqrt(2 * g * cao);
     const vx = (W / 2 - x) / rnd(700, 1400) + rnd(-.05, .05);
     const o = { x, y: H + 60, vx, vy, g, goc: rnd(0, 6.28), vgoc: rnd(-.004, .004) };
-    if (laBom) { o.r = 30; bom.push(o); }
+    if (laNon) { o.r = 26; non.push(o); }
     else { const t = chon(TRAI); Object.assign(o, { loai: t, r: t.r * (W < 420 ? .82 : 1) }); trai.push(o); }
   }
 }
@@ -172,10 +188,10 @@ function catQua(dt) {
     diem += 10 * Math.min(combo, 5);
     veHud();
   }
-  for (let i = bom.length - 1; i >= 0; i--) {
-    if (!chamVao(bom[i])) continue;
-    bom.splice(i, 1);
-    no();
+  for (let i = non.length - 1; i >= 0; i--) {
+    if (!chamVao(non[i])) continue;
+    non.splice(i, 1);
+    voiQua();
   }
 }
 
@@ -194,12 +210,15 @@ function tachDoi(o, goc) {
   }
 }
 
-function no() {
-  rung = 420; chop = 320; combo = 0;
+/* Chạm phải trái non: không nổ, không rung giật. Màn hình chỉ sẫm lại một nhịp,
+   vài mảnh xanh rơi xuống, mất một mùa. Vội quá thì hỏng, thế thôi. */
+function voiQua() {
+  rung = 150; chop = 380; combo = 0;
   mang--; veHud();
-  for (let i = 0; i < 26; i++) {
-    const a = rnd(0, 6.28), s = rnd(.1, .5);
-    hat.push({ x: chuot.x, y: chuot.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s, r: rnd(2, 7), mau: i % 3 ? '#ff9d3d' : '#5a5a5a', doi: 1 });
+  for (let i = 0; i < 18; i++) {
+    const a = rnd(0, 6.28), s = rnd(.05, .26);
+    hat.push({ x: chuot.x, y: chuot.y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - .05,
+               r: rnd(2, 5), mau: i % 3 ? '#7fa04d' : '#cfd8b8', doi: 1 });
   }
   if (mang <= 0) setTimeout(het, 420);
 }
@@ -246,21 +265,24 @@ function veNua(n) {
   ctx.restore();
 }
 
-function veBom(o) {
+/* Trái còn non: xanh cứng, cuống còn tươi, có lớp phấn mờ. Chạm vào là mất một mùa. */
+function veNon(o) {
   ctx.save(); ctx.translate(o.x, o.y); ctx.rotate(o.goc);
   const g = ctx.createRadialGradient(-o.r * .3, -o.r * .35, o.r * .1, 0, 0, o.r);
-  g.addColorStop(0, '#4a4a55'); g.addColorStop(1, '#141419');
+  g.addColorStop(0, '#7fa04d'); g.addColorStop(1, '#2f5228');
   ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, o.r, 0, 6.284); ctx.fill();
-  ctx.strokeStyle = '#c94f3d'; ctx.lineWidth = 3; ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.moveTo(0, -o.r); ctx.quadraticCurveTo(o.r * .5, -o.r * 1.5, o.r * .2, -o.r * 1.8); ctx.stroke();
-  ctx.fillStyle = '#ffcf5a'; ctx.beginPath();
-  ctx.arc(o.r * .2, -o.r * 1.85, 3.4 + Math.sin(performance.now() / 70) * 1.4, 0, 6.284); ctx.fill();
-  ctx.fillStyle = 'rgba(255,255,255,.18)';
-  ctx.beginPath(); ctx.ellipse(-o.r * .3, -o.r * .34, o.r * .24, o.r * .14, -.6, 0, 6.284); ctx.fill();
+  ctx.fillStyle = 'rgba(230,240,220,.16)';                 // lớp phấn của quả chưa chín
+  ctx.beginPath(); ctx.arc(0, 0, o.r * .92, 0, 6.284); ctx.fill();
+  ctx.strokeStyle = '#5c7a3a'; ctx.lineWidth = Math.max(2, o.r * .1); ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(0, -o.r * .95); ctx.lineTo(o.r * .12, -o.r * 1.35); ctx.stroke();
+  ctx.fillStyle = '#6f9648';                                // lá non ở cuống
+  ctx.beginPath(); ctx.ellipse(o.r * .42, -o.r * 1.2, o.r * .34, o.r * .15, -.5, 0, 6.284); ctx.fill();
+  ctx.fillStyle = 'rgba(255,255,255,.14)';
+  ctx.beginPath(); ctx.ellipse(-o.r * .3, -o.r * .34, o.r * .22, o.r * .13, -.6, 0, 6.284); ctx.fill();
   ctx.restore();
 }
 
-/* Vệt Đồ Long Đao: lưỡi vàng nặng, lõi trắng, có quầng sáng. */
+/* Vệt nắng: dải vàng ấm thon dần, lõi trắng, có quầng sáng toả ra. */
 function veDao() {
   if (vet.length < 3) return;
   const n = vet.length;
@@ -323,7 +345,7 @@ function buoc(t) {
       if (dangChay && !ketThuc) { mang--; combo = 0; veHud(); chop = 180; if (mang <= 0) het(); }
     }
   }
-  for (let i = bom.length - 1; i >= 0; i--) { const o = bom[i]; buoc(o); veBom(o); if (o.y - o.r > H + 80) bom.splice(i, 1); }
+  for (let i = non.length - 1; i >= 0; i--) { const o = non[i]; buoc(o); veNon(o); if (o.y - o.r > H + 80) non.splice(i, 1); }
   for (let i = nua.length - 1; i >= 0; i--) { const n = nua[i]; buoc(n); veNua(n); if (n.y - n.r > H + 120) nua.splice(i, 1); }
   for (let i = hat.length - 1; i >= 0; i--) {
     const p = hat[i];
@@ -337,7 +359,7 @@ function buoc(t) {
   while (vet.length && gio - vet[0].t > 190) vet.shift();
   if (dangChay && !ketThuc) veDao();
 
-  if (chop > 0) { chop -= dt; ctx.fillStyle = `rgba(220,60,50,${chop / 320 * .3})`; ctx.fillRect(-20, -20, W + 40, H + 40); }
+  if (chop > 0) { chop -= dt; ctx.fillStyle = `rgba(40,70,45,${chop / 380 * .34})`; ctx.fillRect(-20, -20, W + 40, H + 40); }
 }
 
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
@@ -345,5 +367,5 @@ self.TDTD_GAME = { mo, dong,
   _buoc: (t) => buoc(t),                       // chạy tay một khung hình, dùng khi kiểm thử
   _vung: (x, y, t) => { vet.push({ x, y, t }); if (vet.length > 16) vet.shift(); },
   _batDau: batDau,
-  _debug: () => ({ dangChay, ketThuc, W, H, trai: trai.length, bom: bom.length, nua: nua.length, hat: hat.length, vet: vet.length, diem, mang, tSpawn, y0: trai[0] && Math.round(trai[0].y), vy0: trai[0] && +trai[0].vy.toFixed(4) }) };
+  _debug: () => ({ dangChay, ketThuc, W, H, trai: trai.length, non: non.length, nua: nua.length, hat: hat.length, vet: vet.length, diem, mang, tSpawn, y0: trai[0] && Math.round(trai[0].y), vy0: trai[0] && +trai[0].vy.toFixed(4) }) };
 })();

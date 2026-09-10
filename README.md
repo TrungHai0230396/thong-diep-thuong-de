@@ -57,11 +57,13 @@ Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, 
 
 Hiện có năm ngôi sao:
 
-### Sao xanh ngọc — Đồ Long Đao
+### Sao xanh ngọc — Mùa Chín
 
-Game chém trái cây để xả stress, mã nguồn ở `assets/game.js`, độc lập hẳn với phần thông điệp.
+Trò xả stress, mã nguồn ở `assets/game.js`, độc lập hẳn với phần thông điệp.
 
-Miết ngón tay hoặc rê chuột để vung đao. Vệt đao là dải vàng có quầng sáng, mô phỏng lưỡi Đồ Long. Trái cây gồm dưa hấu, cam, chanh, thanh long, dừa, xoài, măng cụt, chém trúng thì đứt đôi và bắn nước. Chém liên tiếp trong 320 mili giây được nhân điểm tới 5 lần. Ba mạng, để rơi một quả hoặc chém trúng bom là mất một mạng. Không lưu điểm, đóng là hết.
+Miết ngón tay hoặc rê chuột để một vệt nắng đi qua. Nắng chạm tới đâu thì trái chín tới đó, tách đôi và bắn nước. Trái cây gồm dưa hấu, cam, chanh, thanh long, dừa, xoài, măng cụt. Làm chín liên tiếp trong 320 mili giây được nhân điểm tới 5 lần. Ba mùa, để rơi một quả hoặc chạm phải trái còn non là mất một mùa. Không lưu điểm, đóng là hết.
+
+Bản đầu trò này tên **Đồ Long Đao**, người chơi cầm đao chém trái cây và né quả bom. Đổi đi vì cả app không có kẻ thù nào, trong khi tên đao nghĩa là chém rồng. Nắng thay cho đao, trái còn non thay cho bom: chạm vào thì mất một mùa vì vội quá, chứ không ai nổ ai. Màn hình cũng không rung giật và loé đỏ nữa, chỉ sẫm xanh lại một nhịp rồi vài mảnh xanh rơi xuống.
 
 Bấm Esc hoặc nút ✕ để thoát.
 

@@ -26,7 +26,7 @@ const HINH_SAO = {
 };
 
 const SAO = [
-  { id: 'sao-game', mau: '#8fd6c2', hinh: 'lap-lanh',  nhan: 'Chém trái cây, xả stress',
+  { id: 'sao-game', mau: '#8fd6c2', hinh: 'lap-lanh',  nhan: 'Mùa chín, đưa nắng qua cho trái chín',
     mo: () => self.TDTD_GAME && self.TDTD_GAME.mo() },
   { id: 'sao-hoadang', mau: '#f0a860', hinh: 'hoa',    nhan: 'Thả đèn hoa đăng, buông điều nặng lòng',
     mo: () => self.TDTD_HOADANG && self.TDTD_HOADANG.mo() },
