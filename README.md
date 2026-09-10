@@ -22,7 +22,7 @@ Máy chỉ ghi đúng **ba giá trị**, không có giá trị nào là nội du
 |---|---|---|
 | `tdtd.seed` | một con số ngẫu nhiên, sinh trong lần mở đầu tiên | để mỗi người có bộ bài riêng |
 | `tdtd.day` | ngày gần nhất đã nhận thông điệp, dạng `YYYY-MM-DD` | để một ngày chỉ nhận một lần, tải lại trang không rút lại được |
-| `tdtd.tieng` | `1` hoặc `0` | nhớ người dùng đã tắt hay mở tiếng ở hồ nước, khỏi phải bấm lại mỗi lần |
+| `tdtd.tieng` | `1` hoặc `0` | nhớ người dùng đã bật tiếng ở hồ nước hay chưa. Không có khoá này thì coi như tắt |
 
 `tdtd.day` bị ghi đè mỗi ngày nên không tạo thành lịch sử. Thông điệp cũ không lưu ở đâu và không xem lại được. `tdtd.tieng` là một lựa chọn cài đặt, không phải nội dung, và cũng bị ghi đè chứ không cộng dồn.
 
@@ -115,26 +115,42 @@ Hai chỗ dễ sai khi lá biến mất, đều đã sửa và có bài kiểm b
 - Ếch nhớ **chỉ số** lá trong mảng, nên bỏ một chiếc là mọi chỉ số phía sau phải dời theo, và con nào đang ngồi, **đang bay tới**, hay đang bơi tới chiếc lá vừa mất đều phải cho xuống nước. Thiếu vế "đang bay tới" thì con ếch đáp xuống chỗ trống rồi ngồi trên mặt nước cho tới lần tự nhảy sau.
 - Con đang bơi phải **cắm đầu tới chiếc lá đã nhắm**, chỉ nhắm lại khi lá đó mất hẳn. Bản đầu cho nó đổi lá mỗi khi lá đích đầy, thành ra lúc hồ đông thì nó lượn vòng giữa hai chiếc lá đầy tới 25 giây không lên được. Giờ đầy cũng trèo lên, đầy quá thì lá lún và có con khác tuột xuống.
 
-**Tiếng.** Hồ có tiếng, và **sinh hết bằng Web Audio, không nhúng file âm thanh nào** — cả app vẫn 168 KB, không thêm byte nào phải tải về. Nút loa ở góc trên bên trái để tắt mở, lựa chọn đó được nhớ ở khoá `tdtd.tieng`.
+**Tiếng.** Hồ có tiếng, **sinh hết bằng Web Audio, không nhúng file âm thanh nào** — cả app vẫn 168 KB. **Mặc định tắt**; nút loa ở góc trên bên trái để bật, lựa chọn nhớ ở khoá `tdtd.tieng`. Đang tắt thì **không tạo `AudioContext` nào cả**, không tốn gì.
 
-| Tiếng | Cách sinh |
-|---|---|
-| Nền nước và gió | nhiễu lặp qua lowpass 400 Hz, tần số lọc chạy theo một dao động 0,055 Hz nên nền tự thở |
-| Tiếng nước, theo mọi gợn sóng | nhiễu qua bandpass quét từ ~2 kHz xuống 340 Hz trong 110 ms, cộng một hình sin tụt cao độ. To nhỏ theo sức gợn, trái phải theo chỗ gợn trên hồ |
-| Tiếng ộp | dao động cưa qua bandpass, biên độ băm thành 3–6 xung cách nhau 55–90 ms, cao độ tụt dần cuối câu. **Mỗi con ếch một giọng riêng 165–300 Hz** |
-| Cá đớp nòng nọc | nhiễu qua lowpass 230 Hz, tắt trong 160 ms |
-| Lưỡi phóng ra | nhiễu qua highpass 2,2 kHz, dài 40 ms |
-| Côn trùng đêm | 3–5 nhịp nhiễu qua bandpass hẹp quanh 4 kHz, mỗi 18–45 giây |
+Ba tiếng chính đều làm theo tài liệu chứ không mò:
 
-Tiếng ếch thật ra là một chuỗi xung, nên băm biên độ là ra chứ không cần thu âm. Ếch còn **đáp lời nhau**: một con kêu thì một con khác trong vòng 220 px có 40% khả năng kêu đáp sau 0,3–0,9 giây, thành ra câu đối đáp chứ không phải tiếng lẻ.
+| Tiếng | Cách sinh | Căn cứ |
+|---|---|---|
+| Giọt nước | `A·sin(2π f(t)·t)·e^(−βt)` với `f(t) = f0(1+ξt)`, ξ = 0,1 và β = 0,043·f0. Gần như **thuần âm**, cao độ **nhích lên** trong lúc tắt. Bốn cỡ giọt 640 / 820 / 1150 / 1650 Hz; chạm mạnh thì bong bóng to nên chọn giọt trầm, hạt mưa nhỏ thì chọn giọt cao | mô hình bong bóng của van den Doel 2005; cộng hưởng Minnaert `f0 ≈ 3,26/R` cho bong bóng 2 mm ~1600 Hz, 5 mm ~650 Hz |
+| Tiếng ộp | bảy sóng hài của f0 (420–780 Hz) bị **băm biên độ 46–68 nhịp mỗi giây**, mỗi tiếng dài 190 ms, một câu có 1–3 tiếng | tiếng ếch là sóng hài bị băm biên độ 40–130 nhịp/giây, dải trội 400–4000 Hz |
+| Tiếng dế | **hình sin thuần 4,5 và 4,8 kHz**, bốn xung 17 ms cách nhau 18 ms, mỗi xung bọc cửa sổ `sin²` cho khỏi cạch hai đầu | carrier 4,5–4,8 kHz, xung 15–20 ms, nghỉ 15–20 ms, 3–5 xung một tiếng |
 
-Liều lượng phải đo mới ra: bản đầu tôi cho mỗi con có cơ hội kêu mỗi khung hình là `dt/42000`, đo ra **106 tiếng trong 5 phút**, tức 2,8 giây một tiếng — ồn như cái chợ chứ không thư giãn. Hạ xuống `dt/210000` và nghỉ 9–22 giây sau mỗi tiếng thì còn **2,5 tiếng mỗi phút** với 8 con ếch, cùng 8 tiếng nước mỗi phút. Đó là mức đang dùng.
+Thêm tiếng bẹt ướt khi ếch đạp chân rời lá hoặc đáp xuống lá (nhiễu qua một cực thông thấp 250–380 Hz, tắt trong 130–170 ms, kèm một chút cao cho ra cái sột của mặt lá), tiếng cá đớp, và tiếng lưỡi phóng.
+
+**Không có tiếng nền.** Bản đầu tôi cho một vòng nhiễu lọc trầm chạy liên tục; nghe ra tiếng quạt rì rì chứ không ra hồ nước, nghe lâu thì mệt. Hồ đêm thật thì im — chỗ im giữa hai tiếng mới là phần làm nó dịu.
+
+**Kết xuất sẵn thành mẫu.** Bản đầu tôi dựng cả chuỗi lọc cho từng tiếng, mỗi gợn sóng là 6–10 node Web Audio mới, máy yếu gánh không nổi nên thấy lag. Giờ mỗi tiếng được tính ra mẫu **đúng một lần** lúc bật tiếng (sáu bộ mẫu, tính bằng vòng lặp thuần trên `Float32Array`), sau đó phát lại chỉ tốn hai node và có xê dịch `playbackRate` cho khỏi giống nhau. Nhiều nhất 8 tiếng vang cùng lúc, tiếng nước cách nhau tối thiểu 110 ms.
+
+Đo bằng `AnalyserNode` gắn vào mức chung:
+
+| Tiếng | Đỉnh phổ đo được | Khớp với |
+|---|---|---|
+| Giọt nước | 656 Hz, 0% năng lượng trên 3 kHz | Minnaert cho bong bóng 5 mm: 652 Hz |
+| Tiếng ộp | 375 Hz, 0% trên 3 kHz | dải trội quanh 400 Hz |
+| Tiếng dế | 4430 Hz, năng lượng gói trong dải 4359–4500 Hz, 100% trên 3 kHz | carrier 4,5 kHz gần như thuần âm |
+| Giữa hai tiếng | không một bin nào hữu hạn | đã bỏ tiếng nền |
+
+Chi phí mỗi khung hình: **0,194 ms khi bật tiếng so với 0,192 ms khi tắt**, tức tiếng gần như không tốn gì.
+
+Liều lượng cũng phải đo: bản đầu mỗi con ếch có cơ hội kêu `dt/42000` mỗi khung hình, ra **106 tiếng trong 5 phút** — ồn như cái chợ. Hạ xuống `dt/210000` và nghỉ 9–22 giây sau mỗi tiếng thì còn **2,5 tiếng mỗi phút** với 8 con ếch. Ếch còn **đáp lời nhau**: một con kêu thì một con khác trong vòng 220 px có 40% khả năng kêu đáp sau 0,3–0,9 giây.
 
 Ba chỗ đáng biết:
 
 - **Công tắc im lặng của iPhone tắt Web Audio.** Người gạt nút silent sẽ không nghe gì; nút loa hiện rõ trạng thái nên ít ra người ta biết app có tiếng.
-- Tiếng **vào từ từ trong 2 giây** lúc mở hồ, không nổ ra ngay, vì có người mở app lúc nửa đêm.
-- Đóng hồ, tắt tiếng, hay chuyển sang tab khác thì `AudioContext` bị `suspend`, khỏi tốn pin. Mở hồ mà đang tắt tiếng thì **không tạo AudioContext nào cả**.
+- Tiếng **vào từ từ trong 2 giây** lúc bật, không nổ ra ngay, vì có người mở app lúc nửa đêm.
+- Đóng hồ, tắt tiếng, hay chuyển sang tab khác thì `AudioContext` bị `suspend`.
+
+Nguồn: [Minnaert resonance](https://en.wikipedia.org/wiki/Minnaert_resonance), [van den Doel, *Physically based models for liquid sounds*, ACM TAP 2005](https://dl.acm.org/doi/10.1145/1101530.1101554), [Sequential filtering processes shape feature detection in crickets, *Frontiers in Physiology* 2016](https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2016.00046/full), [Signal recognition by frogs in chorus-shaped noise, PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC3002223/).
 
 **Vòng đời.** Ngồi chơi lâu thì thấy trọn một vòng, không có gì phải bấm:
 

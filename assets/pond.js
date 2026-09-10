@@ -67,10 +67,14 @@ function doCo() {
   datEch();
 }
 
-const themSong = (x, y, manh) => {
+/* Mỗi gợn sóng mang theo loại tiếng của nó: 'nuoc' là chạm nước thật, 'dap' là đạp chân rời lá,
+   'dapXuong' là đáp xuống lá, còn 'im' là chỉ có sóng chứ không có tiếng. */
+const themSong = (x, y, manh, am = 'nuoc') => {
   if (song.length > 60) song.shift();
   song.push({ x, y, t: 0, manh, doi: rnd(2600, 3400) });
-  tum(x, manh);
+  if (am === 'nuoc') tum(x, manh);
+  else if (am === 'dap') dap(x, manh + .25, false);
+  else if (am === 'dapXuong') dap(x, manh + .3, true);
 };
 
 function veSong(s) {
@@ -143,22 +147,27 @@ function veLa(l, t) {
    Lá không nhích chỗ bao giờ, nên bỏ một chiếc là mọi chỉ số lá của ếch phải dời theo. */
 
 const SO_LA = 8;                                        // đông hơn nữa thì kín mặt nước
-/* Dòng nước: một hướng gió chung cộng một cái xoáy quanh giữa hồ. Gió phải **đổi chiều thật**,
-   mỗi lần quay 70–150 độ, chứ thổi một chiều thì trước sau gì lá cũng dồn hết vào một góc. */
-const luong = { goc: 0, toc: 1, xoay: 0, gocDich: 0, tocDich: 1, xoayDich: 0, t: 0 };
+/* Dòng nước: hướng gió **quay đều** cộng một cái xoáy quanh giữa hồ.
+   Chỗ này tôi làm sai hai lần rồi nên ghi lại cho rõ:
+   - Gió thổi một chiều thì trước sau gì lá cũng dồn hết vào một góc, đo được 80% thời gian.
+   - Chữa bằng cách hút lá về giữa hồ thì lại thành dồn cục ở giữa, chỉ phủ 13% mặt nước.
+   Cách đúng là để hướng gió quay đều: chạy hết một vòng thì lá cũng đi hết một vòng rồi về gần
+   chỗ cũ, nên **không tích luỹ dạt về phía nào cả** mà chẳng cần ai kéo về. Bán kính vòng đi
+   bằng sức gió chia tốc độ quay, cỡ 50–130 px. */
+const luong = { goc: 0, toc: 1, quay: .03, xoay: 0, tocDich: 1, quayDich: .03, xoayDich: 0, t: 0 };
 
 function buocLuong(dt) {
   luong.t -= dt;
-  if (luong.t <= 0) {                                   // nửa phút tới bốn lăm giây lại trở gió
-    luong.gocDich = luong.goc + (Math.random() < .5 ? 1 : -1) * rnd(1.2, 2.6);
+  if (luong.t <= 0) {                                   // nửa phút một phút lại đổi sức và chiều quay
     luong.tocDich = rnd(.4, 2.4);
-    luong.xoayDich = rnd(-1.5, 1.5);                    // dấu là chiều xoáy, giá trị là sức
-    luong.t = rnd(20000, 45000);
+    luong.quayDich = (Math.random() < .5 ? -1 : 1) * rnd(.018, .05);
+    luong.xoayDich = rnd(-1.2, 1.2);
+    luong.t = rnd(25000, 60000);
   }
-  const lech = Math.atan2(Math.sin(luong.gocDich - luong.goc), Math.cos(luong.gocDich - luong.goc));
-  luong.goc += lech * Math.min(1, dt / 7000);           // trở gió từ từ, không giật
   luong.toc += (luong.tocDich - luong.toc) * Math.min(1, dt / 6000);
+  luong.quay += (luong.quayDich - luong.quay) * Math.min(1, dt / 9000);
   luong.xoay += (luong.xoayDich - luong.xoay) * Math.min(1, dt / 8000);
+  luong.goc += luong.quay * dt / 1000;
 }
 const DOI_LA = () => rnd(240000, 420000);               // một chiếc lá sống 4–7 phút
 const R_LA = () => rnd(26, 50);                         // lớn hết thì được chừng đó
@@ -184,9 +193,13 @@ function troiLa(l, dt) {
   ax += -qy / qr * luong.xoay * nhe;
   ay += qx / qr * luong.xoay * nhe;
 
-  ax -= qx * .005; ay -= qy * .005 * (W / H);           // lòng hồ hơi trũng: gió đẩy dạt đi thì lá tự về giữa,
-                                                        // nếu không thì trước sau gì cả đám cũng nằm một góc.
-                                                        // Trục dọc hút nhẹ hơn theo tỉ lệ khung, vì hồ cao hơn rộng
+  /* Lòng hồ là một hình bầu dục theo khung, **bên trong không kéo gì cả** nên lá tha hồ tản ra;
+     chỉ khi dạt ra ngoài vành đó mới bị kéo về, càng ra xa càng kéo mạnh. Lần trước tôi kéo ở
+     mọi chỗ nên cả đám co lại giữa hồ, chỉ phủ 13% mặt nước; không kéo gì thì 50% thời gian cả
+     đám nằm dạt ngoài vành, tới mép là bị tường chặn rồi nằm luôn đó. */
+  const ex = qx / (W * .4), ey = qy / (H * .4), er = Math.hypot(ex, ey);
+  if (er > 1) { const f = (er - 1) * 6; ax -= ex / er * f; ay -= ey / er * f; }
+
 
   l.wGoc += rnd(-1, 1) * .7 * g;                        // đường lượn riêng của từng chiếc
   ax += Math.cos(l.wGoc) * l.wToc;
@@ -334,7 +347,8 @@ function datEch() {
                nhay: false, boi: false, dich: -1, tDap: 0,
                t: 0, doi: 0, cung: 0, x0: 0, y0: 0, x1: 0, y1: 0, song: 0,
                nghi: 0, nhamMat: 0, tuNhay: rnd(5000, 15000),
-               giong: rnd(165, 300), henKeu: 0, nghiKeu: rnd(3000, 15000),
+               giong: Math.floor(Math.random() * 4), tocGiong: .88 + Math.random() * .26,
+               henKeu: 0, nghiKeu: rnd(3000, 15000),
                an: 0, luoi: null, nghiLuoi: 0, nhaiT: 0, deT: 0 });
   }
 }
@@ -366,7 +380,7 @@ function nhaySang(e, i, tx, ty) {
   e.t = 0; e.nhay = true; e.boi = false;
   if (e.luoi) { if (e.luoi.con) e.luoi.con.dinh = null; e.luoi = null; }   // nhảy thì nhả lưỡi, con bọ thoát
   if (la[e.la]) la[e.la].lun += 4;                      // lá vừa bị đạp chân
-  themSong(e.x0, e.y0, .4);
+  themSong(e.x0, e.y0, .4, la[e.la] ? 'dap' : 'nuoc');  // đạp trên lá thì tiếng bẹt, đang bơi thì tiếng nước
   e.la = i; e.dx = tx - l.x; e.dy = ty - yLa(l);        // nhớ chỗ đậu so với tâm lá
 }
 
@@ -400,7 +414,7 @@ function giatMinh(e, x, y) {
   } else nhaySang(e, dich);
   e.doi *= .82; e.cung = Math.min(1.25, e.cung * 1.3);  // giật mình thì phóng nhanh hơn và cao hơn
   if (la[cu]) la[cu].lun += 3;                          // đạp mạnh nên lá dập sâu hơn
-  themSong(e.x0, e.y0, .75);
+  themSong(e.x0, e.y0, .75, 'im');                      // sóng to hơn, còn tiếng đạp đã kêu ở nhaySang
 }
 
 /* Lá gần nhất còn chỗ. Không lá nào còn chỗ thì đành lấy lá gần nhất. */
@@ -462,7 +476,7 @@ function buocMotCon(e, dt) {
     if (p >= 1) {
       e.nhay = false; e.nghi = 240; e.tuNhay = rnd(5000, 15000); e.tDap = tTruoc;
       if (la[e.la]) la[e.la].lun += 5;
-      themSong(e.x, e.y, .5);                           // đáp xuống, sóng lan ra từ chỗ đáp
+      themSong(e.x, e.y, .5, 'dapXuong');               // đáp xuống lá, sóng lan ra từ chỗ đáp
     }
     return;
   }
@@ -933,26 +947,143 @@ function thanhEch(n) {
              doiSong: DOI_SONG(), tuoi: 0, tan: null, chuKy: CHU_KY(), tChuKy: 0, nl: .45,
              nhay: false, boi: true, tDap: 0, t: 0, doi: 0, cung: 0,
              x0: 0, y0: 0, x1: 0, y1: 0, nghi: 0, nhamMat: 0, tuNhay: rnd(5000, 15000),
-             song: 0, giong: rnd(165, 300), henKeu: 0, nghiKeu: rnd(3000, 15000),
+             song: 0, giong: Math.floor(Math.random() * 4), tocGiong: .88 + Math.random() * .26,
+             henKeu: 0, nghiKeu: rnd(3000, 15000),
              an: 0, luoi: null, nghiLuoi: 0, nhaiT: 0, deT: 0 });
   themSong(n.x, n.y, .4);
 }
 
-/* ---- Tiếng hồ: sinh hết bằng Web Audio, không nhúng file nào ----
-   Tiếng ếch thật ra là một chuỗi xung, nên dao động cưa qua bandpass rồi băm biên độ là ra.
-   Tiếng nước là nhiễu qua bandpass quét từ cao xuống thấp. Nền là nhiễu lọc rất trầm.
+/* ---- Tiếng hồ ----
+   Không nhúng file âm thanh nào. Mỗi tiếng được **tính ra mẫu đúng một lần** lúc mở tiếng, sau đó
+   phát lại chỉ tốn hai node. Bản trước tôi dựng cả chuỗi lọc cho từng tiếng, mỗi gợn sóng là 6–10
+   node mới, máy yếu gánh không nổi nên thấy lag.
+
+   Công thức lấy theo tài liệu, không phải mò:
+   - Giọt nước: van den Doel 2005 mô hình bong bóng `A·sin(2πf(t)t)·e^(−βt)`, `f(t)=f0(1+ξt)`, ξ≈0,1.
+     Cao độ **nhích lên** chứ không tụt, và gần như thuần âm — cho nhiễu vào là ra tiếng rào.
+     f0 theo cộng hưởng Minnaert `f0 ≈ 3,26/R`: bong bóng 2 mm ra ~1600 Hz, 5 mm ra ~650 Hz.
+   - Tiếng dế: carrier 4,5–4,8 kHz gần như hình sin thuần, xung 15–20 ms, nghỉ 15–20 ms, 3–5 xung.
+   - Tiếng ếch: sóng hài bị băm biên độ 40–130 nhịp mỗi giây, dải trội 400–4000 Hz.
+
+   **Không có tiếng nền.** Bản đầu tôi cho một vòng nhiễu lọc trầm chạy liên tục, nghe ra tiếng
+   quạt rì rì chứ không ra hồ nước, và nghe lâu thì mệt. Hồ đêm thật thì im, chỉ có tiếng nước lẻ,
+   tiếng ếch và tiếng dế — chỗ im giữa hai tiếng mới là phần làm nó dịu.
+
    Người bật nút gạt im lặng của iPhone sẽ không nghe gì, đó là cách iOS chặn Web Audio. */
 
-const MUC = .5;                                         // mức chung, đã để nhỏ
-const TIENG_KEY = 'tdtd.tieng';                         // nhớ lựa chọn tắt hay mở, chỉ có vậy
+const MUC = .34;                                        // mức chung
+const TIENG_KEY = 'tdtd.tieng';                         // nhớ lựa chọn tắt hay mở, mặc định tắt
 const LOA_MO = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z" fill="currentColor" stroke="none"/><path d="M15 9.2a4.3 4.3 0 010 5.6"/><path d="M17.9 6.7a8 8 0 010 10.6"/></svg>';
 const LOA_TAT = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z" fill="currentColor" stroke="none"/><path d="M15.4 9.6l5 4.8M20.4 9.6l-5 4.8"/></svg>';
-let ac = null, chung = null, nhieu = null;
-let tiengBat = true;
-try { tiengBat = localStorage.getItem(TIENG_KEY) !== '0'; } catch (e) {}
-let lanTum = 0, demTum = 0, demKeu = 0, tConTrung = 0;
 
-const ben = (x) => Math.max(-.8, Math.min(.8, (x / W - .5) * 1.7));   // trái phải theo chỗ trên hồ
+let ac = null, chung = null, mau = null, dangVang = 0, phanTich = null;
+let lanTum = 0, lanDap = 0, demTum = 0, demDap = 0, demKeu = 0, tConTrung = 0;
+let tiengBat = false;
+try { tiengBat = localStorage.getItem(TIENG_KEY) === '1'; } catch (e) {}   // mặc định tắt
+
+/* --- tính mẫu --- */
+
+const dungMau = (a) => {                                // chuẩn hoá rồi bỏ vào AudioBuffer
+  let d = 0;
+  for (let i = 0; i < a.length; i++) d = Math.max(d, Math.abs(a[i]));
+  const k = d > 0 ? .92 / d : 1;
+  const b = ac.createBuffer(1, a.length, ac.sampleRate), o = b.getChannelData(0);
+  for (let i = 0; i < a.length; i++) o[i] = a[i] * k;
+  return b;
+};
+
+function mauGiot(f0) {
+  const sr = ac.sampleRate, beta = .043 * f0, n = Math.floor(sr * Math.min(.45, 8 / beta));
+  const a = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    const t = i / sr;
+    a[i] = Math.exp(-beta * t) * Math.sin(2 * Math.PI * f0 * (t + .05 * t * t));   // ∫f0(1+0,1t)dt
+  }
+  return dungMau(a);
+}
+
+function mauOp(f0, fp, so) {
+  const sr = ac.sampleRate, dot = .19, nghi = .075;
+  const n = Math.floor(sr * (so * dot + (so - 1) * nghi + .04));
+  const a = new Float32Array(n);
+  for (let k = 0; k < so; k++) {
+    const bd = Math.floor(k * (dot + nghi) * sr), m = Math.floor(dot * sr);
+    for (let i = 0; i < m && bd + i < n; i++) {
+      const t = i / sr, tt = (bd + i) / sr;
+      let v = 0;
+      for (let h = 1; h <= 7; h++) v += Math.sin(2 * Math.PI * f0 * h * tt) / h;   // xấp xỉ sóng cưa
+      const bam = Math.pow(.5 + .5 * Math.sin(2 * Math.PI * fp * t), 2.2);         // băm biên độ
+      const vo = Math.min(1, t / .018) * Math.min(1, (dot - t) / .05);
+      a[bd + i] += v * bam * vo;
+    }
+  }
+  return dungMau(a);
+}
+
+function mauDe(f) {
+  const sr = ac.sampleRate, xung = .017, ke = .018, so = 4;
+  const n = Math.floor(sr * so * (xung + ke)), a = new Float32Array(n), m = Math.floor(sr * xung);
+  for (let k = 0; k < so; k++) {
+    const bd = Math.floor(k * (xung + ke) * sr);
+    for (let i = 0; i < m && bd + i < n; i++) {
+      const cua = Math.sin(Math.PI * i / m);            // cửa sổ mềm, khỏi cạch hai đầu
+      a[bd + i] = Math.sin(2 * Math.PI * f * i / sr) * cua * cua;
+    }
+  }
+  return dungMau(a);
+}
+
+function mauBet(xuong) {                                // bẹt ướt trên mặt lá, đục, có cái sột nhẹ
+  const sr = ac.sampleRate, n = Math.floor(sr * (xuong ? .17 : .13)), a = new Float32Array(n);
+  const k1 = 1 - Math.exp(-2 * Math.PI * (xuong ? 250 : 380) / sr);
+  const k2 = 1 - Math.exp(-2 * Math.PI * 1700 / sr);
+  let y = 0, y2 = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / sr, x = Math.random() * 2 - 1;
+    y += (x - y) * k1; y2 += (x - y2) * k2;
+    const vo = Math.exp(-t * (xuong ? 32 : 44)) * Math.min(1, t / .003);
+    a[i] = (y * 2.6 + (x - y2) * .1) * vo;
+  }
+  return dungMau(a);
+}
+
+function mauThup() {                                    // cá đớp
+  const sr = ac.sampleRate, n = Math.floor(sr * .18), a = new Float32Array(n);
+  const k = 1 - Math.exp(-2 * Math.PI * 190 / sr);
+  let y = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / sr;
+    y += ((Math.random() * 2 - 1) - y) * k;
+    a[i] = y * Math.exp(-t * 26) * Math.min(1, t / .002);
+  }
+  return dungMau(a);
+}
+
+function mauTach() {                                    // lưỡi ếch phóng ra
+  const sr = ac.sampleRate, n = Math.floor(sr * .045), a = new Float32Array(n);
+  const k = 1 - Math.exp(-2 * Math.PI * 2600 / sr);
+  let y = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / sr, x = Math.random() * 2 - 1;
+    y += (x - y) * k;
+    a[i] = (x - y) * Math.exp(-t * 170);
+  }
+  return dungMau(a);
+}
+
+/* --- phát --- */
+
+function phat(b, muc, toc) {
+  if (!ac || !tiengBat || ac.state !== 'running' || !b || dangVang > 8) return false;
+  const s = ac.createBufferSource(); s.buffer = b;
+  if (toc) s.playbackRate.value = toc;
+  const g = ac.createGain(); g.gain.value = muc;
+  s.connect(g); g.connect(chung);
+  dangVang++;
+  s.onended = () => { dangVang--; try { s.disconnect(); g.disconnect(); } catch (e) {} };
+  s.start();
+  return true;
+}
 
 function moTieng() {
   if (ac) { if (tiengBat && ac.state === 'suspended') ac.resume(); return; }
@@ -960,30 +1091,25 @@ function moTieng() {
   if (!AC) return;
   try { ac = new AC(); } catch (e) { ac = null; return; }
 
-  nhieu = ac.createBuffer(1, Math.floor(ac.sampleRate * 1.5), ac.sampleRate);
-  const d = nhieu.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-
   chung = ac.createGain();
   chung.gain.setValueAtTime(.0001, ac.currentTime);
-  chung.gain.linearRampToValueAtTime(tiengBat ? MUC : .0001, ac.currentTime + 2);   // vào từ từ, không giật
+  chung.gain.linearRampToValueAtTime(tiengBat ? MUC : .0001, ac.currentTime + 2);   // vào từ từ
   chung.connect(ac.destination);
 
-  const s = ac.createBufferSource(); s.buffer = nhieu; s.loop = true;   // nền nước và gió
-  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 400; lp.Q.value = .7;
-  const g = ac.createGain(); g.gain.value = .055;
-  const lfo = ac.createOscillator(); lfo.frequency.value = .055;        // lọc chạy chậm cho nền thở
-  const lg = ac.createGain(); lg.gain.value = 170;
-  lfo.connect(lg); lg.connect(lp.frequency);
-  s.connect(lp); lp.connect(g); g.connect(chung);
-  s.start(); lfo.start();
+  mau = {                                               // tính một lần, dùng mãi
+    giot: [mauGiot(640), mauGiot(820), mauGiot(1150), mauGiot(1650)],
+    bet: [mauBet(false), mauBet(false), mauBet(true), mauBet(true)],
+    op: [mauOp(420, 46, 2), mauOp(520, 58, 1), mauOp(640, 52, 3), mauOp(780, 68, 2)],
+    de: [mauDe(4500), mauDe(4800)],
+    thup: mauThup(), tach: mauTach(),
+  };
 }
 
 function dongTieng() {
   if (!ac) return;
   try {
     chung.gain.cancelScheduledValues(ac.currentTime);
-    chung.gain.setValueAtTime(chung.gain.value, ac.currentTime);
+    chung.gain.setValueAtTime(Math.max(.0001, chung.gain.value), ac.currentTime);
     chung.gain.linearRampToValueAtTime(.0001, ac.currentTime + .35);
     setTimeout(() => { if (ac && ac.state === 'running') ac.suspend(); }, 420);
   } catch (e) {}
@@ -1007,111 +1133,38 @@ function batTat() {
   } else dongTieng();
 }
 
-/* Tiếng nước: nhiễu qua bandpass quét xuống, cộng một cái "tinh" tụt cao độ. */
+/* Chạm mạnh thì bong bóng to nên tiếng trầm, hạt mưa nhỏ thì cao — đúng chiều của Minnaert. */
 function tum(x, manh) {
-  if (!ac || !tiengBat || ac.state !== 'running' || manh < .15) return;
+  if (!ac || !tiengBat || manh < .15) return;
   const t0 = ac.currentTime;
-  if (t0 - lanTum < .04) return;                        // gợn dồn dập thì bỏ bớt cho khỏi rào
-  lanTum = t0; demTum++;
-  const v = Math.min(1, manh), p = ac.createStereoPanner();
-  p.pan.value = ben(x); p.connect(chung);
-
-  const s = ac.createBufferSource(); s.buffer = nhieu;
-  s.playbackRate.value = .8 + Math.random() * .5;
-  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.2;
-  bp.frequency.setValueAtTime(1300 + Math.random() * 900, t0);
-  bp.frequency.exponentialRampToValueAtTime(340, t0 + .11);
-  const g = ac.createGain();
-  g.gain.setValueAtTime(.0001, t0);
-  g.gain.linearRampToValueAtTime(.08 * v, t0 + .006);
-  g.gain.exponentialRampToValueAtTime(.0008, t0 + .14);
-  s.connect(bp); bp.connect(g); g.connect(p);
-  s.start(t0); s.stop(t0 + .22);
-
-  const o = ac.createOscillator(); o.type = 'sine';
-  o.frequency.setValueAtTime(850 + Math.random() * 520, t0);
-  o.frequency.exponentialRampToValueAtTime(300, t0 + .09);
-  const og = ac.createGain();
-  og.gain.setValueAtTime(.055 * v, t0);
-  og.gain.exponentialRampToValueAtTime(.0006, t0 + .1);
-  o.connect(og); og.connect(p);
-  o.start(t0); o.stop(t0 + .12);
+  if (t0 - lanTum < .11) return;
+  const v = Math.min(1, manh);
+  const i = Math.min(3, Math.max(0, Math.round((1 - v) * 3.4)));
+  if (phat(mau.giot[i], .3 * v, .93 + Math.random() * .16)) { lanTum = t0; demTum++; }
 }
 
-/* Tiếng ộp: cưa qua bandpass, biên độ băm thành 3–6 xung, cao độ tụt dần cuối câu. */
+function dap(x, manh, xuong) {
+  if (!ac || !tiengBat) return;
+  const t0 = ac.currentTime;
+  if (t0 - lanDap < .025) return;
+  const i = (xuong ? 2 : 0) + (Math.random() < .5 ? 0 : 1);
+  if (phat(mau.bet[i], .34 * Math.min(1, manh), .92 + Math.random() * .18)) { lanDap = t0; demDap++; }
+}
+
 function keu(e) {
-  if (!ac || !tiengBat || ac.state !== 'running') return;
-  const t0 = ac.currentTime, f0 = e.giong;
+  if (!ac || !tiengBat) return;
+  if (!phat(mau.op[e.giong], .3, e.tocGiong)) return;
   demKeu++;
-  const o = ac.createOscillator(); o.type = 'sawtooth';
-  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f0 * 3.1; bp.Q.value = 4;
-  const g = ac.createGain(); g.gain.value = 0;
-  const p = ac.createStereoPanner(); p.pan.value = ben(e.x);
-  o.connect(bp); bp.connect(g); g.connect(p); p.connect(chung);
-
   e.nghiKeu = rnd(9000, 22000); e.henKeu = 0;
-  const so = 3 + Math.floor(Math.random() * 4), nhip = .055 + Math.random() * .035;
-  for (let i = 0; i < so; i++) {
-    const t = t0 + i * nhip;
-    g.gain.setValueAtTime(0, t);
-    g.gain.linearRampToValueAtTime(.11 * (1 - i / (so + 3)), t + .012);
-    g.gain.linearRampToValueAtTime(0, t + nhip * .74);
-  }
-  o.frequency.setValueAtTime(f0, t0);
-  o.frequency.linearRampToValueAtTime(f0 * .9, t0 + so * nhip);
-  o.start(t0); o.stop(t0 + so * nhip + .12);
-
-  for (const k of ech) {                                // một con bên cạnh đáp lời, vừa đủ thành câu đối đáp
+  for (const k of ech) {                                // một con bên cạnh đáp lời cho thành câu đối đáp
     if (k === e || !nguoi(k) || k.henKeu > 0 || k.nghiKeu > 0) continue;
     if (Math.hypot(k.x - e.x, k.y - e.y) < 220 && Math.random() < .4) { k.henKeu = rnd(300, 900); break; }
   }
 }
 
-/* Tiếng cá đớp, tiếng lưỡi, tiếng côn trùng đêm. */
-function thup(x) {
-  if (!ac || !tiengBat || ac.state !== 'running') return;
-  const t0 = ac.currentTime;
-  const s = ac.createBufferSource(); s.buffer = nhieu; s.playbackRate.value = .6;
-  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 230;
-  const g = ac.createGain();
-  g.gain.setValueAtTime(.0001, t0);
-  g.gain.linearRampToValueAtTime(.11, t0 + .01);
-  g.gain.exponentialRampToValueAtTime(.0008, t0 + .16);
-  const p = ac.createStereoPanner(); p.pan.value = ben(x);
-  s.connect(lp); lp.connect(g); g.connect(p); p.connect(chung);
-  s.start(t0); s.stop(t0 + .2);
-}
-
-function tach(x) {
-  if (!ac || !tiengBat || ac.state !== 'running') return;
-  const t0 = ac.currentTime;
-  const s = ac.createBufferSource(); s.buffer = nhieu; s.playbackRate.value = 1.6;
-  const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2200;
-  const g = ac.createGain();
-  g.gain.setValueAtTime(.0001, t0);
-  g.gain.linearRampToValueAtTime(.045, t0 + .003);
-  g.gain.exponentialRampToValueAtTime(.0006, t0 + .04);
-  const p = ac.createStereoPanner(); p.pan.value = ben(x);
-  s.connect(hp); hp.connect(g); g.connect(p); p.connect(chung);
-  s.start(t0); s.stop(t0 + .06);
-}
-
-function conTrung() {
-  if (!ac || !tiengBat || ac.state !== 'running') return;
-  const t0 = ac.currentTime, f = 3800 + Math.random() * 1200, so = 3 + Math.floor(Math.random() * 3);
-  const p = ac.createStereoPanner(); p.pan.value = rnd(-.7, .7); p.connect(chung);
-  for (let i = 0; i < so; i++) {
-    const t = t0 + i * .052;
-    const s = ac.createBufferSource(); s.buffer = nhieu; s.playbackRate.value = 1.4;
-    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = 14;
-    const g = ac.createGain();
-    g.gain.setValueAtTime(.0001, t);
-    g.gain.linearRampToValueAtTime(.03, t + .004);
-    g.gain.exponentialRampToValueAtTime(.0004, t + .022);
-    s.connect(bp); bp.connect(g); g.connect(p);
-    s.start(t); s.stop(t + .04);
-  }
-}
+const thup = (x) => { if (ac && tiengBat) phat(mau.thup, .3, .9 + Math.random() * .25); };
+const tach = (x) => { if (ac && tiengBat) phat(mau.tach, .16, .9 + Math.random() * .3); };
+const conTrung = () => { if (ac && tiengBat) phat(mau.de[Math.random() < .5 ? 0 : 1], .1, .96 + Math.random() * .09); };
 
 function vong(t) {
   raf = requestAnimationFrame(vong);
@@ -1162,8 +1215,9 @@ function mo() {
   song = []; tMua = 900;
   bo = []; trung = []; nong = []; ca = []; tBo = rnd(4000, 9000); tCa = rnd(20000, 45000);
   mucBo = MUC_BO(); tDan = rnd(50000, 110000);
-  luong.goc = luong.gocDich = rnd(0, 6.284); luong.toc = luong.tocDich = rnd(.4, 2.4);
-  luong.xoay = luong.xoayDich = rnd(-1.5, 1.5); luong.t = rnd(20000, 45000);
+  luong.goc = rnd(0, 6.284); luong.toc = luong.tocDich = rnd(.4, 2.4);
+  luong.quay = luong.quayDich = (Math.random() < .5 ? -1 : 1) * rnd(.018, .05);
+  luong.xoay = luong.xoayDich = rnd(-1.2, 1.2); luong.t = rnd(25000, 60000);
   tConTrung = rnd(8000, 20000);
   if (tiengBat) moTieng();
   tTruoc = performance.now();
@@ -1200,10 +1254,21 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _nong: () => nong.map(n => ({ x: Math.round(n.x), y: Math.round(n.y), s: +n.s.toFixed(1), vot: Math.round(n.vot) })),
   _themCa: (x, y, so = 1) => { ca = []; themCa(so); const c = ca[0]; if (c && x !== undefined) { c.x = x; c.y = y; } return !!c; },
   _themBo: (x, y) => { themBo(1); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
+  _pho: () => {                                         // gắn máy phân tích để đo phổ lúc kiểm thử
+    if (!ac) return null;
+    if (!phanTich) { phanTich = ac.createAnalyser(); phanTich.fftSize = 2048; phanTich.smoothingTimeConstant = 0; chung.connect(phanTich); }
+    const d = new Float32Array(phanTich.frequencyBinCount);
+    phanTich.getFloatFrequencyData(d);
+    return { rate: ac.sampleRate, bins: Array.from(d) };
+  },
+  _keu: () => { const e = ech.find(nguoi); if (!e) return false; e.nghiKeu = 0; keu(e); return true; },
+  _de: () => conTrung(),
   _tieng: () => ({ co: !!ac, trangThai: ac ? ac.state : null, bat: tiengBat,
-                   muc: ac ? +chung.gain.value.toFixed(3) : null, tum: demTum, keu: demKeu }),
+                   muc: ac ? +chung.gain.value.toFixed(3) : null, vang: dangVang,
+                   soMau: mau ? Object.keys(mau).length : 0,
+                   tum: demTum, dap: demDap, keu: demKeu }),
   _batTat: () => batTat(),
-  _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2), xoay: +luong.xoay.toFixed(2) }),
+  _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2), quay: +luong.quay.toFixed(3), xoay: +luong.xoay.toFixed(2) }),
   _dam: () => ({ trung: trung.length, nong: nong.length, an: ech.reduce((n, e) => n + e.an, 0),
                  no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2) }),
   _giaDi: (ms) => { for (const e of ech) { e.tuoi += ms; e.tChuKy += ms; } return ech.length; },
