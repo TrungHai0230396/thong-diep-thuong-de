@@ -11,7 +11,7 @@
  },
  {
   "id": 3,
-  "thong_diep": "Ta vẫn luôn trò chuyện qua trực giác và những điềm báo xung quanh.",
+  "thong_diep": "Ta vẫn nhắn nhủ qua trực giác và những điềm báo xung quanh.",
   "y_nghia": "Hãy lắng nghe cảm xúc bên trong và chú ý đến những sự trùng hợp ngẫu nhiên trong ngày."
  },
  {
@@ -31,12 +31,12 @@
  },
  {
   "id": 7,
-  "thong_diep": "Ta có mặt ở khắp mọi nơi, trong từng hơi thở và khoảnh khắc hiện tại của mình.",
+  "thong_diep": "Ta có mặt ở khắp mọi nơi, trong từng hơi thở và từng khoảnh khắc hiện tại.",
   "y_nghia": "Đừng tìm kiếm Thượng đế ở đâu xa xôi. Ngài ở ngay trong sự tĩnh lặng của lòng mình."
  },
  {
   "id": 8,
-  "thong_diep": "Ta và mình vốn giống nhau, khác biệt duy nhất là Ta nhớ Ta là ai, còn mình thì tạm quên.",
+  "thong_diep": "Ta và mỗi người vốn giống nhau, chỉ khác là Ta nhớ Ta là ai, còn người thì tạm quên.",
   "y_nghia": "Bên trong mình có sẵn sức mạnh phi thường, chỉ là đang tạm quên mất vì lo âu thôi."
  },
  {
@@ -51,7 +51,7 @@
  },
  {
   "id": 11,
-  "thong_diep": "Ta luôn đồng ý với mọi quyết định và để mình tự trải nghiệm.",
+  "thong_diep": "Ta luôn đồng ý với mọi quyết định và để mỗi người tự trải nghiệm.",
   "y_nghia": "Vũ trụ luôn ủng hộ những gì mình thực sự muốn làm, dù là bài học thành hay bại."
  },
  {
@@ -71,8 +71,8 @@
  },
  {
   "id": 15,
-  "thong_diep": "Ta không đứng trên cao để soi mói tội lỗi. Ta đang trải nghiệm cuộc sống cùng mình.",
-  "y_nghia": "Hãy sống thoải mái, Thượng đế không ghi sổ phạt mà đang đồng hành qua mọi thăng trầm."
+  "thong_diep": "Ta không đứng trên cao để soi mói tội lỗi. Ta đang trải nghiệm cuộc sống cùng mỗi người.",
+  "y_nghia": "Hãy sống thoải mái, Thượng đế không ghi sổ phạt mà đang đồng hành cùng mỗi người qua mọi thăng trầm."
  },
  {
   "id": 16,
@@ -466,7 +466,7 @@
  },
  {
   "id": 94,
-  "thong_diep": "Hãy cười nhiều lên! Ta rất thích sự vui vẻ và muốn cười cùng mình.",
+  "thong_diep": "Hãy cười nhiều lên! Ta rất thích sự vui vẻ và muốn cười cùng mọi người.",
   "y_nghia": "Đừng quá nghiêm trọng hóa cuộc đời. Hãy học cách mỉm cười trước những rắc rối vụn vặt thường ngày."
  },
  {
@@ -1081,7 +1081,7 @@
  },
  {
   "id": 217,
-  "thong_diep": "Mình không lẻ loi, vũ trụ vẫn luôn đồng hành.",
+  "thong_diep": "Không ai lẻ loi cả, vũ trụ vẫn luôn đồng hành cùng mình.",
   "y_nghia": "Những lúc thấy trơ trọi nhất, thật ra vẫn có nhiều thứ đang lặng lẽ đỡ lấy mình."
  },
  {

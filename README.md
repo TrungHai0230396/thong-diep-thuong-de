@@ -358,7 +358,13 @@ Nguyên tắc:
 - Chữ **"Ta"** (Thượng đế tự xưng, 12 lá) thì giữ: *"Ta luôn trò chuyện với con qua trực giác"* → *"Ta vẫn luôn trò chuyện qua trực giác."*
 - Từ ghép **"con người", "con đường", "con tim", "con cái", "trẻ con"** không phải đại từ nên giữ nguyên. 12 lá còn chứa chúng.
 
-Bảng sửa nằm ở `content/bo-chu-con.json`, khoá bằng **câu gốc** chứ không bằng id — id phụ thuộc thứ tự gộp hai nguồn, câu gốc thì không. Ba phép thử mới trong `test-core.js` giữ chỗ này: không lá nào còn đại từ "con", không lá nào lỡ dùng "bạn"/"ngươi"/"quý vị", và từ ghép có chữ "con" vẫn còn nguyên.
+**Hai cái bẫy gặp phải khi làm.**
+
+*Động từ mất tân ngữ.* "Trò chuyện" cần có người đối diện, bỏ "với con" đi thì câu treo lơ lửng: *"Ta vẫn luôn trò chuyện qua trực giác"* — trò chuyện với ai? Ba chỗ dính, phải đổi sang động từ không cần tân ngữ: *"Ta vẫn nhắn nhủ qua trực giác và những điềm báo xung quanh."*
+
+*"Ta" đụng "mình".* Nặng hơn. Trong câu đã có "Ta" (Thượng đế tự xưng) mà dùng "mình" làm ngôi hai thì **"mình" bị hiểu thành chính Thượng đế**: *"Ta và mình vốn giống nhau"* đọc ra thành "Ta và bản thân Ta". Năm câu dính, phải chuyển sang danh từ: *"Ta và mỗi người vốn giống nhau, chỉ khác là Ta nhớ Ta là ai, còn người thì tạm quên."* Ngoại lệ là khi trong câu đã có "mỗi người" để "chính mình" quy chiếu về — *"Ta chỉ muốn mỗi người nhận ra giá trị của chính mình"* thì không mơ hồ.
+
+Bảng sửa nằm ở `content/bo-chu-con.json`, khoá bằng **câu gốc** chứ không bằng id — id phụ thuộc thứ tự gộp hai nguồn, câu gốc thì không. Năm phép thử mới trong `test-core.js` giữ chỗ này: không lá nào còn đại từ "con", không lá nào lỡ dùng "bạn"/"ngươi"/"quý vị", từ ghép có chữ "con" vẫn còn nguyên, câu có "Ta" thì không dùng "mình" làm ngôi hai, và không động từ nào bị bỏ mất tân ngữ.
 
 ## Gõ từ tiếng Anh
 
@@ -453,7 +459,7 @@ assets/app.css             giao diện
 data/cards.json            219 lá dùng trong app (51 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
-scripts/test-core.js       35 kiểm thử lõi
+scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
@@ -466,7 +472,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 35 kiểm thử lõi (Node 18+)
+node scripts/test-core.js        # chạy 37 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 ```

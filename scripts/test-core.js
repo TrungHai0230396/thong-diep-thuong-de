@@ -88,6 +88,19 @@ ok('không lá nào còn đại từ "con"', (() => {
 ok('không thay "con" bằng "bạn"/"ngươi"/"quý vị"',
    !cards.some(c => /\b(ngươi|quý vị)\b/i.test(c.thong_diep + c.y_nghia)
      || /\bbạn\b(?!\s*(?:thân|bè|đời))/i.test(c.thong_diep) && !/người bạn/i.test(c.thong_diep)));
+/* Trong một câu đã có "Ta" (Thượng đế tự xưng) thì không được dùng "mình" làm ngôi hai:
+   "Ta và mình vốn giống nhau" đọc ra thành "Ta và bản thân Ta". Chỗ đó phải dùng danh từ,
+   trừ khi trong câu đã có "mỗi người" để "chính mình" quy chiếu về. */
+ok('câu có "Ta" thì không dùng "mình" làm ngôi hai', (() => {
+  const dinh = [];
+  for (const c of cards) for (const t of [c.thong_diep, c.y_nghia])
+    if (/\bTa\b/.test(t) && /\bmình\b/.test(t) && !/mỗi người/.test(t)) dinh.push(c.id);
+  return dinh.length === 0;
+})());
+/* Bỏ tân ngữ sau mấy động từ này thì câu treo lơ lửng: trò chuyện với ai, đồng hành cùng ai. */
+ok('không động từ nào bị bỏ mất tân ngữ',
+   !cards.some(c => /(trò chuyện|đồng hành|đi cùng|kề bên)(?!\s+(?:với|cùng)\s+\S)/i
+     .test(c.thong_diep + ' ' + c.y_nghia)));
 ok('từ ghép có chữ "con" vẫn được giữ',
    cards.some(c => /\bcon người\b/i.test(c.thong_diep + c.y_nghia)));
 ok('không lọt "HEBs"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('HEBs')));
