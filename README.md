@@ -205,7 +205,7 @@ Thang thời gian đặt cho **một phiên chơi 5 phút thấy trọn vòng**.
 
 Đi kèm hai điều: con ngồi trên lá đến giờ **nhảy chơi** thì chỉ nhảy sang lá còn chỗ, không còn nhảy bừa lên lá đầy để rồi hất con khác xuống — đo thử với hơn ba mươi con trong hồ, số cú nhảy trong 30 giây giảm từ 39 xuống 16–27. Còn **giật mình** vì ngón tay thì vẫn nhảy bừa: hoảng thì không kịp phép tắc. Lá đầy vẫn lún, và con lên sau cùng vẫn bị hất xuống nước như cũ.
 
-Trên đầu màn hình có dòng chữ mờ đếm số con: `9 ếch`, và khi có con phải ở dưới nước thì `9 ếch · 2 dưới nước`.
+Góc phải trên, ngay bên trái nút chép link và dấu x, có một con số mờ đếm số ếch đang sống trong hồ. Chỉ con số trần, không kèm chữ — trong một cái hồ toàn ếch thì nhìn là biết nó đang đếm gì.
 
 **Đói và chết.** Mỗi con có mức no từ 0 tới 1. Sống là tiêu: no đầy mà không ăn gì thì gần 4 phút là kiệt. Một con mồi bù lại 0,4. Đói thì **trước hết là không đẻ**, cạn hẳn mới chết; ngoài ra mỗi con có tuổi thọ riêng 3,5–6 phút, hết tuổi cũng chết. Chết thì ngồi yên, nhắm mắt, màu bạc dần rồi lịm xuống tan vào nước trong 2,6 giây, để lại một vòng sóng — không có xác nổi. Càng đói hoặc càng già thì màu càng bạc, nên nhìn là biết con nào đang yếu.
 

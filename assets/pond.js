@@ -1261,20 +1261,19 @@ function hienNhanh(bat) {
   } else if (!bat && n) n.remove();
 }
 
-/* Số ếch đang có trong hồ, và trong đó mấy con đang ở dưới nước vì lá hết chỗ ngồi.
-   Chỉ đụng vào DOM khi con số thật sự đổi, chứ ghi mỗi khung hình thì phí. */
-let demHien = '';
+/* Số ếch đang có trong hồ. Chỉ con số trần, không kèm chữ: nó nằm ngay cạnh dấu x trong hồ
+   toàn ếch, nhìn là biết đang đếm cái gì. Chỉ đụng vào DOM khi con số đổi, chứ ghi mỗi khung
+   hình thì phí. */
+let demHien = -1;
 
 function hienDem() {
   if (!tam) return;
   const con = ech.reduce((k, e) => k + (e.tan === null ? 1 : 0), 0);
-  const duoi = ech.reduce((k, e) => k + (e.tan === null && e.boi ? 1 : 0), 0);
-  const chu = !con ? 'hồ vắng ếch' : duoi ? `${con} ếch · ${duoi} dưới nước` : `${con} ếch`;
-  if (chu === demHien) return;
-  demHien = chu;
+  if (con === demHien) return;
+  demHien = con;
   let d = tam.querySelector('.ho-dem');
   if (!d) { d = document.createElement('p'); d.className = 'ho-dem'; tam.appendChild(d); }
-  d.textContent = chu;
+  d.textContent = String(con);
 }
 let tAn = 0;            // lúc trang bị ẩn đi, đo bằng đồng hồ một chiều của trình duyệt
 
@@ -1409,7 +1408,7 @@ function mo() {
   luong.quay = luong.quayDich = (Math.random() < .5 ? -1 : 1) * rnd(.018, .05);
   luong.xoay = luong.xoayDich = rnd(-1.2, 1.2); luong.t = rnd(25000, 60000);
   tConTrung = rnd(8000, 20000);
-  demHien = '';
+  demHien = -1;
   if (tiengBat) moTieng();
   tTruoc = performance.now();
   if (!raf) raf = requestAnimationFrame(vong);

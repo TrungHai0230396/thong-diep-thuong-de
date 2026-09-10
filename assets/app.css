@@ -292,10 +292,11 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .nut-link svg{width:17px;height:17px}
 .nut-link:hover{background:rgba(255,255,255,.12)}
 
-/* số ếch trong hồ */
-.ho-dem{position:absolute;left:0;right:0;z-index:4;text-align:center;margin:0;pointer-events:none;
-  top:calc(env(safe-area-inset-top,0px) + 21px);
-  font-size:12px;letter-spacing:.12em;color:rgba(190,225,240,.44)}
+/* số ếch trong hồ — xếp cùng hàng với nút chép link và dấu x, bên trái hai nút đó */
+.ho-dem{position:absolute;z-index:8;margin:0;pointer-events:none;
+  top:calc(env(safe-area-inset-top,0px) + 14px);right:100px;
+  min-width:34px;height:34px;line-height:34px;text-align:center;
+  font-size:13px;color:rgba(190,225,240,.5)}
 
 /* báo đang tua nhanh trong hồ */
 .ho-nhanh{position:absolute;left:0;right:0;z-index:4;text-align:center;margin:0;pointer-events:none;

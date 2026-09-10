@@ -108,7 +108,7 @@ ok('mấy con thả nổi không chồng lên nhau', (() => {
   return de.length === 0;
 })(), `${HO._ech().filter(e => e.boi && e.dich < 0).length} con đang thả nổi`);
 soatBatBien('bất biến sau khi nhồi ếch', true);
-ok('bảng đếm ghi số con dưới nước', /^\d+ ếch · \d+ dưới nước$/.test(HO._dem()), `"${HO._dem()}"`);
+ok('chỗ đếm ghi đúng số ếch', HO._dem() === String(d.ech), `"${HO._dem()}" / ${d.ech} con`);
 
 console.log('\n— Không quẩn vòng trèo lên rồi tuột xuống —');
 let nhay = 0, truoc = HO._ech().map(e => e.nhay);
