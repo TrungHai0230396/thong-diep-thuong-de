@@ -40,6 +40,24 @@ Ngày tính theo lịch địa phương của máy và đổi lúc 0:00. Nếu a
 
 **Hệ quả:** trong cùng một ngày, một người mở lại bao nhiêu lần cũng chỉ thấy đúng lá đó. Đó là chủ ý, không phải lỗi.
 
+## Mỗi trò một địa chỉ riêng
+
+Gửi cho ai một trong những địa chỉ này là họ mở thẳng vào trò đó, không phải đi tìm ngôi sao:
+
+| Trò | Địa chỉ |
+|---|---|
+| Mùa Chín | `#mua-chin` |
+| Thả đèn hoa đăng | `#tha-den` |
+| Hồ sen | `#ho-sen` |
+| Hộp thở | `#hoi-tho` |
+| Nối sao thành chòm | `#noi-sao` |
+
+Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và tự chạy được cả khi mất mạng. Bấm ngôi sao thì địa chỉ tự đổi theo, **đóng trò thì địa chỉ trở về trang chủ**. Nút Back của điện thoại cũng đóng trò lại chứ không thoát hẳn khỏi app.
+
+Trong mỗi trò có một nút hình mắt xích cạnh nút đóng, bấm là chép địa chỉ trò đó, hoặc mở thẳng bảng chia sẻ của máy.
+
+Toàn bộ phần này nằm gọn trong `assets/app.js`, không phải sửa file của từng trò. Trò nào cũng có nút đóng và phím Esc riêng, nên thay vì đi sửa năm chỗ, `app.js` ngồi nhìn lớp `hien` của thẻ bọc: mất lớp đó nghĩa là người dùng vừa đóng, thì xoá địa chỉ đi.
+
 ## Bầu trời sao
 
 Trên nền có những ngôi sao nhỏ đủ màu, mỗi ngôi là một trò riêng. Chúng rơi vào vị trí ngẫu nhiên mỗi lần tải trang, **không bao giờ đè lên nhau**, cũng không đè chữ.

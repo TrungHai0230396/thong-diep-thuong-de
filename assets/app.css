@@ -282,3 +282,12 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   border-radius:999px;padding:6px 14px;font-size:11.5px;font-family:inherit;cursor:pointer}
 .cs-goc[hidden]{display:none}
 .cs-goc:hover{background:rgba(232,195,122,.14)}
+
+/* nút chép địa chỉ, nằm cạnh nút đóng của mọi trò */
+.nut-link{position:absolute;z-index:8;
+  top:calc(env(safe-area-inset-top,0px) + 14px);right:58px;
+  width:34px;height:34px;border-radius:50%;cursor:pointer;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.32);color:var(--ink);
+  -webkit-tap-highlight-color:transparent}
+.nut-link svg{width:17px;height:17px}
+.nut-link:hover{background:rgba(255,255,255,.12)}

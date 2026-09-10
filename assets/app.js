@@ -27,16 +27,17 @@ const HINH_SAO = {
 
 const SAO = [
   { id: 'sao-game', mau: '#8fd6c2', hinh: 'lap-lanh',  nhan: 'Mùa chín, đưa nắng qua cho trái chín',
-    mo: () => self.TDTD_GAME && self.TDTD_GAME.mo() },
+    duong: 'mua-chin',  khung: '.game',    mun: 'TDTD_GAME' },
   { id: 'sao-hoadang', mau: '#f0a860', hinh: 'hoa',    nhan: 'Thả đèn hoa đăng, buông điều nặng lòng',
-    mo: () => self.TDTD_HOADANG && self.TDTD_HOADANG.mo() },
+    duong: 'tha-den',  khung: '.hoadang', mun: 'TDTD_HOADANG' },
   { id: 'sao-ho',   mau: '#7ec8e3', hinh: 'giot',      nhan: 'Hồ nước, có đàn ếch',
-    mo: () => self.TDTD_HO && self.TDTD_HO.mo() },
+    duong: 'ho-sen',   khung: '.ho',      mun: 'TDTD_HO' },
   { id: 'sao-tho',  mau: '#b8a8e8', hinh: 'tia',       nhan: 'Hộp thở, thở theo nhịp bốn',
-    mo: () => self.TDTD_THO && self.TDTD_THO.mo() },
+    duong: 'hoi-tho',   khung: '.hopho',   mun: 'TDTD_THO' },
   { id: 'sao-chom', mau: '#f2ead0', hinh: 'sao4',      nhan: 'Nối sao thành chòm',
-    mo: () => self.TDTD_CHOMSAO && self.TDTD_CHOMSAO.mo() },
+    duong: 'noi-sao',  khung: '.chomsao', mun: 'TDTD_CHOMSAO' },
 ];
+
 
 const SEED_KEY = 'tdtd.seed';   // hạt giống riêng của máy
 const DAY_KEY  = 'tdtd.day';    // ngày đã nhận thông điệp, bị ghi đè mỗi ngày
@@ -199,12 +200,91 @@ function taoCacSao() {
     b.style.setProperty('--mau-sao', s.mau);
     b.style.animationDelay = -(Math.random() * 4).toFixed(2) + 's';
     b.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HINH_SAO[s.hinh] || s.hinh || HINH_SAO.sao5}"/></svg>`;
-    b.onclick = s.mo;
+    b.onclick = () => moSao(s);
     troi.appendChild(b);
     return b;
   });
 }
-let NUT_SAO = [];
+let NUT_SAO = [], saoDangMo = null, dangTheoDoi = null;
+
+/* Mỗi trò một địa chỉ riêng, gửi cho ai là họ mở thẳng vào trò đó.
+   Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và nút Back
+   của điện thoại đóng trò lại thay vì thoát hẳn khỏi app. */
+const boDau = () => {
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+};
+
+function moSao(s) {
+  const m = self[s.mun];
+  if (!m) return;
+  if (saoDangMo && saoDangMo !== s) dongSao(true);
+  saoDangMo = s;
+  m.mo();
+  if (location.hash.slice(1) !== s.duong) location.hash = s.duong;
+  themNutChepLink(s);
+  theoDoiDong(s);
+}
+
+function dongSao(imLang) {
+  const s = saoDangMo;
+  saoDangMo = null;
+  if (dangTheoDoi) { dangTheoDoi.disconnect(); dangTheoDoi = null; }
+  if (s && self[s.mun]) self[s.mun].dong();
+  if (!imLang) boDau();
+}
+
+/* Trò có nút đóng riêng và phím Esc riêng. Không sửa từng file, chỉ ngồi nhìn
+   lớp 'hien' của nó: mất lớp đó nghĩa là người dùng vừa đóng, thì xoá địa chỉ đi. */
+function theoDoiDong(s) {
+  const k = $(s.khung);
+  if (!k) return;
+  if (dangTheoDoi) dangTheoDoi.disconnect();
+  dangTheoDoi = new MutationObserver(() => {
+    if (!k.classList.contains('hien')) {
+      dangTheoDoi.disconnect(); dangTheoDoi = null; saoDangMo = null; boDau();
+      const n = $('#nut-chep-link'); if (n) n.remove();
+    }
+  });
+  dangTheoDoi.observe(k, { attributes: true, attributeFilter: ['class'] });
+}
+
+/* Nút chép địa chỉ, gắn vào trò đang mở, nằm cạnh nút đóng. Một chỗ cho cả năm trò. */
+function themNutChepLink(s) {
+  const k = $(s.khung);
+  if (!k || $('#nut-chep-link')) return;
+  const b = document.createElement('button');
+  b.id = 'nut-chep-link';
+  b.className = 'nut-link';
+  b.setAttribute('aria-label', 'Chép địa chỉ trò này');
+  b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 13.4a4 4 0 005.7 0l3-3a4 4 0 10-5.7-5.7l-1.2 1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M13.4 10.6a4 4 0 00-5.7 0l-3 3a4 4 0 105.7 5.7l1.2-1.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+  b.onclick = () => chepLink(s);
+  k.appendChild(b);
+}
+
+function chepLink(s) {
+  const d = location.origin + location.pathname + '#' + s.duong;
+  const loi = `${s.nhan} — ${d}`;
+  const xong = () => toast('Đã chép địa chỉ trò này');
+  if (navigator.share) { navigator.share({ text: loi, url: d }).catch(() => {}); return; }
+  if (navigator.clipboard) { navigator.clipboard.writeText(d).then(xong, () => chepTay(d, xong)); return; }
+  chepTay(d, xong);
+}
+
+function chepTay(chu, xong) {
+  const o = document.createElement('textarea');
+  o.value = chu; o.style.position = 'fixed'; o.style.opacity = '0';
+  document.body.appendChild(o); o.select();
+  try { document.execCommand('copy'); xong(); } catch (e) { toast('Không chép được'); }
+  document.body.removeChild(o);
+}
+
+/* Địa chỉ đổi: do người dùng bấm Back, dán link mới, hay mở từ link gửi tới. */
+function theoDiaChi() {
+  const d = location.hash.slice(1);
+  const s = SAO.find(x => x.duong === d);
+  if (s) { if (saoDangMo !== s) moSao(s); }
+  else if (saoDangMo) dongSao(true);
+}
 
 function datCacSao() {
   const daDat = [];
@@ -315,6 +395,8 @@ async function init() {
   $('#btn-draw').onclick = reveal;
   NUT_SAO = taoCacSao();
   datCacSao();
+  addEventListener('hashchange', theoDiaChi);
+  theoDiaChi();                         // mở thẳng vào trò nếu địa chỉ có sẵn
   addEventListener('resize', datLaiNgoiSao);
   addEventListener('orientationchange', datLaiNgoiSao);
   $('#btn-anh').onclick = chiaSeAnh;
