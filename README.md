@@ -16,14 +16,15 @@ Mở http://127.0.0.1:5179 — không cần cài gì, không cần build.
 
 App không giữ lại thông điệp nào. Không lịch sử, không bộ sưu tập, không nhật ký, không tài khoản, không cookie. Đóng tab là thông điệp đi qua, mở lại thì lá úp lại từ đầu.
 
-Máy chỉ ghi đúng **hai giá trị**, không có giá trị nào là nội dung và không có gì tích lũy theo thời gian:
+Máy chỉ ghi đúng **ba giá trị**, không có giá trị nào là nội dung và không có gì tích lũy theo thời gian:
 
 | Khoá | Nội dung | Vì sao cần |
 |---|---|---|
 | `tdtd.seed` | một con số ngẫu nhiên, sinh trong lần mở đầu tiên | để mỗi người có bộ bài riêng |
 | `tdtd.day` | ngày gần nhất đã nhận thông điệp, dạng `YYYY-MM-DD` | để một ngày chỉ nhận một lần, tải lại trang không rút lại được |
+| `tdtd.tieng` | `1` hoặc `0` | nhớ người dùng đã tắt hay mở tiếng ở hồ nước, khỏi phải bấm lại mỗi lần |
 
-`tdtd.day` bị ghi đè mỗi ngày nên không tạo thành lịch sử. Thông điệp cũ không lưu ở đâu và không xem lại được.
+`tdtd.day` bị ghi đè mỗi ngày nên không tạo thành lịch sử. Thông điệp cũ không lưu ở đâu và không xem lại được. `tdtd.tieng` là một lựa chọn cài đặt, không phải nội dung, và cũng bị ghi đè chứ không cộng dồn.
 
 Cách chọn lá:
 
@@ -113,6 +114,27 @@ Hai chỗ dễ sai khi lá biến mất, đều đã sửa và có bài kiểm b
 
 - Ếch nhớ **chỉ số** lá trong mảng, nên bỏ một chiếc là mọi chỉ số phía sau phải dời theo, và con nào đang ngồi, **đang bay tới**, hay đang bơi tới chiếc lá vừa mất đều phải cho xuống nước. Thiếu vế "đang bay tới" thì con ếch đáp xuống chỗ trống rồi ngồi trên mặt nước cho tới lần tự nhảy sau.
 - Con đang bơi phải **cắm đầu tới chiếc lá đã nhắm**, chỉ nhắm lại khi lá đó mất hẳn. Bản đầu cho nó đổi lá mỗi khi lá đích đầy, thành ra lúc hồ đông thì nó lượn vòng giữa hai chiếc lá đầy tới 25 giây không lên được. Giờ đầy cũng trèo lên, đầy quá thì lá lún và có con khác tuột xuống.
+
+**Tiếng.** Hồ có tiếng, và **sinh hết bằng Web Audio, không nhúng file âm thanh nào** — cả app vẫn 168 KB, không thêm byte nào phải tải về. Nút loa ở góc trên bên trái để tắt mở, lựa chọn đó được nhớ ở khoá `tdtd.tieng`.
+
+| Tiếng | Cách sinh |
+|---|---|
+| Nền nước và gió | nhiễu lặp qua lowpass 400 Hz, tần số lọc chạy theo một dao động 0,055 Hz nên nền tự thở |
+| Tiếng nước, theo mọi gợn sóng | nhiễu qua bandpass quét từ ~2 kHz xuống 340 Hz trong 110 ms, cộng một hình sin tụt cao độ. To nhỏ theo sức gợn, trái phải theo chỗ gợn trên hồ |
+| Tiếng ộp | dao động cưa qua bandpass, biên độ băm thành 3–6 xung cách nhau 55–90 ms, cao độ tụt dần cuối câu. **Mỗi con ếch một giọng riêng 165–300 Hz** |
+| Cá đớp nòng nọc | nhiễu qua lowpass 230 Hz, tắt trong 160 ms |
+| Lưỡi phóng ra | nhiễu qua highpass 2,2 kHz, dài 40 ms |
+| Côn trùng đêm | 3–5 nhịp nhiễu qua bandpass hẹp quanh 4 kHz, mỗi 18–45 giây |
+
+Tiếng ếch thật ra là một chuỗi xung, nên băm biên độ là ra chứ không cần thu âm. Ếch còn **đáp lời nhau**: một con kêu thì một con khác trong vòng 220 px có 40% khả năng kêu đáp sau 0,3–0,9 giây, thành ra câu đối đáp chứ không phải tiếng lẻ.
+
+Liều lượng phải đo mới ra: bản đầu tôi cho mỗi con có cơ hội kêu mỗi khung hình là `dt/42000`, đo ra **106 tiếng trong 5 phút**, tức 2,8 giây một tiếng — ồn như cái chợ chứ không thư giãn. Hạ xuống `dt/210000` và nghỉ 9–22 giây sau mỗi tiếng thì còn **2,5 tiếng mỗi phút** với 8 con ếch, cùng 8 tiếng nước mỗi phút. Đó là mức đang dùng.
+
+Ba chỗ đáng biết:
+
+- **Công tắc im lặng của iPhone tắt Web Audio.** Người gạt nút silent sẽ không nghe gì; nút loa hiện rõ trạng thái nên ít ra người ta biết app có tiếng.
+- Tiếng **vào từ từ trong 2 giây** lúc mở hồ, không nổ ra ngay, vì có người mở app lúc nửa đêm.
+- Đóng hồ, tắt tiếng, hay chuyển sang tab khác thì `AudioContext` bị `suspend`, khỏi tốn pin. Mở hồ mà đang tắt tiếng thì **không tạo AudioContext nào cả**.
 
 **Vòng đời.** Ngồi chơi lâu thì thấy trọn một vòng, không có gì phải bấm:
 

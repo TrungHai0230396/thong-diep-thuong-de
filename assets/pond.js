@@ -13,15 +13,22 @@ function dungKhung() {
   tam.className = 'ho';
   tam.innerHTML = `
     <canvas class="ho-cv"></canvas>
+    <button class="ho-tieng"></button>
     <button class="ho-dong" aria-label="Đóng">✕</button>`;
   document.body.appendChild(tam);
   cv = tam.querySelector('.ho-cv');
   ctx = cv.getContext('2d');
   tam.querySelector('.ho-dong').onclick = dong;
+  const loa = tam.querySelector('.ho-tieng');
+  loa.innerHTML = tiengBat ? LOA_MO : LOA_TAT;
+  loa.classList.toggle('tat', !tiengBat);
+  loa.setAttribute('aria-label', tiengBat ? 'Tắt tiếng' : 'Mở tiếng');
+  loa.onclick = batTat;
 
   const cham = (e) => {
     const r = cv.getBoundingClientRect();
     const x = e.clientX - r.left, y = e.clientY - r.top;
+    if (!ac && tiengBat) moTieng();
     themSong(x, y, 1);
     const con = echTai(x, y);
     if (con) giatMinh(con, x, y);
@@ -63,6 +70,7 @@ function doCo() {
 const themSong = (x, y, manh) => {
   if (song.length > 60) song.shift();
   song.push({ x, y, t: 0, manh, doi: rnd(2600, 3400) });
+  tum(x, manh);
 };
 
 function veSong(s) {
@@ -326,6 +334,7 @@ function datEch() {
                nhay: false, boi: false, dich: -1, tDap: 0,
                t: 0, doi: 0, cung: 0, x0: 0, y0: 0, x1: 0, y1: 0, song: 0,
                nghi: 0, nhamMat: 0, tuNhay: rnd(5000, 15000),
+               giong: rnd(165, 300), henKeu: 0, nghiKeu: rnd(3000, 15000),
                an: 0, luoi: null, nghiLuoi: 0, nhaiT: 0, deT: 0 });
   }
 }
@@ -477,6 +486,9 @@ function buocMotCon(e, dt) {
 
   const l = la[e.la];
   if (l) { e.x = l.x + e.dx; e.y = yLa(l) + e.dy; }     // ngồi yên thì nhún theo lá
+  e.nghiKeu = Math.max(0, e.nghiKeu - dt);              // thỉnh thoảng lên tiếng, và đáp lời con bên cạnh
+  if (e.henKeu > 0) { e.henKeu -= dt; if (e.henKeu <= 0 && e.nghiKeu <= 0) keu(e); }
+  else if (e.nghiKeu <= 0 && Math.random() < dt / 210000) keu(e);   // thưa thôi, hồ để thư giãn chứ không phải cái chợ
   ngamVaPhong(e, dt);                                   // ngồi trên lá thì để ý con bọ nào bay gần
   if (e.luoi) return;                                   // đang phóng lưỡi thì chưa nhảy đi đâu
   const gia = Math.min(1, e.tuoi / e.doiSong);
@@ -705,7 +717,7 @@ function ngamVaPhong(e, dt) {
   const d = Math.hypot(b.x - e.x, b.y - b.cao - e.y);
   if (d < e.s * 2.5 && Math.abs(lech) < .6) {           // vào tầm và đang nhìn đúng hướng thì phóng lưỡi
     e.luoi = { t: 0, doi: 300, dai: d, con: b, f: 0 };
-    b.dinh = e;
+    b.dinh = e; tach(e.x);
   }
 }
 
@@ -776,7 +788,7 @@ function buocCa(dt) {
         c.noi += (Math.min(1, (130 - dM) / 90) - c.noi) * .06;
         if (dM < 30) {                                  // đớp
           nong.splice(nong.indexOf(mieng), 1);
-          themSong(mieng.x, mieng.y, .6);
+          themSong(mieng.x, mieng.y, .6); thup(mieng.x);
           c.nghi = rnd(5000, 11000); c.noi = 1;         // đớp xong thì lặn xuống nghỉ một lúc
         }
       } else {
@@ -921,8 +933,184 @@ function thanhEch(n) {
              doiSong: DOI_SONG(), tuoi: 0, tan: null, chuKy: CHU_KY(), tChuKy: 0, nl: .45,
              nhay: false, boi: true, tDap: 0, t: 0, doi: 0, cung: 0,
              x0: 0, y0: 0, x1: 0, y1: 0, nghi: 0, nhamMat: 0, tuNhay: rnd(5000, 15000),
-             song: 0, an: 0, luoi: null, nghiLuoi: 0, nhaiT: 0, deT: 0 });
+             song: 0, giong: rnd(165, 300), henKeu: 0, nghiKeu: rnd(3000, 15000),
+             an: 0, luoi: null, nghiLuoi: 0, nhaiT: 0, deT: 0 });
   themSong(n.x, n.y, .4);
+}
+
+/* ---- Tiếng hồ: sinh hết bằng Web Audio, không nhúng file nào ----
+   Tiếng ếch thật ra là một chuỗi xung, nên dao động cưa qua bandpass rồi băm biên độ là ra.
+   Tiếng nước là nhiễu qua bandpass quét từ cao xuống thấp. Nền là nhiễu lọc rất trầm.
+   Người bật nút gạt im lặng của iPhone sẽ không nghe gì, đó là cách iOS chặn Web Audio. */
+
+const MUC = .5;                                         // mức chung, đã để nhỏ
+const TIENG_KEY = 'tdtd.tieng';                         // nhớ lựa chọn tắt hay mở, chỉ có vậy
+const LOA_MO = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z" fill="currentColor" stroke="none"/><path d="M15 9.2a4.3 4.3 0 010 5.6"/><path d="M17.9 6.7a8 8 0 010 10.6"/></svg>';
+const LOA_TAT = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z" fill="currentColor" stroke="none"/><path d="M15.4 9.6l5 4.8M20.4 9.6l-5 4.8"/></svg>';
+let ac = null, chung = null, nhieu = null;
+let tiengBat = true;
+try { tiengBat = localStorage.getItem(TIENG_KEY) !== '0'; } catch (e) {}
+let lanTum = 0, demTum = 0, demKeu = 0, tConTrung = 0;
+
+const ben = (x) => Math.max(-.8, Math.min(.8, (x / W - .5) * 1.7));   // trái phải theo chỗ trên hồ
+
+function moTieng() {
+  if (ac) { if (tiengBat && ac.state === 'suspended') ac.resume(); return; }
+  const AC = self.AudioContext || self.webkitAudioContext;
+  if (!AC) return;
+  try { ac = new AC(); } catch (e) { ac = null; return; }
+
+  nhieu = ac.createBuffer(1, Math.floor(ac.sampleRate * 1.5), ac.sampleRate);
+  const d = nhieu.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+
+  chung = ac.createGain();
+  chung.gain.setValueAtTime(.0001, ac.currentTime);
+  chung.gain.linearRampToValueAtTime(tiengBat ? MUC : .0001, ac.currentTime + 2);   // vào từ từ, không giật
+  chung.connect(ac.destination);
+
+  const s = ac.createBufferSource(); s.buffer = nhieu; s.loop = true;   // nền nước và gió
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 400; lp.Q.value = .7;
+  const g = ac.createGain(); g.gain.value = .055;
+  const lfo = ac.createOscillator(); lfo.frequency.value = .055;        // lọc chạy chậm cho nền thở
+  const lg = ac.createGain(); lg.gain.value = 170;
+  lfo.connect(lg); lg.connect(lp.frequency);
+  s.connect(lp); lp.connect(g); g.connect(chung);
+  s.start(); lfo.start();
+}
+
+function dongTieng() {
+  if (!ac) return;
+  try {
+    chung.gain.cancelScheduledValues(ac.currentTime);
+    chung.gain.setValueAtTime(chung.gain.value, ac.currentTime);
+    chung.gain.linearRampToValueAtTime(.0001, ac.currentTime + .35);
+    setTimeout(() => { if (ac && ac.state === 'running') ac.suspend(); }, 420);
+  } catch (e) {}
+}
+
+function batTat() {
+  tiengBat = !tiengBat;
+  try { localStorage.setItem(TIENG_KEY, tiengBat ? '1' : '0'); } catch (e) {}
+  const n = tam && tam.querySelector('.ho-tieng');
+  if (n) {
+    n.classList.toggle('tat', !tiengBat);
+    n.setAttribute('aria-label', tiengBat ? 'Tắt tiếng' : 'Mở tiếng');
+    n.innerHTML = tiengBat ? LOA_MO : LOA_TAT;
+  }
+  if (!ac) { if (tiengBat) moTieng(); return; }
+  if (tiengBat) {
+    if (ac.state === 'suspended') ac.resume();
+    chung.gain.cancelScheduledValues(ac.currentTime);
+    chung.gain.setValueAtTime(Math.max(.0001, chung.gain.value), ac.currentTime);
+    chung.gain.linearRampToValueAtTime(MUC, ac.currentTime + .5);
+  } else dongTieng();
+}
+
+/* Tiếng nước: nhiễu qua bandpass quét xuống, cộng một cái "tinh" tụt cao độ. */
+function tum(x, manh) {
+  if (!ac || !tiengBat || ac.state !== 'running' || manh < .15) return;
+  const t0 = ac.currentTime;
+  if (t0 - lanTum < .04) return;                        // gợn dồn dập thì bỏ bớt cho khỏi rào
+  lanTum = t0; demTum++;
+  const v = Math.min(1, manh), p = ac.createStereoPanner();
+  p.pan.value = ben(x); p.connect(chung);
+
+  const s = ac.createBufferSource(); s.buffer = nhieu;
+  s.playbackRate.value = .8 + Math.random() * .5;
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 1.2;
+  bp.frequency.setValueAtTime(1300 + Math.random() * 900, t0);
+  bp.frequency.exponentialRampToValueAtTime(340, t0 + .11);
+  const g = ac.createGain();
+  g.gain.setValueAtTime(.0001, t0);
+  g.gain.linearRampToValueAtTime(.08 * v, t0 + .006);
+  g.gain.exponentialRampToValueAtTime(.0008, t0 + .14);
+  s.connect(bp); bp.connect(g); g.connect(p);
+  s.start(t0); s.stop(t0 + .22);
+
+  const o = ac.createOscillator(); o.type = 'sine';
+  o.frequency.setValueAtTime(850 + Math.random() * 520, t0);
+  o.frequency.exponentialRampToValueAtTime(300, t0 + .09);
+  const og = ac.createGain();
+  og.gain.setValueAtTime(.055 * v, t0);
+  og.gain.exponentialRampToValueAtTime(.0006, t0 + .1);
+  o.connect(og); og.connect(p);
+  o.start(t0); o.stop(t0 + .12);
+}
+
+/* Tiếng ộp: cưa qua bandpass, biên độ băm thành 3–6 xung, cao độ tụt dần cuối câu. */
+function keu(e) {
+  if (!ac || !tiengBat || ac.state !== 'running') return;
+  const t0 = ac.currentTime, f0 = e.giong;
+  demKeu++;
+  const o = ac.createOscillator(); o.type = 'sawtooth';
+  const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f0 * 3.1; bp.Q.value = 4;
+  const g = ac.createGain(); g.gain.value = 0;
+  const p = ac.createStereoPanner(); p.pan.value = ben(e.x);
+  o.connect(bp); bp.connect(g); g.connect(p); p.connect(chung);
+
+  e.nghiKeu = rnd(9000, 22000); e.henKeu = 0;
+  const so = 3 + Math.floor(Math.random() * 4), nhip = .055 + Math.random() * .035;
+  for (let i = 0; i < so; i++) {
+    const t = t0 + i * nhip;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(.11 * (1 - i / (so + 3)), t + .012);
+    g.gain.linearRampToValueAtTime(0, t + nhip * .74);
+  }
+  o.frequency.setValueAtTime(f0, t0);
+  o.frequency.linearRampToValueAtTime(f0 * .9, t0 + so * nhip);
+  o.start(t0); o.stop(t0 + so * nhip + .12);
+
+  for (const k of ech) {                                // một con bên cạnh đáp lời, vừa đủ thành câu đối đáp
+    if (k === e || !nguoi(k) || k.henKeu > 0 || k.nghiKeu > 0) continue;
+    if (Math.hypot(k.x - e.x, k.y - e.y) < 220 && Math.random() < .4) { k.henKeu = rnd(300, 900); break; }
+  }
+}
+
+/* Tiếng cá đớp, tiếng lưỡi, tiếng côn trùng đêm. */
+function thup(x) {
+  if (!ac || !tiengBat || ac.state !== 'running') return;
+  const t0 = ac.currentTime;
+  const s = ac.createBufferSource(); s.buffer = nhieu; s.playbackRate.value = .6;
+  const lp = ac.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 230;
+  const g = ac.createGain();
+  g.gain.setValueAtTime(.0001, t0);
+  g.gain.linearRampToValueAtTime(.11, t0 + .01);
+  g.gain.exponentialRampToValueAtTime(.0008, t0 + .16);
+  const p = ac.createStereoPanner(); p.pan.value = ben(x);
+  s.connect(lp); lp.connect(g); g.connect(p); p.connect(chung);
+  s.start(t0); s.stop(t0 + .2);
+}
+
+function tach(x) {
+  if (!ac || !tiengBat || ac.state !== 'running') return;
+  const t0 = ac.currentTime;
+  const s = ac.createBufferSource(); s.buffer = nhieu; s.playbackRate.value = 1.6;
+  const hp = ac.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 2200;
+  const g = ac.createGain();
+  g.gain.setValueAtTime(.0001, t0);
+  g.gain.linearRampToValueAtTime(.045, t0 + .003);
+  g.gain.exponentialRampToValueAtTime(.0006, t0 + .04);
+  const p = ac.createStereoPanner(); p.pan.value = ben(x);
+  s.connect(hp); hp.connect(g); g.connect(p); p.connect(chung);
+  s.start(t0); s.stop(t0 + .06);
+}
+
+function conTrung() {
+  if (!ac || !tiengBat || ac.state !== 'running') return;
+  const t0 = ac.currentTime, f = 3800 + Math.random() * 1200, so = 3 + Math.floor(Math.random() * 3);
+  const p = ac.createStereoPanner(); p.pan.value = rnd(-.7, .7); p.connect(chung);
+  for (let i = 0; i < so; i++) {
+    const t = t0 + i * .052;
+    const s = ac.createBufferSource(); s.buffer = nhieu; s.playbackRate.value = 1.4;
+    const bp = ac.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = f; bp.Q.value = 14;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.linearRampToValueAtTime(.03, t + .004);
+    g.gain.exponentialRampToValueAtTime(.0004, t + .022);
+    s.connect(bp); bp.connect(g); g.connect(p);
+    s.start(t); s.stop(t + .04);
+  }
 }
 
 function vong(t) {
@@ -949,6 +1137,8 @@ function buoc(t) {
   if (tDan <= 0) { mucBo = MUC_BO(); tDan = rnd(50000, 110000); }   // chừng một hai phút lại đổi mùa
   tBo -= dt;
   if (tBo <= 0) { themBo(); tBo = rnd(16000, 34000) / mucBo; }      // mùa rộ 8–18 giây một con, mùa vắng gần hai phút
+  tConTrung -= dt;
+  if (tConTrung <= 0) { conTrung(); tConTrung = rnd(18000, 45000); }
   tCa -= dt;
   if (tCa <= 0) { themCa(); tCa = rnd(45000, 110000); }
   buocBo(dt); buocCa(dt); buocTrung(dt); buocNong(dt);
@@ -974,11 +1164,14 @@ function mo() {
   mucBo = MUC_BO(); tDan = rnd(50000, 110000);
   luong.goc = luong.gocDich = rnd(0, 6.284); luong.toc = luong.tocDich = rnd(.4, 2.4);
   luong.xoay = luong.xoayDich = rnd(-1.5, 1.5); luong.t = rnd(20000, 45000);
+  tConTrung = rnd(8000, 20000);
+  if (tiengBat) moTieng();
   tTruoc = performance.now();
   if (!raf) raf = requestAnimationFrame(vong);
 }
 
 function dong() {
+  dongTieng();
   if (raf) { cancelAnimationFrame(raf); raf = null; }
   if (tam) tam.classList.remove('hien');
   song = [];
@@ -986,6 +1179,11 @@ function dong() {
 }
 
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
+addEventListener('visibilitychange', () => {            // chuyển tab thì ngưng, đỡ tốn pin
+  if (!ac) return;
+  if (document.hidden) { if (ac.state === 'running') ac.suspend(); }
+  else if (tiengBat && tam && tam.classList.contains('hien') && ac.state === 'suspended') ac.resume();
+});
 self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _cham: (x, y) => { themSong(x, y, 1); const con = echTai(x, y); if (con) giatMinh(con, x, y); },
   _trungEch: (x, y) => !!echTai(x, y),
@@ -1002,6 +1200,9 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _nong: () => nong.map(n => ({ x: Math.round(n.x), y: Math.round(n.y), s: +n.s.toFixed(1), vot: Math.round(n.vot) })),
   _themCa: (x, y, so = 1) => { ca = []; themCa(so); const c = ca[0]; if (c && x !== undefined) { c.x = x; c.y = y; } return !!c; },
   _themBo: (x, y) => { themBo(1); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
+  _tieng: () => ({ co: !!ac, trangThai: ac ? ac.state : null, bat: tiengBat,
+                   muc: ac ? +chung.gain.value.toFixed(3) : null, tum: demTum, keu: demKeu }),
+  _batTat: () => batTat(),
   _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2), xoay: +luong.xoay.toFixed(2) }),
   _dam: () => ({ trung: trung.length, nong: nong.length, an: ech.reduce((n, e) => n + e.an, 0),
                  no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2) }),

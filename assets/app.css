@@ -187,6 +187,11 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 
 /* ---------- hồ nước ---------- */
 .ho-cv{touch-action:none;cursor:default}
+.ho-tieng{position:absolute;z-index:8;top:calc(env(safe-area-inset-top,0px) + 14px);left:16px;
+  width:34px;height:34px;border-radius:50%;cursor:pointer;display:grid;place-items:center;
+  border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.32);color:var(--ink)}
+.ho-tieng:hover{background:rgba(255,255,255,.12)}
+.ho-tieng.tat{color:rgba(244,239,230,.42)}
 .ho-cv.tro{cursor:pointer}          /* đang trỏ vào một con ếch */
 
 /* ---------- hộp thở ---------- */
