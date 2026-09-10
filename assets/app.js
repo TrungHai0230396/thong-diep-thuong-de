@@ -23,6 +23,7 @@ const HINH_SAO = {
   hoa:       'M12 2.4a3.4 3.4 0 013.3 4.2 3.4 3.4 0 012.1 5.4 3.4 3.4 0 01-2.1 5.4A3.4 3.4 0 0112 21.6a3.4 3.4 0 01-3.3-4.2 3.4 3.4 0 01-2.1-5.4 3.4 3.4 0 012.1-5.4A3.4 3.4 0 0112 2.4zm0 6a3.6 3.6 0 100 7.2 3.6 3.6 0 000-7.2z',
   tia:       'M12 1l1.9 7.2 5.4-4-4 5.4L22.5 12l-7.2 1.9 4 5.4-5.4-4L12 22.5l-1.9-7.2-5.4 4 4-5.4L1.5 12l7.2-1.9-4-5.4 5.4 4z',
   giot:      'M12 2.2c3.6 4.6 6.4 8.1 6.4 11.4A6.4 6.4 0 1 1 5.6 13.6c0-3.3 2.8-6.8 6.4-11.4z',
+  sao6:      'M12 1.6l2.2 5.4 5.8-1.2-3.6 4.6 3.6 4.6-5.8-1.2-2.2 5.4-2.2-5.4-5.8 1.2 3.6-4.6-3.6-4.6 5.8 1.2z',
 };
 
 const SAO = [
@@ -36,6 +37,8 @@ const SAO = [
     duong: 'hoi-tho',   khung: '.hopho',   mun: 'TDTD_THO' },
   { id: 'sao-chom', mau: '#f2ead0', hinh: 'sao4',      nhan: 'Nối sao thành chòm',
     duong: 'noi-sao',  khung: '.chomsao', mun: 'TDTD_CHOMSAO' },
+  { id: 'sao-gotu', mau: '#e9a9c0', hinh: 'sao6',      nhan: 'Gõ từ tiếng Anh, gõ tới đâu học tới đó',
+    duong: 'go-tu',    khung: '.gotu',    mun: 'TDTD_GOTU' },
 ];
 
 

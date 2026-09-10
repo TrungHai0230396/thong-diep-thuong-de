@@ -51,6 +51,7 @@ Gửi cho ai một trong những địa chỉ này là họ mở thẳng vào tr
 | Hồ sen | `#ho-sen` |
 | Hộp thở | `#hoi-tho` |
 | Nối sao thành chòm | `#noi-sao` |
+| Gõ từ tiếng Anh | `#go-tu` |
 
 Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và tự chạy được cả khi mất mạng. Bấm ngôi sao thì địa chỉ tự đổi theo, **đóng trò thì địa chỉ trở về trang chủ**. Nút Back của điện thoại cũng đóng trò lại chứ không thoát hẳn khỏi app.
 
@@ -296,6 +297,24 @@ Nay cá phóng từ 95 pixel, bơi 46–66 px/s, và nòng nọc vọt xong ph�
 
 Thẻ bọc màn hình lúc đang ẩn có bề rộng bằng 0, mọi toạ độ tính từ đó thành vô định rồi canvas ném lỗi. Cả năm màn hình phủ kín đều đã chặn: lấy tạm kích thước cửa sổ cho tới khi trang bày xong.
 
+## Gõ từ tiếng Anh
+
+Một ngôi sao hồng nhạt, `#go-tu`. Chọn cấp rồi gõ luôn, mỗi lượt hai mươi từ. Một từ tiếng Anh hiện giữa màn hình, nghĩa tiếng Việt ngay dưới; gõ đúng chữ nào thì chữ đó sáng hồng, chữ đang tới có gạch chân nhấp nháy. **Gõ sai thì chữ không chạy**, chỉ rung một cái — không chặn đường, gõ lại chữ đúng là qua, nên không ai kẹt ở một từ. Hết hai mươi từ thì xem lại: ký tự mỗi phút, từ mỗi phút, tỉ lệ gõ đúng, và **mấy từ vấp nhiều nhất kèm nghĩa** để ngó lại một lượt trước khi gõ tiếp.
+
+Có nút loa đọc từ lên bằng giọng máy sẵn trong trình duyệt (`speechSynthesis`, giọng `en-US`, tốc độ 0,85). Không nhúng file âm thanh nào, máy nào không có thì nút tự im chứ không lỗi.
+
+**Vốn từ không tự bịa.** Lấy từ [NGSL 1.2](https://www.newgeneralservicelist.com/) — New General Service List của Browne, Culligan & Phillips, bản tháng 4/2023: 2 801 từ gốc rút từ 273 triệu từ của Cambridge English Corpus, phủ hơn 92% văn bản tiếng Anh thông thường. Danh sách chia sẵn ba dải tần suất 1000 / 2000 / 3000 nên **ba cấp ở đây chính là ba dải đó**, giữ nguyên thứ tự tần suất, cấp một là những từ hay gặp nhất. Mỗi cấp lấy 120 từ đầu dải sau khi bỏ:
+
+- từ chức năng (`the`, `of`, `to`, `and`…) — dịch lẻ ra thì vô nghĩa mà gõ cũng chẳng học được gì
+- từ dưới ba chữ cái — gõ một hai phím thì không thành bài tập
+- vài từ không hợp giọng một app tĩnh tâm
+
+Nghĩa tiếng Việt lấy nghĩa thông dụng nhất; từ nào hai nghĩa hay dùng ngang nhau thì ghi cả hai, ngăn bằng dấu chấm phẩy — `content` là "nội dung; hài lòng", `pupil` là "học trò; con ngươi". `scripts/test-typing.js` soát lại toàn bộ 360 từ: không dòng hỏng, không trùng từ trong một cấp, không từ nào xuất hiện ở hai cấp.
+
+**Đo tốc độ cho thành thật.** Bấm giờ từ phím đầu tiên tới phím cuối cùng, rồi **trừ đi** mấy quãng 380 mili giây nghỉ giữa các từ — quãng đó là app chèn vào cho kịp nhìn chữ vừa xong sáng lên, tính vào thì hoá ra chê người ta gõ chậm. Và ghi thẳng cái đo được chứ không mượn quy ước "năm ký tự là một từ" của mấy bài test gõ tiếng Anh: mượn thì con số không khớp với cái tên tiếng Việt bên dưới nó.
+
+**Bàn phím điện thoại.** Một ô nhập ẩn giữ tiêu điểm để gọi bàn phím lên; cỡ chữ đặt 16px để iOS đừng tự phóng to trang. Ô đó nhận **cả chuỗi** chứ không chỉ chữ cuối, vì bàn phím điện thoại gõ vuốt hay chọn gợi ý thì chèn nguyên một từ trong một lần — lấy mỗi chữ cuối là mất sạch phần đầu.
+
 ## Hồ vẫn sống khi không nhìn tab
 
 Trình duyệt dừng vòng vẽ khi tab bị ẩn, nên trước đây thời gian trong hồ đứng luôn: chuyển tab đi mười phút, quay lại thì ếch vẫn y nguyên.
@@ -373,6 +392,7 @@ sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên m�
 scripts/build-data.py      CSV -> data/cards.json
 scripts/test-core.js       29 kiểm thử lõi
 scripts/test-pond.js       26 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
+scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 content/raw/               CSV nguồn (v3 và v5)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
@@ -385,6 +405,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 29 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 26 kiểm thử hồ, gồm một tiếng mô phỏng
+node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 ```
 
 ## Sửa chính tả trong nguồn
