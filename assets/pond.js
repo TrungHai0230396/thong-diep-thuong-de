@@ -135,6 +135,17 @@ function veLa(l, t) {
    Lá không nhích chỗ bao giờ, nên bỏ một chiếc là mọi chỉ số lá của ếch phải dời theo. */
 
 const SO_LA = 8;                                        // đông hơn nữa thì kín mặt nước
+const luong = { goc: 0, toc: 1, gocDich: 0, tocDich: 1, t: 0 };  // dòng nước chung, đổi hướng rất chậm
+
+function buocLuong(dt) {
+  luong.t -= dt;
+  if (luong.t <= 0) {                                    // chừng một hai phút lại đổi hướng và sức
+    luong.gocDich = rnd(0, 6.284); luong.tocDich = rnd(.4, 2.6); luong.t = rnd(45000, 95000);
+  }
+  const lech = Math.atan2(Math.sin(luong.gocDich - luong.goc), Math.cos(luong.gocDich - luong.goc));
+  luong.goc += lech * Math.min(1, dt / 9000);            // quay từ từ, không giật
+  luong.toc += (luong.tocDich - luong.toc) * Math.min(1, dt / 6000);
+}
 const DOI_LA = () => rnd(240000, 420000);               // một chiếc lá sống 4–7 phút
 const R_LA = () => rnd(26, 50);                         // lớn hết thì được chừng đó
 const R_MAM = 13;                                       // lúc mới nhú
@@ -143,8 +154,31 @@ const TAN = 5000;                                       // tàn trong 5 giây
 
 const coLa = (x, y, rMax, tuoi, cuong) => ({
   x, y, rMax, r: R_MAM, goc: rnd(0, 6.28), nhun: 0, lun: 0, chim: 0,
+  vx: 0, vy: 0, quay: rnd(-.03, .03),                   // trôi theo dòng, và quay rất chậm
   tuoi, doiSong: DOI_LA(), tNhanh: rnd(30000, 70000), chet: null, cuong,
 });
+
+/* Lá trôi: dòng nước đẩy chung một hướng, lá nào đè lá nào thì đẩy nhau ra, và dạt tới mép thì
+   bị đẩy vào. Nhờ vế đẩy nhau mà đám lá tụ lại rồi lại giãn ra, không dính chùm mãi. */
+function troiLa(l, dt) {
+  const g = dt / 1000;
+  const nhe = 1 + (1 - l.r / 50) * .6;                  // lá nhỏ nhẹ hơn nên trôi nhanh hơn một chút
+  let ax = Math.cos(luong.goc) * luong.toc * nhe, ay = Math.sin(luong.goc) * luong.toc * nhe;
+  for (const k of la) {
+    if (k === l) continue;
+    const dx = l.x - k.x, dy = l.y - k.y, d = Math.hypot(dx, dy) || 1, cham = (l.r + k.r) * .98;
+    if (d < cham) { const f = (cham - d) * .3; ax += dx / d * f; ay += dy / d * f; }
+  }
+  const t = W * .08, ph = W * .92, tr = H * .12, du = H * .92;   // mép hồ
+  if (l.x < t) ax += (t - l.x) * .5;
+  if (l.x > ph) ax += (ph - l.x) * .5;
+  if (l.y < tr) ay += (tr - l.y) * .5;
+  if (l.y > du) ay += (du - l.y) * .5;
+  l.vx += (ax - l.vx) * Math.min(1, dt / 800);
+  l.vy += (ay - l.vy) * Math.min(1, dt / 800);
+  l.x += l.vx * g; l.y += l.vy * g;
+  l.goc += l.quay * g;
+}
 
 /* Chỗ nhú lá con: cách mép lá mẹ một quãng, không đè lá nào, không lọt ra ngoài. */
 function choNhu(me) {
@@ -163,6 +197,8 @@ function choNhu(me) {
    nếu không nó sẽ đáp xuống chỗ trống rồi ngồi trên mặt nước. */
 function boLa(i) {
   const mat = ech.filter(e => e.la === i || e.dich === i);
+  const laMat = la[i];
+  for (const k of la) if (k.cuong && k.cuong.me === laMat) k.cuong = null;   // lá mẹ mất thì cuống rụng
   la.splice(i, 1);
   for (const e of ech) {
     if (e.la > i) e.la--;
@@ -187,8 +223,10 @@ function donKhachTro(l, i) {
 }
 
 function buocLa(dt) {
+  buocLuong(dt);
   for (let i = la.length - 1; i >= 0; i--) {
     const l = la[i];
+    troiLa(l, dt);
     l.tuoi += dt;
     l.r = Math.min(l.rMax, R_MAM + (l.rMax - R_MAM) * Math.min(1, l.tuoi / LON));   // lớn dần
     if (l.cuong) { l.cuong.t += dt; if (l.cuong.t > 20000) l.cuong = null; }        // cuống nhánh rụng đi
@@ -206,7 +244,7 @@ function buocLa(dt) {
       if (l.r >= 34 && la.length < SO_LA) {
         const cho = choNhu(l);
         if (cho) {
-          la.push(coLa(cho[0], cho[1], R_LA(), 0, { x: l.x, y: l.y, t: 0 }));
+          la.push(coLa(cho[0], cho[1], R_LA(), 0, { me: l, t: 0 }));
           themSong(cho[0], cho[1], .16);
         }
       }
@@ -223,12 +261,13 @@ function veCuong() {                                    // cuống nối lá m�
     if (!l.cuong) continue;
     const a = (1 - l.cuong.t / 20000) * .3;
     if (a <= .01) continue;
+    const m = l.cuong.me, mx = m.x, my = yLa(m);
     ctx.strokeStyle = `rgba(120,170,130,${a})`;
     ctx.lineWidth = Math.max(1, l.r * .07);
     ctx.beginPath();
-    ctx.moveTo(l.cuong.x, l.cuong.y);
-    const gx = (l.cuong.x + l.x) / 2, gy = (l.cuong.y + l.y) / 2;
-    ctx.quadraticCurveTo(gx + (l.y - l.cuong.y) * .12, gy - (l.x - l.cuong.x) * .12, l.x, yLa(l));
+    ctx.moveTo(mx, my);
+    const gx = (mx + l.x) / 2, gy = (my + l.y) / 2;
+    ctx.quadraticCurveTo(gx + (l.y - my) * .12, gy - (l.x - mx) * .12, l.x, yLa(l));
     ctx.stroke();
   }
 }
@@ -913,6 +952,7 @@ function mo() {
   song = []; tMua = 900;
   bo = []; trung = []; nong = []; ca = []; tBo = rnd(4000, 9000); tCa = rnd(20000, 45000);
   mucBo = MUC_BO(); tDan = rnd(50000, 110000);
+  luong.goc = luong.gocDich = rnd(0, 6.284); luong.toc = luong.tocDich = rnd(.4, 2.6); luong.t = rnd(45000, 95000);
   tTruoc = performance.now();
   if (!raf) raf = requestAnimationFrame(vong);
 }
@@ -941,6 +981,7 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t),
   _nong: () => nong.map(n => ({ x: Math.round(n.x), y: Math.round(n.y), s: +n.s.toFixed(1), vot: Math.round(n.vot) })),
   _themCa: (x, y, so = 1) => { ca = []; themCa(so); const c = ca[0]; if (c && x !== undefined) { c.x = x; c.y = y; } return !!c; },
   _themBo: (x, y) => { themBo(1); const b = bo[bo.length - 1]; if (b && x !== undefined) { b.x = x; b.y = y; } return !!b; },
+  _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2) }),
   _dam: () => ({ trung: trung.length, nong: nong.length, an: ech.reduce((n, e) => n + e.an, 0),
                  no: ech.map(e => +e.nl.toFixed(2)), mucBo: +mucBo.toFixed(2) }),
   _giaDi: (ms) => { for (const e of ech) { e.tuoi += ms; e.tChuKy += ms; } return ech.length; },

@@ -83,6 +83,14 @@ Trên lá có bốn con ếch lúc mở màn. Chạm đúng vào con nào thì c
 
 **Lá chìm.** Sức chở của lá chia theo bán kính, mỗi 6 px thêm một con: 26–31 px chịu 2 con, 32–37 px chịu 3, 38–43 px chịu 4, từ 44 px chịu 5. Chiếc lá đầu tiên luôn được rải to (44–50 px). Dồn quá sức thì lá lún dần chừng một giây rưỡi, nước loang lên mặt lá, rồi **con lên sau cùng bị tuột xuống nước**: nó bơi 54 px mỗi giây sang chiếc lá gần nhất còn chỗ rồi trèo lên, thân ngập nước chỉ còn cái đầu nhô lên, hai chân đạp nước và để lại vệt sóng.
 
+**Lá trôi.** Lá không đứng một chỗ. Cả hồ có một **dòng nước chung**: hướng và sức đổi ngẫu nhiên mỗi 45–95 giây (sức 0,4–2,6 px mỗi giây), nhưng quay rất chậm chứ không giật, nên đám lá dạt dần về một phía. Lá nhỏ nhẹ hơn nên trôi nhanh hơn chút, và mỗi chiếc còn tự quay quanh trục rất chậm (±0,03 radian mỗi giây).
+
+Chỗ quan trọng để lá **không dính chùm mãi**: hai chiếc đè nhau thì đẩy nhau ra, mỗi pixel chồng lên nhau sinh 0,3 px/giây đẩy ngược. Nhờ vậy đám lá tụ về một góc theo dòng rồi lại tự giãn ra. Dạt tới mép thì bị đẩy vào, nên tâm lá luôn nằm trong khoảng 8–92% bề ngang và 12–92% bề cao.
+
+Ếch ngồi trên lá tự trôi theo, vì mỗi khung hình nó được đặt lại theo tâm lá cộng với chỗ đậu của nó. Cuống nối lá con với lá mẹ giữ **tham chiếu tới lá mẹ** chứ không giữ toạ độ chết, nên lá mẹ trôi thì cuống vẫn dính đúng chỗ; lá mẹ tàn thì cuống rụng theo.
+
+Đo 30 phút: lá đi khắp hồ (một chiếc từ toạ độ 250×862 sang 558×186), có 213 lượt mẫu thấy lá đè nhau nhưng sâu nhất chỉ 10 px và đều tự tách ra, không chiếc nào lọt khỏi khung, và ếch vẫn không con nào lệch khỏi lá của nó.
+
 **Đời của chiếc lá.** Lá không phải cái sân cố định, nó cũng sinh ra rồi tàn đi:
 
 - Mỗi chiếc có cỡ tối đa riêng 26–50 px và **tuổi thọ 4–7 phút**. Năm chiếc lúc mở màn được cho tuổi lệch nhau (10–55% một đời) nên không tàn cùng lúc.
