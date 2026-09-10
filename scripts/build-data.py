@@ -99,12 +99,26 @@ def giong_nhau(a, b):
     return len(A & B) / max(1, len(A | B))
 
 
+def bo_con(msg, mean):
+    t = THAY.get(msg)
+    return (t["thong_diep"], t["y_nghia"]) if t else (msg, mean)
+
+
 def doc_csv(path):
     with open(path, encoding="utf-8-sig") as fh:
         return [r for r in csv.DictReader(fh) if (r.get("ID") or "").strip()]
 
 
+# Bỏ chữ "con" (đại từ ngôi hai) khỏi thông điệp và lời giảng. Không thay bằng "bạn" — cách
+# đó làm mất giọng Thượng đế đang nói. Chủ yếu là **lược hẳn đại từ đi**, tiếng Việt lược chủ
+# ngữ rất tự nhiên; chỗ nào bắt buộc phải có thì dùng "mình". Chữ "Ta" (Thượng đế tự xưng) thì
+# giữ. Từ ghép "con người", "con đường", "con tim", "con cái", "trẻ con" không phải đại từ nên
+# cũng giữ. Bảng khoá bằng **câu gốc** chứ không bằng id, vì id phụ thuộc thứ tự gộp hai nguồn.
+BO_CON = os.path.join(ROOT, "content/bo-chu-con.json")
+THAY = json.load(open(BO_CON, encoding="utf-8")) if os.path.exists(BO_CON) else {}
+
 cards, notes, warn = [], [], []
+goc_cu = []                                             # câu gốc của nguồn 1, dùng để so trùng
 
 # ---- nguồn 1: bộ 100 lá đang chạy, giữ nguyên thứ tự và nội dung ----
 for r in doc_csv(CU):
@@ -112,13 +126,17 @@ for r in doc_csv(CU):
     msg, mean = clean(r["Thông điệp"]), clean(r["Ý nghĩa"])
     for find, rep in FIXES.get(cid, []):
         msg, mean = msg.replace(find, rep), mean.replace(find, rep)
-    cards.append({"id": len(cards) + 1, "thong_diep": cham(msg), "y_nghia": cham(mean)})
+    goc_cu.append(cham(msg))
+    msg, mean = bo_con(cham(msg), cham(mean))
+    cards.append({"id": len(cards) + 1, "thong_diep": msg, "y_nghia": mean})
     notes.append({"id": len(cards), "nguon": f"v6#{cid}", "co_che_game": clean(r.get("Cơ chế game", ""))})
 
 so_cu = len(cards)
 
 # ---- nguồn 2: bóc đuôi ngày, gom trùng, bỏ câu đã có, thay lời giảng bị dán mẫu ----
-da_co, bo_trung, bo_dup, thay_giang = [c["thong_diep"] for c in cards], 0, 0, 0
+# So trùng phải lấy **câu gốc** của nguồn 1, không lấy câu đã bỏ chữ "con": nguồn 2 còn nguyên
+# chữ "con", đem so với bản đã sửa thì hai bên lệch từ, điểm giống tụt xuống và câu trùng lọt qua.
+da_co, bo_trung, bo_dup, thay_giang = goc_cu, 0, 0, 0
 thay_ngay = 0
 seen = set()
 for r in doc_csv(MOI):
@@ -141,7 +159,8 @@ for r in doc_csv(MOI):
             warn.append(f"nguồn 2 #{r['ID']} lời giảng bị dán mẫu mà chưa có bản viết riêng: {msg}")
             continue
         mean, thay_giang = rieng, thay_giang + 1
-    cards.append({"id": len(cards) + 1, "thong_diep": cham(msg), "y_nghia": cham(mean)})
+    msg, mean = bo_con(cham(msg), cham(mean))
+    cards.append({"id": len(cards) + 1, "thong_diep": msg, "y_nghia": mean})
     notes.append({"id": len(cards), "nguon": f"365#{r['ID']}", "co_che_game": clean(r.get("Cơ chế game", ""))})
 
 # ---- soát lại ----
@@ -157,6 +176,11 @@ for c in cards:
         warn.append(f"#{c['id']} còn sót lời giảng dán mẫu")
     if DUOI_NGAY.search(c["thong_diep"]):
         warn.append(f"#{c['id']} còn sót đuôi (Thông điệp ngày N)")
+
+CON = re.compile(r"(?<!trẻ )\bcon\b(?!\s*(?:người|đường|tim|số|vật|cái|mắt|thuyền|sông|chữ|dao|gà|trâu|cá|chim|thú))", re.I)
+for c in cards:
+    if CON.search(c["thong_diep"]) or CON.search(c["y_nghia"]):
+        warn.append(f"#{c['id']} còn sót chữ \"con\" làm đại từ")
 
 ids = [c["id"] for c in cards]
 assert ids == list(range(1, len(cards) + 1)), f"ID không liên tục: {ids[:5]}..."

@@ -345,6 +345,21 @@ Kết quả: 100 + 119 = **219 lá**. Khoảng cách gần nhất giữa hai l�
 
 Bốn phép thử mới giữ chỗ này: không lá nào lọt đuôi `(Thông điệp ngày N)`, không lá nào lọt lời giảng dán mẫu, không lời giảng nào bị dùng cho hai lá, và bộ bài đủ 219 lá.
 
+### Bỏ chữ "con"
+
+Cả bộ 219 lá không còn chữ **"con"** làm đại từ ngôi hai. 157 lá phải sửa, và không sửa bằng cách tìm-thay hàng loạt — thử một lượt bằng luật thì ra "Ta và giống nhau", "Bên bên trong có sẵn sức mạnh", "Vũ trụ không có luật lệ bắt buộc. hoàn toàn tự do lựa chọn cuộc đời mình". Nên 195 câu được viết lại từng câu một.
+
+Nguyên tắc:
+
+- **Lược hẳn đại từ** là chính. Tiếng Việt lược chủ ngữ rất tự nhiên: *"Con không cần phải làm gì để trở nên xứng đáng được yêu thương"* → *"Không cần phải làm gì để trở nên xứng đáng được yêu thương."*
+- Chỗ nào bắt buộc phải có đại từ thì dùng **"mình"**: *"Mọi câu trả lời con cần đều đã có sẵn trong tim con"* → *"Mọi câu trả lời cần tìm đều đã có sẵn trong tim mình."*
+- Câu nói về người nói chung thì dùng **"mỗi người"**: *"Con là một biểu hiện tuyệt đẹp và độc bản của sự sống"* → *"Mỗi người là một biểu hiện tuyệt đẹp và độc bản của sự sống."*
+- **Không** thay bằng "bạn", "em", "ngươi", "quý vị" — làm vậy là mất giọng Thượng đế đang nói, thành ra một người lạ khuyên nhủ.
+- Chữ **"Ta"** (Thượng đế tự xưng, 12 lá) thì giữ: *"Ta luôn trò chuyện với con qua trực giác"* → *"Ta vẫn luôn trò chuyện qua trực giác."*
+- Từ ghép **"con người", "con đường", "con tim", "con cái", "trẻ con"** không phải đại từ nên giữ nguyên. 12 lá còn chứa chúng.
+
+Bảng sửa nằm ở `content/bo-chu-con.json`, khoá bằng **câu gốc** chứ không bằng id — id phụ thuộc thứ tự gộp hai nguồn, câu gốc thì không. Ba phép thử mới trong `test-core.js` giữ chỗ này: không lá nào còn đại từ "con", không lá nào lỡ dùng "bạn"/"ngươi"/"quý vị", và từ ghép có chữ "con" vẫn còn nguyên.
+
 ## Gõ từ tiếng Anh
 
 Một ngôi sao hồng nhạt, `#go-tu`. Chọn cấp rồi gõ luôn, mỗi lượt hai mươi từ. Một từ tiếng Anh hiện giữa màn hình, nghĩa tiếng Việt ngay dưới; gõ đúng chữ nào thì chữ đó sáng hồng, chữ đang tới có gạch chân nhấp nháy. **Gõ sai thì chữ không chạy**, chỉ rung một cái — không chặn đường, gõ lại chữ đúng là qua, nên không ai kẹt ở một từ. Hết hai mươi từ thì xem lại: ký tự mỗi phút, từ mỗi phút, tỉ lệ gõ đúng, và **mấy từ vấp nhiều nhất kèm nghĩa** để ngó lại một lượt trước khi gõ tiếp.
@@ -438,7 +453,7 @@ assets/app.css             giao diện
 data/cards.json            219 lá dùng trong app (51 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
-scripts/test-core.js       32 kiểm thử lõi
+scripts/test-core.js       35 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
@@ -451,7 +466,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 32 kiểm thử lõi (Node 18+)
+node scripts/test-core.js        # chạy 35 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 ```

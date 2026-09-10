@@ -75,6 +75,21 @@ ok('không lọt lời giảng dán mẫu',
    !cards.some(c => c.y_nghia.includes('Hãy áp dụng sự tỉnh thức này')));
 ok('không lời giảng nào bị dùng lại cho hai lá',
    new Set(cards.map(c => c.y_nghia.toLowerCase())).size === cards.length);
+/* Bỏ hẳn đại từ "con" khỏi nội dung. Từ ghép "con người", "con đường", "con tim",
+   "con cái", "trẻ con" thì giữ — chúng không phải đại từ. */
+const DAI_TU_CON = /(?<!trẻ )\bcon\b(?!\s*(?:người|đường|tim|số|vật|cái|mắt|thuyền|sông|chữ|dao|gà|trâu|cá|chim|thú))/i;
+ok('không lá nào còn đại từ "con"', (() => {
+  const dinh = cards.filter(c => DAI_TU_CON.test(c.thong_diep) || DAI_TU_CON.test(c.y_nghia));
+  return dinh.length === 0;
+})(), (() => {
+  const dinh = cards.filter(c => DAI_TU_CON.test(c.thong_diep) || DAI_TU_CON.test(c.y_nghia));
+  return dinh.length ? `còn ${dinh.length} lá, ví dụ #${dinh[0].id}` : '';
+})());
+ok('không thay "con" bằng "bạn"/"ngươi"/"quý vị"',
+   !cards.some(c => /\b(ngươi|quý vị)\b/i.test(c.thong_diep + c.y_nghia)
+     || /\bbạn\b(?!\s*(?:thân|bè|đời))/i.test(c.thong_diep) && !/người bạn/i.test(c.thong_diep)));
+ok('từ ghép có chữ "con" vẫn được giữ',
+   cards.some(c => /\bcon người\b/i.test(c.thong_diep + c.y_nghia)));
 ok('không lọt "HEBs"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('HEBs')));
 ok('không lọt tên riêng "Kiên"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('Kiên')));
 ok('không còn ghi chú cơ chế game trong bundle', !cards.some(c => 'ghi_chu_thiet_ke' in c || 'co_che_game' in c));
