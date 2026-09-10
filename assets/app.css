@@ -291,3 +291,10 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   -webkit-tap-highlight-color:transparent}
 .nut-link svg{width:17px;height:17px}
 .nut-link:hover{background:rgba(255,255,255,.12)}
+
+/* báo đang tua nhanh trong hồ */
+.ho-nhanh{position:absolute;left:0;right:0;z-index:4;text-align:center;margin:0;pointer-events:none;
+  top:calc(env(safe-area-inset-top,0px) + 62px);
+  font-size:12px;letter-spacing:.14em;color:rgba(190,225,240,.6);
+  animation:tho-nhanh 1.4s ease-in-out infinite}
+@keyframes tho-nhanh{0%,100%{opacity:.35}50%{opacity:.85}}

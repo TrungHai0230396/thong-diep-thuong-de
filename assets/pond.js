@@ -36,12 +36,29 @@ function dungKhung() {
       n.huong = Math.atan2(n.y - y, n.x - x); n.vot = 620;
     }
   };
-  cv.addEventListener('pointerdown', cham);
+  /* Nhấn giữ một chỗ thì thời gian trong hồ trôi nhanh, thả ra là về nhịp thường.
+     Không thêm nút nào lên màn hình. Nhích tay quá 14 pixel thì coi như đang vẽ sóng, huỷ. */
+  let hen = null, diem0 = null;
+  const thoiNhanh = () => { clearTimeout(hen); hen = null; diem0 = null; nhanh = 1; hienNhanh(false); };
+
+  cv.addEventListener('pointerdown', e => {
+    cham(e);
+    diem0 = { x: e.clientX, y: e.clientY };
+    clearTimeout(hen);
+    hen = setTimeout(() => { nhanh = 8; hienNhanh(true); }, 620);
+  });
   cv.addEventListener('pointermove', e => {
+    if (diem0 && Math.hypot(e.clientX - diem0.x, e.clientY - diem0.y) > 14 && nhanh === 1) {
+      clearTimeout(hen); hen = null; diem0 = null;
+    }
+    if (nhanh > 1) return;                                // đang tua thì đừng vẽ thêm sóng
     if (e.buttons || e.pointerType === 'touch') { if (Math.random() < .28) cham(e); return; }
     const r = cv.getBoundingClientRect();                 // rê chuột không bấm: đổi con trỏ khi đi qua con ếch
     cv.classList.toggle('tro', !!echTai(e.clientX - r.left, e.clientY - r.top));
   });
+  cv.addEventListener('pointerup', thoiNhanh);
+  cv.addEventListener('pointercancel', thoiNhanh);
+  cv.addEventListener('pointerleave', thoiNhanh);
   addEventListener('resize', doCo);
 }
 
@@ -1176,6 +1193,18 @@ const tach = (x) => { if (ac && tiengBat) phat(mau.tach, .16, .9 + Math.random()
 const conTrung = () => { if (ac && tiengBat) phat(mau.de[Math.random() < .5 ? 0 : 1], .1, .96 + Math.random() * .09); };
 
 let tua = false;        // đang chạy bù thời gian: tính đủ, nhưng không vẽ và không kêu
+let nhanh = 1;          // hệ số tua nhanh khi người dùng nhấn giữ
+
+function hienNhanh(bat) {
+  if (!tam) return;
+  let n = tam.querySelector('.ho-nhanh');
+  if (bat && !n) {
+    n = document.createElement('p');
+    n.className = 'ho-nhanh';
+    n.textContent = 'thời gian đang trôi nhanh';
+    tam.appendChild(n);
+  } else if (!bat && n) n.remove();
+}
 let tAn = 0;            // lúc trang bị ẩn đi, đo bằng đồng hồ một chiều của trình duyệt
 
 /* Dùng performance.now() chứ không dùng Date.now().
@@ -1186,6 +1215,18 @@ const gio = () => performance.now();
 
 function vong(t) {
   raf = requestAnimationFrame(vong);
+  khung(t);
+}
+
+/* Một khung hình đầy đủ: mấy bước ngầm nếu đang tua nhanh, rồi một bước có vẽ. */
+function khung(t) {
+  const dt = Math.max(0, Math.min(34, t - tTruoc));
+  if (nhanh > 1 && dt > 0) {
+    tua = true;                                           // mấy bước ngầm: tính đủ, không vẽ, không kêu
+    for (let i = 1; i < nhanh; i++) buoc(tTruoc + dt);
+    tua = false;
+    tTruoc = t - dt;                                      // để bước vẽ cuối vẫn tiến đúng một nhịp
+  }
   buoc(t);
 }
 
@@ -1272,6 +1313,7 @@ function mo() {
 
 function dong() {
   dongTieng();
+  nhanh = 1; hienNhanh(false);
   if (raf) { cancelAnimationFrame(raf); raf = null; }
   if (tam) tam.classList.remove('hien');
   song = [];
@@ -1289,7 +1331,8 @@ addEventListener('visibilitychange', () => {
     if (ac && tiengBat && dangMo && ac.state === 'suspended') ac.resume();
   }
 });
-self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _buTru: (ms) => buTru(ms),
+self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTru: (ms) => buTru(ms),
+  _nhanh: (n) => { nhanh = n; hienNhanh(n > 1); return nhanh; },
   _cham: (x, y) => { themSong(x, y, 1); const con = echTai(x, y); if (con) giatMinh(con, x, y); },
   _trungEch: (x, y) => !!echTai(x, y),
   _ech: () => ech.map(e => ({ la: e.la, nhay: e.nhay, boi: e.boi, dich: e.dich,

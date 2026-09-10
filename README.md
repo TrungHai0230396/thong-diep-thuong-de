@@ -286,6 +286,16 @@ Chặn trên 20 phút để tab mở qua đêm không phải tua tám tiếng. Q
 
 Điều này chỉ đúng khi **trang còn mở**. Đóng hẳn app rồi mở lại thì hồ bắt đầu từ đầu, vì mốc thời gian chỉ nằm trong bộ nhớ. Muốn hồ già cả khi đóng app thì phải ghi mốc xuống máy, nhưng như vậy ngược với nguyên tắc không lưu gì.
 
+## Tua nhanh trong hồ
+
+**Nhấn giữ một chỗ trên mặt hồ chừng nửa giây thì thời gian trôi nhanh gấp tám lần**, thả tay là về nhịp thường. Dùng để xem trọn vòng đời mà không phải ngồi đợi: trứng nở thành nòng nọc, nòng nọc hoá ếch, lá sen mọc rồi tàn.
+
+Không thêm nút nào lên màn hình. Nhích tay quá 14 pixel thì coi như đang vẽ sóng nên huỷ, không đá nhau với thao tác chạm mặt nước. Trong lúc tua có một dòng chữ mờ ở trên báo cho biết.
+
+Cách chạy: mỗi khung hình chạy thêm bảy bước ngầm rồi mới vẽ một lần. Bảy bước ngầm dùng lại đúng cờ `tua` của phần chạy bù khi ẩn tab, nên không vẽ và không phát tiếng. Vật lý y hệt nhịp thường vì bước thời gian không đổi, chỉ là chạy nhiều bước hơn trong một khung.
+
+Đo thử: 120 khung ở nhịp thường cho 2 giây trong hồ, cũng 120 khung khi tua cho 16 giây, đúng 8 lần.
+
 ## Chia sẻ ảnh
 
 Nút **Chia sẻ ảnh** vẽ lá thông điệp thành PNG dọc 1080×1920, đúng khổ story của Facebook và Zalo. Mã ở `assets/share.js`.
