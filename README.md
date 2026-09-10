@@ -194,12 +194,34 @@ Nguồn: [Minnaert resonance](https://en.wikipedia.org/wiki/Minnaert_resonance),
 | Ruồi hoặc muỗi bay vào | 16–34 giây một tốp, chia cho mức mùa | Bay lượn thất thường, hay quẩn quanh mấy chiếc lá, có bóng nhỏ chạy theo dưới nước. Muỗi nhỏ hơn và có chân dài lêu nghêu |
 | Ếch ngắm | khi con bọ vào trong 4,2 lần thân | Ếch quay đầu nhìn theo. Con nào no gần đầy (trên 0,92) thì chẳng thèm, để dành cho con đói |
 | Phóng lưỡi | 0,3 giây | Vào trong 2,5 lần thân và đầu đã quay tới trong 0,6 radian thì lưỡi phóng ra, dính con bọ ở đầu lưỡi rồi kéo về. Nhảy giữa lúc đó thì nhả lưỡi, con bọ thoát |
-| Đẻ trứng | xét lại mỗi 35–60 giây | Tới hẹn mà mức no trên 0,6 thì đẻ một ổ **3–7 trứng** sát mép lá và trả 0,3 mức no. Còn đói thì khoan, mươi giây nữa xét lại |
+| Đẻ trứng | xét lại mỗi 35–60 giây | Tới hẹn mà mức no trên 0,6 thì đẻ một ổ **3–7 trứng** sát mép lá và trả 0,3 mức no. Còn đói thì khoan, mươi giây nữa xét lại. Cả đàn — ếch, nòng nọc, trứng — mà đã bằng số chỗ ngồi đám sen đang có thì cũng khoan |
 | Trứng nở | 20–26 giây | Mầm đen mọc đuôi rồi nở ra một đàn nòng nọc |
 | Nòng nọc lớn | 40–55 giây | Bơi lượn, thân to dần, quá 62% thời gian thì nhú hai chân sau. Chạm gần thì nó vọt đi tránh ngón tay |
-| Thành ếch | | Bơi tới chiếc lá còn chỗ rồi trèo lên. Hồ đã đủ 9 con thì nó chờ, mỗi lần 12 giây, chờ hết ba lần vẫn chật thì không qua được |
+| Thành ếch | | Lớn đủ ngày là lên bờ, không ai chặn. Bơi tới chiếc lá còn chỗ rồi trèo lên; cả hồ hết chỗ thì ở lại dưới nước |
 
 Thang thời gian đặt cho **một phiên chơi 5 phút thấy trọn vòng**. Đo ba phiên: con bọ đầu tiên hiện ở giây thứ 6–9, ếch phóng lưỡi ở giây 9–17, ổ trứng đầu tiên ở giây 44–59, nòng nọc ở giây 68–83, con ếch mới ở phút thứ **1,8–2,1**, và con đầu tiên chết ở phút thứ 2–2,8. Nghĩa là chơi hai phút là đã thấy hết chuỗi, năm phút thì thấy sang lứa sau.
+
+**Đông tới đâu là hồ tự nói.** Trước đây có hai cái trần tôi tự gõ vào: chặn cứng 9 con ếch, và quá 18 mống thì thôi không đẻ. Đo bốn hồ hai tiếng thì thấy trần đó không phải lưới an toàn mà **chính là dân số** — trung vị của hồ đúng bằng 9, 99% mẫu cũng bằng 9, mọi mùa rộ đều bị cắt cụt. Nó cũng không tiết kiệm máy: bỏ trần còn *rẻ hơn* (8,7 giây CPU cho hai tiếng so với 15,2), vì có trần thì mỗi tiếng gần 500 lượt nòng nọc nằm chờ 12 giây rồi chờ lại, tính mãi mà chẳng thành con nào. Và máy chưa bao giờ là vấn đề: lúc hồ trên 30 con, một khung hình tốn 0,187 ms, 99% dưới 0,66 ms, trong khi ngân sách 60 hình một giây là 16,7 ms.
+
+Nay chỉ còn một giới hạn, và nó do thế giới đặt: **cả đàn không quá số chỗ ngồi mà đám sen đang có**. Sen mọc thêm thì nuôi thêm được, sen tàn thì đàn tự thưa. So bốn cách trên bốn hồ hai tiếng mỗi hồ:
+
+| | trung vị | 90% dưới | 99% dưới | đỉnh |
+|---|---|---|---|---|
+| Trần 9 con + cửa 18 mống (cũ) | 9 | 9 | 9 | 9 |
+| Bỏ trần 9, giữ cửa 18 | 9 | 15 | 19 | 23 |
+| Bỏ cả hai, không giới hạn gì | 8 | 26 | 44 | 56 |
+| **Cửa = số chỗ ngồi trên sen** | **10** | 19 | 24 | 28 |
+
+Đàn đông hơn cũ và biên độ rộng gấp ba, mà đỉnh vẫn còn ra cái hồ. Bỏ sạch mọi giới hạn thì đỉnh lên 44–56 con, nhìn thành một tấm thảm ếch. Bảng này lặp lại được: chạy lại bản chọn trên bốn hồ khác cho đúng trung vị 10, 90% dưới 19, đỉnh 29.
+
+Chỗ thấy rõ nhất là **số ếch lúc dừng**, 16 hồ mỗi bản, mỗi hồ hai tiếng:
+
+```
+cũ : 9, 8, 9, 0, 9, 9, 9, 2, 9, 9, 5, 9, 8, 0, 9, 9      ← mười hồ dừng đúng ở trần
+mới: 0, 17, 0, 17, 21, 4, 9, 0, 13, 8, 11, 14, 5, 12, 10, 14
+```
+
+Còn tuyệt chủng hẳn — hết cả ếch lẫn nòng nọc lẫn trứng, không còn gì gây lại: cũ 2/16, mới 3/16. Mười sáu mẫu thì hai con số đó không phân biệt được, nên không kết luận bản nào bền hơn.
 
 **Hết chỗ trên lá thì ở lại dưới nước.** Mỗi chiếc lá chỉ chở được vài con: mầm mới nhú một con, lá 22–31 px hai con, lớn dần lên ba, bốn, và từ 44 px là năm. Trước đây hết chỗ thì con ếch vẫn cứ trèo lên chiếc lá đã đầy — lá lún xuống, nó tuột ra, lại trèo lên, quẩn mãi một vòng. Nay hết chỗ là **ở lại dưới nước**: nó nổi giữa hồ, khua chân giữ mình khỏi trôi dạt, giữ khoảng với mấy con nổi bên cạnh, hai giây rưỡi ngó quanh một lần xem có lá nào trống ra chưa. Nổi ngay mặt nước nên vẫn với tới con bọ bay thấp, và vẫn đói vẫn già vẫn chết như mọi con trên lá.
 

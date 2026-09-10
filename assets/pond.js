@@ -711,10 +711,10 @@ function veEch(e, t) {
    một ổ trứng bên mép lá, trứng nở ra nòng nọc, nòng nọc lớn dần rồi thành ếch con, bơi tới
    chiếc lá còn chỗ mà bám lên. Ngồi chơi lâu thì thấy trọn cả vòng. */
 
-const TOI_DA_ECH = 9;                                   // chặn cho khỏi chật màn hình, thường thì cái ăn giới hạn trước
 let bo = [], trung = [], nong = [], ca = [], tBo = 0, tCa = 0, mucBo = 1, tDan = 0;
 
 const demCon = () => ech.length + nong.length + trung.reduce((n, o) => n + o.n, 0);
+const tongCho = () => la.reduce((n, l) => n + (l.chet === null ? suc(l) : 0), 0);   // hồ này nuôi nổi mấy con
 
 /* ---- ruồi và muỗi ---- */
 
@@ -924,7 +924,12 @@ function veCa(t) {
 /* ---- trứng và nòng nọc ---- */
 
 function deTrung(e) {
-  if (demCon() >= 18) return false;                     // đông quá mức chịu được thì để đó, chưa đẻ
+  /* Đông tới đâu là **hồ tự nói**, không phải tôi gõ một con số vào. Cả đàn — ếch, nòng nọc,
+     trứng — không được quá số chỗ ngồi mà đám sen đang có: sen mọc thêm thì nuôi thêm được,
+     sen tàn thì đàn tự thưa đi. Trước đây chặn cứng ở 18 mống, và chặn cứng 9 con ếch nữa;
+     đo ra thì trung vị của hồ đúng bằng 9, nghĩa là cái trần đó không phải lưới an toàn mà
+     chính là dân số — mùa rộ nào cũng bị cắt cụt. */
+  if (demCon() >= tongCho()) return false;
   const l = la[e.la], g = rnd(0, 6.284);
   const gx = l ? l.x : e.x, gy = l ? yLa(l) : e.y, b = (l ? l.r : 20) + rnd(12, 24);
   const x = Math.max(16, Math.min(W - 16, gx + Math.cos(g) * b));
@@ -966,7 +971,7 @@ function veTrung(t) {
 }
 
 function themNong(x, y) {
-  nong.push({ x, y, huong: rnd(0, 6.284), toc: rnd(20, 30), s: 4.4, cho: 0,
+  nong.push({ x, y, huong: rnd(0, 6.284), toc: rnd(20, 30), s: 4.4,
               t: 0, doi: rnd(40000, 55000), pha: rnd(0, 6.28), vot: 0, moi: 0 });
 }
 
@@ -991,9 +996,7 @@ function buocNong(dt) {
     n.x += Math.cos(n.huong) * toc * g;
     n.y += Math.sin(n.huong) * toc * g;
     if (n.t >= n.doi) {
-      if (ech.length >= TOI_DA_ECH && n.cho < 3) { n.doi += 12000; n.cho++; continue; }   // hồ chật thì chờ, mỗi lần 12 giây
-      if (ech.length >= TOI_DA_ECH) { themSong(n.x, n.y, .14); nong.splice(i, 1); continue; }   // chờ hết một phút mà vẫn chật thì không qua được
-      thanhEch(n); nong.splice(i, 1);
+      thanhEch(n); nong.splice(i, 1);                    // lớn đủ ngày là lên bờ, không ai chặn
     }
   }
 }
@@ -1479,6 +1482,6 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTr
                    bo: bo.length, ca: ca.length, trung: trung.length, nong: nong.length,
                    laTan: la.filter(l => l.chet !== null).length, mam: la.filter(l => l.r < 22).length,
                    luoi: ech.filter(e => e.luoi).length,
-                   cho: la.reduce((n, l) => n + (l.chet === null ? suc(l) : 0), 0),   // tổng chỗ ngồi trên lá
+                   cho: tongCho(),                      // tổng chỗ ngồi trên lá, cũng là mức đàn tối đa
                    noTua: Math.round(noTua), W, H }) };
 })();
