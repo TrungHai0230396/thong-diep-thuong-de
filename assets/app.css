@@ -512,3 +512,81 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .an-mo{display:block;margin-top:5px;padding-top:5px;font-size:11.5px;line-height:1.45;
   color:rgba(244,239,230,.45);border-top:1px solid rgba(255,255,255,.1)}
 .an-thua{margin:-8px 0 14px;font-size:11.5px;line-height:1.5;text-align:center;color:rgba(244,239,230,.42)}
+
+/* ---------- ngôi sao luyện phát âm ---------- */
+.phatam{position:fixed;inset:0;z-index:30;display:none;overflow:hidden;
+  background:radial-gradient(120% 70% at 50% 0%,#1f2338 0%,#15182b 45%,#0b0e1c 100%)}
+.phatam.hien{display:block}
+.pa-dong{position:absolute;z-index:8;top:calc(env(safe-area-inset-top,0px) + 14px);right:16px;
+  width:34px;height:34px;border-radius:50%;cursor:pointer;
+  border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.32);color:var(--ink);font-size:14px;line-height:1}
+.pa-dong:hover{background:rgba(255,255,255,.12)}
+.pa-trong{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.pa-man{max-width:560px;margin:0 auto;
+  padding:calc(env(safe-area-inset-top,0px) + 62px) 16px calc(28px + var(--safe-b))}
+.pa-tua{margin:0 0 6px;text-align:center;font-family:"Cormorant Garamond",Georgia,serif;
+  font-size:26px;font-weight:600;color:var(--ink)}
+.pa-phu{margin:0 0 18px;text-align:center;font-size:13px;line-height:1.6;color:var(--ink-dim)}
+.pa-nhom{margin:18px 0 8px;font-size:11.5px;letter-spacing:.13em;text-transform:uppercase;color:rgba(232,195,122,.72)}
+.pa-ds{display:flex;flex-direction:column;gap:9px}
+.pa-the{display:flex;align-items:center;gap:12px;width:100%;text-align:left;cursor:pointer;
+  padding:12px 14px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink)}
+.pa-the:hover{background:rgba(232,195,122,.09)}
+.pa-ipa{flex:0 0 auto;min-width:58px;font-size:15px;font-weight:500;color:var(--gold)}
+.pa-the-chu{flex:1;display:flex;flex-direction:column;gap:3px;min-width:0}
+.pa-the-chu b{font-weight:500;font-size:14.5px}
+.pa-the-chu i{font-style:normal;font-size:12px;line-height:1.5;color:var(--ink-dim)}
+.pa-sao{flex:0 0 auto;font-size:8px;letter-spacing:2px;color:rgba(232,195,122,.55)}
+.pa-thua{margin:20px 0 0;font-size:11.5px;line-height:1.65;color:rgba(185,178,204,.72)}
+
+.pa-dau{display:flex;align-items:center;gap:10px;margin:0 0 14px}
+.pa-quay{width:32px;height:32px;flex:0 0 auto;border-radius:50%;cursor:pointer;font-size:19px;line-height:1;
+  border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.28);color:var(--ink)}
+.pa-quay:hover{background:rgba(255,255,255,.12)}
+.pa-ten{font-size:16px;font-weight:500;color:var(--ink)}
+.pa-hinh{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:16px}
+.pa-hinh svg{max-width:100%;height:auto}
+.pa-moi{flex:0 0 auto;width:132px}
+.pa-khoi{margin:0 0 14px;padding:13px 14px;border-radius:14px;
+  border:1px solid var(--line);background:rgba(255,255,255,.035)}
+.pa-khoi.pa-mo{border-style:dashed;opacity:.85}
+.pa-nhan{margin:0 0 6px;font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:rgba(232,195,122,.72)}
+.pa-chu{margin:0;font-size:13.5px;line-height:1.7;color:var(--ink)}
+.pa-chu.pa-nho{font-size:12.5px;color:var(--ink-dim)}
+.pa-chu.pa-thua{margin-top:8px;font-size:11.5px;color:rgba(185,178,204,.7)}
+.pa-bieu{margin:4px 0 8px;text-align:center}
+.pa-bieu svg{max-width:100%;height:auto}
+.pa-tu,.pa-cap,.pa-doi{display:flex;flex-wrap:wrap;gap:8px}
+.pa-tu-nut{cursor:pointer;padding:8px 13px;border-radius:999px;font-size:13.5px;
+  border:1px solid var(--line);background:rgba(232,195,122,.07);color:var(--ink)}
+.pa-tu-nut:hover{background:rgba(232,195,122,.16)}
+.pa-cap-nut{flex:1 1 150px;display:flex;flex-direction:column;gap:3px;cursor:pointer;text-align:left;
+  padding:11px 13px;border-radius:12px;font-size:14px;
+  border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink)}
+.pa-cap-nut:hover{background:rgba(232,195,122,.1)}
+.pa-cap-nut i{font-style:normal;font-size:11.5px;color:var(--ink-dim)}
+.pa-doi{margin-bottom:14px}
+.pa-doi-nut{flex:1 1 130px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
+  padding:14px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink)}
+.pa-doi-nut:hover{background:rgba(232,195,122,.1)}
+.pa-doi-nut b{font-weight:500;font-size:17px}
+.pa-doi-nut i{font-style:normal;font-size:11px;color:rgba(232,195,122,.7)}
+.pa-gui{margin:0 0 9px;padding:9px 11px;border-radius:10px;font-size:11.5px;line-height:1.6;
+  border:1px solid rgba(232,195,122,.2);background:rgba(232,195,122,.06);color:rgba(244,239,230,.86)}
+.pa-mic{width:100%;cursor:pointer;padding:14px;border-radius:14px;font-size:14.5px;
+  border:1px solid rgba(232,195,122,.4);background:rgba(232,195,122,.13);color:var(--ink)}
+.pa-mic:hover{background:rgba(232,195,122,.2)}
+.pa-mic.dang{border-color:rgba(226,140,134,.55);background:rgba(226,140,134,.16);animation:pa-tho 1.4s ease-in-out infinite}
+@keyframes pa-tho{0%,100%{opacity:1}50%{opacity:.62}}
+.pa-loi{margin:0 0 9px;font-size:12.5px;line-height:1.6;color:var(--ink-dim)}
+.pa-loi.nang{color:#f0a9a3}
+.pa-luot{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.pa-luot span{padding:5px 10px;border-radius:999px;font-size:12px;border:1px solid var(--line)}
+.pa-luot span.dung{border-color:rgba(150,205,160,.4);background:rgba(150,205,160,.12);color:#bfe2c6}
+.pa-luot span.sai{border-color:rgba(226,140,134,.35);background:rgba(226,140,134,.1);color:#f0bcb8}
+@media (max-width:420px){ .pa-moi{width:112px} .pa-ipa{min-width:50px;font-size:14px} }
+.pa-doi-hinh{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:16px}
+.pa-doi-hinh .pa-hinh{flex:1 1 240px;max-width:320px;margin:0;display:flex;flex-wrap:wrap;
+  align-items:flex-end;justify-content:center;gap:8px}
+.pa-doi-hinh figcaption{flex:1 0 100%;margin-top:6px;text-align:center;font-size:12px;line-height:1.5;color:var(--ink-dim)}
+.pa-doi-hinh figcaption.pa-sai{color:#f0a9a3}

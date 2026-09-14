@@ -378,6 +378,50 @@ Thêm cảnh mới chỉ cần thêm một mục vào mảng `CANH`, không ph�
 
 Một chỗ suýt sai lúc làm: tôi đặt class cho bong bóng của người kia là `ho`, **trùng với class `.ho` của hồ nước** (`position:fixed;inset:0`), nên bong bóng nhảy ra phủ kín màn hình. Class trong app này phải có tiền tố riêng của từng trò.
 
+### Sao vàng — luyện phát âm
+
+Mã ở `assets/ipa.js` (trò) và `assets/khauhinh.js` (hình vẽ, hàm thuần), địa chỉ riêng `#phat-am`.
+Mỗi âm có: **hình mặt cắt dọc khoang miệng** để thấy lưỡi đặt ở đâu, hình **môi nhìn thẳng**,
+lời giải thích cách đặt miệng, một đoạn nói vì sao người Việt hay sai âm đó, vài từ để bấm nghe,
+và phần **tập phân biệt bằng cặp tối thiểu**.
+
+**Không có điểm phát âm, và đó là chủ ý.** Máy nhận giọng nói chỉ trả về CHỮ chứ không trả về ÂM,
+nên mọi con số "phát âm 87/100" dựng trên nó đều là số bịa. Tôi có thử đưa một câu cố tình nuốt
+hết phụ âm cuối cho mô hình nghe: nó chép lại thành câu đúng và khen. Cái đo được thật thì hẹp
+hơn nhiều: bạn nói một từ trong cặp *ship / sheep*, máy báo nó nghe ra từ nào. Nếu máy nghe đúng
+thì ít nhất hai âm của bạn đã **khác nhau** đủ để máy phân biệt — chỉ vậy thôi, và app ghi đúng
+chừng đó. Màn kết quả còn nói thêm một sự thật khó nghe: đo trên các máy nhận giọng nói, giọng
+người Việt bị chép sai nhiều nhất trong sáu nhóm từng đo (MER 0,143 so với 0,007 của người bản
+ngữ) — khoảng một phần bảy số từ sai kể cả khi bạn nói tốt. Nên "máy không nghe ra" không đồng
+nghĩa với "bạn nói sai".
+
+**Thứ tự các âm xếp theo bằng chứng chứ không theo cảm giác.** Lỗi phụ âm tương quan mạnh với
+việc người nghe có hiểu hay không (r từ -0,56 đến -0,79); lỗi nguyên âm thì không có tương quan
+có ý nghĩa. Nên nhóm **cuối từ** đứng đầu — `/l/` cuối tệ nhất khi đo trên người Việt, đúng 25%
+và mất hẳn 50% — còn hai âm "th" mà người học sợ nhất lại bị xếp gần chót, vì đọc "think" thành
+"tink" thì người ta vẫn hiểu. Bảng có 17 mục, chia bốn nhóm: cuối từ, cụm phụ âm, phụ âm đầu,
+nguyên âm.
+
+**Mục nào máy không kiểm được thì nói thẳng là không kiểm, chứ không giả vờ kiểm.** Lỗi hay gặp
+ở `/f/ /v/` cuối là đổi thành `/p/`: "life" thành "laip". "Laip" không phải từ tiếng Anh, mà gặp
+chuỗi vô nghĩa thì máy tự nắn về từ gần nhất và **giấu mất lỗi** đi. Những mục như vậy mang cờ
+`kiemDuoc: false`, không có cặp nào, và trên màn hình ghi rõ vì sao. Kiểm thử bắt buộc điều này.
+
+Vài điều rút ra khi vẽ cái hình, sau năm lần vẽ hỏng:
+
+- **Khoang khí tô SÁNG trên nền mô TỐI.** Bản đầu tôi làm ngược nên nhìn không ra chỗ nào hẹp.
+  Chỗ sáng hẹp lại chính là chỗ đang cấu âm — đó là toàn bộ thông tin của cái hình.
+- **Lưỡi phải là một khối nằm trên sàn miệng, không được lấp kín khoang.** Lỗi này người dùng
+  chỉ ra: *"lưỡi bạn mô tả bị to hết khoang miệng làm khó hiểu"*. Nâng lưỡi lên thì phải thấy
+  khoảng trống đổi chỗ, chứ không phải cả khoang đặc lại.
+- **Phải có cái mũi.** Thiếu nó thì hình đọc ra như một cái mũ chứ không ra mặt người.
+- **Họng là một cái ống hẹp**, vẽ rộng ra thành cái hộp trắng là mất hình.
+- **Mục so sánh hai âm thì vẽ hai hình cạnh nhau**, vì cái cần dạy là chỗ KHÁC nhau. `/n/` và
+  `/l/` đặt lưỡi y hệt nhau, khác mỗi đường hơi — một hình không nói được điều đó.
+- Nhãn để trong cột trống bên phải, nối bằng đường mảnh. Nhãn đặt chồng lên hình thì đè lên nhau.
+
+Ghi chú tra cứu khi vẽ để ở `content/ghi-chu-khau-hinh-ipa.md`.
+
 ### Sao trắng ngà — nối sao thành chòm
 
 Mã ở `assets/constellation.js`. Trong đám sao lấm tấm có vài ngôi sáng hơn. Kéo từ ngôi này sang ngôi kia để nối. Nối trúng thì đường vàng sáng lên và dính lại, nối trật thì đường tự tan, không báo sai, không đếm giờ, không thua. Nối đủ thì cả chòm bừng sáng, hiện lời giải thích và câu ca dao nếu có.
@@ -557,6 +601,7 @@ node -e "const C=require('./assets/core.js'),k=require('./data/cards.json'),i=k.
 ```
 index.html                 giao diện, một màn hình duy nhất
 assets/core.js             lõi thuần: ngày tháng, xáo bài, chọn lá của ngày (test bằng Node)
+assets/khauhinh.js         vẽ hình khẩu hình: hàm thuần, trả về chuỗi SVG (test bằng Node)
 assets/app.js              điều khiển giao diện
 assets/app.css             giao diện
 data/cards.json            209 lá dùng trong app (49 KB)
@@ -566,6 +611,7 @@ scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
+scripts/test-phatam.js     44 kiểm thử trò phát âm: nội dung, cặp tối thiểu, và hình vẽ
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
@@ -582,6 +628,7 @@ node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
+node scripts/test-phatam.js      # chạy 44 kiểm thử trò luyện phát âm
 ```
 
 ## Sửa chính tả trong nguồn

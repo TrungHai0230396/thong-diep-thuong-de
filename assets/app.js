@@ -43,6 +43,8 @@ const SAO = [
     duong: 'go-tu',    khung: '.gotu',    mun: 'TDTD_GOTU' },
   { id: 'sao-troi', mau: '#aebff0', hinh: 'sao5',      nhan: 'Bầu trời thật đêm nay, ngay trên đầu bạn',
     duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM' },
+  { id: 'sao-phatam', mau: '#e8c37a', hinh: 'tia',     nhan: 'Luyện phát âm, xem miệng đặt lưỡi ở đâu',
+    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM' },
 ];
 
 
