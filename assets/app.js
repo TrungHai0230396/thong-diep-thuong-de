@@ -39,6 +39,8 @@ const SAO = [
     duong: 'noi-sao',  khung: '.chomsao', mun: 'TDTD_CHOMSAO' },
   { id: 'sao-gotu', mau: '#e9a9c0', hinh: 'sao6',      nhan: 'Gõ từ tiếng Anh, gõ tới đâu học tới đó',
     duong: 'go-tu',    khung: '.gotu',    mun: 'TDTD_GOTU' },
+  { id: 'sao-troi', mau: '#aebff0', hinh: 'sao5',      nhan: 'Bầu trời thật đêm nay, ngay trên đầu bạn',
+    duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM' },
 ];
 
 

@@ -52,6 +52,7 @@ Gửi cho ai một trong những địa chỉ này là họ mở thẳng vào tr
 | Hộp thở | `#hoi-tho` |
 | Nối sao thành chòm | `#noi-sao` |
 | Gõ từ tiếng Anh | `#go-tu` |
+| Bầu trời đêm nay | `#troi-dem` |
 
 Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và tự chạy được cả khi mất mạng. Bấm ngôi sao thì địa chỉ tự đổi theo, **đóng trò thì địa chỉ trở về trang chủ**. Nút Back của điện thoại cũng đóng trò lại chứ không thoát hẳn khỏi app.
 
@@ -349,6 +350,38 @@ Kết quả: 100 + 109 = **209 lá**. Khoảng cách gần nhất giữa hai l�
 
 Chín phép thử giữ chỗ này: đủ 209 lá, không lọt đuôi `(Thông điệp ngày N)`, không lọt lời giảng dán mẫu, không lời giảng nào dùng cho hai lá, không hai lá nào nói lại cùng một điều, không nháy đơn thẳng, không thừa dấu chấm sau ngoặc kép, không mũi tên gõ tay, không con số phần trăm.
 
+## Bầu trời đêm nay
+
+Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở chỗ bạn đang đứng, vào đúng lúc này**: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường thấy được, và tám chòm sao mượn lại toạ độ thật của trò Nối sao. Kéo để nhìn quanh, hoặc bấm *Xoay theo máy* rồi giơ điện thoại lên — hướng máy về phía nào thì thấy bầu trời phía đó.
+
+Đây là trò duy nhất trong app **kiểm chứng được bằng cách bước ra sân ngước lên**.
+
+**Không mạng, không thư viện, không bảng tra sẵn.** Tất cả tính bằng công thức trong `assets/astro.js`:
+
+| Cái gì | Lấy ở đâu |
+|---|---|
+| Mặt Trời, Mặt Trăng | Jean Meeus, *Astronomical Algorithms* (ấn bản 2, 1998), chương 25 và 47 |
+| Năm hành tinh | Bảng phần tử Kepler của JPL, [Approximate Positions of the Planets](https://ssd.jpl.nasa.gov/planets/approx_pos.html) |
+| Giờ sao, độ cao, phương vị | Công thức chuẩn, Meeus chương 12–13 |
+| Khúc xạ khí quyển gần chân trời | Công thức Bennett, Meeus chương 16 |
+
+**Đo lại bằng nguồn ngoài, không tự chấm điểm.** `scripts/test-astro.js` đối chiếu với api.sunrise-sunset.org và lunaf.com:
+
+| Kiểm | Kết quả |
+|---|---|
+| Mặt Trời mọc, lặn ở TP.HCM | lệch 1,1 và 1,2 phút |
+| Chạng vạng dân dụng, hàng hải, thiên văn | lệch 0,2 phút |
+| Bốn kỳ trăng non 2026 | lệch 1–3 phút |
+| Bốn kỳ trăng tròn 2026 | lệch 3–32 phút |
+| Sao Kim không rời Mặt Trời quá 47° | đo được 47,2° |
+| Sao Bắc Cực đứng ở độ cao bằng vĩ độ | khớp, xê dịch 1,5° suốt đêm |
+
+**Và một lần thử ngoài dự tính.** Hôm dựng xong trò này là 14/9/2026. Máy tính ra Sao Kim chỉ cách Mặt Trăng **0,48 độ** — sát tới mức nó nấp sau đĩa trăng, nhìn màn hình không thấy đâu. Tra lại thì hôm đó đúng là có **Mặt Trăng che Sao Kim** thật, thấy được từ châu Á, châu Phi, châu Âu, xảy ra lúc 08:30 UT. Máy không hề biết sự kiện này; nó chỉ giải phương trình. Nên chỗ đó được đổi thành một dòng nhắc: *"Sao Kim đang nấp ngay sau Mặt Trăng, cách 0,5°"*.
+
+**Ba chỗ sửa khi vẽ.** Lưỡi liềm lúc đầu vẽ ngược — trăng 12% ra thành trăng khuyết gần tròn, vì tôi lấy sai dấu của nửa elip ranh giới sáng tối; đúng ra nó phải đi qua điểm `x = (1 − 2k)·r`. Bầu trời chạng vạng sáng quá nên đổi sang đường cong bình phương. Và quầng sáng quanh hành tinh vẽ thành một cục đặc, vì `mau.replace('rgb','rgba')` không ăn gì với chuỗi mã hex — phải tự đổi hex sang rgba mới đặt được độ mờ.
+
+Bề sáng của Mặt Trăng luôn quay về phía Mặt Trời, nên ở vĩ độ Việt Nam lưỡi liềm **nằm ngang như cái thuyền** chứ không dựng đứng — cái đó ra được từ phép tính, không phải vẽ sẵn.
+
 ## Gõ từ tiếng Anh
 
 Một ngôi sao hồng nhạt, `#go-tu`. Chọn cấp rồi gõ luôn, mỗi lượt hai mươi từ. Một từ tiếng Anh hiện giữa màn hình, nghĩa tiếng Việt ngay dưới; gõ đúng chữ nào thì chữ đó sáng hồng, chữ đang tới có gạch chân nhấp nháy. **Gõ sai thì chữ không chạy**, chỉ rung một cái — không chặn đường, gõ lại chữ đúng là qua, nên không ai kẹt ở một từ. Hết hai mươi từ thì xem lại: ký tự mỗi phút, từ mỗi phút, tỉ lệ gõ đúng, và **mấy từ vấp nhiều nhất kèm nghĩa** để ngó lại một lượt trước khi gõ tiếp.
@@ -447,6 +480,7 @@ scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
+scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
@@ -460,6 +494,7 @@ python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 37 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
+node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
 ```
 
 ## Sửa chính tả trong nguồn
