@@ -35,6 +35,8 @@ const SAO = [
     duong: 'ho-sen',   khung: '.ho',      mun: 'TDTD_HO' },
   { id: 'sao-tho',  mau: '#b8a8e8', hinh: 'tia',       nhan: 'Hộp thở, thở theo nhịp bốn',
     duong: 'hoi-tho',   khung: '.hopho',   mun: 'TDTD_THO' },
+  { id: 'sao-noi',  mau: '#9fd8b0', hinh: 'hoa',       nhan: 'Tập nói tiếng Anh, câu dùng hằng ngày',
+    duong: 'tap-noi',  khung: '.anhngu',  mun: 'TDTD_ANHNGU' },
   { id: 'sao-chom', mau: '#f2ead0', hinh: 'sao4',      nhan: 'Nối sao thành chòm',
     duong: 'noi-sao',  khung: '.chomsao', mun: 'TDTD_CHOMSAO' },
   { id: 'sao-gotu', mau: '#e9a9c0', hinh: 'sao6',      nhan: 'Gõ từ tiếng Anh, gõ tới đâu học tới đó',

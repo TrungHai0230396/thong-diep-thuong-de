@@ -52,6 +52,7 @@ Gửi cho ai một trong những địa chỉ này là họ mở thẳng vào tr
 | Hộp thở | `#hoi-tho` |
 | Nối sao thành chòm | `#noi-sao` |
 | Gõ từ tiếng Anh | `#go-tu` |
+| Tập nói tiếng Anh | `#tap-noi` |
 | Bầu trời đêm nay | `#troi-dem` |
 
 Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và tự chạy được cả khi mất mạng. Bấm ngôi sao thì địa chỉ tự đổi theo, **đóng trò thì địa chỉ trở về trang chủ**. Nút Back của điện thoại cũng đóng trò lại chứ không thoát hẳn khỏi app.
@@ -75,7 +76,7 @@ Thêm một ngôi sao mới chỉ cần thêm một dòng vào mảng `SAO` ở 
 
 Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, lá bài lẫn các sao đã đặt (cách nhau tối thiểu 18 px). Hết chỗ thì chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài, nên chữ không bao giờ bị che. Đã thử 24 ngôi sao trên màn 375×812, rải 60 lần: không cặp nào đè nhau, không sao nào đè chữ hay lọt ra ngoài màn hình.
 
-Hiện có năm ngôi sao:
+Hiện có tám ngôi sao. Sáu ngôi đầu tả ngay dưới đây, hai ngôi mới nhất — gõ từ tiếng Anh và bầu trời đêm nay — có mục riêng ở cuối:
 
 ### Sao xanh ngọc — Mùa Chín
 
@@ -293,6 +294,40 @@ Màn hình có mục **Lưu ý an toàn**: dừng khi chóng mặt, không tập
 
 Nguồn số giây: nghiên cứu của Balban và cộng sự trên *Cell Reports Medicine* năm 2023 cho kiểu thở hai nhịp vào; hướng dẫn 4–7–8 của bác sĩ Andrew Weil; tài liệu về thở cộng hưởng quanh mức 5,5 hơi mỗi phút.
 
+### Sao lục nhạt — tập nói tiếng Anh
+
+Mã ở `assets/english.js`, địa chỉ riêng `#tap-noi`. Khác với trò **gõ từ tiếng Anh** ở chỗ đó luyện mặt chữ và từ vựng, còn trò này luyện **câu nói ra miệng trong một tình huống có thật**. Mỗi cảnh là một việc thật ngoài đời: **người ta nói trước, bạn chọn câu đáp** trong ba câu. Sáu cảnh, tổng 27 lượt: gặp lần đầu, mua cà phê, hỏi đường, ở quán ăn, mua quần áo, hỏi thăm bạn.
+
+Mức **A1 theo khung CEFR**: chào hỏi, tự giới thiệu, hỏi đáp thông tin cá nhân đơn giản, mua bán, hỏi đường, gọi món. Câu ngắn, thì hiện tại, từ vựng thông dụng.
+
+Nguyên tắc khi viết nội dung, và đó mới là phần khó chứ không phải phần mã:
+
+- **Hai câu sai phải sai vì lý do dạy được điều gì đó**, không phải sai vu vơ. Ví dụ với câu hỏi *What do you do?* thì câu sai là *"I'm doing my homework"* — đúng ngữ pháp, nhưng đó là trả lời cho *What are you doing?*. Chỗ lẫn này người mới học mắc thật.
+- **Mỗi câu sai có một dòng nói vì sao sai**, viết bằng tiếng Việt, ngắn. Chọn sai thì hiện dòng đó rồi cho chọn lại — **không trừ điểm, không đếm giờ, không thua**.
+- **Mỗi lượt có một dòng mẹo** rút ra cái dùng lại được: *"Sau `like` thì động từ thêm -ing"*, *"Câu hỏi cho hai lựa chọn thì không trả lời yes được"*.
+- Câu tiếng Anh nào cũng có bản dịch ngay bên dưới, vì A1 mà bắt đoán nghĩa thì nản.
+
+Giọng đọc lấy từ bộ đọc sẵn có của trình duyệt qua Web Speech, **không nhúng file tiếng nào**. Máy đọc câu của người kia ngay khi câu hiện ra, tốc độ 0,85; chạm vào bất kỳ bong bóng nào để nghe lại, lúc đó chậm hơn nữa còn 0,72 cho kịp nghe. Nút loa ở góc trên bên trái tắt giọng đọc. Máy nào không có giọng tiếng Anh thì trò vẫn chơi được bình thường, chỉ là im.
+
+Hết cảnh thì hiện lại **mấy câu chính bạn vừa nói**, chạm câu nào nghe câu đó, kèm hai nút tập lại hoặc chọn cảnh khác. Không lưu gì xuống máy, đóng ra là hết.
+
+Nội dung có bài kiểm riêng, `node scripts/test-english.js`: mỗi lượt phải có **đúng một** câu đúng, câu sai nào cũng phải có lời giải thích dài hơn tám ký tự, câu tiếng Anh không được lẫn dấu tiếng Việt, không quá 12 chữ, phải viết hoa chữ đầu và có dấu kết câu. Hiện 27 lượt qua hết 20 phép kiểm, câu dài nhất 9 chữ.
+
+Thêm cảnh mới chỉ cần thêm một mục vào mảng `CANH`, không phải sửa gì khác:
+
+```js
+{ id: 'san-bay', ten: 'Ở sân bay', ai: 'Nhân viên', moTa: 'Làm thủ tục, hỏi cổng', hinh: '✈️',
+  luot: [
+    { ho: "Good morning. Your passport, please.", hoVi: 'Chào buổi sáng. Cho xem hộ chiếu ạ.',
+      meo: '"Here you are" dùng khi đưa đồ cho ai đó.',
+      chon: [
+        { en: "Here you are.", vi: 'Của bạn đây.', dung: true },
+        { en: "I'm fine, thank you.", vi: 'Mình khỏe, cảm ơn.', viSao: 'Câu này để đáp "How are you?".' },
+      ] } ] }
+```
+
+Một chỗ suýt sai lúc làm: tôi đặt class cho bong bóng của người kia là `ho`, **trùng với class `.ho` của hồ nước** (`position:fixed;inset:0`), nên bong bóng nhảy ra phủ kín màn hình. Class trong app này phải có tiền tố riêng của từng trò.
+
 ### Sao trắng ngà — nối sao thành chòm
 
 Mã ở `assets/constellation.js`. Trong đám sao lấm tấm có vài ngôi sáng hơn. Kéo từ ngôi này sang ngôi kia để nối. Nối trúng thì đường vàng sáng lên và dính lại, nối trật thì đường tự tan, không báo sai, không đếm giờ, không thua. Nối đủ thì cả chòm bừng sáng, hiện lời giải thích và câu ca dao nếu có.
@@ -495,6 +530,7 @@ node scripts/test-core.js        # chạy 37 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
+node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 ```
 
 ## Sửa chính tả trong nguồn
