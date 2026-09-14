@@ -296,7 +296,7 @@ Nguồn số giây: nghiên cứu của Balban và cộng sự trên *Cell Repor
 
 ### Sao lục nhạt — tập nói tiếng Anh
 
-Mã ở `assets/english.js`, địa chỉ riêng `#tap-noi`. Khác với trò **gõ từ tiếng Anh** ở chỗ đó luyện mặt chữ và từ vựng, còn trò này luyện **câu nói ra miệng trong một tình huống có thật**. Mỗi cảnh là một việc thật ngoài đời: **người ta nói trước, bạn chọn câu đáp** trong ba câu. Sáu cảnh, tổng 27 lượt: gặp lần đầu, mua cà phê, hỏi đường, ở quán ăn, mua quần áo, hỏi thăm bạn.
+Mã ở `assets/english.js` và `assets/nghe.js`, địa chỉ riêng `#tap-noi`. Khác với trò **gõ từ tiếng Anh** ở chỗ đó luyện mặt chữ và từ vựng, còn trò này luyện **câu nói ra miệng trong một tình huống có thật**. Mỗi cảnh là một việc thật ngoài đời: **người ta nói trước, bạn chọn câu đáp** trong ba câu. Sáu cảnh, tổng 27 lượt: gặp lần đầu, mua cà phê, hỏi đường, ở quán ăn, mua quần áo, hỏi thăm bạn.
 
 Mức **A1 theo khung CEFR**: chào hỏi, tự giới thiệu, hỏi đáp thông tin cá nhân đơn giản, mua bán, hỏi đường, gọi món. Câu ngắn, thì hiện tại, từ vựng thông dụng.
 
@@ -307,11 +307,61 @@ Nguyên tắc khi viết nội dung, và đó mới là phần khó chứ không
 - **Mỗi lượt có một dòng mẹo** rút ra cái dùng lại được: *"Sau `like` thì động từ thêm -ing"*, *"Câu hỏi cho hai lựa chọn thì không trả lời yes được"*.
 - Câu tiếng Anh nào cũng có bản dịch ngay bên dưới, vì A1 mà bắt đoán nghĩa thì nản.
 
+**Ba cách chơi**, đổi bằng ba nút ngay đầu màn hình:
+
+| Cách | Bạn làm gì | Cần mạng | Gửi gì đi |
+|---|---|---|---|
+| Bấm chọn | bấm một trong ba câu | không | không gửi gì |
+| **Nói** (mặc định khi máy nghe được) | **nói ra miệng** câu đáp | có | tiếng của bạn, tới Google hoặc Apple |
+| Nói tự do | nói gì cũng được, AI đáp lại và sửa câu | có | câu bạn nói, tới Google |
+
+Phải nói thẳng vì README này có hứa "không gửi dữ liệu đi đâu": **hai cách sau phá lời hứa đó**, và app ghi rõ điều ấy ngay dưới ba nút chọn cách chơi chứ không giấu. Máy nhận giọng nói của trình duyệt gửi đoạn tiếng lên máy chủ Google (Chrome) hoặc Apple (Safari) — MDN ghi nguyên văn *"your audio is sent to a web service for recognition processing"*. Cách **Bấm chọn** vẫn chạy offline và không gửi gì, nên ai không muốn thì vẫn học được trọn vẹn.
+
+**Vì sao chế độ Nói không cần AI.** Trong mỗi lượt chỉ có đúng ba câu người học có thể nói. Việc của máy không phải "hiểu" mà chỉ là so câu nghe được với ba câu đã biết — nên `assets/nghe.js` là hàm thuần, kiểm được bằng Node, không khoá, không máy chủ, không tốn đồng nào.
+
+Bộ so khớp: chuẩn hoá (hạ chữ thường, bung viết tắt `I'm`→`i am`, đổi chữ số thành chữ, `$3`→`three dollars`, bỏ dấu câu) rồi chấm bằng **0,58 × Dice trên cặp ký tự + 0,42 × trùng từ**. Nhận ngay khi điểm ≥ 0,75, nhận dè dặt khi ≥ 0,60, và **cả hai đều đòi bỏ câu đứng nhì ít nhất 0,08** — không bỏ xa thì coi như chưa nghe rõ.
+
+Chỗ này phải đo chứ không đoán được, vì người Việt nói tiếng Anh bị máy nghe sai nhiều nhất trong sáu nhóm tiếng mẹ đẻ từng được đo (MER 0,143 so với 0,007 của người bản ngữ, tức sai gấp hai chục lần). `node scripts/test-nghe.js` mô phỏng đúng mấy lỗi hay gặp rồi chạy trên cả 81 câu:
+
+| Kiểu méo giọng | Nhận đúng | Nhầm sang câu khác |
+|---|---|---|
+| Nghe chuẩn | 27/27 lượt phân biệt sạch ba câu | 0 |
+| Rụng phụ âm cuối | 87,7% | **0** |
+| Thêm th→t | 85,2% | **0** |
+| Thêm rụng mạo từ | 85,2% | **0** |
+| Thêm rụng hẳn một từ | 82,7% | **0** |
+
+Con số đáng giá nhất là cột cuối: **không lần nào nhận nhầm sang câu khác**. Hỏng thì chỉ là "nói lại nhé", chứ không bao giờ khen sai.
+
+Ba điều cố ý trong chế độ Nói:
+
+- Bong bóng của người học luôn hiện **câu chuẩn trong kịch bản**, không hiện chữ máy nghe ra. Cho người mới học nhìn lại *"ai am from viet nahm"* là dạy họ rằng họ dở.
+- Khớp mờ thì vẫn nhận, nhưng kèm một dòng xám *"máy nghe thành…"*. Trò này **không chấm phát âm và không được giả vờ là chấm** — giá trị thật của nó là dám mở miệng nói.
+- Nói trượt hai lần thì tự bung ba câu ra cho nhìn mà đọc theo. Mô tả A1 của CEFR có hẳn vế *người kia giúp mình đặt câu*, nên nhìn câu đọc theo là đúng mức chứ không phải gian lận.
+
 Giọng đọc lấy từ bộ đọc sẵn có của trình duyệt qua Web Speech, **không nhúng file tiếng nào**. Máy đọc câu của người kia ngay khi câu hiện ra, tốc độ 0,85; chạm vào bất kỳ bong bóng nào để nghe lại, lúc đó chậm hơn nữa còn 0,72 cho kịp nghe. Nút loa ở góc trên bên trái tắt giọng đọc. Máy nào không có giọng tiếng Anh thì trò vẫn chơi được bình thường, chỉ là im.
 
 Hết cảnh thì hiện lại **mấy câu chính bạn vừa nói**, chạm câu nào nghe câu đó, kèm hai nút tập lại hoặc chọn cảnh khác. Không lưu gì xuống máy, đóng ra là hết.
 
 Nội dung có bài kiểm riêng, `node scripts/test-english.js`: mỗi lượt phải có **đúng một** câu đúng, câu sai nào cũng phải có lời giải thích dài hơn tám ký tự, câu tiếng Anh không được lẫn dấu tiếng Việt, không quá 12 chữ, phải viết hoa chữ đầu và có dấu kết câu. Hiện 27 lượt qua hết 20 phép kiểm, câu dài nhất 9 chữ.
+
+**Chế độ "Nói tự do" và khoá Gemini.** Đây là phần duy nhất trong cả app cần máy chủ. Câu người học nói được gửi tới `/api/noi` (hàm serverless ở **`api/noi.mjs`**), hàm đó gọi Gemini rồi trả về câu đáp trong vai nhân vật, kèm câu sửa và một dòng mẹo tiếng Việt.
+
+Đuôi **`.mjs` là bắt buộc, không phải sở thích**: tài liệu Vercel ghi rõ dự án không dùng framework thì *"you must either add `"type": "module"` to your package.json or change your JavaScript Functions' file extensions from .js to .mjs"*. Chọn `.mjs` để **khỏi phải thêm `package.json`** — ngay khi có file đó ở gốc, Vercel sẽ chạy `npm install` mỗi lần deploy và app mất tính "không phụ thuộc, không build" mà nó đang có. Hàm viết theo Web Handler (`export async function POST(request)`, trả về `Response`), không phải kiểu `(req, res)`.
+
+**Khoá API không nằm trong mã** và không được phép nằm trong mã: repo này công khai, trang web cũng công khai, nhét khoá vào file JS là ai mở trang cũng đọc được. Khoá đặt ở biến môi trường **`GEMINI_API_KEY`** trong phần Settings → Environment Variables của dự án trên Vercel. Chưa đặt thì hàm trả về `503 {"loi":"chua-cau-hinh"}`, app báo rõ và hai cách chơi kia vẫn chạy bình thường.
+
+Hàm tự giữ mình: chỉ nhận `POST`, chặn lời gọi từ nguồn khác bằng cách so `Origin` với `Host`, cắt câu dài quá 240 ký tự, chỉ gửi lại 14 lượt gần nhất, và chặn thô 20 lượt một phút cho mỗi IP. Lời dặn cho model nằm ở phía máy chủ nên người dùng không sửa được thành chuyện khác.
+
+Model dùng `gemini-3.5-flash-lite`, đo được **1,1 giây một lượt**, tốn chừng 72 token vào và 45 token ra. `gemini-2.5-flash` đã ngừng nhận người dùng mới.
+
+**Ba điều nên biết trước khi bật khoá:**
+
+- **Mức miễn phí đổi bằng dữ liệu.** Điều khoản của bậc Free ghi rõ Google được dùng nội dung để cải thiện sản phẩm, và *"human reviewers may read, annotate, and process your API input and output"*. Với trò tập nói thì thứ gửi đi là câu người học vừa nói ra. Muốn tránh thì phải lên bậc trả tiền, hoặc đơn giản là dùng hai cách chơi kia.
+- **Gói Hobby của Vercel không tính tiền vượt hạn mức, mà khoá dự án 30 ngày.** Hạn mức là 1.000.000 lượt gọi hàm mỗi tháng, và không có cách trả tiền để mở lại sớm — lối thoát duy nhất là nâng lên Pro 20 USD/tháng. Hàm này công khai, nên nếu có ai nghịch thì rủi ro là mất trang 30 ngày chứ không phải mất tiền. Hàm đã chặn thô 20 lượt một phút mỗi IP và cắt `maxOutputTokens` xuống 300, nhưng bộ đếm nằm trong bộ nhớ của từng thực thể hàm nên không chắc chắn.
+- **Đổi biến môi trường xong phải deploy lại.** Tài liệu Vercel: *"Any change you make to environment variables are not applied to previous deployments, they only apply to new deployments."*
+
+Một điều đáng biết trước khi dựa vào chế độ này: khung CEFR mô tả A1 là *người kia nói chậm, nhắc lại, và giúp mình đặt câu* — **hội thoại tự do vốn là mô tả bậc B1**. Nên chế độ Nói theo kịch bản mới là phần chính, còn Nói tự do để dành cho lúc đã quen.
 
 Thêm cảnh mới chỉ cần thêm một mục vào mảng `CANH`, không phải sửa gì khác:
 
@@ -531,6 +581,7 @@ node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một ti�
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
+node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 ```
 
 ## Sửa chính tả trong nguồn

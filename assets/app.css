@@ -479,3 +479,36 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink)}
 .an-nut .an-lai{background:rgba(232,195,122,.16);color:var(--gold)}
 .an-nut button:hover{background:rgba(232,195,122,.12)}
+
+/* nói tự do: mic, ô gõ, lời báo, câu sửa */
+.an-che{display:flex;gap:8px;margin:0 0 14px}
+.an-che button{flex:1;cursor:pointer;padding:9px;border-radius:11px;font-size:13px;
+  border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink-dim)}
+.an-che button.dang{background:rgba(232,195,122,.16);color:var(--gold);border-color:rgba(232,195,122,.45)}
+.an-mic-hang{display:flex}
+.an-mic{flex:1;cursor:pointer;padding:15px;border-radius:14px;font-size:15px;letter-spacing:.02em;
+  border:1px solid rgba(232,195,122,.45);background:rgba(232,195,122,.14);color:var(--gold)}
+.an-mic:disabled{opacity:.5;cursor:default}
+.an-mic.dang{background:rgba(224,101,111,.18);border-color:rgba(224,101,111,.5);color:#f0a9ad;
+  animation:anTho 1.4s ease-in-out infinite}
+@keyframes anTho{0%,100%{opacity:1}50%{opacity:.62}}
+.an-go{margin-top:8px;width:100%;padding:11px 13px;border-radius:12px;font-size:14px;
+  border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);
+  font-family:inherit;opacity:.65}
+.an-go:focus{outline:none;opacity:1;border-color:rgba(232,195,122,.5)}
+.an-go.ro{opacity:1}
+.an-loi{margin:0 0 8px;padding:9px 12px;border-radius:11px;font-size:12.5px;line-height:1.55;
+  background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink-dim)}
+.an-loi.nang{background:rgba(224,101,111,.12);border-color:rgba(224,101,111,.4);color:#f0a9ad}
+.an-sua{display:block;margin-top:5px;padding-top:5px;font-size:12.5px;line-height:1.45;
+  color:var(--gold);border-top:1px solid rgba(232,195,122,.25)}
+.an-tudo{background:rgba(159,216,176,.16)!important;color:#9fd8b0!important;border-color:rgba(159,216,176,.4)!important}
+
+/* chế độ nói theo cảnh */
+.an-goiy{margin-top:8px;width:100%;cursor:pointer;padding:10px;border-radius:12px;font-size:13px;
+  border:1px dashed rgba(232,195,122,.35);background:transparent;color:var(--ink-dim)}
+.an-goiy:hover{background:rgba(232,195,122,.08);color:var(--ink)}
+.an-goi-hop{display:flex;flex-direction:column;gap:8px;margin-top:10px;animation:anHien .3s ease}
+.an-mo{display:block;margin-top:5px;padding-top:5px;font-size:11.5px;line-height:1.45;
+  color:rgba(244,239,230,.45);border-top:1px solid rgba(255,255,255,.1)}
+.an-thua{margin:-8px 0 14px;font-size:11.5px;line-height:1.5;text-align:center;color:rgba(244,239,230,.42)}
