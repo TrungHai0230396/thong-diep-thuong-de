@@ -41,15 +41,6 @@ function vuaKhung(ctx, chu, rong, caoToiDa, coMax, coMin, heSoDong, font) {
   return { co: coMin, dong: xuongDong(ctx, chu, rong) };
 }
 
-function chuGian(ctx, chu, x, y, gian) {
-  if ('letterSpacing' in ctx) { ctx.letterSpacing = gian + 'px'; ctx.fillText(chu, x, y); ctx.letterSpacing = '0px'; return; }
-  const rong = [...chu].reduce((s, c) => s + ctx.measureText(c).width + gian, -gian);
-  let cx = x - rong / 2;
-  const canCu = ctx.textAlign; ctx.textAlign = 'left';
-  for (const c of chu) { ctx.fillText(c, cx, y); cx += ctx.measureText(c).width + gian; }
-  ctx.textAlign = canCu;
-}
-
 async function veAnh({ thongDiep, yNghia, ngayDep }) {
   await napFont();
   const cv = document.createElement('canvas');
@@ -137,11 +128,9 @@ async function veAnh({ thongDiep, yNghia, ngayDep }) {
   ctx.fillStyle = 'rgba(202,195,218,.92)';
   for (const d of dongY) { y += 36; ctx.fillText(d, R / 2, y); y += 16; }
 
-  // chân ảnh
-  ctx.font = `500 23px ${SANS}`; ctx.fillStyle = 'rgba(232,195,122,.9)';
-  chuGian(ctx, 'THÔNG ĐIỆP CỦA THƯỢNG ĐẾ', R / 2, C - 148, 5);
+  // chân ảnh: chỉ còn ngày, không ghi tên app nữa
   ctx.font = `400 25px ${SANS}`; ctx.fillStyle = 'rgba(185,178,204,.75)';
-  ctx.fillText(ngayDep, R / 2, C - 102);
+  ctx.fillText(ngayDep, R / 2, C - 118);
 
   return new Promise(res => cv.toBlob(res, 'image/png'));
 }
