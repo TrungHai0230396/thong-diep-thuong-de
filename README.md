@@ -384,7 +384,22 @@ Mã ở `assets/ipa.js` (trò), `assets/amvi.js` (dựng ra âm) và `assets/kha
 địa chỉ riêng `#phat-am`. Mười bảy âm, mỗi âm là một **buổi dắt tay năm bước** chứ không phải
 một trang tra cứu.
 
-**App tự dựng lấy tiếng, không dùng máy đọc để phát âm.** Máy đọc của trình duyệt chỉ đọc được
+**Tiếng dẫn dắt là giọng NGƯỜI, đọc từ thật.** Đây là chỗ tôi sai và phải sửa lại: bản đầu
+tôi cho bước mở đầu và cả bài luyện tai phát **âm rời do máy dựng**. Phổ đo ra khớp số liệu ngữ
+âm học trên 47 phép đo — mà người dùng nghe vẫn không hiểu gì. Bài học: **đo đúng phổ không có
+nghĩa là tai người nghe ra**, và bộ kiểm thử của tôi không hề canh chỗ đó, vì tôi không nghe
+được nên đã lặng lẽ coi "đúng về vật lý" là "nghe hiểu được".
+
+Nên bây giờ: bước mở đầu phát **từ thật** bằng máy đọc của hệ điều hành, mỗi nút một giọng; bài
+luyện tai hỏi *"bạn vừa nghe từ nào"* với cặp từ thật (sheep / ship) chứ không hỏi về âm rời.
+Âm rời vẫn còn, nhưng lùi xuống một nút phụ có ghi thẳng *"tiếng máy dựng"*.
+
+Kèm theo là một lỗi ngầm phải sửa: máy Mac có 30 giọng en-US thì **13 giọng là trò đùa** — Bells,
+Boing, Bubbles, Zarvox. Bản trước tôi lấy bừa "giọng en-US đầu tiên gặp"; máy này may nên ra
+Samantha, máy khác rơi vào Bubbles là cả bài học thành tiếng ục ục. Giờ có danh sách loại trừ,
+danh sách ưu tiên, và gom **năm giọng** để bài nghe đổi giọng được.
+
+**App vẫn tự dựng lấy tiếng cho phần âm rời.** Máy đọc của trình duyệt chỉ đọc được
 TỪ — đưa cho nó `θ` thì nó đọc tên chữ cái Hy Lạp. Mà bài học ở đây là chính cái âm, tách khỏi
 từ. Nên `amvi.js` dựng âm bằng toán theo lối nguồn–bộ lọc: âm xát là nhiễu Gauss qua bộ cộng
 hưởng đặt đúng vùng tần số; nguyên âm là chuỗi xung thanh môn qua ba bộ cộng hưởng F1 F2 F3;
@@ -398,9 +413,10 @@ ngay, đặt cạnh âm đúng. Nghe được cái sai mới tránh được nó
 
 **Thứ tự các bước theo bằng chứng: TAI ĐI TRƯỚC MIỆNG.** Luyện nghe phân biệt tự nó kéo theo
 cải thiện phát âm, và kéo mạnh hơn luyện nói (tri giác d=0,92 so với sản sinh d=0,54; tổng hợp
-79 nghiên cứu cho g=0,92). Nên bước hai là **luyện tai**: app phát một trong hai âm bằng một
-trong **năm giọng tổng hợp khác nhau**, bạn chọn vừa nghe âm nào, báo đúng sai ngay, tám lượt.
-Năm giọng là cố ý — nghe mãi một mẫu thì người ta nhớ *mẫu* chứ không học được *âm*.
+79 nghiên cứu cho g=0,92). Nên bước hai là **luyện tai**: app đọc một trong hai từ của một cặp
+tối thiểu bằng một trong **năm giọng người khác nhau**, bạn chọn vừa nghe từ nào, báo đúng sai
+ngay, tám lượt. Năm giọng là cố ý — nghe mãi một mẫu thì người ta nhớ *mẫu* chứ không học được
+*âm*.
 
 Và đây là **chỗ duy nhất trong cả trò có điểm số thật**: app biết nó vừa phát âm nào, nên nó
 đếm đúng sai được. Máy nhận giọng ở bước cuối thì không — nó chỉ đoán chữ, nên kết quả của nó
@@ -706,7 +722,7 @@ scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
-scripts/test-phatam.js     65 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
+scripts/test-phatam.js     78 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
@@ -724,7 +740,7 @@ node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 65 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 78 kiểm thử trò luyện phát âm
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 ```
 

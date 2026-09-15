@@ -30,7 +30,6 @@ const AM = [
   /* ---- cuối âm tiết: nhóm quan trọng nhất ---- */
   { ipa: '/l/ cuối', ten: 'l cuối bị nuốt hoặc thành n', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
     hinh: 'canh',
-    taiA: '/l/ đúng', taiB: '/n/ — sai',
     am: 'l-toi', am2: 'n', sai2: true,
     viSao: 'Âm hỏng nhiều nhất khi đo trên người Việt: chỉ 25% đúng, 50% mất hẳn. Tiếng Việt có "l" ở đầu từ nhưng tuyệt đối không có ở cuối, nên "call" thành "co", "tell" thành "ten". Người miền Bắc còn sẵn thói lẫn l/n ngay trong tiếng Việt, mang luôn sang.',
     cach: 'Đầu lưỡi chạm CHẮC vào lợi sau răng trên rồi GIỮ nguyên ở đó, cho hơi thoát ra hai bên cạnh lưỡi. Tự kiểm: bịt mũi lại mà vẫn kêu được thì đúng; bịt mũi mà tắc tiếng là bạn đang nói thành "n".',
@@ -41,7 +40,6 @@ const AM = [
 
   { ipa: '/s/ /z/ cuối', ten: 'đuôi s của số nhiều', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
     hinh: 'canh',
-    taiA: '/s/ — books', taiB: '/z/ — dogs',
     am: 's', am2: 'z',
     viSao: 'Người Việt bỏ /s/ cuối gần như mọi lúc. Mất đuôi s là mất dấu số nhiều và mất chia động từ: "two books" thành "two book". Tiếng Việt cũng không có /z/ ở cuối, nên "eyes" dễ thành "ice" — khác nghĩa hẳn.',
     cach: 'Đầu lưỡi nâng gần lợi, hai hàm răng gần khít, hơi rít qua một rãnh nhỏ giữa lưỡi. /s/ là tiếng rắn kêu, /z/ là tiếng ong bay — /z/ phải bật giọng cho cổ rung. Đặt tay lên cổ, nói "s" rồi "z", phải thấy khác.',
@@ -52,7 +50,6 @@ const AM = [
 
   { ipa: '/t/ /d/ cuối', ten: 'bật ra, đừng nuốt', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
     hinh: 'canh',
-    taiA: '/t/', taiB: '/d/',
     am: 't', am2: 'd', tac: true, kieu: 'cuoi',
     viSao: 'Tiếng Việt CÓ /t/ cuối nhưng ngậm luôn, không nhả hơi — người bản ngữ nghe như bạn chưa nói xong. Nặng hơn: đuôi quá khứ -ed cũng chính là âm này (worked, played), nuốt mất là người nghe không biết chuyện xảy ra lúc nào.',
     cach: 'Chặn đầu lưỡi lên lợi sau răng trên, ngậm hơi lại, rồi NHẢ cho hơi bật ra một tiếng nhỏ. Đừng thêm "ơ" phía sau. Tự kiểm: để tờ giấy mỏng trước miệng, nói "eat" — cuối từ tờ giấy phải nhúc nhích.',
@@ -63,7 +60,6 @@ const AM = [
 
   { ipa: '/k/ /g/ cuối', ten: 'work hay bị nghe thành word', nhom: 'Cuối từ', uuTien: 7, kiemDuoc: true,
     hinh: 'canh',
-    taiA: '/k/ — back', taiB: '/g/ — bag',
     am: 'k', am2: 'g', tac: true, kieu: 'cuoi',
     viSao: 'Cuối từ, /k/ và /g/ hay bị đổi chỗ cho nhau hoặc rơi mất. Có ghi nhận "work" bị nghe thành "word".',
     cach: 'Nâng phần SAU của lưỡi lên chạm vòm mềm, chặn hơi lại rồi thả ra. Đầu lưỡi không làm gì cả. /g/ thì cổ họng rung, /k/ thì không.',
@@ -73,7 +69,6 @@ const AM = [
 
   { ipa: '/f/ /v/ cuối', ten: 'life hay thành laip', nhom: 'Cuối từ', uuTien: 6, kiemDuoc: false,
     hinh: 'truoc',
-    taiA: '/f/ đúng', taiB: '/p/ — sai',
     am: 'f', am2: 'p', sai2: true,
     viSao: 'Cuối từ, /f/ và /v/ hay bị đổi thành /p/ hoặc rơi mất: "life" thành "laip", "five" thành "fai". "Laip" không phải từ tiếng Anh, nên máy sẽ tự nắn về "life" và giấu mất lỗi — mục này chỉ học bằng hình.',
     cach: 'Cắn nhẹ môi DƯỚI vào hàm răng TRÊN rồi đẩy hơi qua khe đó. Môi tuyệt đối không khép kín lại như /p/. Lưỡi nằm yên, không tham gia.',
@@ -85,7 +80,6 @@ const AM = [
   /* ---- cụm phụ âm ---- */
   { ipa: 'cụm st- sp- sk-', ten: 'đừng bỏ chữ đầu', nhom: 'Cụm phụ âm', uuTien: 8, kiemDuoc: true,
     hinh: 'canh',
-    taiA: 'st- đủ hai âm', taiB: 'mất /s/ — sai',
     am: ['s', 't'], am2: 't', sai2: true, tac: true,
     viSao: 'Gặp hai phụ âm dính nhau, người Việt gần như luôn bỏ phụ âm THỨ NHẤT — đo được 55 trên 56 trường hợp. "Stop" thành "top", "spin" thành "pin", và cả hai đều là từ có thật nên người nghe hiểu sang nghĩa khác.',
     cach: 'Giữ âm /s/ cho kêu rõ trước đã, rồi mới sang phụ âm sau. Đừng chèn nguyên âm vào giữa — "sờ-top" cũng sai, vì nó đẻ ra hai âm tiết.',
@@ -95,7 +89,6 @@ const AM = [
 
   { ipa: 'cụm -st -nd -ld', ten: 'hai phụ âm cuối', nhom: 'Cụm phụ âm', uuTien: 7, kiemDuoc: true,
     hinh: 'canh',
-    taiA: '-ld đủ hai âm', taiB: 'mất /d/ — sai',
     am: ['l-toi', 'd'], am2: 'l-toi', sai2: true, tac: true,
     viSao: 'Nhóm lì nhất, vẫn hỏng sau nhiều tuần luyện. Tiếng Việt không bao giờ có hai phụ âm cuối liền nhau nên miệng chưa từng phải làm việc đó.',
     cach: 'Làm chậm lại: phát đủ âm thứ nhất rồi mới sang âm thứ hai. Thà chậm mà đủ còn hơn nhanh mà mất. Nói chậm lại là cách rẻ nhất để người nghe hiểu bạn.',
@@ -106,7 +99,6 @@ const AM = [
   /* ---- phụ âm đầu hay lẫn ---- */
   { ipa: '/p/ và /b/', ten: 'pat hay thành bat', nhom: 'Phụ âm đầu', uuTien: 9, kiemDuoc: true,
     hinh: 'truoc',
-    taiA: '/p/', taiB: '/b/',
     am: 'p', am2: 'b', tac: true,
     viSao: 'Tiếng Việt không có /p/ ở ĐẦU từ, nên nó hay trượt thành /b/ — có ghi nhận "people" đọc thành "bi-bồ". Đây là cặp đứng đầu bảng những lẫn lộn làm hỏng nghĩa nhiều nhất.',
     cach: 'Hai môi khép kín, dồn hơi, rồi bật ra. /p/ phải có một luồng hơi PHỤT mạnh và cổ họng không rung. Tự kiểm: để tờ giấy trước miệng, nói "pat" thì giấy bay, nói "bat" thì giấy đứng yên.',
@@ -117,7 +109,6 @@ const AM = [
 
   { ipa: '/p/ và /f/', ten: 'funny hay thành punny', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
     hinh: 'truoc',
-    taiA: '/p/', taiB: '/f/',
     am: 'p', am2: 'f', tac: true,
     viSao: 'Người Việt hay đọc "funny", "famous" bằng âm /p/. Cặp này đứng thứ hai trong bảng những lẫn lộn làm hỏng nghĩa.',
     cach: '/f/ thì răng trên chạm môi dưới và hơi xì ra LIÊN TỤC kéo dài được; /p/ thì hai môi khép kín rồi bật ra một cái, không kéo dài được. Thử ngân dài: ngân được là /f/.',
@@ -128,7 +119,6 @@ const AM = [
 
   { ipa: '/n/ và /l/', ten: 'night hay thành light', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
     hinh: 'canh',
-    taiA: '/n/', taiB: '/l/',
     am: 'n', am2: 'l',
     viSao: 'Cặp lẫn lộn quen thuộc, nhất là với người miền Bắc vốn đã lẫn l/n trong tiếng Việt. Cả hai lỗi đều đẻ ra từ CÓ THẬT nên người nghe hiểu sang nghĩa khác chứ không đoán lại được.',
     cach: 'Lưỡi đặt cùng một chỗ cho cả hai — khác nhau ở chỗ hơi thoát ra: /n/ cho hơi ra đằng MŨI, /l/ cho hơi ra hai bên lưỡi. Tự kiểm: bịt mũi lại, kêu được là /l/, tắc tiếng là /n/.',
@@ -139,7 +129,6 @@ const AM = [
 
   { ipa: '/r/', ten: 'r kiểu Anh Mỹ', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
     hinh: 'canh',
-    taiA: '/r/', taiB: '/l/',
     am: 'r', am2: 'l',
     viSao: 'Chữ "r" tiếng Việt khác hẳn: miền Bắc đọc thành "z" (rice thành "zai"), miền Nam rung đầu lưỡi. /r/ tiếng Anh thì đầu lưỡi KHÔNG chạm vào đâu cả. Đọc sai thì "right" nghe ra "light".',
     cach: 'Chu môi ra một chút như sắp huýt sáo. Đầu lưỡi KHÔNG chạm vào đâu cả, thân lưỡi gồng nhẹ và kéo lùi về phía cổ. Tuyệt đối không rung đầu lưỡi như "r" tiếng Việt.',
@@ -151,7 +140,6 @@ const AM = [
 
   { ipa: '/v/ và /w/', ten: 'vet hay thành wet', nhom: 'Phụ âm đầu', uuTien: 7, kiemDuoc: true,
     hinh: 'truoc',
-    taiA: '/v/', taiB: '/w/',
     am: 'v', am2: 'w',
     viSao: 'Chữ "v" tiếng Việt đọc khác /v/ tiếng Anh; người miền Nam còn hay đọc thành "d/gi" (very thành "gia-ry"). Quên bật giọng thì /v/ thành /f/: "save" nghe ra "safe", nghĩa ngược nhau.',
     cach: '/v/ thì răng trên cắn nhẹ môi dưới, rung cổ họng, hơi rít qua kẽ răng. /w/ thì răng KHÔNG chạm gì cả, hai môi chu tròn lại rồi mở ra.',
@@ -162,7 +150,6 @@ const AM = [
 
   { ipa: '/ʃ/', ten: 'sh trong she', nhom: 'Phụ âm đầu', uuTien: 6, kiemDuoc: true,
     hinh: 'truoc',
-    taiA: '/ʃ/ — she', taiB: '/s/ — see',
     am: 'sh', am2: 's', sai2: true,
     viSao: 'Nhiều vùng tiếng Việt không phân biệt s/x nên "she" thành "see", "ship" thành "sip" — đều ra từ có thật, nghĩa đổi hẳn. Máy nhận giọng nói cũng nhầm y như người nghe.',
     cach: 'Kéo lưỡi lùi lại một chút so với /s/, nâng phần giữa lưỡi lên gần vòm. Chu môi ra. Tiếng nghe trầm và dày như khi bảo ai đó im lặng: "suỵt".',
@@ -173,7 +160,6 @@ const AM = [
 
   { ipa: '/θ/ /ð/', ten: 'hai âm "th"', nhom: 'Phụ âm đầu', uuTien: 4, kiemDuoc: true,
     hinh: 'truoc',
-    taiA: '/θ/ — think', taiB: '/ð/ — this',
     am: 'th', am2: 'dh',
     viSao: 'Người học sợ âm này nhất, nhưng nó lại ÍT làm hỏng nghĩa nhất — "think" đọc thành "tink" thì người nghe vẫn hiểu. Sửa phụ âm cuối có lợi hơn nhiều. Để đây vì bạn sẽ đi tìm, không phải vì nó gấp.',
     cach: 'Thè nhẹ đầu lưỡi ra, kẹp hờ giữa hai hàm răng, thổi hơi qua khe đó. Soi gương phải THẤY đầu lưỡi. /θ/ (think) không rung cổ họng; /ð/ (this) thì rung, hơi ra ít hơn, tiếng trầm và mượt hơn.',
@@ -195,7 +181,6 @@ const AM = [
 
   { ipa: '/iː/ và /ɪ/', ten: 'sheep hay ship', nhom: 'Nguyên âm', uuTien: 5, kiemDuoc: true, bieu: 'iː',
     hinh: 'truoc',
-    taiA: '/iː/ — sheep', taiB: '/ɪ/ — ship',
     am: 'ii', am2: 'i',
     viSao: 'Cặp nguyên âm người Việt lẫn nhiều nhất. Chúng khác nhau ở VỊ TRÍ LƯỠI chứ không chỉ ở chỗ dài hay ngắn — nên kéo dài âm i tiếng Việt ra vẫn không thành /iː/.',
     cach: '/iː/: cười nhẹ, kéo hai khoé môi sang ngang, lưỡi đẩy lên cao và ra trước gần chạm vòm. /ɪ/: bắt đầu như /iː/ rồi thả lỏng hết — hạ lưỡi xuống, lùi vào, môi buông ra không cười, âm rất ngắn.',
@@ -217,27 +202,49 @@ const AM = [
 const NHOM = ['Cuối từ', 'Cụm phụ âm', 'Phụ âm đầu', 'Nguyên âm'];
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-let tam, oTrong, am = null, capDang = null, luot = [], mayNghe = null, dangNghe = false, docBat = true, giong = null;
+let tam, oTrong, am = null, capDang = null, luot = [], mayNghe = null, dangNghe = false, docBat = true;
 let daBaoGui = false;   // câu báo "giọng bạn được gửi đi" chỉ hiện trước lần bấm micro đầu tiên mỗi buổi
 
 /* iPhone đã cài lên màn hình chính thì WebKit không cho dùng micro — không phải lỗi người dùng. */
 const IOS_CAI = !!(self.navigator && self.navigator.standalone);
 const coNghe = () => !IOS_CAI && !!(self.SpeechRecognition || self.webkitSpeechRecognition);
 
-/* ---- máy đọc ---- */
+/* ---- máy đọc ----
+   Đây là giọng NGƯỜI (máy đọc của hệ điều hành), khác hẳn phần âm tự dựng ở dưới.
+   Hai chuyện phải lo:
+   1. Trên máy Mac có 30 giọng en-US thì 13 giọng là TRÒ ĐÙA — Bells, Boing, Bubbles, Zarvox...
+      Bản trước tôi lấy bừa "giọng en-US đầu tiên gặp", máy này may nên ra Samantha, máy khác
+      rơi vào Bubbles là cả bài học thành tiếng ục ục.
+   2. Lấy được NHIỀU giọng thì bài luyện tai mới đổi giọng được, để người học nghe ra cái chung
+      giữa các giọng chứ không nhớ thuộc một mẫu. */
+const GIONG_DUA = /bad news|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|bahh|deranged|hysterical|pipe|albert|fred|junior|kathy|princess|ralph|agnes|bruce|vicki|victoria/i;
+const GIONG_TOT = /samantha|^alex$|ava|allison|susan|zoe|evan|nathan|joelle|google us english|aria|jenny|guy|michelle|steffan/i;
+let dsGiong = [];
+
 function timGiong() {
   if (!self.speechSynthesis) return;
   const ds = speechSynthesis.getVoices() || [];
-  giong = ds.find(v => /^en[-_]us/i.test(v.lang)) || ds.find(v => /^en/i.test(v.lang)) || null;
+  const sach = (v) => !GIONG_DUA.test(v.name);
+  const my = ds.filter(v => /^en[-_]us/i.test(v.lang) && sach(v));
+  const anh = ds.filter(v => /^en/i.test(v.lang) && sach(v));
+  const xep = [
+    ...my.filter(v => GIONG_TOT.test(v.name)),
+    ...anh.filter(v => GIONG_TOT.test(v.name)),
+    ...my, ...anh,
+  ];
+  const da = new Set();
+  dsGiong = xep.filter(v => !da.has(v.name) && da.add(v.name)).slice(0, 5);
 }
 if (self.speechSynthesis) { timGiong(); speechSynthesis.addEventListener('voiceschanged', timGiong); }
-function doc(chu, cham) {
+
+function doc(chu, cham, iGiong) {
   if (!docBat || !self.speechSynthesis || !chu) return;
   try {
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(chu);
-    u.lang = 'en-US'; u.rate = cham ? .6 : .8;
-    if (giong) u.voice = giong;
+    u.lang = 'en-US'; u.rate = cham ? .62 : .82;
+    const g = dsGiong.length ? dsGiong[((iGiong | 0) % dsGiong.length + dsGiong.length) % dsGiong.length] : null;
+    if (g) { u.voice = g; if (g.lang) u.lang = g.lang; }
     speechSynthesis.speak(u);
   } catch (e) {}
 }
@@ -377,7 +384,7 @@ let buoc = 0;
    Máy nhận giọng thì không: nó chỉ đoán chữ, nên không bao giờ được quy thành điểm. */
 function cacBuoc(a) {
   const ds = ['nghe'];
-  if (a.am2) ds.push('tai');
+  if (a.cap.length) ds.push('tai');
   ds.push('mieng', 'tu', 'noi');
   return ds;
 }
@@ -391,10 +398,14 @@ let taiLich = [], taiVi = 0, taiKQ = [], taiNghe = 0, taiChot = false;
 let phienTai = 0;
 
 function xepLich(a) {
-  /* Bốn lượt âm này, bốn lượt âm kia, trộn lên; giọng thì xoay vòng cho đủ cả năm.
-     Trộn và xoay là để người học không nhớ MẪU mà phải nghe ra ÂM. */
+  /* Bốn lượt từ này, bốn lượt từ kia, trộn lên; cặp từ và giọng đọc thì xoay vòng.
+     Xoay là để người học nghe ra cái ÂM chung giữa các giọng và các từ, chứ không nhớ thuộc
+     một mẫu. Đây là chỗ đổi lớn so với bản trước: bản trước phát ÂM RỜI do máy dựng — đúng
+     về phổ nhưng tai người nghe không ra chữ gì, nên bài tập thành vô nghĩa. */
+  const soG = Math.max(1, dsGiong.length);
   const ds = [];
-  for (let i = 0; i < TAI_SO; i++) ds.push({ b: i < TAI_SO / 2, g: i % 5 });
+  for (let i = 0; i < TAI_SO; i++)
+    ds.push({ b: i < TAI_SO / 2, g: i % soG, c: Math.floor(i / 2) % a.cap.length });
   for (let i = ds.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     const t = ds[i]; ds[i] = ds[j]; ds[j] = t;
@@ -426,10 +437,10 @@ function veTai() {
       <div class="pa-o">${taiLich.map((_, i) =>
         `<i class="${i < taiKQ.length ? (taiKQ[i] ? 'dung' : 'sai') : i === taiVi ? 'nay' : ''}"></i>`).join('')}</div>
       <button class="pa-to" data-lai="1">▶ Nghe lại${taiNghe >= 2 ? ' (hết lượt nghe lại)' : ''}</button>
-      <p class="pa-chu pa-nho pa-giua">Bạn vừa nghe âm nào?</p>
+      <p class="pa-chu pa-nho pa-giua">Bạn vừa nghe từ nào?</p>
       <div class="pa-chon">
-        <button class="pa-chon-nut" data-b="0">${esc(a.taiA)}</button>
-        <button class="pa-chon-nut" data-b="1">${esc(a.taiB)}</button>
+        <button class="pa-chon-nut" data-b="0">${esc(a.cap[l.c][0])}</button>
+        <button class="pa-chon-nut" data-b="1">${esc(a.cap[l.c][1])}</button>
       </div>
       <p class="pa-bao"></p>`;
   }
@@ -443,7 +454,7 @@ function veTai() {
   if (lai) lai.onclick = () => {
     if (taiNghe >= 2) return;
     taiNghe++;
-    phatAm(taiLich[taiVi].b ? am.am : am.am2, am.kieu, .85, taiLich[taiVi].g);
+    docLuot(taiLich[taiVi]);
     veTaiNut();
   };
   const lam = oTrong.querySelector('[data-lam]');
@@ -453,7 +464,7 @@ function veTai() {
     const the = phienTai;
     setTimeout(() => {
       if (the !== phienTai || !am) return;
-      phatAm(taiLich[taiVi].b ? am.am : am.am2, am.kieu, .85, taiLich[taiVi].g);
+      docLuot(taiLich[taiVi]);
     }, 260);
   }
 }
@@ -476,6 +487,9 @@ function noiHinh(lai) {
   }, 380);
 }
 
+/* Đọc từ của lượt này, bằng giọng người, chậm lại một chút cho nghe rõ chỗ khác nhau. */
+function docLuot(l) { doc(am.cap[l.c][l.b ? 0 : 1], true, l.g); }
+
 function veTaiNut() {
   const n = oTrong.querySelector('[data-lai]');
   if (n && taiNghe >= 2) n.textContent = '▶ Nghe lại (hết lượt nghe lại)';
@@ -488,7 +502,7 @@ function chonTai(chonA) {
   taiKQ.push(dung);
   const bao = oTrong.querySelector('.pa-bao');
   if (bao) {
-    bao.textContent = dung ? 'Đúng.' : `Chưa đúng — vừa rồi là ${l.b ? am.taiA : am.taiB}.`;
+    bao.textContent = dung ? 'Đúng.' : `Chưa đúng — vừa rồi là "${am.cap[l.c][l.b ? 0 : 1]}".`;
     bao.className = 'pa-bao ' + (dung ? 'dung' : 'sai');
   }
   oTrong.querySelectorAll('.pa-chon-nut').forEach((n, i) => {
@@ -544,15 +558,24 @@ function veBuoc() {
 
   let than = '';
   if (ten === 'nghe') {
+    /* Dẫn bằng TỪ THẬT đọc bằng giọng người. Bản trước dẫn bằng âm rời do máy dựng: phổ đo ra
+       đúng số liệu ngữ âm học, nhưng tai người nghe không ra chữ gì — đo đúng phổ không có
+       nghĩa là nghe hiểu được, và bài kiểm của tôi không hề canh chỗ đó. Âm rời vẫn giữ, nhưng
+       lùi xuống làm phần phụ và nói thẳng nó là tiếng máy. */
     than = `
       <p class="pa-buoc">Bước 1 — nghe cho quen tai</p>
-      <button class="pa-to" data-am="1">Nghe âm ${esc(a.ipa)}</button>
-      <p class="pa-chu pa-nho pa-giua">Âm này do máy dựng bằng toán, không phải giọng người thật.
-        Nó đúng về mặt vật lý của âm, nhưng nghe hơi máy móc.</p>
+      <div class="pa-tu pa-tu-to">${a.tu.map((t, i) =>
+        `<button class="pa-tu-nut" data-t="${esc(t)}" data-g="${i}">▶ ${esc(t)}</button>`).join('')}</div>
+      <p class="pa-chu pa-nho pa-giua">Giọng người, do máy đọc của máy bạn phát — mỗi nút một giọng khác nhau.
+        Nghe âm ${esc(a.ipa)} nằm trong từ, vì đó mới là cách bạn gặp nó khi nói thật.</p>
       <div class="pa-khoi">
         <p class="pa-nhan">Vì sao phải học âm này</p>
         <p class="pa-chu">${esc(a.viSao)}</p>
-      </div>`;
+      </div>
+      <button class="pa-phu-nut pa-rong" data-am="1">Nghe âm ${esc(a.ipa)} tách riêng (tiếng máy dựng)</button>
+      <p class="pa-chu pa-nho pa-giua">Máy đọc không đọc được một âm đứng rời — đưa nó chữ θ thì nó
+        đọc tên chữ cái Hy Lạp. Nên âm tách riêng này do máy dựng bằng toán: đúng về vật lý, nhưng
+        nghe máy móc và khó bắt. Cái đáng tin là mấy từ ở trên.</p>`;
   } else if (ten === 'mieng') {
     /* Thứ tự hiển thị theo bằng chứng: hình MIỆNG NHÌN THẲNG là hình chính, vì soi gương là
        tự kiểm được ngay. Hình cắt dọc hạ xuống thành lớp "xem thêm" — nó chỉ có ích sau khi
@@ -640,7 +663,7 @@ function veBuoc() {
     nutCham.classList.toggle('bat', chamLai);
     noiHinh();
   };
-  oTrong.querySelectorAll('.pa-tu-nut').forEach(n => { n.onclick = () => doc(n.dataset.t, true); });
+  oTrong.querySelectorAll('.pa-tu-nut').forEach(n => { n.onclick = () => doc(n.dataset.t, true, +(n.dataset.g || 0)); });
   oTrong.querySelectorAll('.pa-cap-nut').forEach(n => { n.onclick = () => moCap(a.cap[+n.dataset.i]); });
 
   /* nút nào cũng vừa phát âm vừa cho hình chạy lại từ đầu, để tai và mắt khớp nhau */
@@ -652,7 +675,7 @@ function veBuoc() {
     };
   });
   noiHinh();
-  if (ten === 'nghe') setTimeout(() => phatAm(a.am, a.kieu), 220);
+  if (ten === 'nghe') setTimeout(() => doc(a.tu[0], true, 0), 260);
 }
 
 /* Vòng chạy thứ hai, cho hình bên phải ở bước so sánh. */
@@ -803,6 +826,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classLis
 self.TDTD_PHATAM = { mo, dong, _am: AM,
   _phat: (t, k) => phatAm(t, k),
   _loa: () => ac && ac.state,
+  _giong: () => dsGiong.map(v => v.name),
   _buoc: () => buoc,
   _soBuoc: (a) => cacBuoc(a),
   _khung: (kh, tac) => khungHinh(kh, tac),

@@ -640,3 +640,6 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink-dim)}
 .pa-phu-nut:hover{background:rgba(255,255,255,.11);color:var(--ink)}
 .pa-phu-nut.bat{border-color:rgba(232,195,122,.45);background:rgba(232,195,122,.14);color:var(--ink)}
+.pa-tu-to{gap:10px;margin-bottom:12px}
+.pa-tu-to .pa-tu-nut{flex:1 1 130px;padding:16px 12px;font-size:16px;text-align:center}
+.pa-rong{display:block;width:100%;margin:6px 0 8px}

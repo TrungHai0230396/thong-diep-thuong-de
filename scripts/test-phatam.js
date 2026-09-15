@@ -156,9 +156,10 @@ ok('âm tắc được đánh dấu để dựng kèm nguyên âm, vì phát r�
    AM.filter(a => ['p', 'b', 't', 'd', 'k', 'g'].includes(a.am)).every(a => a.tac));
 
 console.log('\n— Bài nghe: tai đi trước miệng, và không ra bài cho cặp không ai phân biệt nổi —');
+ok('không còn nhãn luyện tai kiểu cũ nằm lại làm dữ liệu chết',
+   AM.every(a => a.taiA === undefined && a.taiB === undefined));
 const ds0 = self.TDTD_PHATAM._soBuoc(AM[0]);
 ok('bước luyện tai đứng trước bước xem miệng', ds0.indexOf('tai') < ds0.indexOf('mieng'), ds0.join(' → '));
-ok('âm nào có hai vế thì đều luyện tai được', AM.filter(a => a.am2).every(a => a.taiA && a.taiB));
 /* /f/ và /θ/ dựng đúng thì vẫn gần như không phân biệt được bằng tai — thí nghiệm 1961 cho
    người bản ngữ nghe cũng chịu. Ra bài bắt chọn giữa hai âm đó là bịa ra một tương phản
    không tồn tại, và người học sẽ "đúng" nhờ đoán. */
@@ -198,6 +199,42 @@ ok('âm tắc có khung nhả hơi, thứ hình tĩnh không nói được',
 ok('âm kéo dài được thì hơi thoát đều suốt', self.TDTD_PHATAM._khung(AM[1].kh, false).some(k => k.p.hoi > .5));
 ok('mỗi khung là một tư thế khác nhau, không đứng yên',
    new Set(self.TDTD_PHATAM._khung(AM[2].kh, true).map(k => JSON.stringify(k.p))).size >= 3);
+
+console.log('\n— Nghe bằng giọng NGƯỜI, không phải âm máy dựng —');
+/* Bài học lớn nhất của vòng này: đo đúng phổ KHÔNG có nghĩa là tai người nghe ra. Bộ dựng âm
+   khớp số liệu ngữ âm học trên 47 phép đo, mà người dùng nghe vẫn không hiểu gì. Nên thứ dẫn
+   dắt người học phải là từ thật đọc bằng giọng người; âm dựng lùi xuống làm phần phụ. */
+ok('bước đầu dẫn bằng từ thật, không phát âm rời',
+   /Bước 1 — nghe cho quen tai[\s\S]{0,400}pa-tu-nut/.test(nguon)
+   && !/Bước 1[\s\S]{0,200}data-am="1">Nghe âm/.test(nguon));
+ok('có nói rõ đâu là giọng người', /Giọng người, do máy đọc của máy bạn phát/.test(nguon));
+ok('âm máy dựng còn giữ nhưng nói thẳng là tiếng máy',
+   /tách riêng \(tiếng máy dựng\)/.test(nguon) && /nghe máy móc và khó bắt/.test(nguon));
+ok('nói rõ vì sao máy đọc không đọc được âm rời', /tên chữ cái Hy Lạp/.test(nguon));
+ok('luyện tai đọc TỪ trong cặp, không phát âm rời',
+   /function docLuot[\s\S]{0,160}am\.cap\[l\.c\]/.test(nguon));
+ok('câu hỏi hỏi về TỪ chứ không hỏi về âm', /Bạn vừa nghe từ nào/.test(nguon));
+ok('luyện tai chỉ mở khi có cặp từ thật để đọc', /if \(a\.cap\.length\) ds\.push\('tai'\)/.test(nguon));
+ok('âm nào có bước luyện tai thì đều có cặp từ',
+   AM.filter(a => self.TDTD_PHATAM._soBuoc(a).includes('tai')).every(a => a.cap.length),
+   AM.filter(a => self.TDTD_PHATAM._soBuoc(a).includes('tai') && !a.cap.length).map(a => a.ipa).join(', '));
+
+console.log('\n— Chọn giọng: loại giọng trò đùa của hệ điều hành —');
+/* Máy Mac có 30 giọng en-US thì 13 giọng là trò đùa. Lấy bừa "giọng en-US đầu tiên" là có ngày
+   cả bài học đọc bằng giọng Bubbles. */
+const mDua = nguon.match(/const GIONG_DUA = \/([^/]+)\//);
+ok('có danh sách loại giọng trò đùa', !!mDua);
+const reDua = mDua ? new RegExp(mDua[1], 'i') : null;
+ok('loại đủ các giọng trò đùa hay gặp trên máy Mac',
+   reDua && ['Bad News', 'Bells', 'Boing', 'Bubbles', 'Cellos', 'Jester', 'Organ',
+             'Superstar', 'Trinoids', 'Whisper', 'Wobble', 'Zarvox'].every(n => reDua.test(n)),
+   reDua ? ['Bad News', 'Bells', 'Boing', 'Bubbles', 'Zarvox'].filter(n => !reDua.test(n)).join(', ') : '');
+ok('không loại nhầm giọng tử tế',
+   reDua && ['Samantha', 'Alex', 'Ava', 'Allison', 'Google US English', 'Microsoft Aria'].every(n => !reDua.test(n)),
+   reDua ? ['Samantha', 'Alex', 'Ava', 'Allison'].filter(n => reDua.test(n)).join(', ') : '');
+ok('gom nhiều giọng chứ không lấy mỗi một, để bài nghe đổi giọng được',
+   /dsGiong = xep[\s\S]{0,80}slice\(0, 5\)/.test(nguon));
+ok('mỗi lượt nghe gắn một giọng', /doc\(am\.cap\[l\.c\]\[l\.b \? 0 : 1\], true, l\.g\)/.test(nguon));
 
 console.log('\n— Máy không nghe được thì phải nói vì sao, đừng im lặng —');
 ok('có lối đi cho máy không có phần nhận giọng nói', /không có phần nhận giọng nói/.test(nguon));
