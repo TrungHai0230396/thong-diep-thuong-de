@@ -385,6 +385,10 @@ function cacBuoc(a) {
 /* ---- bước luyện tai ---- */
 const TAI_SO = 8;
 let taiLich = [], taiVi = 0, taiKQ = [], taiNghe = 0, taiChot = false;
+/* Thẻ phiên: mỗi lần vào lại bước luyện tai thì tăng một. Các hẹn giờ đang treo mang thẻ cũ sẽ
+   tự bỏ qua. Không có nó thì bấm trả lời rồi bấm ngay "Bỏ qua bước này" là màn luyện tai vẽ đè
+   lên bước vừa chuyển sang, và tiếng của lượt cũ vẫn kêu. */
+let phienTai = 0;
 
 function xepLich(a) {
   /* Bốn lượt âm này, bốn lượt âm kia, trộn lên; giọng thì xoay vòng cho đủ cả năm.
@@ -445,9 +449,13 @@ function veTai() {
   const lam = oTrong.querySelector('[data-lam]');
   if (lam) lam.onclick = () => { batTai(am); };
   oTrong.querySelectorAll('.pa-chon-nut').forEach(n => { n.onclick = () => chonTai(+n.dataset.b === 0); });
-  if (!xong && !taiChot) setTimeout(() => {
-    phatAm(taiLich[taiVi].b ? am.am : am.am2, am.kieu, .85, taiLich[taiVi].g);
-  }, 260);
+  if (!xong && !taiChot) {
+    const the = phienTai;
+    setTimeout(() => {
+      if (the !== phienTai || !am) return;
+      phatAm(taiLich[taiVi].b ? am.am : am.am2, am.kieu, .85, taiLich[taiVi].g);
+    }, 260);
+  }
 }
 /* Nối mọi hình đang hiện trên màn với vòng chạy. Gọi lại được sau khi mở lớp "xem thêm"
    hoặc đổi tốc độ, nên không cần vẽ lại cả màn. */
@@ -487,13 +495,16 @@ function chonTai(chonA) {
     if ((i === 0) === l.b) n.classList.add('that');
     n.disabled = true;
   });
+  const the = phienTai;
   setTimeout(() => {
+    if (the !== phienTai || !am) return;
     taiVi++; taiNghe = 0; taiChot = false;
-    if (am) veTai();
+    veTai();
   }, dung ? 700 : 1300);
 }
 
 function batTai(a) {
+  phienTai++;
   taiLich = xepLich(a); taiVi = 0; taiKQ = []; taiNghe = 0; taiChot = false;
   veTai();
 }
@@ -514,11 +525,12 @@ function dauMan() {
       `<i class="${i === buoc ? 'nay' : i < buoc ? 'roi' : ''}"></i>`).join('')}</div>`;
 }
 function gocMan() {
-  oTrong.querySelector('.pa-quay').onclick = veDanhSach;
+  oTrong.querySelector('.pa-quay').onclick = () => { phienTai++; veDanhSach(); };
   const lui = oTrong.querySelector('.pa-lui');
-  if (lui) lui.onclick = () => { if (buoc > 0) { buoc--; veBuoc(); } else veDanhSach(); };
+  if (lui) lui.onclick = () => { phienTai++; if (buoc > 0) { buoc--; veBuoc(); } else veDanhSach(); };
   const toi = oTrong.querySelector('.pa-toi');
   if (toi) toi.onclick = () => {
+    phienTai++;
     if (buoc >= cacBuoc(am).length - 1) { veDanhSach(); return; }
     buoc++; veBuoc();
   };
@@ -779,6 +791,8 @@ function mo() {
 }
 function dong() {
   thoiNghe(); thoiHinh();
+  phienTai++;                                   // đóng sao rồi thì hẹn giờ cũ đừng kêu nữa
+  if (ac) { try { ac.suspend(); } catch (e) {} }
   if (self.speechSynthesis) { try { speechSynthesis.cancel(); } catch (e) {} }
   if (tam) tam.classList.remove('hien');
   document.body.classList.remove('khoa-cuon');

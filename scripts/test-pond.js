@@ -75,6 +75,29 @@ const quaSuc = () => {
   return [...dem].filter(([i, n]) => n > suc(la[i].r)).map(([i, n]) => `lá#${i} ${n}/${suc(la[i].r)}`);
 };
 
+/* Dựng thẳng đúng tình huống từng làm hỏng bất biến ở phút 30, thay vì chờ nó tự xảy ra
+   khoảng một lần trong ba lượt chạy ba phút. Hai lỗi ghép lại mới ra:
+   1. đáp xuống lá xong mà không xoá e.dich, nên con đang ngồi vẫn mang mục tiêu bơi cũ;
+   2. boLa() so e.la === i SAU khi đã dời chỉ số, nên so nhầm sang chiếc lá khác.
+   Kết quả: con ếch ngồi trên lá j > i, bị dời thành j-1, rồi vẫn bị gán cho đang bơi. */
+function soatBoLa() {
+  const truoc = HO._la().length;
+  if (truoc < 3) return ['hồ chưa đủ lá để dựng phép thử'];
+  const loi = [];
+  /* con #0 ngồi trên lá 2 nhưng còn mang mục tiêu cũ là lá 1 — đúng vết mà lỗi để lại */
+  HO._datEch([{ la: 2, dich: 1 }, { la: 1, dich: -1 }, { la: -1, boi: true, dich: 1 }]);
+  HO._boLa(1);
+  const e = HO._ech(), la = HO._la();
+  if (e[0].boi) loi.push('con đang ngồi lá khác bị gán cho đang bơi khi một lá xa nó biến mất');
+  if (e[0].la !== 1) loi.push(`con ngồi lá 2 phải được dời thành lá 1, đang là ${e[0].la}`);
+  if (e[1].la !== -1) loi.push('con ngồi đúng chiếc lá vừa mất phải được gỡ ra');
+  if (e[1].la === -1 && !e[1].boi) loi.push('con mất lá phải xuống nước bơi');
+  if (!e[2].boi || e[2].la >= 0) loi.push('con đang bơi tới lá vừa mất phải bơi tiếp, không được bám lá');
+  e.forEach((x, i) => { if (x.boi && x.la >= 0) loi.push(`ếch #${i} vừa bơi vừa bám lá`); });
+  if (la.length !== truoc - 1) loi.push('số lá không giảm đúng một');
+  return loi;
+}
+
 /* `chat` = hồ đang bị nhồi ếch quá mức thiết kế. Lúc đó chuyện lá chở quá sức là liên tục và
    đúng ý đồ: con nào cũng có quyền nhảy lên lá đông, lá lún rồi hất con lên sau cùng xuống,
    nhồi gấp ba sức chứa thì vòng đó không bao giờ ngớt. Chỉ đòi lá tự gỡ ra ở hồ chạy tự nhiên. */
@@ -150,6 +173,7 @@ gioThuc(false);
 ok('trả hết nợ', HO._debug().noTua === 0, `${khung} khung, tổng ${tong} ms`);
 ok('chia ra nhiều khung chứ không dồn một cục', khung > 20, `${khung} khung`);
 ok('không khung nào đơ quá 60 ms', dinh <= 60, `nặng nhất ${dinh} ms`);   // ngân sách 40 cộng một bước lỡ nhịp
+const khung8 = khung;                                 // mốc để đong bài một ngày ở dưới
 
 HO.mo(); chay(3);
 HO._buTru(30 * 60 * 1000);
@@ -186,7 +210,19 @@ gioThuc(true);
 let khungNgay = 0;
 while (HO._debug().noTua > 0 && khungNgay < 500000) { chay(1 / 60, 33); khungNgay++; }
 gioThuc(false);
-ok('một ngày nợ trả xong trong vài trăm khung', khungNgay < 600, `${khungNgay} khung`);
+/* Đong bằng chính bài tám tiếng ở trên, đo trên cùng cái máy trong cùng lượt chạy — nhờ vậy
+   tốc độ máy bị khử đi. Phải làm thế vì con số tuyệt đối không nói lên gì về thuật toán: cùng
+   một đoạn mã, máy rảnh ra 5xx khung, máy đang đánh chỉ mục ra 7xx, nên ngưỡng 600 cứng lúc
+   đạt lúc hỏng. Mà bỏ hẳn giờ thật đi cũng không xong: không có giờ thật thì cơ chế chia ngân
+   sách chẳng bị ép gì, nó trả sạch nợ trong ĐÚNG MỘT khung và bài kiểm thành ra đạt suông.
+
+   Ngưỡng đặt theo phương sai ĐO ĐƯỢC, không theo cảm tính: một ngày gấp ba lần tám tiếng, mà
+   tỉ lệ thật đo qua nhiều lượt trải từ 1,8 tới 5,4 lần — hai phép đo diễn ra ở hai lúc khác
+   nhau nên tải máy giữa chúng cũng khác. Lấy mười lần là còn gần gấp đôi chỗ trống so với lượt
+   xấu nhất từng thấy, mà vẫn bắt được hồi quy thật: thuật toán mà hỏng thì tỉ lệ vọt lên hàng
+   chục lần chứ không nhích lên vài phần mười. */
+ok('một ngày nợ không tốn quá nhiều khung hơn tám tiếng',
+   khungNgay < Math.max(200, khung8 * 10), `${khungNgay} khung, tám tiếng tốn ${khung8}`);
 
 console.log('\n— Đàn bọ là một quần thể, không phải cái vòi phun —');
 HO.mo(); chay(60);
@@ -199,10 +235,13 @@ ok('không ai ăn thì đàn bọ dày lên ngay', HO._dam().damBo > boA, `${boA
 /* Mốc theo thời gian: mùa đổi 50–110 giây một lần nên phải nhìn cả quãng dài, và nhìn đỉnh
    chứ không nhìn lúc cuối — cuối quãng có thể rơi đúng mùa vắng. */
 let dinhBo = HO._dam().damBo;
-for (let i = 0; i < 24; i++) { chay(15); dinhBo = Math.max(dinhBo, HO._dam().damBo); }
-/* Nói cho đúng: chỉ trống được chừng một phút thôi, rồi có con lạc tới ăn. Nên nhìn đỉnh
-   của quãng — đỉnh là lúc hồ còn trống — chứ không nhìn con số lúc cuối. */
-ok('hồ trống thì đàn bọ lên rõ trước khi ếch quay lại', dinhBo >= 2, `đỉnh ${dinhBo.toFixed(2)}`);
+/* Giữ hồ TRỐNG suốt quãng đo, thay vì để mặc rồi nhìn đỉnh. Lý do: chừng một phút là có ếch
+   lạc bơi tới ăn, mà nó tới lúc nào thì ngẫu nhiên — nên đỉnh đo được lúc 2,4 lúc 1,92, và
+   bài kiểm hỏng oan chừng một lần trong bốn lượt. Điều cần khẳng định ở đây là "không ai ăn
+   thì đàn bọ dày lên", nên dọn sạch kẻ ăn đi là đo đúng thứ định đo, chứ không phải nới ngưỡng
+   cho nó qua. */
+for (let i = 0; i < 24; i++) { HO._donSach(); chay(15); dinhBo = Math.max(dinhBo, HO._dam().damBo); }
+ok('không có gì ăn thì đàn bọ dày lên rõ', dinhBo >= 2, `đỉnh ${dinhBo.toFixed(2)}`);
 ok('đàn bọ không vượt quá sức chứa của mùa', HO._dam().damBo <= HO._dam().sucBo * 1.45,
    `${HO._dam().damBo} / sức chứa ${HO._dam().sucBo}`);
 /* Bản đầu tôi làm tròn thay vì lấy phần nguyên: đàn 0,5 con vẫn thả một con bay ra, ếch nuốt
@@ -246,6 +285,10 @@ for (let i = 0; i < 6; i++) {
   if (HO._debug().ech === 0) chetHo++;
 }
 ok('ẩn tab một ngày rồi quay lại, hồ không chết sạch', chetHo <= 1, `${chetHo}/6 hồ trống`);
+
+console.log('\n— Gỡ một chiếc lá giữa mảng —');
+const loiBoLa = soatBoLa();
+ok('gỡ lá xong không con nào rơi vào trạng thái mâu thuẫn', loiBoLa.length === 0, loiBoLa.join('; '));
 
 console.log('\n— Chạy dài một tiếng —');
 HO.mo(); chay(3);

@@ -486,6 +486,65 @@ Vùng bắt điểm khi chạm cũng tự co theo từng chòm: chòm nào có h
 
 Một lưu ý về độ chính xác: Hội Thiên văn Việt Nam nêu rõ Thần Nông chỉ là **nhóm sao** do người xưa đặt tên, không trùng khớp với chòm Thiên Yết trong thiên văn học hiện đại. App ghi đúng như vậy trong phần chú thích chứ không gọi nhầm là chòm sao.
 
+## Con ếch vừa bơi vừa bám lá
+
+Bài kiểm hồ nước hỏng khoảng **một lần trong ba lượt chạy**, luôn ở quanh phút 30, luôn cùng một
+câu: `ếch #2 vừa bơi vừa bám lá`. Lúc đầu trông như bài kiểm chập chờn — chạy lại là đạt. Nó
+không chập chờn; đó là một lỗi thật, chỉ cần đúng hai việc xảy ra cùng lúc nên mới hiếm.
+
+Hai lỗi ghép lại mới ra:
+
+1. **Đáp xuống lá xong mà không xoá mục tiêu bơi cũ.** Con ếch bơi tới lá `i`, trèo lên, nhảy
+   sang lá khác — nhưng `e.dich` vẫn giữ nguyên số `i` mãi mãi. Nhìn vào trạng thái thì nó "đang
+   nhắm tới" một chiếc lá mà thực ra nó đã rời từ lâu.
+2. **`boLa()` so chỉ số cũ sau khi đã dời chỉ số.** Hàm này gom trước danh sách con nào liên
+   quan, rồi `splice` chiếc lá ra khỏi mảng, rồi dời chỉ số của mọi con (`e.la--` nếu `e.la > i`),
+   rồi mới so `e.la === i`. Tới lúc so thì `i` đã trỏ sang một chiếc lá khác rồi.
+
+Ghép lại: con ếch ngồi yên trên lá `j > i` nhưng còn mang `dich === i` cũ. Lá `i` tàn và bị gỡ.
+Nó bị gom vào danh sách "liên quan" qua cái `dich` cũ đó. Chỉ số của nó bị dời `j → j-1`. Rồi
+phép so `e.la === i` trượt, nên nó không được gỡ khỏi lá — mà vẫn bị gán `boi = true`. Thành ra
+một con ếch vừa bơi vừa bám lá. Lỗi thứ hai còn có mặt tệ hơn: con nào đang ngồi đúng lá `i+1`
+thì bị **đá khỏi chiếc lá hoàn toàn lành lặn**.
+
+Chữa: xoá `e.dich` ngay khi bám được lá; và trong `boLa()` thì so `=== i` **trước** rồi mới dời
+chỉ số, đồng thời không bắt con nào còn lá phải xuống nước.
+
+Đi tìm lỗi trên còn lòi ra một bài kiểm **hỏng oan** ngay bên cạnh, và nó đáng nói vì là một
+kiểu sai khác hẳn. Bài "hồ trống thì đàn bọ lên rõ" dọn sạch ếch rồi đo đỉnh đàn bọ trong sáu
+phút, đòi đỉnh ≥ 2. Nhưng chừng một phút là có ếch lạc bơi tới ăn, mà nó tới lúc nào thì ngẫu
+nhiên — nên đỉnh lúc 2,4 lúc 1,92, hỏng chừng một lần trong bốn lượt. Cách chữa dễ là hạ ngưỡng
+xuống 1,8, và như thế là sai: hạ ngưỡng chỉ làm bài kiểm im đi chứ không làm nó đo đúng hơn.
+Điều cần khẳng định ở đây là "không có gì ăn thì đàn bọ dày lên", nên bây giờ hồ được **dọn sạch
+ở mỗi bước đo** — bỏ hẳn cái ngẫu nhiên đi thay vì nới ngưỡng để chiều nó.
+
+Và một bài thứ ba, hỏng theo kiểu thứ ba. Bài "một ngày nợ trả xong trong vài trăm khung" đếm
+số khung cần để trả hết một ngày thời gian ẩn tab, đòi dưới 600. Cùng một đoạn mã: máy rảnh ra
+5xx khung, máy đang đánh chỉ mục Spotlight ra 7xx. Lý do là lúc đo có cộng giờ thật vào nợ, nên
+máy càng chậm thì mỗi khung càng làm nợ dày thêm — một vòng luẩn quẩn, và con số tuyệt đối
+không nói lên điều gì về thuật toán.
+
+Tôi thử bỏ hẳn giờ thật đi cho hết ngẫu nhiên, y như cách chữa bài đàn bọ. **Không xong**, và nó
+hỏng theo cách nguy hiểm hơn: không có giờ thật thì cơ chế chia ngân sách chẳng bị ép gì, nó trả
+sạch nợ trong đúng **một** khung, bài kiểm đạt suông mà không còn khẳng định gì cả. Một bài kiểm
+luôn đạt còn tệ hơn một bài kiểm lúc đạt lúc hỏng, vì nó còn giả vờ đang canh giữ.
+
+Cách chữa đúng là **đong bằng chính bài tám tiếng ở ngay trên, đo trên cùng cái máy trong cùng
+lượt chạy** — tốc độ máy có mặt ở cả hai vế nên bị khử đi, và cái còn lại đúng là thứ cần đo:
+trả một ngày nợ có tốn quá nhiều khung hơn trả tám tiếng không.
+
+Nói cho hết: cách này **giảm** dao động chứ không xoá được nó, vì hai phép đo diễn ra ở hai lúc
+khác nhau nên tải máy giữa chúng cũng khác. Đo thật qua nhiều lượt thấy tỉ lệ trải từ 1,8 tới
+5,4 lần. Nên ngưỡng đặt ở mười lần — lấy từ phương sai đo được chứ không từ cảm tính, còn gần
+gấp đôi chỗ trống so với lượt xấu nhất từng thấy, mà vẫn bắt được hồi quy thật: thuật toán hỏng
+thì tỉ lệ vọt lên hàng chục lần chứ không nhích vài phần mười.
+
+Chỗ đáng nói về cách kiểm: tôi không sửa rồi chạy lại cho tới khi xanh — như vậy chỉ chứng minh
+được là nó *hiếm*, không chứng minh được là nó *hết*. Thay vào đó dựng thẳng đúng tình huống đó
+trong `soatBoLa()` (con #0 ngồi lá 2 mà còn mang `dich` là lá 1, rồi gỡ lá 1), rồi **chạy bài
+kiểm mới đó với bản pond.js CHƯA sửa** để chắc rằng nó thật sự báo hỏng. Một bài kiểm đạt cả
+trước lẫn sau khi vá thì không chứng minh được gì cả.
+
 ## Hồ nước: cân bằng cá và nòng nọc
 
 Cú phóng của cá phải bắt đầu **xa hơn** khoảng nòng nọc cong đuôi chạy. Bản trước cá tăng tốc ở 55 pixel còn nòng nọc bỏ chạy từ 62, nên có một vành đai mà nòng nọc nhanh hơn cá: nó thoát ra, cá chậm lại, rồi lặp mãi, không con nào bị bắt.

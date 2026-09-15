@@ -257,18 +257,20 @@ function choNhu(me) {
    Con nào đang ngồi, đang bay tới hay đang bơi tới chiếc lá vừa mất thì cho xuống nước bơi tiếp,
    nếu không nó sẽ đáp xuống chỗ trống rồi ngồi trên mặt nước. */
 function boLa(i) {
+  /* Ghi lại ai liên quan TRƯỚC khi dời chỉ số. Sau khi splice thì i trỏ sang một chiếc lá khác,
+     nên so e.la === i lúc đó là so nhầm người — chính chỗ này từng đẻ ra con ếch vừa bơi vừa
+     bám lá: nó ngồi trên lá j > i, bị dời thành j-1, rồi vẫn bị gán cho đang bơi. */
   const mat = ech.filter(e => e.la === i || e.dich === i);
   const laMat = la[i];
   for (const k of la) if (k.cuong && k.cuong.me === laMat) k.cuong = null;   // lá mẹ mất thì cuống rụng
   la.splice(i, 1);
   for (const e of ech) {
-    if (e.la > i) e.la--;
-    if (e.dich > i) e.dich--;
+    if (e.la === i) e.la = -1; else if (e.la > i) e.la--;
+    if (e.dich === i) e.dich = -1; else if (e.dich > i) e.dich--;
   }
   for (const e of mat) {
-    if (e.la === i) e.la = -1;
-    if (e.dich === i) e.dich = -1;
     if (e.tan !== null) continue;                       // con đang tan thì để nó tan
+    if (e.la >= 0) continue;                            // vẫn còn lá bám thì cứ ngồi, khỏi xuống nước
     e.boi = true; e.dich = laConCho(-1, e.x, e.y);
   }
 }
@@ -548,6 +550,10 @@ function buocMotCon(e, dt) {
     e.y = e.y0 + (e.y1 - e.y0) * p;
     if (p >= 1) {
       e.nhay = false; e.nghi = 240; e.tuNhay = rnd(5000, 15000); e.tDap = tTruoc;
+      /* Bám được lá rồi thì mục tiêu bơi cũ hết nghĩa. Không xoá thì con ếch đang ngồi yên vẫn
+         mang chỉ số một chiếc lá nó từng nhắm tới, và khi chiếc đó biến mất thì boLa() nhặt
+         nhầm nó, gán cho đang bơi trong khi nó vẫn bám lá. */
+      if (e.la >= 0) e.dich = -1;
       if (la[e.la]) la[e.la].lun += 5;
       themSong(e.x, e.y, .5, 'dapXuong');               // đáp xuống lá, sóng lan ra từ chỗ đáp
     }
@@ -1484,6 +1490,11 @@ addEventListener('visibilitychange', () => {
   }
 });
 self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTru: (ms) => buTru(ms),
+  _boLa: (i) => boLa(i),
+  _datEch: (ds) => { ech.length = 0; for (const o of ds) ech.push(Object.assign({
+      x: 0, y: 0, x0: 0, y0: 0, x1: 0, y1: 0, goc: 0, t: 0, doi: 500, cung: .5, dx: 0, dy: 0,
+      la: -1, dich: -1, nhay: false, boi: false, tan: null, nghi: 0, tuNhay: 9e9, luoi: null,
+      no: 0, tuoi: 0, doiSong: 9e9 }, o)); },
   _nhanh: (n) => { nhanh = n; hienNhanh(n > 1); return nhanh; },
   _cham: (x, y) => { themSong(x, y, 1); const con = echTai(x, y); if (con) giatMinh(con, x, y); },
   _trungEch: (x, y) => !!echTai(x, y),
