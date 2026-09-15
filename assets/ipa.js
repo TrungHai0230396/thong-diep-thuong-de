@@ -29,6 +29,7 @@
 const AM = [
   /* ---- cuối âm tiết: nhóm quan trọng nhất ---- */
   { ipa: '/l/ cuối', ten: 'l cuối bị nuốt hoặc thành n', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
+    tuA: 'tell', tuB: 'ten',
     hinh: 'canh',
     am: 'l-toi', am2: 'n', sai2: true,
     viSao: 'Âm hỏng nhiều nhất khi đo trên người Việt: chỉ 25% đúng, 50% mất hẳn. Tiếng Việt có "l" ở đầu từ nhưng tuyệt đối không có ở cuối, nên "call" thành "co", "tell" thành "ten". Người miền Bắc còn sẵn thói lẫn l/n ngay trong tiếng Việt, mang luôn sang.',
@@ -39,6 +40,7 @@ const AM = [
     nhan1: '/l/ — hơi ra hai bên lưỡi', kh2: { luoiSau: .2, luoiCao: .4, dauLuoi: 1, moiTron: 0, hamMo: .2, rung: true, mui: true, chamO: 'loi' }, nhan2: 'thành /n/ — hơi lên mũi (sai)', moi2: 'trung' },
 
   { ipa: '/s/ /z/ cuối', ten: 'đuôi s của số nhiều', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
+    tuA: 'price', tuB: 'prize',
     hinh: 'canh',
     am: 's', am2: 'z',
     viSao: 'Người Việt bỏ /s/ cuối gần như mọi lúc. Mất đuôi s là mất dấu số nhiều và mất chia động từ: "two books" thành "two book". Tiếng Việt cũng không có /z/ ở cuối, nên "eyes" dễ thành "ice" — khác nghĩa hẳn.',
@@ -49,6 +51,7 @@ const AM = [
     nhan1: '/s/ — không rung', kh2: { luoiSau: .05, luoiCao: .5, dauLuoi: .85, moiTron: 0, hamMo: .18, rung: true, mui: false, chamO: 'loi' }, nhan2: '/z/ — cùng chỗ, có rung', moi2: 'trung' },
 
   { ipa: '/t/ /d/ cuối', ten: 'bật ra, đừng nuốt', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
+    tuA: 'hat', tuB: 'had',
     hinh: 'canh',
     am: 't', am2: 'd', tac: true, kieu: 'cuoi',
     viSao: 'Tiếng Việt CÓ /t/ cuối nhưng ngậm luôn, không nhả hơi — người bản ngữ nghe như bạn chưa nói xong. Nặng hơn: đuôi quá khứ -ed cũng chính là âm này (worked, played), nuốt mất là người nghe không biết chuyện xảy ra lúc nào.',
@@ -59,6 +62,7 @@ const AM = [
     nhan1: '/t/ — chặn rồi bật ra', kh2: { luoiSau: .05, luoiCao: .3, dauLuoi: 1, moiTron: 0, hamMo: .2, rung: true, mui: false, chamO: 'loi' }, nhan2: '/d/ — cùng chỗ, có rung', moi2: 'trung' },
 
   { ipa: '/k/ /g/ cuối', ten: 'work hay bị nghe thành word', nhom: 'Cuối từ', uuTien: 7, kiemDuoc: true,
+    tuA: 'back', tuB: 'bag',
     hinh: 'canh',
     am: 'k', am2: 'g', tac: true, kieu: 'cuoi',
     viSao: 'Cuối từ, /k/ và /g/ hay bị đổi chỗ cho nhau hoặc rơi mất. Có ghi nhận "work" bị nghe thành "word".',
@@ -68,6 +72,7 @@ const AM = [
     kh: { luoiSau: 1, luoiCao: .7, dauLuoi: 0, moiTron: 0, hamMo: .2, rung: false, mui: false, chamO: 'vom-mem' }, moi: 'trung' },
 
   { ipa: '/f/ /v/ cuối', ten: 'life hay thành laip', nhom: 'Cuối từ', uuTien: 6, kiemDuoc: false,
+    tuA: 'life',
     hinh: 'truoc',
     am: 'f', am2: 'p', sai2: true,
     viSao: 'Cuối từ, /f/ và /v/ hay bị đổi thành /p/ hoặc rơi mất: "life" thành "laip", "five" thành "fai". "Laip" không phải từ tiếng Anh, nên máy sẽ tự nắn về "life" và giấu mất lỗi — mục này chỉ học bằng hình.',
@@ -79,6 +84,7 @@ const AM = [
 
   /* ---- cụm phụ âm ---- */
   { ipa: 'cụm st- sp- sk-', ten: 'đừng bỏ chữ đầu', nhom: 'Cụm phụ âm', uuTien: 8, kiemDuoc: true,
+    tuA: 'stop', tuB: 'top',
     hinh: 'canh',
     am: ['s', 't'], am2: 't', sai2: true, tac: true,
     viSao: 'Gặp hai phụ âm dính nhau, người Việt gần như luôn bỏ phụ âm THỨ NHẤT — đo được 55 trên 56 trường hợp. "Stop" thành "top", "spin" thành "pin", và cả hai đều là từ có thật nên người nghe hiểu sang nghĩa khác.',
@@ -88,6 +94,7 @@ const AM = [
     kh: { luoiSau: .05, luoiCao: .55, dauLuoi: .85, moiTron: 0, hamMo: .18, rung: false, mui: false, chamO: 'loi' }, moi: 'det' },
 
   { ipa: 'cụm -st -nd -ld', ten: 'hai phụ âm cuối', nhom: 'Cụm phụ âm', uuTien: 7, kiemDuoc: true,
+    tuA: 'cold', tuB: 'coal',
     hinh: 'canh',
     am: ['l-toi', 'd'], am2: 'l-toi', sai2: true, tac: true,
     viSao: 'Nhóm lì nhất, vẫn hỏng sau nhiều tuần luyện. Tiếng Việt không bao giờ có hai phụ âm cuối liền nhau nên miệng chưa từng phải làm việc đó.',
@@ -98,6 +105,7 @@ const AM = [
 
   /* ---- phụ âm đầu hay lẫn ---- */
   { ipa: '/p/ và /b/', ten: 'pat hay thành bat', nhom: 'Phụ âm đầu', uuTien: 9, kiemDuoc: true,
+    tuA: 'pat', tuB: 'bat',
     hinh: 'truoc',
     am: 'p', am2: 'b', tac: true,
     viSao: 'Tiếng Việt không có /p/ ở ĐẦU từ, nên nó hay trượt thành /b/ — có ghi nhận "people" đọc thành "bi-bồ". Đây là cặp đứng đầu bảng những lẫn lộn làm hỏng nghĩa nhiều nhất.',
@@ -108,6 +116,7 @@ const AM = [
     nhan1: '/p/ — không rung, phụt hơi', kh2: { luoiSau: .2, luoiCao: .2, dauLuoi: .1, moiTron: 0, hamMo: 0, rung: true, mui: false, chamO: 'moi' }, nhan2: '/b/ — cùng chỗ, có rung', moi2: 'trung' },
 
   { ipa: '/p/ và /f/', ten: 'funny hay thành punny', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
+    tuA: 'pat', tuB: 'fat',
     hinh: 'truoc',
     am: 'p', am2: 'f', tac: true,
     viSao: 'Người Việt hay đọc "funny", "famous" bằng âm /p/. Cặp này đứng thứ hai trong bảng những lẫn lộn làm hỏng nghĩa.',
@@ -118,6 +127,7 @@ const AM = [
     nhan1: '/p/ — hai môi khép kín rồi bật một cái', kh2: { luoiSau: .2, luoiCao: .3, dauLuoi: .1, moiTron: 0, hamMo: .18, rung: false, mui: false, chamO: 'rang' }, nhan2: '/f/ — răng chạm môi, hơi xì kéo dài', moi2: 'trung' },
 
   { ipa: '/n/ và /l/', ten: 'night hay thành light', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
+    tuA: 'night', tuB: 'light',
     hinh: 'canh',
     am: 'n', am2: 'l',
     viSao: 'Cặp lẫn lộn quen thuộc, nhất là với người miền Bắc vốn đã lẫn l/n trong tiếng Việt. Cả hai lỗi đều đẻ ra từ CÓ THẬT nên người nghe hiểu sang nghĩa khác chứ không đoán lại được.',
@@ -128,6 +138,7 @@ const AM = [
     nhan1: '/n/ — hơi lên mũi', kh2: { luoiSau: .55, luoiCao: .45, dauLuoi: 1, moiTron: .1, hamMo: .25, rung: true, mui: false, chamO: 'loi' }, nhan2: '/l/ — hơi ra hai bên lưỡi', moi2: 'trung' },
 
   { ipa: '/r/', ten: 'r kiểu Anh Mỹ', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
+    tuA: 'right', tuB: 'light',
     hinh: 'canh',
     am: 'r', am2: 'l',
     viSao: 'Chữ "r" tiếng Việt khác hẳn: miền Bắc đọc thành "z" (rice thành "zai"), miền Nam rung đầu lưỡi. /r/ tiếng Anh thì đầu lưỡi KHÔNG chạm vào đâu cả. Đọc sai thì "right" nghe ra "light".',
@@ -139,6 +150,7 @@ const AM = [
     nhan1: '/r/ — đầu lưỡi lơ lửng, không chạm', kh2: { luoiSau: .55, luoiCao: .45, dauLuoi: 1, moiTron: .1, hamMo: .25, rung: true, mui: false, chamO: 'loi' }, nhan2: '/l/ — đầu lưỡi chạm hẳn vào lợi', moi2: 'trung' },
 
   { ipa: '/v/ và /w/', ten: 'vet hay thành wet', nhom: 'Phụ âm đầu', uuTien: 7, kiemDuoc: true,
+    tuA: 'vet', tuB: 'wet',
     hinh: 'truoc',
     am: 'v', am2: 'w',
     viSao: 'Chữ "v" tiếng Việt đọc khác /v/ tiếng Anh; người miền Nam còn hay đọc thành "d/gi" (very thành "gia-ry"). Quên bật giọng thì /v/ thành /f/: "save" nghe ra "safe", nghĩa ngược nhau.',
@@ -149,6 +161,7 @@ const AM = [
     nhan1: '/v/ — răng chạm môi dưới', kh2: { luoiSau: .85, luoiCao: .6, dauLuoi: .05, moiTron: 1, hamMo: .2, rung: true, mui: false, chamO: 'khong' }, nhan2: '/w/ — môi chu, răng không chạm', moi2: 'tron' },
 
   { ipa: '/ʃ/', ten: 'sh trong she', nhom: 'Phụ âm đầu', uuTien: 6, kiemDuoc: true,
+    tuA: 'she', tuB: 'see',
     hinh: 'truoc',
     am: 'sh', am2: 's', sai2: true,
     viSao: 'Nhiều vùng tiếng Việt không phân biệt s/x nên "she" thành "see", "ship" thành "sip" — đều ra từ có thật, nghĩa đổi hẳn. Máy nhận giọng nói cũng nhầm y như người nghe.',
@@ -159,6 +172,7 @@ const AM = [
     nhan1: '/ʃ/ — lưỡi lùi sau, môi chu', kh2: { luoiSau: .05, luoiCao: .5, dauLuoi: .85, moiTron: 0, hamMo: .18, rung: false, mui: false, chamO: 'loi' }, nhan2: '/s/ — lưỡi sát lợi, môi bẹt', moi2: 'det' },
 
   { ipa: '/θ/ /ð/', ten: 'hai âm "th"', nhom: 'Phụ âm đầu', uuTien: 4, kiemDuoc: true,
+    tuA: 'think', tuB: 'this',
     hinh: 'truoc',
     am: 'th', am2: 'dh',
     viSao: 'Người học sợ âm này nhất, nhưng nó lại ÍT làm hỏng nghĩa nhất — "think" đọc thành "tink" thì người nghe vẫn hiểu. Sửa phụ âm cuối có lợi hơn nhiều. Để đây vì bạn sẽ đi tìm, không phải vì nó gấp.',
@@ -171,6 +185,7 @@ const AM = [
 
   /* ---- nguyên âm: có ích, nhưng ít cấp hơn phụ âm ---- */
   { ipa: '/ə/', ten: 'âm ơ nhẹ, schwa', nhom: 'Nguyên âm', uuTien: 6, kiemDuoc: false, bieu: 'ə',
+    tuA: 'about',
     hinh: 'truoc',
     am: 'uh',
     viSao: 'Âm hay gặp nhất trong tiếng Anh, nằm ở mọi âm tiết KHÔNG có trọng âm. Người Việt đọc rõ đều từng chữ nên câu nghe cứng và sai nhịp. Máy không kiểm được vì nó nằm chìm trong từ, không đứng riêng để đo.',
@@ -180,6 +195,7 @@ const AM = [
     kh: { luoiSau: .45, luoiCao: .45, dauLuoi: .1, moiTron: .4, hamMo: .4, rung: true, mui: false, chamO: 'khong' }, moi: 'trung' },
 
   { ipa: '/iː/ và /ɪ/', ten: 'sheep hay ship', nhom: 'Nguyên âm', uuTien: 5, kiemDuoc: true, bieu: 'iː',
+    tuA: 'sheep', tuB: 'ship',
     hinh: 'truoc',
     am: 'ii', am2: 'i',
     viSao: 'Cặp nguyên âm người Việt lẫn nhiều nhất. Chúng khác nhau ở VỊ TRÍ LƯỠI chứ không chỉ ở chỗ dài hay ngắn — nên kéo dài âm i tiếng Việt ra vẫn không thành /iː/.',
@@ -190,6 +206,7 @@ const AM = [
     nhan1: '/iː/ — lưỡi cao và ra trước', kh2: { luoiSau: .25, luoiCao: .72, dauLuoi: .15, moiTron: .35, hamMo: .3, rung: true, mui: false, chamO: 'khong' }, nhan2: '/ɪ/ — thả lỏng, hạ và lùi', moi2: 'trung' },
 
   { ipa: '/æ/', ten: 'a bẹt, cat', nhom: 'Nguyên âm', uuTien: 4, kiemDuoc: true, bieu: 'æ',
+    tuA: 'cat',
     hinh: 'truoc',
     am: 'ae',
     viSao: 'Hay bị đọc thành "e". "Bad" thành "bed", "man" thành "men" — đổi nghĩa hẳn.',
@@ -584,9 +601,19 @@ function veBuoc() {
     const canh = a.hinh === 'canh';
     const hinhCanh = (kh, nhan2, sai) => `<figure class="pa-hinh">${K ? K.ve(kh, { nhan: 'Khẩu hình ' + (nhan2 || a.ipa) }) : ''}
       ${nhan2 ? `<figcaption${sai ? ' class="pa-sai"' : ''}>${esc(nhan2)}</figcaption>` : ''}</figure>`;
+    /* Nút dưới mỗi hình đọc một TỪ THẬT bằng giọng người, chọn sao cho từ đó minh hoạ đúng cái
+       âm mà hình đang vẽ. Chỗ duy nhất còn dùng âm máy dựng là vế sai của /f/ /v/ cuối, vì lỗi
+       ở đó đẻ ra "laip" — không phải từ nên máy đọc chịu, mà lại đúng là cái cần cho nghe. */
+    const nutNghe = (thu, sai) => {
+      const t = thu === 2 ? a.tuB : a.tuA;
+      const lop = 'pa-nut-am' + (sai ? ' sai' : '');
+      return t
+        ? `<button class="${lop}" data-hinh="${thu}" data-t="${esc(t)}" data-g="${thu === 2 ? 1 : 0}">▶ ${esc(t)}</button>`
+        : `<button class="${lop}" data-hinh="${thu}">▶ nghe (tiếng máy dựng)</button>`;
+    };
     const hinhTruoc = (kh, ten2, sai, thu) => `<figure class="pa-hinh pa-truoc">${K ? K.veMatTruoc(kh, { nhan: 'Miệng nhìn thẳng, ' + (ten2 || a.ipa) }) : ''}
       ${ten2 ? `<figcaption${sai ? ' class="pa-sai"' : ''}>${esc(ten2)}</figcaption>` : ''}
-      <button class="pa-nut-am${sai ? ' sai' : ''}" data-am="${thu}">▶ nghe</button></figure>`;
+      ${nutNghe(thu, sai)}</figure>`;
     than = `
       <p class="pa-buoc">Bước ${ds.indexOf('mieng') + 1} — giờ mới xem miệng làm gì</p>
       <div class="pa-doi-hinh${canh ? '' : ' pa-to-hinh'}">
@@ -609,7 +636,9 @@ function veBuoc() {
       </div>
       ${a.luuY ? `<div class="pa-khoi pa-mo"><p class="pa-nhan">Một điều cần nói thật</p>
         <p class="pa-chu pa-nho">${esc(a.luuY)}</p></div>` : ''}
-      ${a.sai2 ? '<p class="pa-chu pa-nho pa-giua">Hình bên phải là lỗi hay gặp. Bấm nút của nó để nghe cái sai — nghe được nó thì mới tránh được nó.</p>' : ''}`;
+      <p class="pa-chu pa-nho pa-giua">Hai nút dưới hình đọc từ thật bằng giọng người.${a.sai2
+        ? ' Hình bên phải là lỗi hay gặp — bấm nút của nó để nghe cái sai, nghe được nó thì mới tránh được nó.'
+        : ''}</p>`;
   } else if (ten === 'tu') {
     than = `
       <p class="pa-buoc">Bước ${ds.indexOf('tu') + 1} — nghe âm đó nằm trong từ</p>
@@ -666,13 +695,19 @@ function veBuoc() {
   oTrong.querySelectorAll('.pa-tu-nut').forEach(n => { n.onclick = () => doc(n.dataset.t, true, +(n.dataset.g || 0)); });
   oTrong.querySelectorAll('.pa-cap-nut').forEach(n => { n.onclick = () => moCap(a.cap[+n.dataset.i]); });
 
-  /* nút nào cũng vừa phát âm vừa cho hình chạy lại từ đầu, để tai và mắt khớp nhau */
-  oTrong.querySelectorAll('[data-am]').forEach(n => {
+  /* nút dưới hình: đọc từ bằng giọng người (hoặc phát âm máy dựng nếu không có từ),
+     đồng thời cho hình chạy lại từ đầu để tai và mắt khớp nhau */
+  oTrong.querySelectorAll('[data-hinh]').forEach(n => {
     n.onclick = () => {
-      const hai = n.dataset.am === '2';
-      phatAm(hai ? a.am2 : a.am, a.kieu);
+      const hai = n.dataset.hinh === '2';
+      if (n.dataset.t) doc(n.dataset.t, true, +(n.dataset.g || 0));
+      else phatAm(hai ? a.am2 : a.am, a.kieu);
       noiHinh(hai ? 2 : 1);
     };
+  });
+  /* nút phụ ở bước đầu: âm tách riêng, không gắn với hình nào */
+  oTrong.querySelectorAll('[data-am]').forEach(n => {
+    n.onclick = () => phatAm(n.dataset.am === '2' ? a.am2 : a.am, a.kieu);
   });
   noiHinh();
   if (ten === 'nghe') setTimeout(() => doc(a.tu[0], true, 0), 260);

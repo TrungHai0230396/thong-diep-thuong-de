@@ -392,7 +392,15 @@ nghĩa là tai người nghe ra**, và bộ kiểm thử của tôi không hề 
 
 Nên bây giờ: bước mở đầu phát **từ thật** bằng máy đọc của hệ điều hành, mỗi nút một giọng; bài
 luyện tai hỏi *"bạn vừa nghe từ nào"* với cặp từ thật (sheep / ship) chứ không hỏi về âm rời.
-Âm rời vẫn còn, nhưng lùi xuống một nút phụ có ghi thẳng *"tiếng máy dựng"*.
+Bước xem miệng cũng vậy: nút dưới mỗi hình đọc một **từ thật minh hoạ đúng cái âm hình đó
+đang vẽ** — hình /l/ đọc *tell*, hình /n/ (vế sai) đọc *ten*. Từ minh hoạ chọn tay chứ không lấy
+bừa cặp đầu tiên, vì cặp đầu chưa chắc minh hoạ đúng cái tương phản mà hai hình đang vẽ: cặp đầu
+của `/s/ /z/ cuối` là *books / book* (rụng đuôi) trong khi hai hình vẽ /s/ với /z/, nên ở đó
+phải là *price / prize*.
+
+Âm rời vẫn còn, nhưng lùi xuống một nút phụ có ghi thẳng *"tiếng máy dựng"*. Chỗ **duy nhất**
+còn dùng nó làm tiếng chính là vế sai của `/f/ /v/ cuối`, vì lỗi ở đó đẻ ra *"laip"* — không
+phải từ nên máy đọc chịu, mà lại đúng là cái cần cho nghe.
 
 Kèm theo là một lỗi ngầm phải sửa: máy Mac có 30 giọng en-US thì **13 giọng là trò đùa** — Bells,
 Boing, Bubbles, Zarvox. Bản trước tôi lấy bừa "giọng en-US đầu tiên gặp"; máy này may nên ra
@@ -722,7 +730,7 @@ scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
-scripts/test-phatam.js     78 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
+scripts/test-phatam.js     86 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
@@ -740,7 +748,7 @@ node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 78 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 86 kiểm thử trò luyện phát âm
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 ```
 

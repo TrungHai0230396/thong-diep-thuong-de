@@ -219,6 +219,25 @@ ok('âm nào có bước luyện tai thì đều có cặp từ',
    AM.filter(a => self.TDTD_PHATAM._soBuoc(a).includes('tai')).every(a => a.cap.length),
    AM.filter(a => self.TDTD_PHATAM._soBuoc(a).includes('tai') && !a.cap.length).map(a => a.ipa).join(', '));
 
+console.log('\n— Bước xem miệng cũng phải là giọng người —');
+/* Lần trước tôi sửa bước đầu và bước luyện tai nhưng BỎ SÓT đúng bước này: hai nút dưới hình
+   vẫn phát âm máy dựng. Nên giờ có bài canh riêng. */
+ok('hình nào cũng có từ thật để đọc', AM.every(a => a.tuA), AM.filter(a => !a.tuA).map(a => a.ipa).join(', '));
+ok('hình thứ hai cũng có từ, trừ chỗ lỗi không đẻ ra từ nào',
+   AM.filter(a => a.kh2 && !a.tuB).every(a => a.ipa.includes('/f/')),
+   AM.filter(a => a.kh2 && !a.tuB).map(a => a.ipa).join(', '));
+ok('nút dưới hình đọc từ bằng giọng người', /data-hinh="\$\{thu\}" data-t=/.test(nguon)
+   && /if \(n\.dataset\.t\) doc\(n\.dataset\.t, true/.test(nguon));
+ok('chỗ không có từ thì ghi rõ là tiếng máy dựng', /▶ nghe \(tiếng máy dựng\)/.test(nguon));
+ok('có nói cho người dùng biết đó là giọng người', /Hai nút dưới hình đọc từ thật bằng giọng người/.test(nguon));
+/* Từ minh hoạ phải đúng cái âm hình đang vẽ, nên không lấy bừa cặp đầu tiên: cặp đầu của
+   /s/ /z/ cuối là books/book (rụng đuôi), còn hai hình thì vẽ /s/ với /z/. */
+const tuKhac = AM.filter(a => a.tuB && a.tuA !== a.tuB);
+ok('hai từ minh hoạ phải khác nhau', tuKhac.length === AM.filter(a => a.tuB).length);
+ok('từ minh hoạ là từ đơn, không phải câu', AM.every(a => !/\s/.test(a.tuA + (a.tuB || ''))));
+ok('không lấy bừa cặp đầu tiên khi cặp đó không minh hoạ đúng hình',
+   AM.find(a => a.ipa === '/s/ /z/ cuối').tuA === 'price');
+
 console.log('\n— Chọn giọng: loại giọng trò đùa của hệ điều hành —');
 /* Máy Mac có 30 giọng en-US thì 13 giọng là trò đùa. Lấy bừa "giọng en-US đầu tiên" là có ngày
    cả bài học đọc bằng giọng Bubbles. */
