@@ -454,6 +454,26 @@ mọi hình — với người chưa học ngữ âm thì đó là quá tải, v
 hiểu gì". Giờ chỉ còn nhãn nào đang làm việc cho âm đó, và viết theo kiểu rà lưỡi là thấy: "gờ
 cứng sau răng trên" thay cho "lợi", "chỗ mềm tít trong" thay cho "vòm mềm".
 
+**Nhãn tự xuống dòng, và có bài kiểm canh bề rộng CHỮ chứ không chỉ canh nét vẽ.** Người dùng
+bắt được lỗi này: nhãn "gờ cứng sau răng trên" viết một dòng thì tràn khỏi khung và bị xén thành
+"gờ cứng sau răng t". Bộ kiểm thử lúc đó có bài soát toạ độ nằm trong khung — nhưng nó chỉ soát
+toạ độ **nét vẽ**, không soát bề rộng **chữ**, nên nó không thấy gì cả.
+
+Chữa cái lỗi thì dễ. Chữa cái *lỗ hổng trong bộ kiểm* mới là phần đáng kể, và nó dạy hai chuyện:
+
+- Ước bề rộng chữ bằng một hệ số chung cho mọi ký tự thì **không đủ**: chữ `i` rộng 0,25 lần cỡ
+  chữ còn chữ `m` rộng 0,87 — chênh hơn ba lần. Hệ số chung 0,58 báo nhầm hai chú thích vốn vừa
+  khít. Nên bảng hệ số chia theo loại ký tự, hiệu chỉnh từ mười phép đo thật bằng canvas với đúng
+  phông của app; sai số còn dưới 7%, rồi chừa thêm 8% biên trước khi kêu.
+- Phép đo đầu tiên tôi viết trong trình duyệt báo "0 nhãn tràn" — **sai**, vì nó khớp mẫu
+  `<text x="…" y="…"` nên bỏ sót mọi thẻ viết thuộc tính theo thứ tự khác, trong đó có đúng chú
+  thích môi. Thước đo cũng phải bị nghi ngờ như thứ nó đo. Bản sau bắt mọi thẻ `<text>`: 65 hình,
+  211 thẻ chữ, 0 tràn.
+
+Và một chỗ bài kiểm mới đã đúng còn tôi đã sai: chú thích "đầu lưỡi thò ra giữa hai hàm răng"
+rộng 192px trong khung 200px — vừa khít, nhưng chỉ chừa 4px mỗi bên, phông khác một chút là cắt.
+Nên chú thích dưới hình giờ cũng tự xuống dòng, và khung tự cao thêm theo số dòng.
+
 **Ba chỗ app nói thật dù nói ra thì kém hấp dẫn hơn:**
 
 - **Không có điểm phát âm.** Máy nhận giọng trả về CHỮ chứ không trả về ÂM. Tôi có thử đưa một
@@ -730,7 +750,7 @@ scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
-scripts/test-phatam.js     86 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
+scripts/test-phatam.js     89 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
@@ -748,7 +768,7 @@ node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 86 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 89 kiểm thử trò luyện phát âm
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 ```
 

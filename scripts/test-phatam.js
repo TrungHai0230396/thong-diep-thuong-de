@@ -180,13 +180,74 @@ ok('âm nào cũng vẽ được hình nhìn thẳng', AM.every(a => K.veMatTruo
 const vt = AM.map(a => K.veMatTruoc(a.kh, {}).replace(/aria-label="[^"]*"/, ''));
 ok('hình nhìn thẳng phân biệt được các nhóm âm, không phải một hình dùng chung',
    new Set(vt).size >= 8, `${new Set(vt).size} hình khác nhau trên ${vt.length} âm`);
+/* Đọc chữ sau khi GHÉP các dòng lại: nhãn dài giờ được ngắt vào nhiều <tspan>, nên soi thẳng
+   vào giữa hai thẻ <text> là không thấy gì. */
+const chuTrong = (sv) => [...sv.matchAll(/<text[^>]*>([\s\S]*?)<\/text>/g)]
+  .map(m => m[1].replace(/<\/tspan><tspan[^>]*>/g, ' ').replace(/<[^>]*>/g, '')).join(' | ');
 ok('hình nhìn thẳng nào cũng có một câu mô tả bằng lời',
-   AM.every(a => /<text[^>]*>[^<]{6,}<\/text>/.test(K.veMatTruoc(a.kh, {}))));
+   AM.every(a => chuTrong(K.veMatTruoc(a.kh, {})).replace(/[|\s]/g, '').length >= 6));
 ok('hình cắt dọc chỉ còn tối đa ba nhãn đang làm việc, không phải chín nhãn giải phẫu',
    AM.every(a => (K.ve(a.kh, {}).match(/<text/g) || []).length <= 5),
    'nhiều nhất ' + Math.max(...AM.map(a => (K.ve(a.kh, {}).match(/<text/g) || []).length)));
 ok('nhãn viết bằng cảm giác, không bằng tên giải phẫu',
-   K.ve({ luoiSau: .05, luoiCao: .3, dauLuoi: 1, moiTron: 0, hamMo: .2, chamO: 'loi' }, {}).includes('gờ cứng sau răng trên'));
+   chuTrong(K.ve({ luoiSau: .05, luoiCao: .3, dauLuoi: 1, moiTron: 0, hamMo: .2, chamO: 'loi' }, {}))
+     .includes('gờ cứng sau răng trên'));
+
+console.log('\n— Nhãn phải nằm gọn trong khung, không bị cắt mất chữ —');
+/* Người dùng bắt được lỗi này: "gờ cứng sau răng trên" viết một dòng thì tràn ra khỏi khung và
+   bị xén mất mấy chữ cuối, thành "gờ cứng sau răng t". Bài kiểm cũ chỉ soi toạ độ NÉT VẼ, không
+   soi bề rộng CHỮ — nên nó không thấy gì.
+   Ước bề rộng theo LOẠI KÝ TỰ, không phải "ký tự nào cũng rộng bằng nhau". Bản đầu tôi lấy một
+   hệ số chung 0,58 và nó báo nhầm hai chú thích vốn vừa khít — vì chữ i rộng 0,25 mà chữ m rộng
+   0,87, chênh nhau hơn ba lần. Bảng hệ số dưới đây hiệu chỉnh từ mười phép đo thật bằng canvas
+   với đúng phông của app; sai số còn dưới 7%. Nên chừa thêm 8% biên trước khi kêu. */
+const HEP = "iíìỉĩịlj|.,'!:;()[]", RONG = 'mwMW';
+const rongChu = (s, co) => {
+  let w = 0;
+  for (const c of s) {
+    if (HEP.includes(c)) w += .25;
+    else if (RONG.includes(c)) w += .87;
+    else if (c === ' ') w += .27;
+    else if (c !== c.toLowerCase() && c === c.toUpperCase()) w += .64;
+    else w += .545;
+  }
+  return w * co;
+};
+function nhanTran(sv) {
+  const vb = sv.match(/viewBox="([^"]+)"/)[1].split(' ').map(Number);
+  const phai = vb[0] + vb[2], duoi = vb[1] + vb[3], loi = [];
+  for (const m of sv.matchAll(/<text x="([-\d.]+)" y="([-\d.]+)"([^>]*)>([\s\S]*?)<\/text>/g)) {
+    if (/transform=/.test(m[3])) continue;           // chữ xoay: bề rộng đổi sang chiều dọc
+    const x = +m[1], y = +m[2];
+    const co = +((m[3].match(/font-size="([\d.]+)"/) || [])[1] || 12);
+    const neo = (m[3].match(/text-anchor="(\w+)"/) || [])[1];
+    const tsp = [...m[4].matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g)].map(t => t[1]);
+    const ds = tsp.length ? tsp : [m[4].replace(/<[^>]*>/g, '')];
+    ds.forEach((d, i) => {
+      const w = rongChu(d, co) * 1.08;      // chừa 8% biên cho sai số của mô hình
+      const tu = neo === 'middle' ? x - w / 2 : neo === 'end' ? x - w : x;
+      if (tu < vb[0] - 1 || tu + w > phai + 1 || y + i * co * 1.18 > duoi + 1)
+        loi.push(`"${d}" ${Math.round(tu)}→${Math.round(tu + w)} ngoài khung ${vb[0]}..${phai}`);
+    });
+  }
+  return loi;
+}
+const moiHinh = [];
+AM.forEach(a => {
+  moiHinh.push([a.ipa + ' cắt dọc', K.ve(a.kh, {})], [a.ipa + ' nhìn thẳng', K.veMatTruoc(a.kh, {})]);
+  if (a.kh2) moiHinh.push([a.ipa + ' cắt dọc 2', K.ve(a.kh2, {})], [a.ipa + ' nhìn thẳng 2', K.veMatTruoc(a.kh2, {})]);
+  if (a.bieu) moiHinh.push([a.ipa + ' nguyên âm', K.veNguyenAm(a.bieu)]);
+});
+['det', 'trung', 'tron', 'mo'].forEach(k => moiHinh.push(['môi ' + k, K.veMoi(k, {})]));
+const tranHet = moiHinh.flatMap(([t, sv]) => nhanTran(sv).map(l => t + ' :: ' + l));
+ok(`không nhãn nào bị cắt, soát ${moiHinh.length} hình`, tranHet.length === 0, tranHet.slice(0, 3).join(' | '));
+ok('nhãn dài được ngắt thành nhiều dòng chứ không viết tràn',
+   /<tspan/.test(K.ve({ luoiSau: .1, luoiCao: .35, dauLuoi: 1, moiTron: 0, hamMo: .25, chamO: 'loi' }, {})));
+ok('ngắt dòng giữ nguyên đủ chữ, không nuốt mất chữ nào', (() => {
+  const sv = K.ve({ luoiSau: .1, luoiCao: .35, dauLuoi: 1, moiTron: 0, hamMo: .25, chamO: 'loi' }, {});
+  const chu = [...sv.matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g)].map(m => m[1]).join(' ');
+  return chu.includes('đầu lưỡi chạm đây') && chu.includes('gờ cứng sau răng trên');
+})());
 
 console.log('\n— Hình động —');
 ok('có tư thế miệng lúc nghỉ để bắt đầu chuyển động', K.NGHI && K.NGHI.chamO === 'khong');

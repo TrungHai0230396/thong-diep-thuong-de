@@ -32,6 +32,35 @@ const TEN_CHAM = { moi: 'hai môi chạm nhau', rang: 'lưỡi chạm răng', lo
 
 const so = (n) => Math.round(n * 10) / 10;
 
+/* Ước bề rộng chữ theo LOẠI ký tự — chữ i rộng 0,25 còn chữ m rộng 0,87, chênh hơn ba lần, nên
+   một hệ số chung cho mọi ký tự thì lúc thừa lúc thiếu. Bảng này hiệu chỉnh từ mười phép đo
+   thật bằng canvas với đúng phông của app, sai số dưới 7%. */
+const HEP_CHU = "iíìỉĩịlj|.,'!:;()[]", RONG_CHU = 'mwMW';
+function rongChu(s, co) {
+  let w = 0;
+  for (const c of s) {
+    if (HEP_CHU.includes(c)) w += .25;
+    else if (RONG_CHU.includes(c)) w += .87;
+    else if (c === ' ') w += .27;
+    else if (c !== c.toLowerCase() && c === c.toUpperCase()) w += .64;
+    else w += .545;
+  }
+  return w * co;
+}
+/* Ngắt chuỗi thành các dòng vừa bề rộng cho trước. Chừa 10% biên: sai số mô hình là 7%, và
+   thà xuống dòng sớm một nhịp còn hơn bị xén mất mấy chữ cuối như lần trước. */
+function ngatDong(chu, co, rong) {
+  const dong = [];
+  let d = '';
+  for (const t of String(chu).split(' ')) {
+    if (!d) d = t;
+    else if (rongChu(d + ' ' + t, co) * 1.1 <= rong) d += ' ' + t;
+    else { dong.push(d); d = t; }
+  }
+  if (d) dong.push(d);
+  return dong;
+}
+
 /* ---------- mặt cắt dọc ---------- */
 /* Bố cục: mặt quay sang TRÁI. Đầu và cổ tô màu mô (tối), khoang khí khoét ra bằng màu SÁNG —
    nhìn vào là thấy ngay chỗ nào hẹp lại, vì chỗ hẹp chính là chỗ đang cấu âm.
@@ -184,6 +213,17 @@ function ve(p, o) {
   const g = [];
   const nhan = (x, y, chu, mau, co, neo) =>
     `<text x="${so(x)}" y="${so(y)}"${neo ? ` text-anchor="${neo}"` : ''} font-size="${co || 12}" fill="${mau || 'rgba(244,239,230,.62)'}">${chu}</text>`;
+  /* Nhãn dài thì TỰ XUỐNG DÒNG. Cột nhãn bên phải chỉ rộng chừng 96px, mà "gờ cứng sau răng
+     trên" viết một dòng thì tràn ra ngoài khung và bị cắt mất mấy chữ cuối — đúng lỗi người
+     dùng nhìn thấy.
+     Ước bề rộng mỗi ký tự bằng 0,58 lần cỡ chữ. Đo thật bằng canvas với phông đang dùng thì tỉ
+     lệ chỉ chừng 0,54, nhưng lấy đúng 0,54 thì biên an toàn còn 4% — phông khác một chút, máy
+     khác một chút là tràn lại. Thà ngắt dòng sớm một nhịp. */
+  const nhanDai = (x, y, chu, mau, co) => {
+    const dong = ngatDong(chu, co, 96);
+    return `<text x="${so(x)}" y="${so(y)}" font-size="${co}" fill="${mau}">` +
+      dong.map((l, i) => `<tspan x="${so(x)}" dy="${i ? so(co * 1.18) : 0}">${l}</tspan>`).join('') + '</text>';
+  };
 
   g.push(`<path class="k-dau" d="${N.dau}" fill="rgba(226,140,134,.22)" stroke="rgba(244,239,230,.55)" stroke-width="1.6" stroke-linejoin="round"/>`);
   g.push(`<path class="k-khoang" d="${N.khoang}" fill="rgba(238,246,252,.92)"/>`);
@@ -203,7 +243,7 @@ function ve(p, o) {
 
   if (N.vong) {
     g.push(`<circle class="k-vong" cx="${N.vong.x}" cy="${N.vong.y}" r="7.5" fill="none" stroke="#e8c37a" stroke-width="2.8"/>`);
-    g.push(`<path d="M${N.vong.x + 8},${so(N.vong.y - 6)} L234,50" fill="none" stroke="rgba(232,195,122,.6)" stroke-width="1.3"/>`);
+    g.push(`<path d="M${N.vong.x + 8},${so(N.vong.y - 6)} L234,46" fill="none" stroke="rgba(232,195,122,.6)" stroke-width="1.3"/>`);
   }
 
   /* NHÃN: tối đa ba, và chỉ nhãn nào ĐANG LÀM VIỆC cho âm này.
@@ -221,8 +261,8 @@ function ve(p, o) {
   };
   if (N.vong) {
     const [noi1, noi2] = CAM_GIAC[p.chamO] || ['', ''];
-    g.push(nhan(238, 60, noi1, 'rgba(232,195,122,.8)', 11.5));
-    g.push(nhan(238, 42, noi2, '#e8c37a', 13));
+    g.push(nhanDai(238, 38, noi2, '#e8c37a', 13));
+    g.push(nhanDai(238, 74, noi1, 'rgba(232,195,122,.8)', 11.5));
   }
   g.push(nhan(so(N.dinhX), so(N.sanY(N.dinhX) + 4), 'lưỡi', '#ffd9dc', 12, 'middle'));
   g.push(`<g class="k-nhanmui"${N.mui ? '' : ' opacity="0"'}>${nhan(142, 50, 'hơi ra đằng mũi', '#7ec8e3', 12.5, 'middle')}</g>`);
@@ -336,8 +376,10 @@ function veMatTruoc(p, o) {
     : luoiRa ? 'đầu lưỡi thò ra giữa hai hàm răng'
     : tron_ > .5 ? 'môi chu tròn ra trước' : tron_ < .2 && ham < .3 ? 'môi kéo ngang như cười'
     : ham > .7 ? 'há hàm to' : 'môi thả lỏng');
-  g.push(`<text x="${CX}" y="146" text-anchor="middle" font-size="12.5" fill="rgba(244,239,230,.72)">${chu}</text>`);
-  return `<svg viewBox="0 0 200 156" role="img" aria-label="${o.nhan || 'Miệng nhìn thẳng: ' + chu}">${g.join('')}</svg>`;
+  const dong = ngatDong(chu, 12.5, 186);
+  g.push(`<text x="${CX}" y="146" text-anchor="middle" font-size="12.5" fill="rgba(244,239,230,.72)">` +
+    dong.map((l, i) => `<tspan x="${CX}" dy="${i ? 15 : 0}">${l}</tspan>`).join('') + '</text>');
+  return `<svg viewBox="0 0 200 ${156 + (dong.length - 1) * 15}" role="img" aria-label="${o.nhan || 'Miệng nhìn thẳng: ' + chu}">${g.join('')}</svg>`;
 }
 
 /* Thay các nét động trên hình nhìn thẳng — nhưng GIỮ NGUYÊN dòng chú thích.
