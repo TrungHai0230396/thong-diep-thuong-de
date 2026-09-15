@@ -183,13 +183,32 @@ function timNguong(hamViTri, nguong, msDauNgay, viDo, kinhDo, len) {
   return null;
 }
 
-/* Mặt Trời mọc và lặn: ngưỡng -0,833 độ, gồm bán kính đĩa Mặt Trời và khúc xạ. */
-function mocLan(msDauNgay, viDo, kinhDo) {
-  const f = (JD) => matTroi(JD);
+/* Mọc và lặn. Ngưỡng độ cao khác nhau giữa hai thiên thể:
+   - Mặt Trời -0,833 độ: gồm bán kính đĩa và khúc xạ khí quyển.
+   - Mặt Trăng +0,125 độ: Trăng ở gần nên có thị sai chân trời chừng 0,95 độ, trừ đi khúc xạ
+     0,57 và bán kính đĩa 0,26 thì còn dương — nên Trăng mọc muộn hơn là chỉ tính khúc xạ. */
+function mocLan(msDauNgay, viDo, kinhDo, thienThe) {
+  const trang = thienThe === 'trang';
+  const f = (JD) => (trang ? matTrang(JD) : matTroi(JD));
+  const nguong = trang ? 0.125 : -0.833;
   return {
-    moc: timNguong(f, -0.833, msDauNgay, viDo, kinhDo, true),
-    lan: timNguong(f, -0.833, msDauNgay, viDo, kinhDo, false),
+    moc: timNguong(f, nguong, msDauNgay, viDo, kinhDo, true),
+    lan: timNguong(f, nguong, msDauNgay, viDo, kinhDo, false),
   };
+}
+
+/* Một thiên thể không ở trên trời thì có HAI lý do khác hẳn nhau: chưa mọc, hoặc đã lặn rồi.
+   Trả về cái QUYẾT ĐỊNH, còn câu chữ để chỗ hiển thị tự lo — tách ra thì kiểm thử được bằng
+   Node, mà chính vì trước đây nó nằm lẫn trong phần vẽ chữ nên không ai canh: dòng chữ gộp cả
+   hai thành "chưa lên khỏi chân trời", thành thử mười một giờ đêm mà Trăng lặn từ chín giờ thì
+   app vẫn bảo nó chưa lên. */
+function trangThaiMocLan(cao, ml, mlMai, luc) {
+  ml = ml || { moc: null, lan: null };
+  if (cao > 0) return { tinh: 'tren', lan: ml.lan !== null && ml.lan > luc ? ml.lan : null };
+  if (ml.moc !== null && ml.moc > luc) return { tinh: 'chuaMoc', moc: ml.moc };
+  if (ml.lan !== null && ml.lan <= luc)
+    return { tinh: 'daLan', lan: ml.lan, maiMoc: mlMai && mlMai.moc !== null ? mlMai.moc : null };
+  return { tinh: 'khongRo' };
 }
 
 /* Trời tối tới mức nào: theo độ cao Mặt Trời dưới chân trời.
@@ -203,7 +222,7 @@ function doToi(caoMatTroi) {
 }
 
 const API = { ngayJulius, matTroi, matTrang, hanhTinh, docCao, gioSao, khucXa,
-              mocLan, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG) };
+              mocLan, trangThaiMocLan, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG) };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 else self.TDTD_ASTRO = API;

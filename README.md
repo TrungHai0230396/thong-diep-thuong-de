@@ -670,6 +670,41 @@ Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở
 
 Bề sáng của Mặt Trăng luôn quay về phía Mặt Trời, nên ở vĩ độ Việt Nam lưỡi liềm **nằm ngang như cái thuyền** chứ không dựng đứng — cái đó ra được từ phép tính, không phải vẽ sẵn.
 
+## "Sao giờ không thấy mặt trăng?"
+
+Người dùng mở bầu trời lúc gần nửa đêm và hỏi vậy. Bầu trời **vẽ đúng** — lúc đó Trăng ở −41°
+dưới chân trời, nó lặn từ 20:45 — nhưng dòng chữ dưới đáy lại bảo *"chưa lên khỏi chân trời"*.
+
+Lỗi nằm ở chỗ chỉ có hai nhánh:
+
+```js
+b.trang.cao > 0 ? `đang ở ${…}°` : 'chưa lên khỏi chân trời'
+```
+
+Một thiên thể khuất khỏi bầu trời thì có **hai** lý do khác hẳn nhau: chưa mọc, hoặc đã lặn rồi.
+Gộp cả hai thành một câu là nói sai nửa số trường hợp, và đúng nửa sai ấy làm người đọc tưởng
+app hỏng. Đây không phải lỗi tính toán — phần thiên văn vẫn đúng từng độ — mà là lỗi **nội dung**.
+
+Chữa xong thì dòng chữ trả lời thẳng cả hai câu người dùng hỏi:
+
+> Mặt Trời **đã lặn lúc 17:54, mai mọc 05:43** · trăng lưỡi liềm đầu tháng, sáng 21%, **đã lặn
+> lúc 20:45, mai mọc 09:48**
+
+Hai điều phải làm thêm:
+
+- `mocLan()` vốn đóng cứng vào Mặt Trời. Mở nó ra cho cả Trăng, với **ngưỡng độ cao khác**:
+  Mặt Trời lấy −0,833° (bán kính đĩa cộng khúc xạ), còn Trăng lấy **+0,125°** vì Trăng ở gần nên
+  có thị sai chân trời chừng 0,95° — trừ khúc xạ 0,57 và bán kính đĩa 0,26 thì còn dương. Không
+  để ý chỗ này là giờ Trăng mọc lệch vài phút.
+- Tách phần **quyết định** (`trangThaiMocLan`, hàm thuần trong `astro.js`) khỏi phần **câu chữ**
+  (trong `nightsky.js`). Chính vì trước đây nó nằm lẫn trong đoạn dựng HTML nên **không có bài
+  kiểm nào chạm tới được** — đó là lý do lỗi sống tới lúc người dùng nhìn thấy. Cùng một bài học
+  với lỗi chấm điểm phát âm ở trên.
+
+Kiểm thử thiên văn: 21 lên 34, trong đó mốc chắc nhất là *đúng thời điểm tính ra là mọc thì độ
+cao phải bằng đúng ngưỡng* (lệch 0,000°), và *mỗi ngày Trăng mọc muộn hơn 50–53 phút* — khớp con
+số trong sách.
+
 ## Gõ từ tiếng Anh
 
 Một ngôi sao hồng nhạt, `#go-tu`. Chọn cấp rồi gõ luôn, mỗi lượt hai mươi từ. Một từ tiếng Anh hiện giữa màn hình, nghĩa tiếng Việt ngay dưới; gõ đúng chữ nào thì chữ đó sáng hồng, chữ đang tới có gạch chân nhấp nháy. **Gõ sai thì chữ không chạy**, chỉ rung một cái — không chặn đường, gõ lại chữ đúng là qua, nên không ai kẹt ở một từ. Hết hai mươi từ thì xem lại: ký tự mỗi phút, từ mỗi phút, tỉ lệ gõ đúng, và **mấy từ vấp nhiều nhất kèm nghĩa** để ngó lại một lượt trước khi gõ tiếp.
@@ -770,7 +805,7 @@ scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
-scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
+scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số liệu ngoài
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
@@ -786,7 +821,7 @@ python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 37 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
-node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
+node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm

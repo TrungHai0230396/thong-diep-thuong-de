@@ -317,21 +317,39 @@ function capNhatChu(b, luc) {
   const gioNgan = (ms) => ms === null ? '—' :
     new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
+  const mai = new Date(dau); mai.setDate(mai.getDate() + 1);
+  const mlMai = A().mocLan(mai.getTime(), noi.vi, noi.kinh);
+  const mt = A().mocLan(dau.getTime(), noi.vi, noi.kinh, 'trang');
+  const mtMai = A().mocLan(mai.getTime(), noi.vi, noi.kinh, 'trang');
+
   const tren = b.ht.filter(p => p.cao > 0).map(p => p.ten);
   const q = tam.querySelector('.td-tin');
   q.innerHTML = `
     <p class="td-dong1">${noi.ten} · ${gio} · ${b.toi.ten}</p>
     <p class="td-dong2">
-      Mặt Trời mọc ${gioNgan(ml.moc)}, lặn ${gioNgan(ml.lan)}
-      · ${tenTrang(b.trang.tuoi, b.trang.sang)}, sáng ${Math.round(b.trang.sang * 100)}%
-      ${b.trang.cao > 0 ? `, đang ở ${Math.round(b.trang.cao)}° trên ${huongChu(b.trang.huong)}`
-                        : ', chưa lên khỏi chân trời'}
+      Mặt Trời ${dangODau(b.troi.cao, b.troi.huong, ml, mlMai, luc)}
+      · ${tenTrang(b.trang.tuoi, b.trang.sang)}, sáng ${Math.round(b.trang.sang * 100)}%,
+      ${dangODau(b.trang.cao, b.trang.huong, mt, mtMai, luc)}
     </p>
     <p class="td-dong3">${tren.length ? 'Đang trên trời: ' + tren.join(' · ')
                                       : 'Không hành tinh nào trên trời lúc này'}</p>
     ${b.gapTrang.length ? `<p class="td-gap">${b.gapTrang.map(g =>
       g.cach < 0.6 ? `${g.ten} đang nấp ngay sau Mặt Trăng, cách ${so1(g.cach)}°`
                    : `${g.ten} đang sát Mặt Trăng, cách ${so1(g.cach)}°`).join(' · ')}</p>` : ''}`;
+}
+
+/* Một thiên thể không ở trên trời thì có HAI lý do khác hẳn nhau: chưa mọc, hoặc đã lặn rồi.
+   Bản trước gộp cả hai thành một câu "chưa lên khỏi chân trời", nên lúc mười một giờ đêm mà
+   Trăng đã lặn từ chín rưỡi thì app vẫn bảo nó "chưa lên" — người đọc tưởng app hỏng. */
+function dangODau(cao, huong, ml, mlMai, luc) {
+  const g = (ms) => ms === null ? '—' :
+    new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+  const t = A().trangThaiMocLan(cao, ml, mlMai, luc);
+  if (t.tinh === 'tren')
+    return `đang ở ${Math.round(cao)}° trên ${huongChu(huong)}` + (t.lan ? `, lặn lúc ${g(t.lan)}` : '');
+  if (t.tinh === 'chuaMoc') return `chưa mọc, mọc lúc ${g(t.moc)}`;
+  if (t.tinh === 'daLan') return `đã lặn lúc ${g(t.lan)}` + (t.maiMoc ? `, mai mọc ${g(t.maiMoc)}` : '');
+  return 'đang ở dưới chân trời';
 }
 
 const so1 = (x) => x.toFixed(1).replace('.', ',');       // dấu thập phân kiểu Việt
@@ -495,5 +513,6 @@ self.TDTD_TROIDEM = { mo, dong,
   _nhin: (h, c, g) => { huongNhin = h; caoNhin = c; if (g) goc = g; return { huongNhin, caoNhin, goc }; },
   _chieu: (cao, huong) => chieu(cao, huong),
   _tenTrang: tenTrang,
+  _dangODau: (cao, huong, ml, mlMai, luc) => dangODau(cao, huong, ml, mlMai, luc),
   _debug: () => ({ noi, huongNhin: Math.round(huongNhin), caoNhin: Math.round(caoNhin), goc, theoMay, W, H }) };
 })();

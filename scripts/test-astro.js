@@ -186,5 +186,66 @@ console.log('\n— Trời tối tới đâu —');
   ok('nửa đêm là tối hẳn', m(17, 0) === 'toi');
 }
 
+console.log('\n— Trăng mọc và lặn —');
+/* Người dùng hỏi "sao giờ không thấy mặt trăng". Bầu trời vẽ đúng — Trăng đã lặn thật — nhưng
+   dòng chữ dưới đáy chỉ có hai trường hợp "đang ở N độ" hoặc "chưa lên khỏi chân trời", nên
+   mười một giờ đêm mà Trăng lặn từ chín giờ thì nó vẫn bảo "chưa lên". Gộp nhầm "chưa mọc" với
+   "đã lặn" là lỗi nội dung, không phải lỗi tính toán. */
+const dauNgay = (y, m, d) => new Date(y, m - 1, d, 0, 0, 0, 0).getTime();
+const caoLuc = (ms, thien) => {
+  const JD = A.ngayJulius(ms);
+  const v = thien === 'trang' ? A.matTrang(JD) : A.matTroi(JD);
+  return A.docCao(v.ra, v.dec, HCM.vi, HCM.kinh, JD).cao;
+};
+const mlT = (ms) => A.mocLan(ms, HCM.vi, HCM.kinh, 'trang');
+
+ok('ngày thường ở Việt Nam thì Trăng có cả giờ mọc lẫn giờ lặn',
+   [10, 15, 20, 25].every(d => { const m = mlT(dauNgay(2026, 9, d)); return m.moc !== null && m.lan !== null; }));
+/* Mốc chắc nhất: đúng thời điểm tính ra là mọc thì độ cao phải bằng ngưỡng. Hàm tìm thời điểm
+   mà trôi thì chỗ này lộ ngay. */
+let lechNguong = 0;
+for (const d of [5, 12, 19, 26]) {
+  const m = mlT(dauNgay(2026, 9, d));
+  for (const t of [m.moc, m.lan]) if (t !== null) lechNguong = Math.max(lechNguong, Math.abs(caoLuc(t, 'trang') - 0.125));
+}
+ok('đúng lúc mọc và lúc lặn, Trăng ở đúng ngưỡng 0,125°', lechNguong < 0.05,
+   `lệch nhiều nhất ${lechNguong.toFixed(3)}°`);
+ok('Trăng dùng ngưỡng khác Mặt Trời, vì Trăng ở gần nên có thị sai chân trời',
+   Math.abs(caoLuc(mlT(dauNgay(2026, 9, 15)).moc, 'trang')
+            - caoLuc(A.mocLan(dauNgay(2026, 9, 15), HCM.vi, HCM.kinh).moc, 'troi')) > 0.5);
+const trePhut = [];
+for (const d of [10, 11, 12, 13, 14]) {
+  const a = mlT(dauNgay(2026, 9, d)).moc, b = mlT(dauNgay(2026, 9, d + 1)).moc;
+  if (a !== null && b !== null) trePhut.push((b - a - 864e5) / 60000);
+}
+ok('mỗi ngày Trăng mọc muộn hơn chừng 30–80 phút, vì nó chạy ngược chiều nhật động',
+   trePhut.every(v => v > 20 && v < 90), trePhut.map(v => Math.round(v) + 'p').join(' '));
+
+console.log('\n— Nói rõ "chưa mọc" với "đã lặn", đừng gộp làm một —');
+const T = A.trangThaiMocLan;
+const ml0 = { moc: dauNgay(2026, 9, 15) + 9.8 * 36e5, lan: dauNgay(2026, 9, 15) + 20.75 * 36e5 };
+const mlMai0 = { moc: dauNgay(2026, 9, 16) + 10.6 * 36e5, lan: null };
+const luc = (h) => dauNgay(2026, 9, 15) + h * 36e5;
+ok('đang trên trời thì báo là trên trời', T(23, ml0, mlMai0, luc(19)).tinh === 'tren');
+ok('trên trời thì kèm luôn giờ lặn còn ở phía trước', T(23, ml0, mlMai0, luc(19)).lan === ml0.lan);
+ok('trên trời mà giờ lặn đã qua thì không bịa ra giờ lặn', T(23, ml0, mlMai0, luc(22)).lan === null);
+ok('trước giờ mọc thì là CHƯA MỌC', T(-30, ml0, mlMai0, luc(4)).tinh === 'chuaMoc');
+ok('sau giờ lặn thì là ĐÃ LẶN, tuyệt đối không phải chưa mọc',
+   T(-40, ml0, mlMai0, luc(23)).tinh === 'daLan', T(-40, ml0, mlMai0, luc(23)).tinh);
+ok('đã lặn thì kèm luôn mai mấy giờ mọc', T(-40, ml0, mlMai0, luc(23)).maiMoc === mlMai0.moc);
+ok('ngày không có mọc lẫn lặn thì trả về không rõ, không nổ lỗi',
+   T(-40, { moc: null, lan: null }, null, luc(23)).tinh === 'khongRo');
+ok('thiếu hẳn dữ liệu mọc lặn cũng không nổ lỗi', T(-40, null, null, luc(23)).tinh === 'khongRo');
+/* Chạy thẳng trên bầu trời thật của hôm nay: lúc nào Trăng dưới chân trời thì phải rơi đúng một
+   trong hai tình huống, không được rơi vào "không rõ". */
+let mo = 0;
+for (let h = 0; h < 24; h++) {
+  const ms = dauNgay(2026, 9, 15) + h * 36e5;
+  const c = caoLuc(ms, 'trang');
+  const t = T(c, mlT(dauNgay(2026, 9, 15)), mlT(dauNgay(2026, 9, 16)), ms);
+  if (c <= 0 && t.tinh === 'khongRo') mo++;
+}
+ok('suốt 24 giờ, giờ nào Trăng khuất cũng nói được vì sao khuất', mo === 0, `${mo} giờ không nói được`);
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);
