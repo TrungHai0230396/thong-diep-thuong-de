@@ -144,6 +144,61 @@ ok('dùng lại bộ so chữ sẵn có, không viết bộ thứ hai', /TDTD_NG
 ok('nhận dạng đặt đúng cấu hình', /maxAlternatives = 5/.test(nguon) && /interimResults = false/.test(nguon)
    && /continuous = false/.test(nguon) && /lang = 'en-US'/.test(nguon));
 
+console.log('\n— Phát ra được chính cái âm đang dạy —');
+const V = require('../assets/amvi.js');
+ok('âm nào cũng gắn mã để phát ra được', AM.every(a => a.am), AM.filter(a => !a.am).map(a => a.ipa).join(', '));
+ok('mã âm nào cũng có thật trong bộ tổng hợp',
+   AM.flatMap(a => [].concat(a.am, a.am2 || [])).filter(Boolean).every(t => V.DS.includes(t)));
+ok('mã âm nào cũng dựng ra tiếng được',
+   AM.flatMap(a => [].concat(a.am, a.am2 || [])).filter(Boolean)
+     .every(t => { const m = V.mau(t, 44100, 'cuoi'); return m && m.length > 1000; }));
+ok('âm tắc được đánh dấu để dựng kèm nguyên âm, vì phát rời chỉ nghe như tiếng tách',
+   AM.filter(a => ['p', 'b', 't', 'd', 'k', 'g'].includes(a.am)).every(a => a.tac));
+
+console.log('\n— Bài nghe: tai đi trước miệng, và không ra bài cho cặp không ai phân biệt nổi —');
+const ds0 = self.TDTD_PHATAM._soBuoc(AM[0]);
+ok('bước luyện tai đứng trước bước xem miệng', ds0.indexOf('tai') < ds0.indexOf('mieng'), ds0.join(' → '));
+ok('âm nào có hai vế thì đều luyện tai được', AM.filter(a => a.am2).every(a => a.taiA && a.taiB));
+/* /f/ và /θ/ dựng đúng thì vẫn gần như không phân biệt được bằng tai — thí nghiệm 1961 cho
+   người bản ngữ nghe cũng chịu. Ra bài bắt chọn giữa hai âm đó là bịa ra một tương phản
+   không tồn tại, và người học sẽ "đúng" nhờ đoán. */
+const capTai = AM.filter(a => a.am2).map(a => [].concat(a.am)[0] + '/' + a.am2);
+ok('không ra bài nghe cho cặp /f/ với /θ/',
+   !capTai.some(c => c === 'f/th' || c === 'th/f' || c === 'v/dh' || c === 'dh/v'), capTai.join(' '));
+ok('chỗ nào tai không tách được thì phải nói ra',
+   AM.find(a => a.ipa.includes('θ')).luuY && /không thể phân biệt bằng tai|58/.test(AM.find(a => a.ipa.includes('θ')).luuY));
+
+console.log('\n— Hình: miệng nhìn thẳng là hình chính, cắt dọc chỉ là xem thêm —');
+ok('âm nào cũng chọn rõ hình chính', AM.every(a => a.hinh === 'truoc' || a.hinh === 'canh'),
+   AM.filter(a => !a.hinh).map(a => a.ipa).join(', '));
+ok('âm phân biệt bằng môi hàm thì lấy hình nhìn thẳng',
+   ['/p/ và /b/', '/p/ và /f/', '/v/ và /w/', '/æ/'].every(i => AM.find(a => a.ipa === i).hinh === 'truoc'));
+ok('âm phân biệt bằng lưỡi bên trong thì lấy hình cắt dọc',
+   ['/l/ cuối', '/t/ /d/ cuối', '/k/ /g/ cuối', '/r/'].every(i => AM.find(a => a.ipa === i).hinh === 'canh'));
+ok('âm nào cũng vẽ được hình nhìn thẳng', AM.every(a => K.veMatTruoc(a.kh, {}).startsWith('<svg')));
+const vt = AM.map(a => K.veMatTruoc(a.kh, {}).replace(/aria-label="[^"]*"/, ''));
+ok('hình nhìn thẳng phân biệt được các nhóm âm, không phải một hình dùng chung',
+   new Set(vt).size >= 8, `${new Set(vt).size} hình khác nhau trên ${vt.length} âm`);
+ok('hình nhìn thẳng nào cũng có một câu mô tả bằng lời',
+   AM.every(a => /<text[^>]*>[^<]{6,}<\/text>/.test(K.veMatTruoc(a.kh, {}))));
+ok('hình cắt dọc chỉ còn tối đa ba nhãn đang làm việc, không phải chín nhãn giải phẫu',
+   AM.every(a => (K.ve(a.kh, {}).match(/<text/g) || []).length <= 5),
+   'nhiều nhất ' + Math.max(...AM.map(a => (K.ve(a.kh, {}).match(/<text/g) || []).length)));
+ok('nhãn viết bằng cảm giác, không bằng tên giải phẫu',
+   K.ve({ luoiSau: .05, luoiCao: .3, dauLuoi: 1, moiTron: 0, hamMo: .2, chamO: 'loi' }, {}).includes('gờ cứng sau răng trên'));
+
+console.log('\n— Hình động —');
+ok('có tư thế miệng lúc nghỉ để bắt đầu chuyển động', K.NGHI && K.NGHI.chamO === 'khong');
+ok('pha trộn được hai tư thế', (() => {
+  const g = K.tron(K.NGHI, AM[0].kh, .5);
+  return g.luoiCao > Math.min(K.NGHI.luoiCao, AM[0].kh.luoiCao) - .01;
+})());
+ok('âm tắc có khung nhả hơi, thứ hình tĩnh không nói được',
+   self.TDTD_PHATAM._khung(AM[2].kh, true).some(k => k.p.hoi > .5));
+ok('âm kéo dài được thì hơi thoát đều suốt', self.TDTD_PHATAM._khung(AM[1].kh, false).some(k => k.p.hoi > .5));
+ok('mỗi khung là một tư thế khác nhau, không đứng yên',
+   new Set(self.TDTD_PHATAM._khung(AM[2].kh, true).map(k => JSON.stringify(k.p))).size >= 3);
+
 console.log('\n— Máy không nghe được thì phải nói vì sao, đừng im lặng —');
 ok('có lối đi cho máy không có phần nhận giọng nói', /không có phần nhận giọng nói/.test(nguon));
 ok('có lối đi cho iPhone đã cài ra màn hình chính', /navigator && self\.navigator\.standalone/.test(nguon)

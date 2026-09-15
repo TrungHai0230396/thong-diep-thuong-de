@@ -380,45 +380,80 @@ Một chỗ suýt sai lúc làm: tôi đặt class cho bong bóng của người
 
 ### Sao vàng — luyện phát âm
 
-Mã ở `assets/ipa.js` (trò) và `assets/khauhinh.js` (hình vẽ, hàm thuần), địa chỉ riêng `#phat-am`.
-Mỗi âm có: **hình mặt cắt dọc khoang miệng** để thấy lưỡi đặt ở đâu, hình **môi nhìn thẳng**,
-lời giải thích cách đặt miệng, một đoạn nói vì sao người Việt hay sai âm đó, vài từ để bấm nghe,
-và phần **tập phân biệt bằng cặp tối thiểu**.
+Mã ở `assets/ipa.js` (trò), `assets/amvi.js` (dựng ra âm) và `assets/khauhinh.js` (vẽ hình),
+địa chỉ riêng `#phat-am`. Mười bảy âm, mỗi âm là một **buổi dắt tay năm bước** chứ không phải
+một trang tra cứu.
 
-**Không có điểm phát âm, và đó là chủ ý.** Máy nhận giọng nói chỉ trả về CHỮ chứ không trả về ÂM,
-nên mọi con số "phát âm 87/100" dựng trên nó đều là số bịa. Tôi có thử đưa một câu cố tình nuốt
-hết phụ âm cuối cho mô hình nghe: nó chép lại thành câu đúng và khen. Cái đo được thật thì hẹp
-hơn nhiều: bạn nói một từ trong cặp *ship / sheep*, máy báo nó nghe ra từ nào. Nếu máy nghe đúng
-thì ít nhất hai âm của bạn đã **khác nhau** đủ để máy phân biệt — chỉ vậy thôi, và app ghi đúng
-chừng đó. Màn kết quả còn nói thêm một sự thật khó nghe: đo trên các máy nhận giọng nói, giọng
-người Việt bị chép sai nhiều nhất trong sáu nhóm từng đo (MER 0,143 so với 0,007 của người bản
-ngữ) — khoảng một phần bảy số từ sai kể cả khi bạn nói tốt. Nên "máy không nghe ra" không đồng
-nghĩa với "bạn nói sai".
+**App tự dựng lấy tiếng, không dùng máy đọc để phát âm.** Máy đọc của trình duyệt chỉ đọc được
+TỪ — đưa cho nó `θ` thì nó đọc tên chữ cái Hy Lạp. Mà bài học ở đây là chính cái âm, tách khỏi
+từ. Nên `amvi.js` dựng âm bằng toán theo lối nguồn–bộ lọc: âm xát là nhiễu Gauss qua bộ cộng
+hưởng đặt đúng vùng tần số; nguyên âm là chuỗi xung thanh môn qua ba bộ cộng hưởng F1 F2 F3;
+âm tắc là một khoảng ngậm hơi, một tiếng nổ, rồi nguyên âm. Toàn bộ là hàm thuần trả về
+`Float32Array`, nên **kiểm thử được bằng Node bằng cách đo phổ** rồi đối chiếu số liệu ngữ âm
+học — `scripts/test-amvi.js` có 47 phép đo như vậy.
 
-**Thứ tự các âm xếp theo bằng chứng chứ không theo cảm giác.** Lỗi phụ âm tương quan mạnh với
-việc người nghe có hiểu hay không (r từ -0,56 đến -0,79); lỗi nguyên âm thì không có tương quan
-có ý nghĩa. Nên nhóm **cuối từ** đứng đầu — `/l/` cuối tệ nhất khi đo trên người Việt, đúng 25%
-và mất hẳn 50% — còn hai âm "th" mà người học sợ nhất lại bị xếp gần chót, vì đọc "think" thành
-"tink" thì người ta vẫn hiểu. Bảng có 17 mục, chia bốn nhóm: cuối từ, cụm phụ âm, phụ âm đầu,
-nguyên âm.
+Cái lợi lớn nhất của việc tự dựng, và là thứ máy đọc vĩnh viễn không làm được: **phát được cả
+âm SAI**. "Life" đọc thành "laip" thì máy đọc chịu, vì *laip* không phải từ. Dựng thì nghe được
+ngay, đặt cạnh âm đúng. Nghe được cái sai mới tránh được nó.
 
-**Mục nào máy không kiểm được thì nói thẳng là không kiểm, chứ không giả vờ kiểm.** Lỗi hay gặp
-ở `/f/ /v/` cuối là đổi thành `/p/`: "life" thành "laip". "Laip" không phải từ tiếng Anh, mà gặp
-chuỗi vô nghĩa thì máy tự nắn về từ gần nhất và **giấu mất lỗi** đi. Những mục như vậy mang cờ
-`kiemDuoc: false`, không có cặp nào, và trên màn hình ghi rõ vì sao. Kiểm thử bắt buộc điều này.
+**Thứ tự các bước theo bằng chứng: TAI ĐI TRƯỚC MIỆNG.** Luyện nghe phân biệt tự nó kéo theo
+cải thiện phát âm, và kéo mạnh hơn luyện nói (tri giác d=0,92 so với sản sinh d=0,54; tổng hợp
+79 nghiên cứu cho g=0,92). Nên bước hai là **luyện tai**: app phát một trong hai âm bằng một
+trong **năm giọng tổng hợp khác nhau**, bạn chọn vừa nghe âm nào, báo đúng sai ngay, tám lượt.
+Năm giọng là cố ý — nghe mãi một mẫu thì người ta nhớ *mẫu* chứ không học được *âm*.
 
-Vài điều rút ra khi vẽ cái hình, sau năm lần vẽ hỏng:
+Và đây là **chỗ duy nhất trong cả trò có điểm số thật**: app biết nó vừa phát âm nào, nên nó
+đếm đúng sai được. Máy nhận giọng ở bước cuối thì không — nó chỉ đoán chữ, nên kết quả của nó
+được báo nguyên văn "máy nghe ra từ nào", không bao giờ quy thành điểm.
 
-- **Khoang khí tô SÁNG trên nền mô TỐI.** Bản đầu tôi làm ngược nên nhìn không ra chỗ nào hẹp.
-  Chỗ sáng hẹp lại chính là chỗ đang cấu âm — đó là toàn bộ thông tin của cái hình.
-- **Lưỡi phải là một khối nằm trên sàn miệng, không được lấp kín khoang.** Lỗi này người dùng
-  chỉ ra: *"lưỡi bạn mô tả bị to hết khoang miệng làm khó hiểu"*. Nâng lưỡi lên thì phải thấy
-  khoảng trống đổi chỗ, chứ không phải cả khoang đặc lại.
-- **Phải có cái mũi.** Thiếu nó thì hình đọc ra như một cái mũ chứ không ra mặt người.
-- **Họng là một cái ống hẹp**, vẽ rộng ra thành cái hộp trắng là mất hình.
-- **Mục so sánh hai âm thì vẽ hai hình cạnh nhau**, vì cái cần dạy là chỗ KHÁC nhau. `/n/` và
-  `/l/` đặt lưỡi y hệt nhau, khác mỗi đường hơi — một hình không nói được điều đó.
-- Nhãn để trong cột trống bên phải, nối bằng đường mảnh. Nhãn đặt chồng lên hình thì đè lên nhau.
+**Hình nhìn thẳng là hình chính, hình cắt dọc chỉ là lớp xem thêm.** Đây là chỗ tôi làm sai sáu
+lần liền, và bằng chứng đứng về phía người dùng chứ không về phía tôi: không nghiên cứu nào
+chứng minh cho người học nhìn bộ phận *bên trong* tốt hơn cho họ nhìn *mặt người nói* (Nakai
+2018); thí nghiệm đối chứng cho thấy hình cắt dọc có lưỡi **không hơn** hình mặt, và khả năng
+đọc môi áp đảo khả năng đọc lưỡi (Badin 2010); hình bên trong chỉ bắt đầu có ích **sau khi**
+người ta được dạy cách đọc nó (Grauwinkel 2007). Nói cách khác cái hình cắt dọc cần một bài học
+riêng trước khi nó dạy được gì — nên nó không được đứng ở chỗ đầu tiên người mới nhìn vào.
+
+Nên giờ: âm nào phân biệt bằng môi và hàm (`/p/ /b/ /f/ /v/ /w/ /θ/`, các nguyên âm) thì hình
+chính là **miệng nhìn thẳng như soi gương** — thấy ngay môi khép, răng cắn môi, lưỡi thò ra, và
+soi gương là tự kiểm được. Âm nào phân biệt bằng lưỡi bên trong (`/t/ /d/ /k/ /g/ /l/ /r/`, cụm
+phụ âm) thì mới lấy hình cắt dọc, kèm hình nhìn thẳng nhỏ bên dưới.
+
+**Hình động, không phải hình tĩnh.** Tổng hợp của Höffler & Leutner: hình động hơn hình tĩnh
+d=0,37 nói chung, nhưng **d=1,06 với kiến thức vận động** — mà phát âm chính là vận động. Lưỡi
+đi từ tư thế nghỉ tới tư thế đích rồi nhả ra, kèm luồng hơi chạy dọc khoang. Riêng bài "/t/ cuối
+phải bật ra" thì thứ cần dạy là một *sự kiện theo thời gian*, hình đứng yên không thể nói được.
+Có nút **Chậm lại** (0,4×) vì người học nói thẳng là tốc độ thật quá nhanh để theo dõi.
+
+**Nhãn còn tối đa ba, và viết bằng cảm giác.** Bản trước dán chín nhãn giải phẫu cố định lên
+mọi hình — với người chưa học ngữ âm thì đó là quá tải, và là một phần của lời chê "nhìn không
+hiểu gì". Giờ chỉ còn nhãn nào đang làm việc cho âm đó, và viết theo kiểu rà lưỡi là thấy: "gờ
+cứng sau răng trên" thay cho "lợi", "chỗ mềm tít trong" thay cho "vòm mềm".
+
+**Ba chỗ app nói thật dù nói ra thì kém hấp dẫn hơn:**
+
+- **Không có điểm phát âm.** Máy nhận giọng trả về CHỮ chứ không trả về ÂM. Tôi có thử đưa một
+  câu cố tình nuốt hết phụ âm cuối cho mô hình nghe: nó chép lại thành câu đúng và khen. Cái đo
+  được thật thì hẹp hơn: bạn nói "ship", máy báo nó nghe ra từ nào — tức **máy có phân biệt được
+  hai từ hay không**, chứ không phải giọng bạn hay dở. Màn kết quả còn nói thêm rằng giọng người
+  Việt bị các máy này chép sai nhiều nhất trong sáu nhóm từng đo (MER 0,143 so với 0,007 của
+  người bản ngữ), nên "máy không nghe ra" không đồng nghĩa với "bạn nói sai".
+- **Mục nào máy không kiểm được thì nói thẳng.** Lỗi `/f/` cuối đẻ ra "laip"; gặp chuỗi vô nghĩa
+  thì máy tự nắn về từ gần nhất và **giấu mất lỗi**. Những mục đó mang cờ `kiemDuoc: false`,
+  không có bài nói, và kiểm thử bắt buộc điều này.
+- **`/θ/` và `/f/` gần như không phân biệt được bằng tai, kể cả với người bản ngữ.** Thí nghiệm
+  Heinz & Stevens 1961 dựng đúng hai âm này cho người bản ngữ nghe và họ cũng chịu; ngay cả với
+  giọng người thật, `/θ/` chỉ nhận đúng 58–72%. Nên app **không ra bài nghe cho cặp này** — ra
+  bài là bịa một tương phản không tồn tại, người học sẽ "đúng" nhờ đoán. Có một kiểm thử riêng
+  chặn việc đó, và bài `/θ/` nói thẳng rằng ở âm này cái đáng tin là *nhìn* chứ không phải *nghe*.
+
+Cũng vì lý do đó mà có bài kiểm **"tương phản có còn khi đổi giọng không"**: lấy dấu vân phổ của
+từng âm ở từng giọng rồi thử nhận dạng một âm ở giọng này bằng mẫu lấy từ các giọng khác. Đạt
+135 trên 140 lượt. Bài này bắt được ba lỗi thật lúc làm: âm tắc hữu thanh thiếu vạch rung lúc
+ngậm hơi (nên `/t/` với `/d/` gần như không phân biệt nổi), tiếng nổ to gấp mười tám lần nguyên
+âm theo sau (nghe thành "tách" rồi thều thào), và âm tắc thiếu chuyển tiếp formant (nên `/p/`
+`/t/` `/k/` nghe giống nhau — chỗ chặn nằm ở đâu thì tai đọc ra từ đường F2 trượt vào nguyên âm,
+chứ tiếng nổ quá ngắn để một mình nó đủ).
 
 Ghi chú tra cứu khi vẽ để ở `content/ghi-chu-khau-hinh-ipa.md`.
 
@@ -602,6 +637,7 @@ node -e "const C=require('./assets/core.js'),k=require('./data/cards.json'),i=k.
 index.html                 giao diện, một màn hình duy nhất
 assets/core.js             lõi thuần: ngày tháng, xáo bài, chọn lá của ngày (test bằng Node)
 assets/khauhinh.js         vẽ hình khẩu hình: hàm thuần, trả về chuỗi SVG (test bằng Node)
+assets/amvi.js             dựng âm vị tiếng Anh bằng toán: hàm thuần, trả về Float32Array
 assets/app.js              điều khiển giao diện
 assets/app.css             giao diện
 data/cards.json            209 lá dùng trong app (49 KB)
@@ -611,7 +647,8 @@ scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
-scripts/test-phatam.js     44 kiểm thử trò phát âm: nội dung, cặp tối thiểu, và hình vẽ
+scripts/test-phatam.js     65 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
+scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
 content/cards/, content/topics.json     bản nội dung theo chủ đề từ CSV v3, hiện không dùng
@@ -628,7 +665,8 @@ node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 44 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 65 kiểm thử trò luyện phát âm
+node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 ```
 
 ## Sửa chính tả trong nguồn
