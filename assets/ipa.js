@@ -826,17 +826,31 @@ function nghe() {
   try { mayNghe.start(); } catch (e) { dangNghe = false; bao('Không mở được micro.', true); }
 }
 
-function xet(ds) {
+/* Quyết định cho một lượt nói. Tách khỏi phần vẽ để kiểm thử được bằng Node — chính vì trước
+   đây nó dính liền với phần vẽ nên không có bài kiểm nào, và lỗi dưới đây lọt ra tới người dùng.
+
+   CHỈ xét phương án ĐẦU, không đem cả danh sách đi so. Máy nhận giọng trả về tới năm phương án,
+   mà với cặp tối thiểu thì danh sách đó gần như luôn chứa CẢ HAI từ — hai từ vốn giống nhau, đó
+   là lý do chúng thành một cặp. Đem cả danh sách đi so thì phương án này khớp "books" hoàn hảo,
+   phương án kia khớp "book" hoàn hảo, bộ so khớp thấy hoà bèn báo "không phân biệt được", và
+   người nói đúng vẫn bị đếm sai — đúng mãi mãi 0 điểm.
+   Thứ đo được thật là máy QUYẾT bạn vừa nói từ nào, tức phương án xếp đầu. */
+function quyet(ds, cap) {
   const N = self.TDTD_NGHE;
-  const kq = N ? N.chonCau(ds, [capDang[0], capDang[1]]) : { chi: -1 };
-  luot.push({ nghe: ds[0], dung: kq.chi === 0 });
+  const dau = (ds && ds[0] ? String(ds[0]) : '').trim();
+  if (!N || !dau || !cap) return { nghe: dau, chi: -1, dung: false };
+  const kq = N.chonCau([dau], [cap[0], cap[1]]);
+  return { nghe: dau, chi: kq.chi, dung: kq.chi === 0 };
+}
+
+function xet(ds) {
+  const kq = quyet(ds, capDang);
+  luot.push({ nghe: kq.nghe, dung: kq.dung });
   if (luot.length > 5) luot.shift();
   veCap();
   if (kq.chi === 1) bao(`Máy nghe ra "${capDang[1]}" chứ không phải "${capDang[0]}".`);
-  else if (kq.chi < 0) bao(`Máy nghe thành "${ds[0]}", không khớp từ nào trong cặp.`);
+  else if (kq.chi < 0) bao(kq.nghe ? `Máy nghe thành "${kq.nghe}", không khớp từ nào trong cặp.` : 'Máy không nghe được gì.');
 }
-
-function thoiHinh() { dungHinh(); if (quay2) { cancelAnimationFrame(quay2); quay2 = null; } }
 
 function thoiNghe() { if (mayNghe) { try { mayNghe.abort(); } catch (e) {} mayNghe = null; } dangNghe = false; }
 
@@ -871,6 +885,7 @@ self.TDTD_PHATAM = { mo, dong, _am: AM,
   _moAm: (i) => moAm(AM[i]),
   _cap: (i, k) => { moAm(AM[i]); moCap(AM[i].cap[k]); },
   _xet: (ds) => xet(ds),
+  _quyet: (ds, cap) => quyet(ds, cap),
   _trangThai: () => ({ am: am ? am.ipa : null, cap: capDang ? capDang[0] + '/' + capDang[1] : null, luot: luot.length,
                        dung: luot.filter(l => l.dung).length, nghe: coNghe() }) };
 })();

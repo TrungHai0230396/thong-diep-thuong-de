@@ -316,6 +316,37 @@ ok('gom nhiều giọng chứ không lấy mỗi một, để bài nghe đổi g
    /dsGiong = xep[\s\S]{0,80}slice\(0, 5\)/.test(nguon));
 ok('mỗi lượt nghe gắn một giọng', /doc\(am\.cap\[l\.c\]\[l\.b \? 0 : 1\], true, l\.g\)/.test(nguon));
 
+console.log('\n— Chấm lượt nói: chỉ xét phương án máy xếp đầu —');
+/* Lỗi người dùng gặp: nói "books" đúng, màn hình hiện máy nghe ra "books", mà vẫn đếm 0/5.
+   Nguyên nhân: máy nhận giọng trả về tới năm phương án, và với cặp tối thiểu thì danh sách đó
+   gần như luôn chứa CẢ HAI từ. Đem cả danh sách đi so thì hai vế hoà nhau, bộ so khớp báo
+   "không phân biệt được", người nói đúng bị đếm sai — đúng mãi mãi 0 điểm.
+   Phần quyết định trước đây dính liền với phần vẽ nên không kiểm thử được; giờ tách ra. */
+const Q = self.TDTD_PHATAM._quyet;
+const capBooks = ['books', 'book'];
+ok('nói đúng, máy xếp từ đúng lên đầu → tính đúng',
+   Q(['books', 'book', 'moose'], capBooks).dung === true);
+ok('máy xếp từ KIA lên đầu → tính sai, và chỉ rõ nó nghe ra từ nào',
+   (() => { const k = Q(['book', 'books'], capBooks); return k.dung === false && k.chi === 1; })());
+ok('máy nghe ra từ ngoài cặp → không tính đúng, cũng không đổ cho từ kia',
+   (() => { const k = Q(['moose', 'book'], capBooks); return k.dung === false && k.chi === -1; })());
+ok('máy không nghe được gì → không tính đúng, không nổ lỗi',
+   (() => { const k = Q([''], capBooks); return k.dung === false && k.chi === -1 && k.nghe === ''; })());
+ok('danh sách rỗng cũng không nổ lỗi', Q([], capBooks).dung === false && Q(undefined, capBooks).dung === false);
+ok('khoảng trắng thừa quanh chữ không làm sai kết quả', Q(['  books  '], capBooks).dung === true);
+/* Bài quan trọng nhất: chính cách làm cũ phải TRƯỢT ở đây. Nếu đem cả danh sách đi so mà vẫn
+   đạt thì bài kiểm này không canh được gì. */
+ok('cách cũ (so cả danh sách) đúng là hỏng — nên bài này có ý nghĩa',
+   N.chonCau(['books', 'book', 'moose'], capBooks).chi !== 0,
+   'chonCau cả danh sách trả chi=' + N.chonCau(['books', 'book', 'moose'], capBooks).chi);
+/* Soát toàn bộ cặp trong app: nói đúng từ nào thì phải được tính đúng từ đó, cả hai chiều. */
+let sai = [];
+AM.forEach(a => a.cap.forEach(c => {
+  if (!Q([c[0], c[1]], [c[0], c[1]]).dung) sai.push(`${c[0]}/${c[1]} nói vế A`);
+  if (Q([c[1], c[0]], [c[0], c[1]]).chi !== 1) sai.push(`${c[0]}/${c[1]} nói vế B`);
+}));
+ok('cả 38 cặp: nói vế nào máy xếp đầu thì chấm đúng vế đó', sai.length === 0, sai.slice(0, 3).join('; '));
+
 console.log('\n— Máy không nghe được thì phải nói vì sao, đừng im lặng —');
 ok('có lối đi cho máy không có phần nhận giọng nói', /không có phần nhận giọng nói/.test(nguon));
 ok('có lối đi cho iPhone đã cài ra màn hình chính', /navigator && self\.navigator\.standalone/.test(nguon)

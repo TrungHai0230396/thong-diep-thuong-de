@@ -474,6 +474,27 @@ Và một chỗ bài kiểm mới đã đúng còn tôi đã sai: chú thích "�
 rộng 192px trong khung 200px — vừa khít, nhưng chỉ chừa 4px mỗi bên, phông khác một chút là cắt.
 Nên chú thích dưới hình giờ cũng tự xuống dòng, và khung tự cao thêm theo số dòng.
 
+**Nói đúng mà máy đếm 0/5.** Người dùng nói "books", màn hình hiện rõ máy nghe ra *books*, mà
+vẫn đếm 0 lần đúng. Nguyên nhân nằm ở chỗ tôi dùng sai một công cụ vốn đúng: máy nhận giọng trả
+về tới **năm phương án**, và tôi đem cả danh sách đó đi so với hai từ trong cặp. Với cặp tối
+thiểu thì danh sách ấy gần như **luôn chứa cả hai từ** — hai từ vốn giống nhau, đó chính là lý
+do chúng được chọn làm một cặp. Thế là phương án này khớp *books* hoàn hảo, phương án kia khớp
+*book* hoàn hảo, bộ so khớp thấy hoà bèn báo "không phân biệt được", và người nói đúng bị đếm
+sai. Đúng **mãi mãi** 0 điểm.
+
+Thứ đo được thật là máy **quyết** bạn vừa nói từ nào — tức phương án nó xếp đầu. Giờ chỉ xét
+phương án đầu.
+
+Trò tập nói tiếng Anh dùng chung bộ so khớp ấy nhưng **không** dính lỗi này, và tôi có kiểm chứ
+không đoán: nói rõ một câu thì không lần nào nhận nhầm, và khi các phương án là biến thể của
+cùng một câu thì 27/27 đúng. Khác nhau ở chỗ ba câu để chọn vốn khác xa nhau, còn cặp tối thiểu
+thì cố ý giống nhau.
+
+Phần quyết định trước đây dính liền với phần vẽ nên **không có bài kiểm nào** — đó là lý do lỗi
+lọt tới tận người dùng. Giờ nó là hàm thuần, có tám bài canh, trong đó có một bài kiểm chứng
+rằng **cách làm cũ đúng là trượt** — bài kiểm nào đạt cả trước lẫn sau khi vá thì không canh
+được gì.
+
 **Ba chỗ app nói thật dù nói ra thì kém hấp dẫn hơn:**
 
 - **Không có điểm phát âm.** Máy nhận giọng trả về CHỮ chứ không trả về ÂM. Tôi có thử đưa một
@@ -750,7 +771,7 @@ scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
-scripts/test-phatam.js     89 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
+scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
@@ -768,7 +789,7 @@ node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 89 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 ```
 
