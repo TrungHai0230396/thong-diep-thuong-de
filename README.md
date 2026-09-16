@@ -670,6 +670,45 @@ Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở
 
 Bề sáng của Mặt Trăng luôn quay về phía Mặt Trời, nên ở vĩ độ Việt Nam lưỡi liềm **nằm ngang như cái thuyền** chứ không dựng đứng — cái đó ra được từ phép tính, không phải vẽ sẵn.
 
+## Bấm vào Mặt Trăng thì không có gì xảy ra
+
+Người dùng nói tiếp: *"bấm vô xem mặt trăng mặt trời thì ko xem đc"*. Soát ra thì app **chưa hề
+có** chức năng chạm chọn — biến `chon` khai báo ở `nightsky.js` rồi bỏ đó, không một dòng nào
+dùng tới. Canvas chỉ bắt kéo để xoay và lăn để phóng.
+
+Nhưng gốc của lời phàn nàn sâu hơn một phép dò chạm: **quá nửa thời gian trong ngày thì Trăng
+hoặc Trời nằm dưới chân trời**, tức không vẽ ra gì để mà chạm. Nên làm ba lớp:
+
+- **Chạm lên bầu trời** để chọn thứ đang thấy. Phân biệt chạm với kéo bằng ngưỡng 9px và 450ms —
+  ngón tay trên điện thoại không bao giờ đứng yên tuyệt đối.
+- **Thiên thể đã lặn vẽ thành bóng mờ** dưới đường chân trời, viền đứt, ghi rõ *"dưới chân
+  trời"*. Nhờ vậy chúc mắt xuống là thấy nó đang nằm đâu dưới đất, và chạm vào được. Kẹp góc
+  nhìn nới từ −20° xuống −85° để còn chúc xuống được.
+- **Bấm thẳng vào chữ "Mặt Trời" / "Mặt Trăng"** trong dòng chữ dưới đáy thì quay hướng nhìn về
+  phía nó. Đây là lối đi luôn dùng được, kể cả khi nó đã lặn.
+
+Ba chỗ hỏng mà bộ kiểm mới bắt được ngay khi vừa viết xong tính năng:
+
+- `chieu()` **trả toạ độ cho cả vật nằm ngoài màn hình** — nó chỉ chặn vật ở sau lưng. Không lọc
+  thì chạm sát mép màn có lúc trúng một thiên thể đang nằm ngoài khung; đo thật thấy Mặt Trời
+  có mốc chạm ở `y = −54`.
+- `dong()` **không buông lựa chọn**. Đóng màn lúc đang chọn rồi mở lại thì vòng kéo hướng nhìn
+  lôi mắt về mục tiêu cũ, ghi đè hướng mà `mo()` vừa đặt — người dùng mở ra thấy đang chúi xuống
+  đất mà không hiểu vì sao.
+- `mocLan()` bị gọi **tám lần mỗi giây**, mỗi lần là vòng lặp 1441 bước tính đầy đủ vị trí thiên
+  thể. Đo được 25ms mỗi giây đốt vào việc tính lại đúng mấy con số không đổi. Giờ nhớ lại, và
+  gom mọi chỗ đổi nơi về **một cửa duy nhất** `doiNoi()` — ba chỗ vốn gán thẳng vào biến `noi`,
+  chỉ cần một chỗ quên xoá bộ nhớ là app hiện giờ mọc của nơi cũ mà không ai thấy sai ở đâu.
+
+Và một cái bẫy đơn vị đáng ghi: `kc` của **Mặt Trăng tính bằng km** (~385 000) còn `kc` của Mặt
+Trời và hành tinh tính bằng **đơn vị thiên văn**. Cùng một tên trường, hai thang lệch nhau 150
+triệu lần. Viết một dòng hiển thị dùng chung cho cả ba là ra ngay một Mặt Trăng cách Trái Đất
+385 nghìn tỉ km. Có bài kiểm canh riêng chỗ này.
+
+Bầu trời trước đó chỉ có bài kiểm phần **tính** (`test-astro.js`), không bài nào chạm tới phần
+**nhìn** và phần **chạm** — đúng chỗ đó đẻ ra cả lỗi này lẫn lỗi "chưa lên khỏi chân trời" ở
+dưới. Giờ có `test-troidem.js`: dựng DOM và canvas giả, chạy thật vòng vẽ, rồi soi vào đó.
+
 ## "Sao giờ không thấy mặt trăng?"
 
 Người dùng mở bầu trời lúc gần nửa đêm và hỏi vậy. Bầu trời **vẽ đúng** — lúc đó Trăng ở −41°
@@ -806,6 +845,7 @@ scripts/test-core.js       37 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số liệu ngoài
+scripts/test-troidem.js    33 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, bẫy đơn vị
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
@@ -822,6 +862,7 @@ node scripts/test-core.js        # chạy 37 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
+node scripts/test-troidem.js     # chạy 33 kiểm thử bầu trời đêm
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm

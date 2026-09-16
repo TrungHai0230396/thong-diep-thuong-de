@@ -49,6 +49,10 @@ let noi = { ten: 'TP.HCM', vi: 10.8231, kinh: 106.6297, tuMay: false };
 let huongNhin = 180, caoNhin = 25, goc = 75;             // đang nhìn về đâu, và mở góc bao nhiêu
 let theoMay = false, batTheoMay = null;
 let keo = null, chon = null;
+/* Mốc chạm: mỗi khung vẽ ghi lại thiên thể nào nằm ở đâu trên màn, để chạm vào là dò ra được.
+   Trước đây biến `chon` khai báo rồi bỏ không, tức app chưa hề có chức năng chạm chọn —
+   người dùng bấm vào Mặt Trăng mà không có gì xảy ra là vì thế. */
+let moc = [], ngam = null;
 
 try {
   const l = JSON.parse(localStorage.getItem(NOI_KEY) || 'null');
@@ -221,6 +225,7 @@ function veTrang(p, pTroi, r, sang) {
 
 function ve(luc) {
   const b = bauTroi(luc);
+  moc = [];
   const sangTroi = veNen(b.troi.cao);
 
   /* Sao chỉ hiện khi trời đủ tối, và mờ dần theo độ sáng còn lại của bầu trời. */
@@ -270,6 +275,7 @@ function ve(luc) {
     const ro = Math.max(0, 1 - sangTroi * (p.sang < -2 ? 1.1 : 2.2));
     if (ro < .05) continue;
     veSao(s, p.sang < -3 ? 3.6 : p.sang < -1 ? 3 : 2.2, p.mau);
+    moc.push({ x: s.x, y: s.y, r: 20, ten: p.ten, loai: 'ht' });
     if (!chenChu(s.x, s.y + 22)) continue;
     ctx.font = '500 12px "Be Vietnam Pro", system-ui, sans-serif';
     ctx.textAlign = 'center';
@@ -277,12 +283,40 @@ function ve(luc) {
     ctx.fillText(p.ten, s.x, s.y + 22);
   }
 
+  /* Thiên thể đã lặn: vẽ thành BÓNG MỜ dưới đường chân trời, như nhìn xuyên qua đất.
+     Không vẽ thì người dùng bấm vào đâu cũng không ra, mà nó lại là thứ hay bị hỏi nhất —
+     "sao giờ không thấy mặt trăng". Vẽ mờ và ghi rõ "dưới chân trời" thì vừa thấy được nó
+     đang ở đâu, vừa không nhầm là nó đang mọc. */
+  const veBong = (cao, huong, ten, mau, r) => {
+    if (cao > -1) return;
+    const s = chieu(cao, huong);
+    if (!s) return;
+    ctx.save();
+    ctx.globalAlpha = .34;
+    ctx.setLineDash([3, 3]);
+    ctx.strokeStyle = mau; ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, 6.284); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = '500 11px "Be Vietnam Pro", system-ui, sans-serif';
+    ctx.textAlign = 'center'; ctx.fillStyle = mau;
+    ctx.fillText(ten, s.x, s.y + r + 13);
+    ctx.fillStyle = 'rgba(200,210,230,.85)';
+    ctx.font = '400 10px "Be Vietnam Pro", system-ui, sans-serif';
+    ctx.fillText('dưới chân trời', s.x, s.y + r + 25);
+    ctx.restore();
+    moc.push({ x: s.x, y: s.y, r: Math.max(r, 16), ten, loai: 'bong' });
+  };
+  veBong(b.troi.cao, b.troi.huong, 'Mặt Trời', 'rgba(255,214,120,.9)', 13);
+  veBong(b.trang.cao, b.trang.huong, 'Mặt Trăng', 'rgba(246,240,214,.9)', 12);
+  for (const p of b.ht) if (p.cao <= -1) veBong(p.cao, p.huong, p.ten, p.mau, 7);
+
   /* Mặt Trăng. */
   if (b.trang.cao > -2) {
     const s = chieu(b.trang.cao, b.trang.huong);
     if (s) {
       const sTroi = b.troi.cao > -30 ? chieu(b.troi.cao, b.troi.huong) : null;
       veTrang(s, sTroi, 17, b.trang.sang);
+      moc.push({ x: s.x, y: s.y, r: 26, ten: 'Mặt Trăng', loai: 'trang' });
       ctx.font = '500 12px "Be Vietnam Pro", system-ui, sans-serif';
       ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(246,240,214,.85)';
       ctx.fillText('Mặt Trăng', s.x, s.y + 34);
@@ -298,6 +332,7 @@ function ve(luc) {
       g.addColorStop(1, 'rgba(255,200,90,0)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(s.x, s.y, 90, 0, 6.284); ctx.fill();
       ctx.fillStyle = '#fff4cf'; ctx.beginPath(); ctx.arc(s.x, s.y, 15, 0, 6.284); ctx.fill();
+      moc.push({ x: s.x, y: s.y, r: 26, ten: 'Mặt Trời', loai: 'troi' });
       ctx.font = '500 12px "Be Vietnam Pro", system-ui, sans-serif';
       ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(255,238,190,.9)';
       ctx.fillText('Mặt Trời', s.x, s.y + 32);
@@ -313,29 +348,126 @@ function ve(luc) {
 function capNhatChu(b, luc) {
   const gio = new Date(luc).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
   const dau = new Date(luc); dau.setHours(0, 0, 0, 0);
-  const ml = A().mocLan(dau.getTime(), noi.vi, noi.kinh);
+  const ml = mocLanNho(dau.getTime());
   const gioNgan = (ms) => ms === null ? '—' :
     new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
   const mai = new Date(dau); mai.setDate(mai.getDate() + 1);
-  const mlMai = A().mocLan(mai.getTime(), noi.vi, noi.kinh);
-  const mt = A().mocLan(dau.getTime(), noi.vi, noi.kinh, 'trang');
-  const mtMai = A().mocLan(mai.getTime(), noi.vi, noi.kinh, 'trang');
+  const mlMai = mocLanNho(mai.getTime());
+  const mt = mocLanNho(dau.getTime(), 'trang');
+  const mtMai = mocLanNho(mai.getTime(), 'trang');
 
   const tren = b.ht.filter(p => p.cao > 0).map(p => p.ten);
   const q = tam.querySelector('.td-tin');
   q.innerHTML = `
     <p class="td-dong1">${noi.ten} · ${gio} · ${b.toi.ten}</p>
     <p class="td-dong2">
-      Mặt Trời ${dangODau(b.troi.cao, b.troi.huong, ml, mlMai, luc)}
+      <button class="td-ten" data-xem="Mặt Trời">Mặt Trời</button> ${dangODau(b.troi.cao, b.troi.huong, ml, mlMai, luc)}
       · ${tenTrang(b.trang.tuoi, b.trang.sang)}, sáng ${Math.round(b.trang.sang * 100)}%,
-      ${dangODau(b.trang.cao, b.trang.huong, mt, mtMai, luc)}
+      <button class="td-ten" data-xem="Mặt Trăng">Mặt Trăng</button> ${dangODau(b.trang.cao, b.trang.huong, mt, mtMai, luc)}
     </p>
     <p class="td-dong3">${tren.length ? 'Đang trên trời: ' + tren.join(' · ')
                                       : 'Không hành tinh nào trên trời lúc này'}</p>
     ${b.gapTrang.length ? `<p class="td-gap">${b.gapTrang.map(g =>
       g.cach < 0.6 ? `${g.ten} đang nấp ngay sau Mặt Trăng, cách ${so1(g.cach)}°`
                    : `${g.ten} đang sát Mặt Trăng, cách ${so1(g.cach)}°`).join(' · ')}</p>` : ''}`;
+
+  /* Bấm thẳng vào chữ "Mặt Trời" / "Mặt Trăng" là quay nhìn về phía nó. Đây mới là lối đi cho
+     trường hợp nó đã lặn: lúc đó nó không nằm trên màn nên chạm vào bầu trời không thể trúng. */
+  q.querySelectorAll('.td-ten').forEach(n => {
+    n.onclick = () => {
+      const v = n.dataset.xem === 'Mặt Trời' ? b.troi : b.trang;
+      chon = n.dataset.xem;
+      nhinToi(v.cao, v.huong);
+      veThe();
+    };
+  });
+}
+
+/* Giờ mọc lặn chỉ đổi mỗi ngày một lần và mỗi nơi một khác, mà tính nó là vòng lặp 1441 bước,
+   mỗi bước tính đầy đủ vị trí thiên thể. Đo được: tám lời gọi tốn 25ms — mà dòng chữ chạy lại
+   MỖI GIÂY, tức mỗi giây đốt 25ms chỉ để tính lại đúng mấy con số cũ. Trên điện thoại còn nặng
+   hơn nhiều. Nên nhớ lại, và xoá khi đổi nơi. */
+const khoMocLan = new Map();
+function mocLanNho(msDauNgay, thienThe) {
+  const khoa = `${msDauNgay}|${noi.vi}|${noi.kinh}|${thienThe || 'troi'}`;
+  if (!khoMocLan.has(khoa)) {
+    if (khoMocLan.size > 12) khoMocLan.clear();
+    khoMocLan.set(khoa, A().mocLan(msDauNgay, noi.vi, noi.kinh, thienThe));
+  }
+  return khoMocLan.get(khoa);
+}
+
+/* ---------- chạm chọn một thiên thể ---------- */
+
+/* Dò xem chạm trúng cái gì. Nhiều thứ chồng nhau thì lấy cái gần tâm chạm nhất.
+   Bỏ qua mốc nằm ngoài màn: hàm chieu() chỉ trả null khi vật ở SAU LƯNG, còn vật ở trước mặt
+   nhưng lệch ra ngoài mép thì nó vẫn trả toạ độ — có lúc âm hẳn. Không lọc thì chạm sát mép
+   màn có thể trúng nhầm một thiên thể đang nằm ngoài khung. */
+function chonTai(x, y) {
+  let gan = null, dGan = Infinity;
+  for (const m of moc) {
+    if (m.x < -m.r || m.x > W + m.r || m.y < -m.r || m.y > H + m.r) continue;
+    const d = Math.hypot(m.x - x, m.y - y);
+    if (d <= m.r && d < dGan) { gan = m; dGan = d; }
+  }
+  chon = gan ? gan.ten : null;
+  veThe();
+}
+
+/* Quay hướng nhìn về phía một thiên thể, kể cả khi nó đang dưới chân trời — đó mới là chỗ
+   người dùng cần: "bấm vô xem mặt trăng" lúc trăng đã lặn thì phải đưa mắt xuống dưới đất. */
+function nhinToi(cao, huong) {
+  theoMay = false;
+  ngam = { cao: Math.max(-82, Math.min(85, cao)), huong };
+}
+function keoNhin() {
+  if (!ngam) return;
+  const dh = A().quanh(ngam.huong - huongNhin), dc = ngam.cao - caoNhin;
+  if (Math.abs(dh) < .4 && Math.abs(dc) < .4) { huongNhin = ngam.huong; caoNhin = ngam.cao; ngam = null; return; }
+  huongNhin = A().chuan(huongNhin + dh * .16);
+  caoNhin = caoNhin + dc * .16;
+}
+
+/* Thẻ thông tin của thiên thể đang chọn. Chỉ hiện những thứ app THẬT SỰ tính được. */
+function veThe() {
+  const o = tam && tam.querySelector('.td-the');
+  if (!o) return;
+  if (!chon) { o.hidden = true; return; }
+  const b = veThe.b;
+  if (!b) { o.hidden = true; return; }
+  const luc = veThe.luc || Date.now();
+  const dau = new Date(luc); dau.setHours(0, 0, 0, 0);
+  const mai = new Date(dau); mai.setDate(mai.getDate() + 1);
+
+  let v = null, phu = '';
+  if (chon === 'Mặt Trời') {
+    v = b.troi;
+    phu = dangODau(v.cao, v.huong, mocLanNho(dau.getTime()),
+                   mocLanNho(mai.getTime()), luc);
+  } else if (chon === 'Mặt Trăng') {
+    v = b.trang;
+    /* CẨN THẬN đơn vị: kc của Trăng tính bằng KM (~385000), còn kc của Mặt Trời và hành tinh
+       tính bằng ĐƠN VỊ THIÊN VĂN. Cùng một tên trường, hai thang lệch nhau 150 triệu lần —
+       viết một dòng hiển thị dùng chung cho cả ba là ra ngay một Mặt Trăng cách 385 nghìn tỉ km. */
+    phu = `${tenTrang(v.tuoi, v.sang)}, sáng ${Math.round(v.sang * 100)}% · ` +
+      dangODau(v.cao, v.huong, mocLanNho(dau.getTime(), 'trang'),
+               mocLanNho(mai.getTime(), 'trang'), luc) +
+      ` · cách Trái Đất ${Math.round(v.kc / 1000)} nghìn km, ánh sáng đi hết ${so1(v.kc / 299792.458)} giây`;
+  } else {
+    v = b.ht.find(p => p.ten === chon);
+    if (v) phu = (v.cao > 0 ? `đang ở ${Math.round(v.cao)}° trên ${huongChu(v.huong)}`
+                            : 'đang ở dưới chân trời') +
+      (v.kc ? ` · cách Trái Đất ${so1(v.kc)} đơn vị thiên văn` : '');
+  }
+  if (!v) { o.hidden = true; return; }
+  o.hidden = false;
+  o.innerHTML = `<button class="td-the-thoi" aria-label="Đóng">✕</button>
+    <p class="td-the-ten">${chon}</p>
+    <p class="td-the-phu">${phu}</p>
+    <button class="td-the-nhin">Quay nhìn về phía này</button>`;
+  o.querySelector('.td-the-thoi').onclick = () => { chon = null; o.hidden = true; };
+  o.querySelector('.td-the-nhin').onclick = () => nhinToi(v.cao, v.huong);
 }
 
 /* Một thiên thể không ở trên trời thì có HAI lý do khác hẳn nhau: chưa mọc, hoặc đã lặn rồi.
@@ -359,9 +491,11 @@ const huongChu = (h) => TAM_HUONG[Math.round(((h % 360) + 360) % 360 / 45) % 8].
 
 function vong() {
   raf = requestAnimationFrame(vong);
+  keoNhin();
   const luc = Date.now();
   const b = ve(luc);
-  if (!vong.t || luc - vong.t > 1000) { capNhatChu(b, luc); vong.t = luc; }
+  veThe.b = b; veThe.luc = luc;
+  if (!vong.t || luc - vong.t > 1000) { capNhatChu(b, luc); veThe(); vong.t = luc; }
 }
 
 /* ---------- khung ---------- */
@@ -383,6 +517,7 @@ function dungKhung() {
     <canvas class="td-cv"></canvas>
     <button class="td-dong" aria-label="Đóng">✕</button>
     <div class="td-tin"></div>
+    <div class="td-the" hidden></div>
     <div class="td-thanh">
       <button class="td-noi" type="button">Đổi nơi</button>
       <button class="td-may" type="button">Xoay theo máy</button>
@@ -395,14 +530,26 @@ function dungKhung() {
   tam.querySelector('.td-noi').onclick = moBangChonNoi;
   tam.querySelector('.td-may').onclick = doiTheoMay;
 
-  cv.addEventListener('pointerdown', e => { keo = { x: e.clientX, y: e.clientY, h: huongNhin, c: caoNhin }; });
+  cv.addEventListener('pointerdown', e => {
+    keo = { x: e.clientX, y: e.clientY, h: huongNhin, c: caoNhin, luc: Date.now(), xa: 0 };
+  });
   cv.addEventListener('pointermove', e => {
     if (!keo) return;
     theoMay = false;
+    keo.xa = Math.max(keo.xa, Math.hypot(e.clientX - keo.x, e.clientY - keo.y));
     huongNhin = A().chuan(keo.h - (e.clientX - keo.x) * goc / W);
-    caoNhin = Math.max(-20, Math.min(88, keo.c + (e.clientY - keo.y) * goc / W));
+    caoNhin = Math.max(-85, Math.min(88, keo.c + (e.clientY - keo.y) * goc / W));
   });
-  for (const s of ['pointerup', 'pointercancel', 'pointerleave']) cv.addEventListener(s, () => { keo = null; });
+  /* Chạm hay kéo? Nhích dưới 9px và nhả trong 450ms thì tính là CHẠM. Ngưỡng rộng tay vì
+     ngón tay trên điện thoại không bao giờ đứng yên tuyệt đối. */
+  cv.addEventListener('pointerup', e => {
+    if (keo && keo.xa < 9 && Date.now() - keo.luc < 450) {
+      const r = cv.getBoundingClientRect();
+      chonTai(e.clientX - r.left, e.clientY - r.top);
+    }
+    keo = null;
+  });
+  for (const s of ['pointercancel', 'pointerleave']) cv.addEventListener(s, () => { keo = null; });
   cv.addEventListener('wheel', e => {
     e.preventDefault();
     goc = Math.max(25, Math.min(110, goc + Math.sign(e.deltaY) * 4));
@@ -428,13 +575,26 @@ function moBangChonNoi() {
   b.querySelector('.td-dinhvi').onclick = xinViTri;
   b.querySelectorAll('.td-tp button').forEach(n => {
     n.onclick = () => {
-      noi = { ten: n.textContent, vi: +n.dataset.vi, kinh: +n.dataset.kinh, tuMay: false };
+      doiNoi({ ten: n.textContent, vi: +n.dataset.vi, kinh: +n.dataset.kinh, tuMay: false });
       luuNoi(); b.hidden = true;
     };
   });
 }
 
 function luuNoi() { try { localStorage.setItem(NOI_KEY, JSON.stringify(noi)); } catch (e) {} }
+
+/* Một cửa DUY NHẤT để đổi nơi. Ba chỗ vốn gán thẳng vào biến noi — nút thành phố, định vị, và
+   móc kiểm thử — nên chỉ cần một chỗ quên xoá bộ nhớ giờ mọc lặn là app hiện giờ mọc của nơi
+   cũ mà không ai thấy sai ở đâu. */
+function doiNoi(moi, luu) {
+  noi = moi;
+  khoMocLan.clear();
+  chon = null; ngam = null;
+  const t = tam && tam.querySelector('.td-the');
+  if (t) t.hidden = true;
+  if (luu) luuNoi();
+  return noi;
+}
 
 function xinViTri() {
   const b = tam.querySelector('.td-bang');
@@ -443,7 +603,7 @@ function xinViTri() {
   nut.textContent = 'Đang hỏi vị trí…'; nut.disabled = true;
   navigator.geolocation.getCurrentPosition(
     (p) => {
-      noi = { ten: 'chỗ bạn đứng', vi: p.coords.latitude, kinh: p.coords.longitude, tuMay: true };
+      doiNoi({ ten: 'chỗ bạn đứng', vi: p.coords.latitude, kinh: p.coords.longitude, tuMay: true });
       luuNoi(); b.hidden = true;
     },
     () => { nut.textContent = 'Không lấy được vị trí, chọn thành phố nhé'; nut.disabled = false; },
@@ -501,6 +661,12 @@ function mo() {
 function dong() {
   if (raf) { cancelAnimationFrame(raf); raf = null; }
   theoMay = false;
+  /* Bỏ lựa chọn và đích ngắm. Không bỏ thì mở lại màn, keoNhin() sẽ lôi hướng nhìn về thiên thể
+     chọn từ lần trước, ghi đè luôn hướng mà mo() vừa đặt — người dùng mở ra thấy đang chúi
+     xuống đất mà không hiểu vì sao. */
+  chon = null; ngam = null;
+  const t = tam && tam.querySelector('.td-the');
+  if (t) t.hidden = true;
   if (tam) { tam.classList.remove('hien'); const b = tam.querySelector('.td-bang'); if (b) b.hidden = true; }
   document.body.classList.remove('khoa-cuon');
 }
@@ -509,10 +675,18 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classLis
 
 self.TDTD_TROIDEM = { mo, dong,
   _bauTroi: (luc) => bauTroi(luc || Date.now()),
-  _noi: (v, k, ten) => { noi = { ten: ten || 'thử', vi: v, kinh: k, tuMay: false }; return noi; },
+  _ve: (luc) => ve(luc || Date.now()),
+  _keoNhin: () => keoNhin(),
+  _noi: (v, k, ten) => doiNoi({ ten: ten || 'thử', vi: v, kinh: k, tuMay: false }),
   _nhin: (h, c, g) => { huongNhin = h; caoNhin = c; if (g) goc = g; return { huongNhin, caoNhin, goc }; },
   _chieu: (cao, huong) => chieu(cao, huong),
   _tenTrang: tenTrang,
+  _mocLanNho: (ms, t) => mocLanNho(ms, t),
+  _coNhoMocLan: () => khoMocLan.size,
+  _moc: () => moc.map(m => ({ ten: m.ten, loai: m.loai, x: Math.round(m.x), y: Math.round(m.y), r: m.r })),
+  _chonTai: (x, y) => { chonTai(x, y); return chon; },
+  _chon: () => chon,
+  _nhinToi: (c, h) => nhinToi(c, h),
   _dangODau: (cao, huong, ml, mlMai, luc) => dangODau(cao, huong, ml, mlMai, luc),
   _debug: () => ({ noi, huongNhin: Math.round(huongNhin), caoNhin: Math.round(caoNhin), goc, theoMay, W, H }) };
 })();
