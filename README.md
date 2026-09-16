@@ -670,6 +670,60 @@ Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở
 
 Bề sáng của Mặt Trăng luôn quay về phía Mặt Trời, nên ở vĩ độ Việt Nam lưỡi liềm **nằm ngang như cái thuyền** chứ không dựng đứng — cái đó ra được từ phép tính, không phải vẽ sẵn.
 
+## Mấy giờ mưa
+
+Người dùng xin thêm. Màn bầu trời giờ có ba dòng mưa, và cả ba đều phải chống lại cùng một cám
+dỗ: nói nghe cho chắc chắn hơn thực tế.
+
+**Chọn dịch vụ.** Dùng [Open-Meteo](https://open-meteo.com/) vì nó là cái duy nhất thoả cả ba
+ràng buộc của app này cùng lúc: không cần khoá API (nên không có bí mật nào để lộ trong một web
+tĩnh công khai), CORS mở thật, miễn phí ở mức dùng cá nhân. **met.no thì không dùng được từ
+trình duyệt** — và nó hỏng theo kiểu rất dễ đánh lừa: gọi bằng `curl` không kèm `Origin` thì
+thấy `access-control-allow-origin: *`, trông như chạy tốt; nhưng gọi kèm `Origin` (đúng cái
+trình duyệt luôn tự gửi) thì trả **403 với mọi origin**. Phải thử đúng cách mới thấy.
+
+**Cái bẫy nguy hiểm nhất: lệch một tiếng.** Open-Meteo trả lượng mưa tại mốc `15:00` là tổng của
+khoảng **14:00–15:00**, không phải 15:00–16:00. Hiểu ngược thì sai 100% số trường hợp, sai đúng
+một lượng cố định, và nhìn vào giao diện không tài nào thấy được — người dùng chỉ đọc một câu
+tiếng Việt trôi chảy. Tôi không tin trí nhớ mà **kiểm bằng thực nghiệm**: lấy dữ liệu 15 phút
+gốc ở Berlin rồi cộng bốn mốc lại — cộng bốn mốc *trước* khớp 0,00 mm suốt 22 giờ, cộng bốn mốc
+*sau* lệch 5,4 mm. Có bài kiểm canh riêng chỗ này.
+
+**Ba dòng, không hơn**, theo thứ tự quan trọng giảm dần: *khi nào* → *nặng cỡ nào* → *máy chắc
+tới đâu*. Và bốn chỗ cố ý không làm, vì làm là nói dối:
+
+- **Không bao giờ viết "không mưa"**, chỉ viết *"bản dự báo không thấy mưa"*. Hai câu đó khác
+  nhau, và cái khác nhau ấy chính là thứ app này quan tâm.
+- **Không viết "mưa lúc 15:20"**. Dữ liệu chỉ mịn tới từng giờ và ô lưới mô hình rộng chừng
+  27 km; viết giờ phút là bịa ra hai chữ số cuối. Luôn viết khoảng giờ.
+- **Không viết "70%"**, mà viết *"máy chạy 30 lần, 21 lần thấy có mưa"*. Con số của Open-Meteo
+  vốn LÀ số lần có mưa trong 30 lần chạy mô phỏng — nên viết đúng như nó là thì vừa thật hơn vừa
+  dễ hiểu hơn. Đây cũng đúng cách diễn đạt bằng tần suất tự nhiên mà Gigerenzer chỉ ra là tránh
+  được hiểu lầm về xác suất.
+- **Không dùng chữ "mưa phùn"**. Mưa phùn định nghĩa bằng cỡ hạt, mà API chỉ trả về mm. Dải nhẹ
+  nhất gọi là *"lất phất vài hạt, chưa ướt áo"*.
+
+**Càng xa càng nói ít đi.** Dưới ba tiếng thì nêu khoảng giờ và nói thẳng *"đây là tầm máy đoán
+khá được"*. Ba tới mười hai tiếng thì vẫn nêu giờ nhưng kèm *"giờ giấc có thể xê dịch một hai
+tiếng"*. **Quá mười hai tiếng thì bỏ hẳn con số giờ** — ở tầm đó nó chỉ là vẻ ngoài chính xác.
+
+Và phải nói ra cái giới hạn thật: **mưa rào đối lưu nhiệt đới là đúng loại thời tiết mà mô hình
+toàn cầu dự báo kém nhất**, mà Việt Nam thì không có mô hình khu vực độ phân giải cao nào phủ
+tới. Hỏi năm mô hình cùng một câu cho mười hai giờ tới ở TP.HCM: ICON nói 0,0 mm, ECMWF nói
+3,5 mm. Đó là mức bất định thật.
+
+Ba chỗ kỹ thuật đáng ghi:
+
+- **Toạ độ làm tròn về hai chữ số thập phân trước khi gửi đi.** Ô lưới mô hình rộng ~11 km nên
+  làm tròn tới ~1 km không mất gì, mà vị trí chính xác của người dùng thì không rời khỏi máy.
+- **Đừng tin `r.ok`.** Khi mất mạng, service worker của app bắt lỗi rồi trả về `index.html` với
+  **status 200** — `r.ok` vẫn `true`, và `JSON.parse` sẽ nuốt phải một trang HTML. Phải soi
+  `content-type`. Đã dựng đúng cái bẫy đó trong trình duyệt để chắc nó bị chặn.
+- Tệp `nightsky.js` trước đó hứa ngay ở đầu là *"không gọi mạng"*. Thêm mưa là phá lời hứa đó,
+  nên lời hứa được sửa lại chứ không để nằm im — **một lời hứa sai trong tài liệu cũng là một
+  dạng bịa**. Phần thiên văn thì vẫn đúng như cũ: máy tự giải phương trình, ngoại tuyến vẫn
+  chạy; chỉ riêng dòng mưa là đi xin người khác, và giao diện tách bạch hai thứ đó.
+
 ## Bấm vào Mặt Trăng thì không có gì xảy ra
 
 Người dùng nói tiếp: *"bấm vô xem mặt trăng mặt trời thì ko xem đc"*. Soát ra thì app **chưa hề
@@ -846,6 +900,8 @@ scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trì
 scripts/test-typing.js     27 kiểm thử trò gõ từ, gồm soát lại toàn bộ vốn từ
 scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số liệu ngoài
 scripts/test-troidem.js    33 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, bẫy đơn vị
+assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
+scripts/test-mua.js        45 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
@@ -863,6 +919,7 @@ node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một ti�
 node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 33 kiểm thử bầu trời đêm
+node scripts/test-mua.js         # chạy 45 kiểm thử phần đọc dự báo mưa
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm

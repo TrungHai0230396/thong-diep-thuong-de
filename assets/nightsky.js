@@ -3,7 +3,10 @@
    Toàn bộ vị trí lấy từ assets/astro.js: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường
    thấy được, cùng tám chòm sao mượn lại toạ độ thật của trò Nối sao.
 
-   Không gọi mạng. Chỉ hỏi vị trí của máy nếu người dùng bấm cho phép; không thì chọn
+   Phần thiên văn KHÔNG gọi mạng: máy tự giải phương trình nên ngoại tuyến vẫn đúng từng độ.
+   Riêng phần DỰ BÁO MƯA thì có gọi mạng, ra dịch vụ Open-Meteo — nói rõ ở đây vì trước đó
+   tệp này hứa "không gọi mạng", mà để một lời hứa sai nằm lại cũng là một dạng bịa.
+   Chỉ hỏi vị trí của máy nếu người dùng bấm cho phép; không thì chọn
    thành phố trong danh sách. Vị trí đã chọn giữ lại trong máy để lần sau khỏi chọn nữa. */
 (() => {
 'use strict';
@@ -368,6 +371,11 @@ function capNhatChu(b, luc) {
     </p>
     <p class="td-dong3">${tren.length ? 'Đang trên trời: ' + tren.join(' · ')
                                       : 'Không hành tinh nào trên trời lúc này'}</p>
+    ${mua.tinh === 'co' && mua.dong.length ? `<div class="td-mua">
+      ${mua.dong.map((c, i) => `<p class="${i ? 'td-mua-phu' : 'td-mua-chinh'}">${c}</p>`).join('')}
+      <p class="td-mua-nguon">Dữ liệu mưa của <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a>,
+        app tự diễn giải lại thành câu. Phần thiên văn ở trên thì máy tự tính, không cần mạng.</p>
+    </div>` : mua.tinh === 'hong' ? `<p class="td-mua-hong">Chưa xin được dự báo mưa — có thể đang mất mạng.</p>` : ''}
     ${b.gapTrang.length ? `<p class="td-gap">${b.gapTrang.map(g =>
       g.cach < 0.6 ? `${g.ten} đang nấp ngay sau Mặt Trăng, cách ${so1(g.cach)}°`
                    : `${g.ten} đang sát Mặt Trăng, cách ${so1(g.cach)}°`).join(' · ')}</p>` : ''}`;
@@ -396,6 +404,48 @@ function mocLanNho(msDauNgay, thienThe) {
     khoMocLan.set(khoa, A().mocLan(msDauNgay, noi.vi, noi.kinh, thienThe));
   }
   return khoMocLan.get(khoa);
+}
+
+/* ---------- dự báo mưa ----------
+   Dùng Open-Meteo vì nó là dịch vụ duy nhất thoả cả ba ràng buộc của app này cùng lúc: không
+   cần khoá API (nên không có bí mật nào để lộ), CORS mở thật (đã gọi thử với header Origin và
+   vẫn trả access-control-allow-origin: *), và miễn phí cho mức dùng cá nhân.
+   (met.no thì không dùng được từ trình duyệt: nó trả 403 cho BẤT KỲ request nào có Origin, dù
+   thử bằng curl không Origin thì trông như CORS vẫn ổn.)
+
+   Toạ độ làm tròn về hai chữ số thập phân TRƯỚC KHI gửi đi. Ô lưới của mô hình rộng chừng
+   11km nên làm tròn tới ~1km không mất gì về độ chính xác, mà vị trí chính xác của người dùng
+   thì không rời khỏi máy họ. */
+const MUA_URL = 'https://api.open-meteo.com/v1/forecast';
+const MUA_LAI = 600000;                                 // xin lại sau mười phút
+let mua = { luc: 0, tinh: 'chua', dong: [], dangXin: false };
+
+async function xinMua() {
+  if (mua.dangXin) return;
+  mua.dangXin = true;
+  try {
+    const q = new URLSearchParams({
+      latitude: (Math.round(noi.vi * 100) / 100).toString(),
+      longitude: (Math.round(noi.kinh * 100) / 100).toString(),
+      hourly: 'precipitation,rain,showers,precipitation_probability,weather_code',
+      forecast_hours: '24', timezone: 'auto',
+    });
+    const bo = new AbortController();
+    const hen = setTimeout(() => bo.abort(), 8000);
+    const r = await fetch(`${MUA_URL}?${q}`, { signal: bo.signal });
+    clearTimeout(hen);
+    /* ĐỪNG tin r.ok. Khi mất mạng, service worker của app bắt lỗi fetch rồi trả về index.html
+       với status 200 — r.ok vẫn TRUE, và JSON.parse sẽ nuốt phải một trang HTML. Phải soi
+       kiểu nội dung mới biết mình nhận được cái gì. */
+    const kieu = r.headers.get('content-type') || '';
+    if (!r.ok || !kieu.includes('json')) throw new Error('khong-phai-json');
+    const d = await r.json();
+    const M = self.TDTD_MUA;
+    mua = { luc: Date.now(), tinh: 'co', dangXin: false,
+            dong: M ? M.cau(M.doc(d.hourly, Date.now())) : [] };
+  } catch (e) {
+    mua = { luc: Date.now(), tinh: 'hong', dangXin: false, dong: [] };
+  }
 }
 
 /* ---------- chạm chọn một thiên thể ---------- */
@@ -495,7 +545,12 @@ function vong() {
   const luc = Date.now();
   const b = ve(luc);
   veThe.b = b; veThe.luc = luc;
-  if (!vong.t || luc - vong.t > 1000) { capNhatChu(b, luc); veThe(); vong.t = luc; }
+  if (!vong.t || luc - vong.t > 1000) {
+    capNhatChu(b, luc); veThe(); vong.t = luc;
+    /* Bám vào nhánh một giây sẵn có: phép so sánh này gần như miễn phí, mà mạng thì chỉ chạm
+       tới mười phút một lần. */
+    if (luc - mua.luc > MUA_LAI) xinMua();
+  }
 }
 
 /* ---------- khung ---------- */
@@ -589,6 +644,7 @@ function luuNoi() { try { localStorage.setItem(NOI_KEY, JSON.stringify(noi)); } 
 function doiNoi(moi, luu) {
   noi = moi;
   khoMocLan.clear();
+  mua = { luc: 0, tinh: 'chua', dong: [], dangXin: false };   // dự báo của nơi cũ hết giá trị
   chon = null; ngam = null;
   const t = tam && tam.querySelector('.td-the');
   if (t) t.hidden = true;
@@ -683,6 +739,9 @@ self.TDTD_TROIDEM = { mo, dong,
   _tenTrang: tenTrang,
   _mocLanNho: (ms, t) => mocLanNho(ms, t),
   _coNhoMocLan: () => khoMocLan.size,
+  _xinMua: () => xinMua(),
+  _mua: () => ({ tinh: mua.tinh, dong: mua.dong.slice() }),
+  _quenMua: () => { mua = { luc: 0, tinh: 'chua', dong: [], dangXin: false }; },
   _moc: () => moc.map(m => ({ ten: m.ten, loai: m.loai, x: Math.round(m.x), y: Math.round(m.y), r: m.r })),
   _chonTai: (x, y) => { chonTai(x, y); return chon; },
   _chon: () => chon,

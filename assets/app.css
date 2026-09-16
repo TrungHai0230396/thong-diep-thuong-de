@@ -658,3 +658,12 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .td-ten{cursor:pointer;padding:1px 5px;border-radius:6px;font-size:inherit;font-family:inherit;
   border:1px solid rgba(232,195,122,.35);background:rgba(232,195,122,.12);color:var(--ink)}
 .td-ten:hover{background:rgba(232,195,122,.24)}
+/* dòng dự báo mưa trong bầu trời đêm */
+.td-mua{margin:8px 0 0;padding:9px 11px;border-radius:11px;
+  border:1px solid rgba(126,200,227,.26);background:rgba(126,200,227,.08)}
+.td-mua p{margin:0}
+.td-mua-chinh{font-size:13.5px;color:var(--ink)}
+.td-mua-phu{margin-top:3px!important;font-size:12px;line-height:1.55;color:var(--ink-dim)}
+.td-mua-nguon{margin-top:6px!important;font-size:10.5px;line-height:1.5;color:rgba(185,178,204,.65)}
+.td-mua-nguon a{color:rgba(126,200,227,.85)}
+.td-mua-hong{margin:8px 0 0;font-size:12px;color:rgba(185,178,204,.7)}
