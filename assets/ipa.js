@@ -391,6 +391,15 @@ function chayHinh(svgs, khung) {
 }
 function dungHinh() { if (quay) { cancelAnimationFrame(quay); quay = null; } }
 
+/* Dừng CẢ HAI vòng chạy hình. Hàm này từng bị xoá nhầm lúc tôi tách hàm quyet() ra khỏi xet():
+   phép thay thế lấy trọn đoạn từ "function xet" tới "function thoiNghe", mà thoiHinh lại nằm
+   lọt giữa hai mốc đó. Hậu quả: dong() ném lỗi ngay trước dòng gỡ lớp "hien", nên màn phát âm
+   mở ra là không bao giờ đóng được, phủ kín màn hình và làm mọi ngôi sao khác bấm như không. */
+function thoiHinh() {
+  dungHinh();
+  if (quay2) { cancelAnimationFrame(quay2); quay2 = null; }
+}
+
 /* ---- màn một âm: dắt tay từng bước, không phải một trang dài cuộn xuống ---- */
 let buoc = 0;
 
