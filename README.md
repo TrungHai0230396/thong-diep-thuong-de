@@ -670,6 +670,40 @@ Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở
 
 Bề sáng của Mặt Trăng luôn quay về phía Mặt Trời, nên ở vĩ độ Việt Nam lưỡi liềm **nằm ngang như cái thuyền** chứ không dựng đứng — cái đó ra được từ phép tính, không phải vẽ sẵn.
 
+## Một hàm bị nuốt mất, và cả app đứng hình
+
+Người dùng báo: *"bấm vô ngôi sao thì ko ra"*. Đây là lỗi tôi tự gây ra và tự đẩy lên mạng.
+
+`dong()` của trò phát âm ném lỗi `thoiHinh is not defined` **ngay trước** dòng gỡ lớp `hien`.
+Nên màn phát âm mở ra là không bao giờ đóng được, mà nó thì `position:fixed;inset:0;z-index:30`
+— phủ kín màn hình. Người dùng bấm ngôi sao nào cũng thấy như không có gì xảy ra, vì trò mới
+mở ra *đằng sau* một tấm chắn trong suốt.
+
+Nguyên nhân thì tầm thường mà đáng nhớ: lúc tách hàm `quyet()` ra khỏi `xet()`, tôi thay trọn
+đoạn từ `function xet` tới `function thoiNghe` — mà `thoiHinh` lại **nằm lọt giữa hai mốc đó**.
+Sửa bằng cách thay cả một khối văn bản thì luôn có rủi ro này, và trình biên dịch không kêu gì
+cả vì JavaScript chỉ phát hiện tên không tồn tại lúc CHẠY tới dòng đó.
+
+Chỗ đáng nói không phải cái lỗi, mà là vì sao nó ra được tới người dùng: **không một bài kiểm
+nào từng gọi `dong()`**. Chín ngôi sao, hàng trăm phép kiểm nội dung, mà không ai thử đóng một
+trò lại bao giờ.
+
+Nên giờ có `scripts/test-sao.js`. Nó không kiểm nội dung trò nào cả — nó đọc danh sách ngôi sao
+thẳng từ `app.js` (thêm sao mới là nó tự biết) rồi hỏi đúng mấy câu mà mọi ngôi sao đều phải
+trả lời được:
+
+- mở có ném lỗi không;
+- đóng có ném lỗi không;
+- đóng rồi thì lớp `hien` có thật sự mất không;
+- đóng xong mở lại có được không;
+- và **đóng lúc chưa từng mở** có nổ không — `app.js` có nhánh gọi `dong()` trước khi trò kịp mở.
+
+Đã kiểm rằng bài này thật sự có răng: gài lại đúng lỗi cũ thì nó báo hỏng ba chỗ; bỏ lỗi ra thì
+xanh. Nó còn bắt luôn hai chỗ khác ngay lần chạy đầu — và hoá ra cả hai là lỗi của *giàn kiểm*
+chứ không phải của sản phẩm: bộ DOM giả thiếu `blur()`, và cách tôi dò khung đang lấy "phần tử
+mang lớp `hien` đầu tiên" nên nó chỉ về khung của một trò khác chưa đóng được, báo oan hai ngôi
+sao vô tội.
+
 ## Mấy giờ mưa
 
 Người dùng xin thêm. Màn bầu trời giờ có ba dòng mưa, và cả ba đều phải chống lại cùng một cám
@@ -902,6 +936,7 @@ scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số li�
 scripts/test-troidem.js    33 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, bẫy đơn vị
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        45 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
+scripts/test-sao.js        47 kiểm thử vòng đời MỌI ngôi sao: mở, đóng, đóng rồi mở lại
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
@@ -920,6 +955,7 @@ node scripts/test-typing.js      # chạy 27 kiểm thử trò gõ từ
 node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 33 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 45 kiểm thử phần đọc dự báo mưa
+node scripts/test-sao.js         # chạy 47 kiểm thử vòng đời mọi ngôi sao
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm
