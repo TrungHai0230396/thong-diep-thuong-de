@@ -24,6 +24,7 @@ const HINH_SAO = {
   tia:       'M12 1l1.9 7.2 5.4-4-4 5.4L22.5 12l-7.2 1.9 4 5.4-5.4-4L12 22.5l-1.9-7.2-5.4 4 4-5.4L1.5 12l7.2-1.9-4-5.4 5.4 4z',
   giot:      'M12 2.2c3.6 4.6 6.4 8.1 6.4 11.4A6.4 6.4 0 1 1 5.6 13.6c0-3.3 2.8-6.8 6.4-11.4z',
   sao6:      'M12 1.6l2.2 5.4 5.8-1.2-3.6 4.6 3.6 4.6-5.8-1.2-2.2 5.4-2.2-5.4-5.8 1.2 3.6-4.6-3.6-4.6 5.8 1.2z',
+  sao8:      'M12 1.4L13.76 7.75L19.5 4.5L16.25 10.24L22.6 12L16.25 13.76L19.5 19.5L13.76 16.25L12 22.6L10.24 16.25L4.5 19.5L7.75 13.76L1.4 12L7.75 10.24L4.5 4.5L10.24 7.75z',
 };
 
 const SAO = [
@@ -45,6 +46,8 @@ const SAO = [
     duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM' },
   { id: 'sao-phatam', mau: '#e8c37a', hinh: 'tia',     nhan: 'Luyện phát âm, xem miệng đặt lưỡi ở đâu',
     duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM' },
+  { id: 'sao-lich', mau: '#e58a7a', hinh: 'sao8',      nhan: 'Xem ngày tốt xấu, nên và không nên làm gì',
+    duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY' },
 ];
 
 

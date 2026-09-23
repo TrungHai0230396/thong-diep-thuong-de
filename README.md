@@ -54,6 +54,7 @@ Gửi cho ai một trong những địa chỉ này là họ mở thẳng vào tr
 | Gõ từ tiếng Anh | `#go-tu` |
 | Tập nói tiếng Anh | `#tap-noi` |
 | Bầu trời đêm nay | `#troi-dem` |
+| Xem ngày | `#xem-ngay` |
 
 Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và tự chạy được cả khi mất mạng. Bấm ngôi sao thì địa chỉ tự đổi theo, **đóng trò thì địa chỉ trở về trang chủ**. Nút Back của điện thoại cũng đóng trò lại chứ không thoát hẳn khỏi app.
 
@@ -638,6 +639,43 @@ Kết quả: 100 + 109 = **209 lá**. Khoảng cách gần nhất giữa hai l�
 
 Chín phép thử giữ chỗ này: đủ 209 lá, không lọt đuôi `(Thông điệp ngày N)`, không lọt lời giảng dán mẫu, không lời giảng nào dùng cho hai lá, không hai lá nào nói lại cùng một điều, không nháy đơn thẳng, không thừa dấu chấm sau ngoặc kép, không mũi tên gõ tay, không con số phần trăm.
 
+## Xem ngày
+
+Một ngôi sao màu son đỏ, `#xem-ngay`. Ba phần trên một màn hình:
+
+1. **Hôm nay tốt hay xấu** — ngày hoàng đạo hay hắc đạo và thần nào cai quản, trực gì cùng danh sách nên và không nên, giờ hoàng đạo, cảnh báo Tam nương / Nguyệt kỵ. Có mũi tên xem ngày trước, ngày sau.
+2. **Bạn muốn làm gì?** — gõ việc định làm ("khai trương quán cà phê", "chuyển nhà") hoặc chọn một trong 15 mục, app tìm năm ngày tốt nhất trong 60 ngày tới, kèm lý do và giờ tốt.
+3. **Tuổi** (không bắt buộc) — nhập ngày sinh thì tránh luôn ngày xung tuổi. Chỉ lưu trong máy.
+
+**Không hỏi tên**, vì lịch vạn niên không có luật nào dùng tên người. Cái có luật thật là tuổi: ngày có chi đối với chi năm sinh (Tý–Ngọ, Sửu–Mùi...) là ngày xung. Tuổi tính theo **năm âm** — sinh 20/1/1990 là tuổi Kỷ Tỵ chứ không phải Canh Ngọ, vì Tết năm đó là 27/1.
+
+**Không tự đặt ra luật nào.** Nguồn của từng phần, ghi cả ở đầu `assets/lich.js`:
+
+| Phần | Nguồn |
+|---|---|
+| Âm lịch, can chi | Thuật toán Hồ Ngọc Đức, [Thuật toán tính âm lịch](https://www.xemamlich.uhm.vn/calrules.html), múi giờ 7.0 — chép lại từng dòng |
+| 12 thần hoàng đạo / hắc đạo | saptet.com, khớp xemlicham.com, lichvannien365.com, lichngaytot.com |
+| 12 trực | theo **tháng tiết khí**, không theo tháng âm — ja.wikipedia 十二直, zh.wikipedia 建除十二神 |
+| Nên / không nên của từng trực | **chỉ lichvannien365.com** |
+| Giờ hoàng đạo | tra theo **chi** của ngày, bảng của saptet.com |
+| Tam nương, Nguyệt kỵ | mùng 3, 7, 13, 18, 22, 27 / mùng 5, 14, 23 âm lịch |
+
+**Các nguồn cãi nhau, nên chọn một chứ không trộn.** Bốn trang lịch vạn niên đồng ý về âm lịch, can chi, thần và giờ — nhưng danh sách nên / không nên thì mỗi trang một kiểu: trực Khai trang này bảo nên động thổ, trang kia bảo kỵ; trực Bình một trang ghi "tốt mọi việc", trang khác lại có hẳn danh sách xấu. Ở đây lấy trọn của lichvannien365.com vì nó chia sẵn hai danh sách tốt / xấu song song. Một trang khác (viettopreview) tra giờ hoàng đạo theo **can** của ngày — sai với mọi ngày đã đối chiếu, nên bỏ.
+
+**Một chỗ các trang không thống nhất, chọn theo số đông.** Ngày 7/9/2026 tiết Bạch lộ bắt đầu lúc 21 giờ 41. Ba trang coi hôm đó vẫn thuộc tháng cũ (trực Kiến), một trang coi là đã sang tháng mới (trực Bế). App xét tiết vào **giữa trưa** giờ Việt Nam, ra đúng như ba trang — và cũng khớp ngày 4/2/2026, Lập xuân lúc 3 giờ 02, cả bốn trang đều coi là đã sang tháng.
+
+**Đối chiếu với lịch đã công bố**, `scripts/test-lich.js`:
+
+- bảy ngày rải khắp năm 2026 — khớp cả âm lịch, can chi ngày tháng năm, thần, trực, sáu giờ hoàng đạo
+- mười lăm ngày tháng 9/2026, từng ngày một với saptet.com — khớp thần lẫn trực
+- trực lặp hai ngày liền khi giao tiết (7 và 8/9 cùng Kiến), còn trung khí như Thu phân thì không làm lặp
+- mùng một Tết 2024, 2025, 2026
+- 3.650 ngày từ 2000 tới 2029 đổi dương sang âm rồi âm về dương vẫn đúng
+
+**Một lỗi tự bắt được ở phần nhận việc.** Bản đầu dò theo chuỗi con, nên *"tổ chức sự kiện"* ra kiện tụng, *"đi khám phá hang động"* ra khám bệnh, *"thiết kế lại phòng"* ra thi cử (vì "thiết" chứa "thi"), *"đăng ký tài khoản"* ra ký hợp đồng. Giờ dò theo **chữ trọn vẹn**, và gỡ mấy từ ghép hay gây nhầm ra trước khi dò. Chỗ ứng việc hiện đại ("khai trương quán") với chữ cổ trong sách ("mở tiệm", "giá thú") là phần biên soạn của app, không phải của nguồn.
+
+Chưa thử được tháng nhuận — không ngày mẫu nào rơi vào tháng nhuận. Thần của tháng nhuận đang dùng số của tháng nó lặp lại.
+
 ## Bầu trời đêm nay
 
 Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở chỗ bạn đang đứng, vào đúng lúc này**: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường thấy được, và tám chòm sao mượn lại toạ độ thật của trò Nối sao. Kéo để nhìn quanh, hoặc bấm *Xoay theo máy* rồi giơ điện thoại lên — hướng máy về phía nào thì thấy bầu trời phía đó.
@@ -938,6 +976,10 @@ assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hà
 scripts/test-mua.js        45 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-sao.js        47 kiểm thử vòng đời MỌI ngôi sao: mở, đóng, đóng rồi mở lại
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
+
+scripts/test-astro.js      21 kiểm thử thiên văn, đối chiếu số liệu ngoài
+scripts/test-lich.js       40 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
+scripts/test-phatam.js     65 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
 content/raw/               CSV nguồn (v3, v5, v6 và bản 365)
 content/ghi-chu-co-che-game.json        cột "Cơ chế game" trong CSV, giữ làm ghi chú, không dùng trong app
@@ -956,6 +998,9 @@ node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 33 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 45 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy 47 kiểm thử vòng đời mọi ngôi sao
+
+node scripts/test-astro.js       # chạy 21 kiểm thử thiên văn
+node scripts/test-lich.js        # chạy 40 kiểm thử lịch vạn niên
 node scripts/test-english.js     # chạy 20 kiểm thử nội dung trò tập nói
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm
