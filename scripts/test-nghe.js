@@ -10,15 +10,11 @@ const fs = require('fs');
 const path = require('path');
 const N = require(path.join(__dirname, '..', 'assets', 'nghe.js'));
 
-global.self = global;
-global.addEventListener = () => {};
-const gia = () => ({ style: {}, dataset: {}, children: [],
-  classList: { add() {}, remove() {}, toggle() {}, contains() { return false; } },
-  appendChild(c) { this.children.push(c); return c; }, querySelector() { return null; },
-  querySelectorAll() { return []; }, setAttribute() {}, addEventListener() {}, remove() {} });
-global.document = { createElement: gia, body: Object.assign(gia(), { classList: { add() {}, remove() {} } }) };
-eval(fs.readFileSync(path.join(__dirname, '..', 'assets', 'english.js'), 'utf8'));
-const CANH = self.TDTD_ANHNGU._canh;
+/* Câu mẫu: 27 lượt, mỗi lượt ba câu gần nhau, tách ra từ trò Tập nói tiếng Anh trước khi
+   gỡ trò đó. Trò Tập nói không còn, nhưng hàm chonCau vẫn là thứ trò Luyện phát âm dùng để
+   nghe người dùng nói, nên phép thử độ bền của nó vẫn phải giữ — chỉ đổi nguồn câu mẫu. */
+const MAU = JSON.parse(fs.readFileSync(path.join(__dirname, 'cau-mau-nghe.json'), 'utf8'));
+const CANH = MAU.map(c => ({ luot: c.map(ba => ({ chon: ba.map(en => ({ en })) })) }));
 
 let pass = 0, fail = 0;
 const ok = (n, c, them = '') => { c ? pass++ : fail++; console.log(`${c ? '  ✓' : '  ✗'} ${n}${them ? ' — ' + them : ''}`); };

@@ -60,7 +60,7 @@ global.performance = { now: () => Date.now() };
 
 /* Nạp mọi tệp trò, đúng thứ tự như index.html. */
 const TEP = ['core.js', 'game.js', 'share.js', 'lantern.js', 'pond.js', 'breath.js',
-             'constellation.js', 'typing.js', 'nghe.js', 'english.js', 'mua.js',
+             'constellation.js', 'nghe.js', 'mua.js',
              'astro.js', 'nightsky.js', 'lich.js', 'almanac.js', 'amvi.js', 'khauhinh.js', 'ipa.js'];
 for (const t of TEP) new Function(fs.readFileSync(path.join(__dirname, '..', 'assets', t), 'utf8'))();
 
@@ -74,7 +74,7 @@ let pass = 0, fail = 0;
 const ok = (n, c, them = '') => { c ? pass++ : fail++; console.log(`${c ? '  ✓' : '  ✗'} ${n}${them ? ' — ' + them : ''}`); };
 
 console.log('\n— Đọc được danh sách ngôi sao từ app.js —');
-ok('tìm thấy các ngôi sao', SAO.length >= 9, `${SAO.length} sao: ${SAO.map(s => s.id).join(', ')}`);
+ok('tìm thấy các ngôi sao', SAO.length >= 8, `${SAO.length} sao: ${SAO.map(s => s.id).join(', ')}`);
 ok('sao nào cũng khai báo tên mô-đun', SAO.every(s => s.mun));
 
 console.log('\n— Mô-đun của mỗi sao phải có mặt và đủ hai cửa mo/dong —');
