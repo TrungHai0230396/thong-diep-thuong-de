@@ -127,6 +127,12 @@ def cham(s):
     return s if loi.endswith((".", "!", "?", "…")) else s + "."
 
 
+def bo_cham_cuoi(s):
+    """Thông điệp in to giữa lá bài như một câu đề từ, nên không để dấu chấm ở cuối. Dấu chấm giữa
+       câu vẫn giữ, "?" và "!" vẫn giữ, dấu ba chấm cũng không bị cắt mất một chấm."""
+    return s[:-1] if s.endswith(".") and not s.endswith("..") else s
+
+
 def tu(s):
     """Bộ từ đã bỏ dấu câu, để so hai câu có phải một không."""
     return set(re.sub(r"[^\w\s]", "", unicodedata.normalize("NFC", s.lower())).split())
@@ -160,7 +166,7 @@ for r in doc_csv(CU):
     msg, mean = nhay(sua(clean(r["Thông điệp"]))), nhay(sua(clean(r["Ý nghĩa"])))
     for find, rep in FIXES.get(cid, []):
         msg, mean = msg.replace(find, rep), mean.replace(find, rep)
-    cards.append({"id": len(cards) + 1, "thong_diep": cham(msg), "y_nghia": cham(mean)})
+    cards.append({"id": len(cards) + 1, "thong_diep": bo_cham_cuoi(cham(msg)), "y_nghia": cham(mean)})
     notes.append({"id": len(cards), "nguon": f"v6#{cid}", "co_che_game": clean(r.get("Cơ chế game", ""))})
 
 so_cu = len(cards)
@@ -190,7 +196,7 @@ for r in doc_csv(MOI):
             continue
         mean, thay_giang = rieng, thay_giang + 1
     da_co.append(msg)                                   # lá mới cũng vào danh sách, để lá sau so với nó
-    cards.append({"id": len(cards) + 1, "thong_diep": cham(msg), "y_nghia": cham(mean)})
+    cards.append({"id": len(cards) + 1, "thong_diep": bo_cham_cuoi(cham(msg)), "y_nghia": cham(mean)})
     notes.append({"id": len(cards), "nguon": f"365#{r['ID']}", "co_che_game": clean(r.get("Cơ chế game", ""))})
 
 # ---- soát lại ----

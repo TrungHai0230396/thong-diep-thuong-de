@@ -553,7 +553,9 @@ Kết quả: 100 + 109 = **209 lá**. Khoảng cách gần nhất giữa hai l�
 
 **Đọc tay lại từng lá** thì ra thêm sáu chỗ, sửa trong bảng `SUA_CAU`: lỗi chính tả *"gông cồng"* → *"gông cùm"*; chơi chữ *"Present (Món quà)"* chỉ có trong tiếng Anh nên phải nói rõ ra; mũi tên gõ bằng `->` đổi thành `→`; *"chịu trách nhiệm 100%"* lạc giọng giữa một lá tĩnh tâm nên đổi thành *"trọn vẹn"*; và máy chiếu phim thì chạy cuộn phim chứ không có đĩa. Sáu lá dùng nháy đơn thẳng `'…'` cũng đổi sang nháy kép cong `“…”` cho hợp phông serif.
 
-Chín phép thử giữ chỗ này: đủ 209 lá, không lọt đuôi `(Thông điệp ngày N)`, không lọt lời giảng dán mẫu, không lời giảng nào dùng cho hai lá, không hai lá nào nói lại cùng một điều, không nháy đơn thẳng, không thừa dấu chấm sau ngoặc kép, không mũi tên gõ tay, không con số phần trăm.
+**Thông điệp không có dấu chấm cuối câu.** Nó in to giữa lá bài như một câu đề từ, nên dấu chấm cuối chỉ làm câu trông cụt. `build-data.py` bỏ dấu chấm cuối của thông điệp (dấu chấm giữa câu, dấu hỏi, dấu chấm than và dấu ba chấm vẫn giữ); lời giảng nhỏ bên dưới là câu văn thường nên vẫn có dấu chấm.
+
+Mười phép thử giữ chỗ này: đủ 209 lá, thông điệp không có dấu chấm cuối câu, không lọt đuôi `(Thông điệp ngày N)`, không lọt lời giảng dán mẫu, không lời giảng nào dùng cho hai lá, không hai lá nào nói lại cùng một điều, không nháy đơn thẳng, không thừa dấu chấm sau ngoặc kép, không mũi tên gõ tay, không con số phần trăm.
 
 ## Xem ngày
 
@@ -867,7 +869,7 @@ assets/app.css             giao diện
 data/cards.json            209 lá dùng trong app (49 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
-scripts/test-core.js       37 kiểm thử lõi
+scripts/test-core.js       38 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số liệu ngoài
 scripts/test-troidem.js    33 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, bẫy đơn vị
@@ -889,7 +891,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 37 kiểm thử lõi (Node 18+)
+node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 33 kiểm thử bầu trời đêm

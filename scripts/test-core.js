@@ -68,6 +68,8 @@ ok('không lá nào có con số phần trăm', !cards.some(c => /\d+\s*%/.test(
 ok(`ID liên tục 1–${cards.length}`, IDS.every((v, i) => v === i + 1));
 ok('không lá nào thiếu thông điệp', cards.every(c => c.thong_diep && c.thong_diep.length > 30));
 ok('không lá nào thiếu ý nghĩa', cards.every(c => c.y_nghia && c.y_nghia.length > 15));
+ok('thông điệp không có dấu chấm cuối câu', !cards.some(c => /[^.]\.$/.test(c.thong_diep)),
+   cards.filter(c => /[^.]\.$/.test(c.thong_diep)).map(c => '#' + c.id).slice(0, 5).join(' '));
 ok('không trùng thông điệp', new Set(cards.map(c => c.thong_diep.toLowerCase())).size === cards.length);
 /* Nguồn 365 dán đuôi "(Thông điệp ngày N)" vào 265 dòng cho chúng trông khác nhau, và
    dán chung một lời giảng mẫu cho 265 dòng đó. Cả hai thứ không được lọt vào bundle. */
