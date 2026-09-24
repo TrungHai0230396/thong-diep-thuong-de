@@ -575,10 +575,16 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .xn-mot-canh{margin:0 0 4px;font-size:12px;line-height:1.55;color:#f0b3a6}
 .xn-mot-gio{margin:0;font-size:12px;line-height:1.55;color:rgba(244,239,230,.5)}
 
-.xn-tuoi-hoi{display:block;font-size:14px;color:rgba(244,239,230,.85)}
+.xn-tuoi-hoi{margin:0;font-size:14px;color:rgba(244,239,230,.85)}
 .xn-tuoi-hoi span{color:rgba(244,239,230,.45);font-size:12px}
-.xn-sinh{display:block;width:100%;margin-top:8px;padding:10px 12px;border-radius:12px;font-size:16px;
+.xn-chon-sinh{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.xn-chon-sinh select{flex:1 1 0;min-width:0;padding:10px 4px 10px 10px;border-radius:12px;font-size:16px;
   border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:var(--ink);color-scheme:dark}
+.xn-chon-sinh select:focus{outline:none;border-color:rgba(232,195,122,.55)}
+.xn-luu{flex:1 0 100%;padding:10px 14px;border-radius:12px;cursor:pointer;font-size:14px;white-space:nowrap;
+  border:1px solid rgba(232,195,122,.4);background:rgba(232,195,122,.12);color:#f0c48a}
+.xn-luu:disabled{opacity:.4;cursor:default}
+.xn-loi{margin:8px 0 0;font-size:13px;color:#f0b3a6}
 .xn-ghi{margin:8px 0 0;font-size:12px;line-height:1.6;color:rgba(244,239,230,.42)}
 .xn-tuoi-co{margin:0 0 8px;font-size:14px;line-height:1.6;color:rgba(244,239,230,.85)}
 .xn-tuoi-co b{color:#f0c48a;font-weight:500}

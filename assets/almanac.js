@@ -139,15 +139,37 @@ function veTuoi() {
     };
     return;
   }
+  /* Ba ô chọn và nút Xong, không dùng <input type="date">: bản cũ lưu ngay ở sự kiện change đầu
+     tiên, mà trình duyệt điện thoại điền sẵn một ngày ngay khi mở bảng chọn, nên người dùng chưa
+     kịp chọn thì app đã lưu và vẽ lại khung. Giờ chỉ lưu khi bấm Xong. */
+  const namNay = new Date().getFullYear();
+  const chon = (lop, nhan, ds) => `<select class="${lop}" aria-label="${nhan} sinh">
+      <option value="">${nhan}</option>${ds.map(n => `<option value="${n}">${n}</option>`).join('')}</select>`;
+  const dem = (a, b) => Array.from({ length: Math.abs(b - a) + 1 }, (_, i) => a < b ? a + i : a - i);
   o.innerHTML = `
-    <label class="xn-tuoi-hoi">Nhập ngày sinh để tránh ngày xung tuổi <span>(không bắt buộc)</span>
-      <input class="xn-sinh" type="date" min="1920-01-01" max="${new Date().toISOString().slice(0, 10)}">
-    </label>
+    <p class="xn-tuoi-hoi">Nhập ngày sinh để tránh ngày xung tuổi <span>(không bắt buộc)</span></p>
+    <div class="xn-chon-sinh">
+      ${chon('xn-s-ngay', 'Ngày', dem(1, 31))}
+      ${chon('xn-s-thang', 'Tháng', dem(1, 12))}
+      ${chon('xn-s-nam', 'Năm', dem(namNay, 1920))}
+      <button class="xn-luu" type="button" disabled>Xong</button>
+    </div>
+    <p class="xn-loi" hidden></p>
     <p class="xn-ghi">Chỉ lưu trong máy này. Tuổi tính theo năm âm, sinh trước Tết thì thuộc năm trước.
       Lịch vạn niên không có luật nào dùng tên người, nên ở đây không hỏi tên.</p>`;
-  o.querySelector('.xn-sinh').onchange = (e) => {
-    const [yy, mm, dd] = e.target.value.split('-').map(Number);
-    if (!yy || yy < 1900) return;
+  const [sNgay, sThang, sNam] = ['.xn-s-ngay', '.xn-s-thang', '.xn-s-nam'].map(s => o.querySelector(s));
+  const nut = o.querySelector('.xn-luu'), loi = o.querySelector('.xn-loi');
+  const doc = () => [+sNgay.value, +sThang.value, +sNam.value];
+  [sNgay, sThang, sNam].forEach(s => s.onchange = () => {
+    nut.disabled = doc().some(n => !n);
+    loi.hidden = true;
+  });
+  nut.onclick = () => {
+    const [dd, mm, yy] = doc();
+    if (!dd || !mm || !yy) return;
+    const t = new Date(yy, mm - 1, dd);
+    if (t.getDate() !== dd) { loi.textContent = `Tháng ${mm}/${yy} không có ngày ${dd}.`; loi.hidden = false; return; }
+    if (t > new Date()) { loi.textContent = 'Ngày sinh không thể ở tương lai.'; loi.hidden = false; return; }
     ngaySinh = { dd, mm, yy }; capNhatTuoi();
     try { localStorage.setItem(SINH_KEY, JSON.stringify(ngaySinh)); } catch (e) {}
     veTuoi(); veNgay();
@@ -202,7 +224,7 @@ function dong() {
 }
 
 addEventListener('keydown', e => {
-  if (e.key === 'Escape' && tam && tam.classList.contains('hien') && document.activeElement?.tagName !== 'INPUT') dong();
+  if (e.key === 'Escape' && tam && tam.classList.contains('hien') && !['INPUT', 'SELECT'].includes(document.activeElement?.tagName)) dong();
 });
 
 self.TDTD_XEMNGAY = { mo, dong,

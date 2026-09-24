@@ -563,6 +563,8 @@ Một ngôi sao màu son đỏ, `#xem-ngay`. Ba phần trên một màn hình:
 2. **Bạn muốn làm gì?** — gõ việc định làm ("khai trương quán cà phê", "chuyển nhà") hoặc chọn một trong 15 mục, app tìm năm ngày tốt nhất trong 60 ngày tới, kèm lý do và giờ tốt.
 3. **Tuổi** (không bắt buộc) — nhập ngày sinh thì tránh luôn ngày xung tuổi. Chỉ lưu trong máy.
 
+**Chọn ngày sinh bằng ba ô Ngày / Tháng / Năm và nút Xong, không dùng ô lịch của máy.** Bản đầu dùng `<input type="date">` và lưu ngay khi ô báo đổi giá trị. Người dùng báo vừa chạm vào ô, chưa chọn gì đã thấy tự chọn: trình duyệt trên điện thoại điền sẵn một ngày ngay khi mở bảng chọn (thường là hôm nay) và báo đổi giá trị, app lưu luôn rồi vẽ lại khung, bảng chọn mất theo. Tôi không có iPhone để chạy lại đúng cảnh đó, nhưng chỗ lưu-ngay-khi-đổi là đủ để sinh ra đúng lỗi ấy. Giờ chỉ lưu khi bấm Xong; ngày không có thật (31/2) hay ngày ở tương lai thì báo lỗi chứ không lưu.
+
 **Không hỏi tên**, vì lịch vạn niên không có luật nào dùng tên người. Cái có luật thật là tuổi: ngày có chi đối với chi năm sinh (Tý–Ngọ, Sửu–Mùi...) là ngày xung. Tuổi tính theo **năm âm** — sinh 20/1/1990 là tuổi Kỷ Tỵ chứ không phải Canh Ngọ, vì Tết năm đó là 27/1.
 
 **Không tự đặt ra luật nào.** Nguồn của từng phần, ghi cả ở đầu `assets/lich.js`:
