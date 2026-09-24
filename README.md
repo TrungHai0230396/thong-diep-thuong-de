@@ -738,6 +738,38 @@ Ba chỗ kỹ thuật đáng ghi:
   dạng bịa**. Phần thiên văn thì vẫn đúng như cũ: máy tự giải phương trình, ngoại tuyến vẫn
   chạy; chỉ riêng dòng mưa là đi xin người khác, và giao diện tách bạch hai thứ đó.
 
+## Hỏi nơi ở ngay lần đầu
+
+Trước đây ai chưa bấm **Đổi nơi** đều được gán lặng lẽ là TP.HCM, nên người ở Hà Nội mở ra thấy
+dự báo mưa của TP.HCM mà không hề biết. Vị trí Mặt Trời, Mặt Trăng trong nước lệch nhau không
+đáng kể, nhưng mưa thì khác hẳn giữa hai nơi.
+
+Giờ lần đầu mở màn này là hiện ngay bảng **"Bạn đang ở đâu?"**: nút *Dùng vị trí của máy* và
+mười thành phố. App không tự bật định vị, chỉ hỏi vị trí khi người dùng bấm nút. Bấm *Để sau*
+thì bầu trời vẽ tạm theo TP.HCM, dòng chữ ghi rõ *"Xem tạm TP.HCM"*, **không xin dự báo mưa**
+cho chỗ tạm đó, và lần mở sau hỏi lại. Chọn rồi thì app nhớ, không hỏi nữa.
+
+## Kéo bầu trời cho êm
+
+Người dùng thấy bầu trời "giật giật xíu". Tính toán không phải thủ phạm: mỗi khung hình vẽ hết
+chừng 0,1 ms. Ba chỗ thật sự gây giật:
+
+- **Mỗi giây viết lại cả khối chữ và thẻ thông tin**, dù chữ không đổi. Mỗi lần như thế trình
+  duyệt phải dàn trang và vẽ lại, mà thẻ thông tin còn có lớp kính mờ, trên điện thoại là một cú
+  khựng nhỏ lặp đều. Giờ chỉ viết lại khi chữ thật sự đổi, thường là mỗi phút một lần; đo trong
+  trình duyệt: 0 lần viết lại trong 4,5 giây. Viết lại mỗi giây còn làm rơi cú bấm nếu đúng lúc
+  ngón tay đang nhấn nút *"Quay nhìn về phía này"*.
+- **Xoay theo máy đưa thẳng số đo cảm biến lên màn hình.** Cảm biến điện thoại lúc nào cũng rung
+  nhẹ, nên hình rung theo. Giờ màn hình trôi dần về hướng cảm biến (hằng số thời gian 100 ms):
+  thử với cảm biến rung ±2° thì hình chỉ còn rung 0,17°, và vẫn bám kịp hướng máy trong chưa tới
+  một giây. Qua mốc 0°/360° thì đi đường ngắn.
+- **Nhấc ngón là đứng khựng.** Giờ vuốt nhanh rồi nhấc thì bầu trời trôi thêm một đoạn rồi chậm
+  dần mà dừng, như kéo bản đồ; dừng tay rồi mới nhấc thì đứng yên.
+
+Các chuyển động đều tính theo thời gian thật giữa hai khung hình, nên màn 60 Hz hay 120 Hz đều
+trôi cùng một tốc độ. Kéo tay trong lúc đang xoay theo máy thì tắt xoay theo máy, và nút cũng tắt
+theo (trước đây nút vẫn ghi "Đang xoay theo máy").
+
 ## Bấm vào Mặt Trăng thì không có gì xảy ra
 
 Người dùng nói tiếp: *"bấm vô xem mặt trăng mặt trời thì ko xem đc"*. Soát ra thì app **chưa hề
@@ -894,7 +926,7 @@ scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       38 kiểm thử lõi
 scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
 scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số liệu ngoài
-scripts/test-troidem.js    33 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, bẫy đơn vị
+scripts/test-troidem.js    44 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, hỏi nơi lần đầu, trôi êm, bẫy đơn vị
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-sao.js        47 kiểm thử vòng đời MỌI ngôi sao: mở, đóng, đóng rồi mở lại
@@ -916,7 +948,7 @@ python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 33 kiểm thử bầu trời đêm
+node scripts/test-troidem.js     # chạy 44 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 40 kiểm thử lịch vạn niên

@@ -49,9 +49,15 @@ function tenTrang(tuoi, sang) {
 
 let tam, cv, ctx, W, H, DPR, raf = null;
 let noi = { ten: 'TP.HCM', vi: 10.8231, kinh: 106.6297, tuMay: false };
+/* Người dùng đã tự chọn nơi chưa. Chưa thì TP.HCM ở trên chỉ là chỗ tạm để vẽ bầu trời, và
+   KHÔNG xin dự báo mưa cho nó: người ở Hà Nội mở ra mà thấy mưa của TP.HCM thì tệ hơn là không
+   thấy gì. Vị trí Mặt Trời, Mặt Trăng trong nước lệch nhau không đáng kể, còn mưa thì khác hẳn. */
+let daChon = false;
 let huongNhin = 180, caoNhin = 25, goc = 75;             // đang nhìn về đâu, và mở góc bao nhiêu
 let theoMay = false, batTheoMay = null;
 let keo = null, chon = null;
+let mucMay = null;       // hướng cảm biến vừa đọc; màn hình trôi dần về đó chứ không nhảy theo
+let quanTinh = null;     // vận tốc còn lại sau khi nhấc ngón, độ mỗi mili giây
 /* Mốc chạm: mỗi khung vẽ ghi lại thiên thể nào nằm ở đâu trên màn, để chạm vào là dò ra được.
    Trước đây biến `chon` khai báo rồi bỏ không, tức app chưa hề có chức năng chạm chọn —
    người dùng bấm vào Mặt Trăng mà không có gì xảy ra là vì thế. */
@@ -59,7 +65,7 @@ let moc = [], ngam = null;
 
 try {
   const l = JSON.parse(localStorage.getItem(NOI_KEY) || 'null');
-  if (l && typeof l.vi === 'number') noi = l;
+  if (l && typeof l.vi === 'number') { noi = l; daChon = true; }
 } catch (e) {}
 
 /* ---------- chiếu từ bầu trời xuống mặt kính ---------- */
@@ -365,8 +371,8 @@ function capNhatChu(b, luc) {
      ngay cạnh chỗ hiện dữ liệu của họ. Câu giải thích nguồn thì bỏ, người dùng không cần đọc. */
   const dongMua = cauMua(Date.now());   // giờ thật, kể cả khi đang xem thử giờ khác
   const q = tam.querySelector('.td-tin');
-  q.innerHTML = `
-    <p class="td-dong1">${noi.ten} · ${gio} · ${b.toi.ten}</p>
+  const html = `
+    <p class="td-dong1">${daChon ? noi.ten : 'Xem tạm ' + noi.ten} · ${gio} · ${b.toi.ten}</p>
     <p class="td-dong2">
       <button class="td-ten" data-xem="Mặt Trời">Mặt Trời</button> ${dangODau(b.troi.cao, b.troi.huong, ml, mlMai, luc)}
       · ${tenTrang(b.trang.tuoi, b.trang.sang)}, sáng ${Math.round(b.trang.sang * 100)}%,
@@ -377,16 +383,24 @@ function capNhatChu(b, luc) {
     ${dongMua.length ? `<div class="td-mua">
       ${dongMua.map((c, i) => `<p class="${i ? 'td-mua-phu' : 'td-mua-chinh'}">${c}</p>`).join('')}
       <p class="td-mua-nguon"><a href="https://open-meteo.com/" target="_blank" rel="noopener">theo Open-Meteo.com</a></p>
-    </div>` : mua.tinh === 'hong' ? `<p class="td-mua-hong">Chưa xin được dự báo mưa — có thể đang mất mạng.</p>` : ''}
+    </div>` : mua.tinh === 'hong' ? `<p class="td-mua-hong">Chưa xin được dự báo mưa — có thể đang mất mạng.</p>`
+      : !daChon ? `<p class="td-mua-hong">Bấm Đổi nơi để chọn chỗ bạn ở, app sẽ báo trời có mưa không.</p>` : ''}
     ${b.gapTrang.length ? `<p class="td-gap">${b.gapTrang.map(g =>
       g.cach < 0.6 ? `${g.ten} đang nấp ngay sau Mặt Trăng, cách ${so1(g.cach)}°`
                    : `${g.ten} đang sát Mặt Trăng, cách ${so1(g.cach)}°`).join(' · ')}</p>` : ''}`;
+  /* Chỉ viết lại khi chữ thật sự đổi — thường là mỗi phút một lần, lúc đồng hồ nhảy số. Trước đây
+     viết lại MỖI GIÂY, và mỗi lần như thế trình duyệt phải dàn trang, vẽ lại cả khối chữ; trên
+     điện thoại đó là một cú khựng nhỏ lặp đều đặn giữa lúc đang kéo bầu trời. */
+  if (q._html === html) return;
+  q._html = html;
+  q.innerHTML = html;
 
   /* Bấm thẳng vào chữ "Mặt Trời" / "Mặt Trăng" là quay nhìn về phía nó. Đây mới là lối đi cho
      trường hợp nó đã lặn: lúc đó nó không nằm trên màn nên chạm vào bầu trời không thể trúng. */
   q.querySelectorAll('.td-ten').forEach(n => {
     n.onclick = () => {
-      const v = n.dataset.xem === 'Mặt Trời' ? b.troi : b.trang;
+      const bb = veThe.b || b;             // vị trí mới nhất, không phải lúc chữ được viết
+      const v = n.dataset.xem === 'Mặt Trời' ? bb.troi : bb.trang;
       chon = n.dataset.xem;
       nhinToi(v.cao, v.huong);
       veThe();
@@ -476,12 +490,35 @@ function nhinToi(cao, huong) {
   theoMay = false;
   ngam = { cao: Math.max(-82, Math.min(85, cao)), huong };
 }
-function keoNhin() {
+function keoNhin(dt = 16.7) {
   if (!ngam) return;
+  quanTinh = null;
   const dh = A().quanh(ngam.huong - huongNhin), dc = ngam.cao - caoNhin;
   if (Math.abs(dh) < .4 && Math.abs(dc) < .4) { huongNhin = ngam.huong; caoNhin = ngam.cao; ngam = null; return; }
-  huongNhin = A().chuan(huongNhin + dh * .16);
-  caoNhin = caoNhin + dc * .16;
+  const k = 1 - Math.pow(1 - .16, dt / 16.7);   // cùng một tốc độ trên màn 60 Hz lẫn 120 Hz
+  huongNhin = A().chuan(huongNhin + dh * k);
+  caoNhin = caoNhin + dc * k;
+}
+
+/* Hai thứ làm bầu trời trôi êm giữa hai khung hình.
+   - Xoay theo máy: cảm biến điện thoại lúc nào cũng rung nhẹ, đưa thẳng số đo lên màn thì hình
+     rung theo. Nên màn hình trôi dần về hướng cảm biến (hằng số thời gian 100ms): đủ nhanh để
+     thấy như bám theo tay, đủ chậm để nuốt cái rung.
+   - Nhấc ngón sau khi vuốt: bầu trời trôi thêm một chút rồi chậm dần mà dừng, như kéo bản đồ,
+     chứ không đứng khựng lại. */
+function troiNhin(dt) {
+  if (theoMay && mucMay) {
+    const k = 1 - Math.exp(-dt / 100);
+    huongNhin = A().chuan(huongNhin + A().quanh(mucMay.h - huongNhin) * k);
+    caoNhin += (mucMay.c - caoNhin) * k;
+  }
+  if (quanTinh && !keo) {
+    huongNhin = A().chuan(huongNhin + quanTinh.h * dt);
+    caoNhin = Math.max(-85, Math.min(88, caoNhin + quanTinh.c * dt));
+    const giam = Math.exp(-dt / 325);
+    quanTinh.h *= giam; quanTinh.c *= giam;
+    if (Math.hypot(quanTinh.h, quanTinh.c) < .002) quanTinh = null;
+  }
 }
 
 /* Thẻ thông tin của thiên thể đang chọn. Chỉ hiện những thứ app THẬT SỰ tính được. */
@@ -517,10 +554,14 @@ function veThe() {
   }
   if (!v) { o.hidden = true; return; }
   o.hidden = false;
-  o.innerHTML = `<button class="td-the-thoi" aria-label="Đóng">✕</button>
+  /* Thẻ này có lớp kính mờ, vẽ lại rất tốn trên điện thoại, nên cũng chỉ viết lại khi chữ đổi.
+     Viết lại mỗi giây còn gây một lỗi khác: đúng lúc ngón tay đang nhấn thì nút bị thay bằng nút
+     mới, và cú bấm rơi mất. */
+  const html = `<button class="td-the-thoi" aria-label="Đóng">✕</button>
     <p class="td-the-ten">${chon}</p>
     <p class="td-the-phu">${phu}</p>
     <button class="td-the-nhin">Quay nhìn về phía này</button>`;
+  if (o._html !== html) { o._html = html; o.innerHTML = html; }
   o.querySelector('.td-the-thoi').onclick = () => { chon = null; o.hidden = true; };
   o.querySelector('.td-the-nhin').onclick = () => nhinToi(v.cao, v.huong);
 }
@@ -544,9 +585,12 @@ const huongChu = (h) => TAM_HUONG[Math.round(((h % 360) + 360) % 360 / 45) % 8].
 
 /* ---------- vòng chạy ---------- */
 
-function vong() {
+function vong(t) {
   raf = requestAnimationFrame(vong);
-  keoNhin();
+  const dt = vong.tr && t ? Math.min(50, Math.max(0, t - vong.tr)) : 16.7;
+  vong.tr = t;
+  troiNhin(dt);
+  keoNhin(dt);
   const luc = Date.now();
   const b = ve(luc);
   veThe.b = b; veThe.luc = luc;
@@ -554,7 +598,7 @@ function vong() {
     capNhatChu(b, luc); veThe(); vong.t = luc;
     /* Bám vào nhánh một giây sẵn có: phép so sánh này gần như miễn phí, mà mạng thì chỉ chạm
        tới mười phút một lần. */
-    if (luc - mua.luc > MUA_LAI) xinMua();
+    if (daChon && luc - mua.luc > MUA_LAI) xinMua();
   }
 }
 
@@ -591,14 +635,24 @@ function dungKhung() {
   tam.querySelector('.td-may').onclick = doiTheoMay;
 
   cv.addEventListener('pointerdown', e => {
-    keo = { x: e.clientX, y: e.clientY, h: huongNhin, c: caoNhin, luc: Date.now(), xa: 0 };
+    quanTinh = null; ngam = null;
+    keo = { x: e.clientX, y: e.clientY, h: huongNhin, c: caoNhin, luc: Date.now(), xa: 0,
+            tr: e.timeStamp, vh: 0, vc: 0 };
   });
   cv.addEventListener('pointermove', e => {
     if (!keo) return;
-    theoMay = false;
+    if (theoMay) doiTheoMay();              // tự kéo tay thì tắt xoay theo máy, và nút cũng tắt theo
     keo.xa = Math.max(keo.xa, Math.hypot(e.clientX - keo.x, e.clientY - keo.y));
-    huongNhin = A().chuan(keo.h - (e.clientX - keo.x) * goc / W);
-    caoNhin = Math.max(-85, Math.min(88, keo.c + (e.clientY - keo.y) * goc / W));
+    const h = A().chuan(keo.h - (e.clientX - keo.x) * goc / W);
+    const c = Math.max(-85, Math.min(88, keo.c + (e.clientY - keo.y) * goc / W));
+    /* Vận tốc làm mượt qua vài lần chạm, để một cú giật tay cuối cùng không quyết định cả cú trôi. */
+    const dt = e.timeStamp - keo.tr;
+    if (dt > 0) {
+      keo.vh = keo.vh * .6 + (A().quanh(h - huongNhin) / dt) * .4;
+      keo.vc = keo.vc * .6 + ((c - caoNhin) / dt) * .4;
+    }
+    keo.tr = e.timeStamp;
+    huongNhin = h; caoNhin = c;
   });
   /* Chạm hay kéo? Nhích dưới 9px và nhả trong 450ms thì tính là CHẠM. Ngưỡng rộng tay vì
      ngón tay trên điện thoại không bao giờ đứng yên tuyệt đối. */
@@ -606,6 +660,9 @@ function dungKhung() {
     if (keo && keo.xa < 9 && Date.now() - keo.luc < 450) {
       const r = cv.getBoundingClientRect();
       chonTai(e.clientX - r.left, e.clientY - r.top);
+    } else if (keo && e.timeStamp - keo.tr < 80 && Math.hypot(keo.vh, keo.vc) > .01) {
+      /* Chỉ trôi khi ngón tay còn đang chạy lúc nhấc lên. Dừng tay rồi mới nhấc thì đứng yên. */
+      quanTinh = { h: keo.vh, c: keo.vc };
     }
     keo = null;
   });
@@ -625,11 +682,12 @@ function moBangChonNoi() {
   b.innerHTML = `
     <div class="td-hop">
       <p class="td-tieu">Bạn đang ở đâu?</p>
+      ${daChon ? '' : '<p class="td-vi-sao">Để biết trời chỗ bạn có mưa không, và Mặt Trời, Mặt Trăng đang ở hướng nào.</p>'}
       <button class="td-dinhvi" type="button">Dùng vị trí của máy</button>
       <p class="td-hay">hoặc chọn thành phố</p>
       <div class="td-tp">${THANH_PHO.map(([t, v, k]) =>
-        `<button type="button" data-vi="${v}" data-kinh="${k}"${t === noi.ten ? ' class="dang"' : ''}>${t}</button>`).join('')}</div>
-      <button class="td-thoi" type="button">Thôi</button>
+        `<button type="button" data-vi="${v}" data-kinh="${k}"${daChon && t === noi.ten ? ' class="dang"' : ''}>${t}</button>`).join('')}</div>
+      <button class="td-thoi" type="button">${daChon ? 'Thôi' : 'Để sau'}</button>
     </div>`;
   b.querySelector('.td-thoi').onclick = () => { b.hidden = true; };
   b.querySelector('.td-dinhvi').onclick = xinViTri;
@@ -648,6 +706,7 @@ function luuNoi() { try { localStorage.setItem(NOI_KEY, JSON.stringify(noi)); } 
    cũ mà không ai thấy sai ở đâu. */
 function doiNoi(moi, luu) {
   noi = moi;
+  daChon = true;
   khoMocLan.clear();
   mua = { luc: 0, tinh: 'chua', gio: null, dangXin: false };   // dự báo của nơi cũ hết giá trị
   chon = null; ngam = null;
@@ -680,15 +739,18 @@ function ganCamBien() {
        vì nó đã trừ độ lệch từ; Android thì lấy alpha rồi đảo dấu. */
     const h = typeof e.webkitCompassHeading === 'number' ? e.webkitCompassHeading
             : (e.alpha === null ? null : 360 - e.alpha);
-    if (h !== null) huongNhin = A().chuan(h);
-    if (typeof e.beta === 'number') caoNhin = Math.max(-20, Math.min(88, e.beta - 90));
+    if (h === null && typeof e.beta !== 'number') return;
+    mucMay = {
+      h: h !== null ? A().chuan(h) : (mucMay ? mucMay.h : huongNhin),
+      c: typeof e.beta === 'number' ? Math.max(-20, Math.min(88, e.beta - 90)) : (mucMay ? mucMay.c : caoNhin),
+    };
   };
   addEventListener('deviceorientation', batTheoMay, true);
 }
 
 async function doiTheoMay() {
   const nut = tam.querySelector('.td-may');
-  if (theoMay) { theoMay = false; nut.classList.remove('bat'); nut.textContent = 'Xoay theo máy'; return; }
+  if (theoMay) { theoMay = false; mucMay = null; nut.classList.remove('bat'); nut.textContent = 'Xoay theo máy'; return; }
   /* iOS 13 trở lên bắt phải xin phép, và chỉ xin được ngay trong một cú chạm. */
   const D = self.DeviceOrientationEvent;
   if (D && typeof D.requestPermission === 'function') {
@@ -701,6 +763,7 @@ async function doiTheoMay() {
     return;
   }
   if (!batTheoMay) ganCamBien();
+  quanTinh = null; mucMay = null;
   theoMay = true; nut.classList.add('bat'); nut.textContent = 'Đang xoay theo máy';
 }
 
@@ -717,11 +780,18 @@ function mo() {
   huongNhin = b.trang.cao > 5 ? b.trang.huong : b.troi.cao > 5 ? b.troi.huong : 180;
   caoNhin = Math.max(15, Math.min(60, b.trang.cao > 5 ? b.trang.cao : b.troi.cao > 5 ? b.troi.cao : 25));
   if (!raf) raf = requestAnimationFrame(vong);
+  /* Chưa chọn nơi thì hỏi ngay, không lặng lẽ lấy TP.HCM. Không tự bật định vị: chỉ hỏi vị trí
+     khi người dùng bấm nút. Bấm "Để sau" thì lần mở sau hỏi lại. */
+  if (!daChon) moBangChonNoi();
 }
 
 function dong() {
   if (raf) { cancelAnimationFrame(raf); raf = null; }
-  theoMay = false;
+  theoMay = false; mucMay = null; quanTinh = null;
+  if (tam) {                               // mở lại màn thì nút không còn ghi "Đang xoay theo máy" nữa
+    const nut = tam.querySelector('.td-may');
+    nut.classList.remove('bat'); nut.textContent = 'Xoay theo máy';
+  }
   /* Bỏ lựa chọn và đích ngắm. Không bỏ thì mở lại màn, keoNhin() sẽ lôi hướng nhìn về thiên thể
      chọn từ lần trước, ghi đè luôn hướng mà mo() vừa đặt — người dùng mở ra thấy đang chúi
      xuống đất mà không hiểu vì sao. */
@@ -752,5 +822,11 @@ self.TDTD_TROIDEM = { mo, dong,
   _chon: () => chon,
   _nhinToi: (c, h) => nhinToi(c, h),
   _dangODau: (cao, huong, ml, mlMai, luc) => dangODau(cao, huong, ml, mlMai, luc),
-  _debug: () => ({ noi, huongNhin: Math.round(huongNhin), caoNhin: Math.round(caoNhin), goc, theoMay, W, H }) };
+  _daChon: () => daChon,
+  _troiNhin: (dt) => { troiNhin(dt); return { huongNhin, caoNhin, quanTinh }; },
+  _quanTinh: (h, c) => { quanTinh = h === null ? null : { h, c }; },
+  _mucMay: (h, c) => { theoMay = true; mucMay = { h, c }; },
+  _htmlChu: () => tam.querySelector('.td-tin')._html,
+  _quenNoi: () => { daChon = false; },
+  _debug: () => ({ noi, daChon, huongNhin: Math.round(huongNhin), caoNhin: Math.round(caoNhin), goc, theoMay, W, H }) };
 })();

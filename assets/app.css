@@ -336,6 +336,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .td-bang[hidden]{display:none}
 .td-hop{width:100%;max-width:380px;text-align:center}
 .td-tieu{margin:0 0 14px;font-family:"Cormorant Garamond",Georgia,serif;font-size:25px;color:#f0c48a}
+.td-vi-sao{margin:-6px 0 16px;font-size:13px;line-height:1.6;color:rgba(244,239,230,.7)}
 .td-dinhvi{width:100%;padding:11px;margin:0 0 14px;border-radius:12px;cursor:pointer;font-size:14px;
   border:1px solid rgba(174,191,240,.45);background:rgba(174,191,240,.1);color:var(--ink)}
 .td-dinhvi:disabled{opacity:.6;cursor:default}

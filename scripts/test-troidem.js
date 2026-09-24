@@ -60,7 +60,22 @@ let pass = 0, fail = 0;
 const ok = (n, c, them = '') => { c ? pass++ : fail++; console.log(`${c ? '  ✓' : '  ✗'} ${n}${them ? ' — ' + them : ''}`); };
 
 T.mo();
+
+console.log('\n— Chưa chọn nơi thì hỏi, không lặng lẽ lấy TP.HCM —');
+/* Trước đây ai chưa bấm Đổi nơi đều thấy dự báo mưa của TP.HCM, kể cả người ở Hà Nội. */
+{
+  const tam = than.children.find(c => c.className === 'troidem');
+  const bang = tam && tam.querySelector('.td-bang');
+  ok('máy chưa lưu nơi nào thì coi là chưa chọn', T._daChon() === false);
+  ok('mở màn lần đầu là hiện bảng "Bạn đang ở đâu?"',
+     bang && bang.hidden === false && bang.innerHTML.includes('Bạn đang ở đâu'));
+  ok('lần đầu nút đóng ghi "Để sau", và không đánh dấu sẵn TP.HCM như đã chọn',
+     bang.innerHTML.includes('Để sau') && !bang.innerHTML.includes('class="dang"'));
+  ok('chưa chọn thì không có dự báo mưa nào', T._mua().tinh === 'chua' && T._mua().dong.length === 0);
+}
+
 const HCM = T._noi(10.8231, 106.6297, 'TP.HCM');
+ok('chọn nơi xong thì tính là đã chọn', T._daChon() === true);
 /* Một lúc chắc chắn là ban đêm ở Việt Nam, để Mặt Trời nằm dưới chân trời. */
 const DEM = new Date(2026, 8, 15, 23, 30, 0).getTime();
 const dauN = (h) => new Date(2026, 8, 15, 0, 0, 0).getTime() + h * 36e5;
@@ -190,6 +205,43 @@ const sauMo = T._debug();
 ok('mở lại thì hướng nhìn đứng yên chỗ mình đặt, không bị lôi về mục tiêu cũ',
    Math.abs(sauMo.huongNhin - 180) < 2 && Math.abs(sauMo.caoNhin - 25) < 2,
    `${sauMo.huongNhin}° cao ${sauMo.caoNhin}°`);
+
+console.log('\n— Trôi êm: cảm biến rung thì hình không rung theo, vuốt xong thì trôi rồi dừng —');
+{
+  const quanh = (x) => ((x % 360) + 540) % 360 - 180;
+  T._nhin(100, 30);
+  T._mucMay(130, 30);
+  const r1 = T._troiNhin(16.7);
+  ok('xoay máy 30° thì một khung hình không nhảy hết 30°', r1.huongNhin > 100 && r1.huongNhin < 110, `${r1.huongNhin.toFixed(1)}°`);
+  let r = r1;
+  for (let i = 0; i < 60; i++) r = T._troiNhin(16.7);   // một giây
+  ok('sau một giây thì đã bám kịp hướng máy', Math.abs(quanh(r.huongNhin - 130)) < .5, `${r.huongNhin.toFixed(2)}°`);
+
+  /* Cảm biến rung ±2° mỗi lần đọc: màn hình phải êm hơn hẳn thế. */
+  T._nhin(130, 30);
+  let lon = 0;
+  for (let i = 0; i < 120; i++) {
+    T._mucMay(130 + (i % 2 ? 2 : -2), 30);
+    const x = T._troiNhin(16.7).huongNhin;
+    if (i > 20) lon = Math.max(lon, Math.abs(quanh(x - 130)));
+  }
+  ok('cảm biến rung ±2° thì màn hình chỉ rung dưới 0,5°', lon < .5, `rung ${lon.toFixed(2)}°`);
+
+  /* Qua mốc 0°/360° phải đi đường ngắn, không quay ngược cả vòng. */
+  T._nhin(355, 30); T._mucMay(5, 30);
+  const qua = T._troiNhin(16.7).huongNhin;
+  ok('từ 355° sang 5° đi đường ngắn qua 0°, không quay ngược 350°', qua > 355 || qua < 5, `${qua.toFixed(1)}°`);
+  T.dong(); T.mo();                                    // tắt xoay theo máy
+
+  T._nhin(100, 30);
+  T._quanTinh(.06, 0);                                 // vuốt nhanh 60° mỗi giây rồi nhấc ngón
+  let q = null, buoc = 0;
+  do { q = T._troiNhin(16.7); buoc++; } while (q.quanTinh && buoc < 600);
+  const di = quanh(q.huongNhin - 100);
+  ok('nhấc ngón thì bầu trời trôi thêm một đoạn', di > 10 && di < 30, `${di.toFixed(1)}°`);
+  ok('rồi tự dừng, không trôi mãi', !q.quanTinh && buoc < 300, `${buoc} khung`);
+  T._quanTinh(null);
+}
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);
