@@ -82,11 +82,13 @@ Hiện có tám ngôi sao. Sáu ngôi đầu tả ngay dưới đây, hai ngôi 
 
 Trò xả stress, mã nguồn ở `assets/game.js`, độc lập hẳn với phần thông điệp.
 
-Miết ngón tay hoặc rê chuột để một vệt nắng đi qua. Nắng chạm tới đâu thì trái chín tới đó, tách đôi và bắn nước. Trái cây gồm dưa hấu, cam, chanh, thanh long, dừa, xoài, măng cụt. Làm chín liên tiếp trong 320 mili giây được nhân điểm tới 5 lần. Ba mùa, để rơi một quả hoặc chạm phải trái còn non là mất một mùa. Không lưu điểm, đóng là hết.
+Miết ngón tay hoặc rê chuột để một vệt nắng đi qua. Nắng chạm tới đâu thì trái chín tới đó, tách đôi và bắn nước. Trái cây gồm dưa hấu, cam, chanh, thanh long, dừa, xoài, măng cụt. Làm chín liên tiếp trong 320 mili giây được nhân điểm tới 5 lần. Ba mùa, để rơi một quả hoặc chạm phải bông hoa là mất một mùa. Không lưu điểm, đóng là hết.
 
-Bản đầu trò này tên **Đồ Long Đao**, người chơi cầm đao chém trái cây và né quả bom. Đổi đi vì cả app không có kẻ thù nào, trong khi tên đao nghĩa là chém rồng. Nắng thay cho đao, trái còn non thay cho bom: chạm vào thì mất một mùa vì vội quá, chứ không ai nổ ai. Màn hình cũng không rung giật và loé đỏ nữa, chỉ sẫm xanh lại một nhịp rồi vài mảnh xanh rơi xuống.
+Bản đầu trò này tên **Đồ Long Đao**, người chơi cầm đao chém trái cây và né quả bom. Đổi đi vì cả app không có kẻ thù nào, trong khi tên đao nghĩa là chém rồng. Nắng thay cho đao, bông hoa thay cho bom: hoa chưa kết trái mà chạm vào thì mất một mùa vì vội quá, chứ không ai nổ ai. Màn hình cũng không rung giật và loé đỏ nữa, chỉ sẫm lại một nhịp rồi cánh hoa rụng xuống.
 
-Trái non phải nhìn là biết đừng chạm, nếu không người chơi tưởng nó cũng là trái chín. Ba dấu hiệu tách hẳn nó khỏi trái chín: màu xám xanh đục không bắt sáng, vỏ sần chứ không bóng, và một vòng nét đứt thở đều quanh quả. Trái chín thì căng, bóng, có đốm sáng.
+Thứ phải né thì phải nhìn là biết. Bản trước dùng **trái còn non**: quả tròn xám xanh, vỏ sần, có vòng nét đứt quanh quả. Người chơi báo rất khó phân biệt, và đúng là vậy: nó tròn như mọi trái khác, xanh như chanh và dưa hấu, trên điện thoại còn to ngang trái chanh (26 px so với 25 px). Lúc trái bay vèo qua, mắt nhận ra vật trước hết bằng **hình dáng** rồi mới tới màu, mà vòng nét đứt với vỏ sần thì quá mảnh để kịp thấy.
+
+Giờ là **bông hoa**: năm cánh trắng hồng, nhụy vàng, có quầng sáng dịu, cánh hé ra khép vào rất khẽ. Hình dáng khác hẳn mọi quả tròn, màu không trùng trái nào. Hoa to hơn trái non cũ một chút (32 px, trên điện thoại 28 px) vì năm cánh chiếm ít chỗ hơn một quả tròn cùng cỡ. Vùng tính chạm nhỏ hơn hình vẽ (82%), vì giữa hai cánh là khoảng trống, sượt qua đó thì không nên mất mùa. Dòng gợi ý ở màn mở có vẽ sẵn một bông hoa nhỏ để người chơi biết trước phải né cái gì.
 
 Bấm Esc hoặc nút ✕ để thoát.
 

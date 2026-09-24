@@ -129,7 +129,8 @@ body.khoa-cuon{overflow:hidden}
 .g-dao{width:min(70vw,250px);margin-bottom:2px;filter:drop-shadow(0 6px 22px rgba(232,195,122,.34))}
 .g-dao svg{width:100%;height:auto;display:block}
 .g-phu,.g-tong{color:var(--ink-dim);font-size:14px;margin:0;line-height:1.7}
-.g-cach{color:var(--ink-dim);font-size:12px;opacity:.65;margin:6px 0 0}
+.g-cach{color:var(--ink-dim);font-size:12px;opacity:.75;margin:6px 0 0;line-height:1.8}
+.g-hoa{width:16px;height:16px;vertical-align:-3px}
 .game-het .ghost{margin-top:2px}
 .ephemeral{text-align:center;color:var(--ink-dim);font-size:12.5px;line-height:1.8;margin:0 0 16px;opacity:.85}
 
