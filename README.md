@@ -683,23 +683,43 @@ tiếng Việt trôi chảy. Tôi không tin trí nhớ mà **kiểm bằng th�
 gốc ở Berlin rồi cộng bốn mốc lại — cộng bốn mốc *trước* khớp 0,00 mm suốt 22 giờ, cộng bốn mốc
 *sau* lệch 5,4 mm. Có bài kiểm canh riêng chỗ này.
 
-**Ba dòng, không hơn**, theo thứ tự quan trọng giảm dần: *khi nào* → *nặng cỡ nào* → *máy chắc
-tới đâu*. Và bốn chỗ cố ý không làm, vì làm là nói dối:
+**Ba dòng, không hơn**, theo thứ tự quan trọng giảm dần: *khi nào* → *nặng cỡ nào* → *còn bao
+lâu và chắc tới đâu*. Và bốn chỗ cố ý không làm, vì làm là nói dối:
 
 - **Không bao giờ viết "không mưa"**, chỉ viết *"bản dự báo không thấy mưa"*. Hai câu đó khác
   nhau, và cái khác nhau ấy chính là thứ app này quan tâm.
 - **Không viết "mưa lúc 15:20"**. Dữ liệu chỉ mịn tới từng giờ và ô lưới mô hình rộng chừng
   27 km; viết giờ phút là bịa ra hai chữ số cuối. Luôn viết khoảng giờ.
-- **Không viết "70%"**, mà viết *"máy chạy 30 lần, 21 lần thấy có mưa"*. Con số của Open-Meteo
-  vốn LÀ số lần có mưa trong 30 lần chạy mô phỏng — nên viết đúng như nó là thì vừa thật hơn vừa
-  dễ hiểu hơn. Đây cũng đúng cách diễn đạt bằng tần suất tự nhiên mà Gigerenzer chỉ ra là tránh
-  được hiểu lầm về xác suất.
+- **Không viết "70%"**, và cũng không kể *"máy chạy 30 lần, 21 lần thấy có mưa"* như bản trước.
+  Người dùng hỏi câu đó để làm gì — họ chỉ cần biết khi nào mưa, mưa cỡ nào, còn bao lâu. Con số
+  xác suất của Open-Meteo vẫn được dùng bên trong: quá nửa số lần chạy thấy mưa thì giờ đó tính
+  là giờ mưa.
 - **Không dùng chữ "mưa phùn"**. Mưa phùn định nghĩa bằng cỡ hạt, mà API chỉ trả về mm. Dải nhẹ
   nhất gọi là *"lất phất vài hạt, chưa ướt áo"*.
 
-**Càng xa càng nói ít đi.** Dưới ba tiếng thì nêu khoảng giờ và nói thẳng *"đây là tầm máy đoán
-khá được"*. Ba tới mười hai tiếng thì vẫn nêu giờ nhưng kèm *"giờ giấc có thể xê dịch một hai
+**Càng xa càng nói ít đi.** Dưới ba tiếng thì nêu khoảng giờ và nói thẳng *"dự báo ở tầm này
+khá sát"*. Ba tới mười hai tiếng thì vẫn nêu giờ nhưng kèm *"giờ giấc có thể xê dịch một hai
 tiếng"*. **Quá mười hai tiếng thì bỏ hẳn con số giờ** — ở tầm đó nó chỉ là vẻ ngoài chính xác.
+
+**"15 giờ rồi mà vẫn báo khoảng 14 giờ chiều có dông."** Người dùng báo đúng câu đó, ở TP.HCM,
+ngày 24/9/2026. Lấy lại dữ liệu Open-Meteo lúc ấy thì thấy giờ nào cũng từ 50% trở lên, nên cả
+24 tiếng gom thành một đợt: từ 14 giờ chiều nay tới 14 giờ chiều mai. Ba lỗi chồng lên nhau:
+
+- **Độ dài đợt lấy bằng hiệu hai con số giờ**: 14 − 14 = 0, nên đợt 24 tiếng bị coi là một
+  tiếng và đọc thành *"Khoảng 14 giờ chiều"*. Giờ độ dài tính bằng thời gian thật. Chạy bản cũ
+  trên đúng dữ liệu ấy ra lại đúng câu người dùng thấy; dữ liệu đó giờ nằm trong `test-mua.js`.
+- **Đợt đã bắt đầu vẫn đọc từ đầu đợt**, nên câu mở bằng giờ đã qua. Giờ bỏ phần đã trôi qua,
+  tính từ giờ mưa đầu tiên còn ở phía trước; nếu giờ đó đang diễn ra thì nói *"Từ giờ tới
+  khoảng 16 giờ chiều có dông"*. Lượng mưa nặng nhất cũng chỉ tính trên phần còn lại. Hết đợt
+  còn quá mười hai tiếng thì không nêu giờ tạnh (*"Từ giờ tới chiều mai còn mưa rải rác, có lúc
+  dông"*), cùng lý do không nêu giờ bắt đầu khi còn xa. Có dông ở một giờ nào đó trong đợt dài
+  không có nghĩa là dông suốt, nên nói *"có lúc dông"*.
+- **Câu chỉ dựng một lần lúc xin dữ liệu**, mười phút một lần, nên qua mốc giờ mà chưa tới lượt
+  xin lại thì câu cũ vẫn nằm đó. Giờ app giữ dữ liệu thô và dựng lại câu theo giờ thật mỗi lần
+  vẽ; mạng thì vẫn chỉ chạm mười phút một lần.
+
+Dưới dự báo chỉ còn một link nhỏ *"theo Open-Meteo.com"*, không giải thích gì thêm. Không bỏ hẳn
+được: giấy phép CC BY 4.0 của Open-Meteo ghi rõ phải có link về họ ngay cạnh chỗ hiện dữ liệu.
 
 Và phải nói ra cái giới hạn thật: **mưa rào đối lưu nhiệt đới là đúng loại thời tiết mà mô hình
 toàn cầu dự báo kém nhất**, mà Việt Nam thì không có mô hình khu vực độ phân giải cao nào phủ
@@ -876,7 +896,7 @@ scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trì
 scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số liệu ngoài
 scripts/test-troidem.js    33 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, bẫy đơn vị
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
-scripts/test-mua.js        45 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
+scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-sao.js        47 kiểm thử vòng đời MỌI ngôi sao: mở, đóng, đóng rồi mở lại
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 scripts/test-lich.js       40 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
@@ -897,7 +917,7 @@ node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 33 kiểm thử bầu trời đêm
-node scripts/test-mua.js         # chạy 45 kiểm thử phần đọc dự báo mưa
+node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 40 kiểm thử lịch vạn niên
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói

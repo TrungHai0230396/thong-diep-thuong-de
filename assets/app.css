@@ -500,8 +500,8 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .td-mua p{margin:0}
 .td-mua-chinh{font-size:13.5px;color:var(--ink)}
 .td-mua-phu{margin-top:3px!important;font-size:12px;line-height:1.55;color:var(--ink-dim)}
-.td-mua-nguon{margin-top:6px!important;font-size:10.5px;line-height:1.5;color:rgba(185,178,204,.65)}
-.td-mua-nguon a{color:rgba(126,200,227,.85)}
+.td-mua-nguon{margin-top:4px!important;font-size:10px;line-height:1.4;text-align:right}
+.td-mua-nguon a{color:rgba(185,178,204,.45);text-decoration:none}
 .td-mua-hong{margin:8px 0 0;font-size:12px;color:rgba(185,178,204,.7)}
 
 

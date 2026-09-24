@@ -12,9 +12,9 @@
    - Không bao giờ viết "không mưa", chỉ viết "bản dự báo không thấy mưa".
    - Không viết "mưa lúc 15:20". Dữ liệu chỉ mịn tới từng giờ và ô lưới rộng chừng 27km, viết
      giờ phút là bịa ra hai chữ số cuối.
-   - Không viết "30%". Con số ấy của Open-Meteo vốn là đếm số lần có mưa trong 30 lần chạy mô
-     phỏng, nên viết đúng như nó là thì vừa thật vừa dễ hiểu hơn — đúng cách diễn đạt bằng tần
-     suất tự nhiên mà Gigerenzer chỉ ra là tránh được hiểu lầm. */
+   - Không viết "30%", và cũng không kể "máy chạy 30 lần" cho người dùng nghe: họ chỉ cần biết
+     khi nào mưa, mưa cỡ nào, còn bao lâu. Con số ấy vẫn được dùng bên trong để quyết định một giờ
+     có tính là giờ mưa hay không. */
 (function (root) {
 'use strict';
 
@@ -69,6 +69,10 @@ function doc(gio, luc) {
   }
   const d = dot.find(x => lucCua(x.den) > luc);
   if (!d) return { tinh: 'khong', soGio: n };
+  /* Bỏ phần đợt đã trôi qua. Đợt 14–16 giờ mà lúc này đã 15 giờ thì không được nói "khoảng
+     14–16 giờ": người đọc lúc 15 giờ thấy số 14 là tưởng app báo sai. Tính từ giờ mưa đầu tiên
+     chưa hết (mốc còn ở phía trước), và nếu giờ đó đang diễn ra thì nói là "từ giờ tới...". */
+  while (d.tu < d.den && !(lucCua(d.tu) > luc && co[d.tu])) d.tu++;
 
   let mm = 0, lan = 0, dong = false;
   for (let i = d.tu; i <= d.den; i++) {
@@ -86,12 +90,16 @@ function doc(gio, luc) {
   const gioDen = gioChu(gio.time[d.den]);
   return {
     tinh: 'co', batDau, ketThuc, gioTu, gioDen, mm, lan, dong,
+    dangDien: batDau <= luc,
+    gioBayGio: new Date(luc).getHours(),
     conBaoLau: Math.max(0, (batDau - luc) / GIO),
+    conLai: Math.max(0, (ketThuc - luc) / GIO),          // mấy tiếng nữa thì hết đợt
+    dai: Math.round((ketThuc - batDau) / GIO),           // đợt dài mấy tiếng, tính bằng thời gian thật
     soGio: n,
   };
 }
 
-/* Dựng câu. Ba dòng, không hơn: KHI NÀO, NẶNG CỠ NÀO, MÁY CHẮC TỚI ĐÂU. */
+/* Dựng câu. Ba dòng, không hơn: KHI NÀO, NẶNG CỠ NÀO, CÒN BAO LÂU VÀ CHẮC TỚI ĐÂU. */
 function cau(kq) {
   if (!kq || kq.tinh === 'chuaBiet') return [];
   if (kq.tinh === 'khong')
@@ -103,10 +111,22 @@ function cau(kq) {
 
   /* Quá mười hai tiếng thì KHÔNG nêu giờ nữa. Ở tầm đó con số giờ chỉ là vẻ ngoài chính xác. */
   const gi = kq.dong ? 'dông' : 'mưa';
-  const dai = (denG - tuG + 24) % 24;          // đợt kéo dài mấy tiếng
-  const quaDem = denG < tuG;                   // vắt qua nửa đêm
-  if (xa > 12) d.push(`Muộn hơn trong ngày có thể có ${gi}.`);
-  else if (tuG === denG) d.push(`Khoảng ${tuG} giờ ${buoi(tuG)} có ${gi}.`);
+  /* Độ dài đợt lấy từ thời gian thật, KHÔNG lấy hiệu hai con số giờ. Bản trước lấy hiệu giờ,
+     nên đợt 24 tiếng (14 giờ chiều nay tới 14 giờ chiều mai) ra độ dài 0 và bị đọc thành
+     "Khoảng 14 giờ chiều có dông" — người dùng nhìn thấy câu đó lúc 15 giờ. */
+  const dai = kq.dai;
+  const quaDem = tuG + dai >= 24;              // vắt qua nửa đêm
+  if (kq.dangDien) {
+    const mai = denG <= kq.gioBayGio && kq.conLai > 0 ? ' mai' : '';
+    /* Đợt dài thì không nói như một trận liền, và có dông ở đâu đó trong đợt không có nghĩa là
+       dông suốt: "mưa rải rác, có lúc dông". Hết đợt còn quá mười hai tiếng thì không nêu giờ
+       tạnh, cùng lý do không nêu giờ bắt đầu khi còn xa: con số giờ chỉ là vẻ ngoài chính xác. */
+    const raiRac = kq.dong ? 'mưa rải rác, có lúc dông' : 'mưa rải rác';
+    if (kq.conLai > 12) d.push(`Từ giờ tới ${buoi(denG)}${mai} còn ${raiRac}.`);
+    else if (kq.conLai >= 6) d.push(`Từ giờ tới khoảng ${denG} giờ ${buoi(denG)}${mai} có ${raiRac}.`);
+    else d.push(`Từ giờ tới khoảng ${denG} giờ ${buoi(denG)}${mai} có ${gi}.`);
+  }
+  else if (xa > 12) d.push(`Muộn hơn trong ngày có thể có ${gi}.`);
   /* Vắt qua nửa đêm thì tuyệt đối không viết "14–1 giờ": đọc lên là vô nghĩa. */
   else if (quaDem)
     d.push(`Từ khoảng ${tuG} giờ ${buoi(tuG)} tới ${denG} giờ ${buoi(denG)} mai có ${gi}${dai >= 6 ? ', rải rác' : ''}.`);
@@ -117,11 +137,12 @@ function cau(kq) {
 
   d.push(`Lúc nặng nhất chừng ${so1(kq.mm)} mm một tiếng — ${taNang(kq.mm)}.`);
 
-  /* Không viết "70%". Viết đúng cái con số ấy vốn là: đếm trên ba mươi lần chạy. */
-  const chac = `Máy chạy ${SO_LAN_CHAY} lần, ${kq.lan} lần thấy có mưa.`;
-  d.push(chac + (xa <= 3 ? ' Còn dưới ba tiếng nữa, đây là tầm máy đoán khá được.'
-       : xa <= 12 ? ` Còn chừng ${Math.round(xa)} tiếng nữa, giờ giấc có thể xê dịch một hai tiếng.`
-       : ' Còn xa, chưa chốt được giờ.'));
+  d.push(kq.dangDien ? (kq.conLai <= 3 ? 'Dự báo ở tầm gần thế này khá sát.'
+                        : kq.conLai <= 12 ? 'Giờ tạnh có thể xê dịch một hai tiếng.'
+                        : 'Còn xa, chưa chốt được giờ tạnh.')
+       : xa <= 3 ? 'Còn dưới ba tiếng nữa, dự báo ở tầm này khá sát.'
+       : xa <= 12 ? `Còn chừng ${Math.round(xa)} tiếng nữa, giờ giấc có thể xê dịch một hai tiếng.`
+       : 'Còn xa, chưa chốt được giờ.');
   return d;
 }
 

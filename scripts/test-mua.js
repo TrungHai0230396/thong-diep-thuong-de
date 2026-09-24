@@ -76,8 +76,8 @@ const c1 = M.cau(M.doc(dung([[7, 0, 0], [9, 3, 90]]), luc(7, 30)));
 ok('đúng ba dòng', c1.length === 3, `${c1.length} dòng`);
 ok('dòng đầu nói KHOẢNG giờ, không nói giờ phút', /^Khoảng \d+/.test(c1[0]) && !/:\d\d/.test(c1[0]), c1[0]);
 ok('dòng hai tả nặng cỡ nào bằng việc người ta làm', /mm một tiếng/.test(c1[1]), c1[1]);
-ok('dòng ba nói máy chắc tới đâu bằng SỐ LẦN CHẠY, không bằng phần trăm',
-   /Máy chạy 30 lần, \d+ lần/.test(c1[2]) && !/%/.test(c1[2]), c1[2]);
+ok('dòng ba không kể chuyện máy chạy bao nhiêu lần — người dùng không cần biết',
+   !/máy|lần/i.test(c1[2]), c1[2]);
 ok('không câu nào chứa dấu phần trăm', c1.every(x => !x.includes('%')));
 ok('không bao giờ viết "không mưa", chỉ viết bản dự báo không thấy mưa', (() => {
   const c = M.cau(M.doc(dung([[7, 0, 0], [8, 0, 2]]), luc(7)));
@@ -107,10 +107,46 @@ console.log('\n— Nói thật về độ chắc theo khoảng cách thời gian
 const gan = M.cau(M.doc(dung([[7, 0, 0], [9, 3, 90]]), luc(7, 30)));
 const vua = M.cau(M.doc(dung([[7, 0, 0], [15, 3, 90]]), luc(7, 30)));
 const xa = M.cau(M.doc(dung([[7, 0, 0], [23, 3, 90]]), luc(7, 30)));
-ok('dưới ba tiếng thì nói đây là tầm đoán khá được', /tầm máy đoán khá được/.test(gan[2]), gan[2]);
+ok('dưới ba tiếng thì nói dự báo ở tầm này khá sát', /khá sát/.test(gan[2]), gan[2]);
 ok('ba tới mười hai tiếng thì cảnh báo giờ giấc xê dịch', /xê dịch/.test(vua[2]), vua[2]);
 ok('quá mười hai tiếng thì KHÔNG nêu giờ nữa', !/Khoảng \d+/.test(xa[0]), xa[0]);
 ok('và nói thẳng là chưa chốt được giờ', /chưa chốt được giờ/.test(xa[2]), xa[2]);
+
+console.log('\n— Đợt mưa đã bắt đầu thì không nhắc lại giờ đã qua —');
+/* Người dùng báo: 15 giờ rồi mà app vẫn nói "khoảng 14 giờ chiều có dông". Đợt có mốc 15 và
+   16 giờ tức là mưa 14–16 giờ; lúc 15 giờ 10 thì giờ 14–15 đã qua, không được nhắc lại. */
+const dang = M.doc(dung([[13, 0, 0], [14, 0, 0], [15, 3, 90, 95], [16, 2, 80, 95], [17, 0, 0]]), luc(15, 10));
+const cDang = M.cau(dang);
+ok('lúc 15 giờ 10, đợt 14–16 giờ được coi là đang diễn ra', dang.dangDien === true);
+ok('và không còn nhắc số 14', !/\b14\b/.test(cDang[0]), cDang[0]);
+ok('mà nói "từ giờ tới khoảng 16 giờ chiều"', /^Từ giờ tới khoảng 16 giờ chiều có dông/.test(cDang[0]), cDang[0]);
+ok('dòng ba không nói "còn dưới ba tiếng nữa" khi mưa đã tới', !/Còn dưới/.test(cDang[2]), cDang[2]);
+const mmSau = M.doc(dung([[13, 0, 0], [14, 0, 0], [15, 9, 90], [16, 1, 80], [17, 0, 0]]), luc(15, 10));
+ok('lượng mưa tính trên phần còn lại, không lấy giờ nặng đã qua', mmSau.mm === 1, `${mmSau.mm} mm`);
+const khoGiua = M.doc(dung([[13, 0, 0], [14, 0, 0], [15, 3, 90], [16, 0, 0], [17, 2, 80]]), luc(15, 10));
+ok('giờ mưa vừa qua, giờ tới khô, giờ sau nữa mưa: báo đợt sau chứ không nói "từ giờ"',
+   !khoGiua.dangDien && khoGiua.gioTu === 16 && khoGiua.gioDen === 17, `${khoGiua.gioTu}–${khoGiua.gioDen} giờ`);
+ok('qua hẳn mốc cuối đợt thì không báo đợt đó nữa',
+   M.doc(dung([[13, 0, 0], [14, 0, 0], [15, 3, 90], [16, 0, 0], [17, 0, 0], [18, 0, 0]]), luc(15, 10)).tinh === 'khong');
+const dem2 = M.cau(M.doc(dung([[22, 0, 0], [23, 2, 80], [0, 2, 80], [1, 2, 80]]), luc(22, 30)));
+ok('đang mưa lúc gần nửa đêm, tới 1 giờ khuya thì nói là "mai"', /1 giờ khuya mai/.test(dem2[0]), dem2[0]);
+
+console.log('\n— Đợt dài cả ngày: đúng dữ liệu TP.HCM lúc người dùng báo lỗi —');
+/* Open-Meteo, TP.HCM, 24/9/2026 lúc 15 giờ 09. Giờ nào cũng từ 50% trở lên nên cả 24 tiếng
+   gom thành một đợt, từ 14 giờ chiều nay tới 14 giờ chiều mai. Bản cũ lấy hiệu hai con số giờ
+   (14 − 14 = 0) nên đọc ra "Khoảng 14 giờ chiều có dông" — đúng câu người dùng thấy lúc 15 giờ. */
+const HCM = dung([
+  [15, .3, 100, 51], [16, 4.7, 100, 95], [17, .1, 100, 51], [18, 0, 100, 3], [19, 0, 98, 3],
+  [20, 0, 89, 3], [21, 0, 76, 3], [22, 0, 67, 3], [23, 0, 64, 3], [0, 0, 63, 3], [1, .1, 63, 51],
+  [2, 0, 62, 3], [3, 0, 61, 3], [4, 0, 59, 2], [5, .4, 55, 51], [6, .2, 51, 51], [7, .5, 49, 53],
+  [8, 0, 50, 3], [9, 0, 54, 3], [10, .1, 61, 51], [11, .2, 73, 51], [12, .2, 87, 51],
+  [13, 2.6, 98, 81], [14, 1.9, 100, 80]]);
+const hcm = M.doc(HCM, luc(15, 9)), cHcm = M.cau(hcm);
+ok('đợt 24 tiếng không bị đọc thành một tiếng', hcm.dai >= 23, `dài ${hcm.dai} tiếng`);
+ok('không còn câu "Khoảng 14 giờ chiều có dông"', !/Khoảng 14 giờ/.test(cHcm[0]), cHcm[0]);
+ok('hết đợt còn quá mười hai tiếng thì không nêu giờ tạnh', !/\d+ giờ/.test(cHcm[0]), cHcm[0]);
+ok('dông một lúc không có nghĩa là dông suốt ngày: nói "có lúc dông"', /có lúc dông/.test(cHcm[0]), cHcm[0]);
+ok('không nói "khá sát" về chuyện của mười mấy tiếng nữa', !/khá sát/.test(cHcm[2]), cHcm[2]);
 
 console.log('\n— Dông khác mưa —');
 const dong = M.doc(dung([[7, 0, 0], [9, 8, 90, 95]]), luc(7, 30));

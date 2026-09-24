@@ -361,6 +361,9 @@ function capNhatChu(b, luc) {
   const mtMai = mocLanNho(mai.getTime(), 'trang');
 
   const tren = b.ht.filter(p => p.cao > 0).map(p => p.ten);
+  /* Dưới dự báo mưa chỉ còn một link nhỏ về Open-Meteo: giấy phép CC BY 4.0 của họ buộc có link
+     ngay cạnh chỗ hiện dữ liệu của họ. Câu giải thích nguồn thì bỏ, người dùng không cần đọc. */
+  const dongMua = cauMua(Date.now());   // giờ thật, kể cả khi đang xem thử giờ khác
   const q = tam.querySelector('.td-tin');
   q.innerHTML = `
     <p class="td-dong1">${noi.ten} · ${gio} · ${b.toi.ten}</p>
@@ -371,10 +374,9 @@ function capNhatChu(b, luc) {
     </p>
     <p class="td-dong3">${tren.length ? 'Đang trên trời: ' + tren.join(' · ')
                                       : 'Không hành tinh nào trên trời lúc này'}</p>
-    ${mua.tinh === 'co' && mua.dong.length ? `<div class="td-mua">
-      ${mua.dong.map((c, i) => `<p class="${i ? 'td-mua-phu' : 'td-mua-chinh'}">${c}</p>`).join('')}
-      <p class="td-mua-nguon">Dữ liệu mưa của <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a>,
-        app tự diễn giải lại thành câu. Phần thiên văn ở trên thì máy tự tính, không cần mạng.</p>
+    ${dongMua.length ? `<div class="td-mua">
+      ${dongMua.map((c, i) => `<p class="${i ? 'td-mua-phu' : 'td-mua-chinh'}">${c}</p>`).join('')}
+      <p class="td-mua-nguon"><a href="https://open-meteo.com/" target="_blank" rel="noopener">theo Open-Meteo.com</a></p>
     </div>` : mua.tinh === 'hong' ? `<p class="td-mua-hong">Chưa xin được dự báo mưa — có thể đang mất mạng.</p>` : ''}
     ${b.gapTrang.length ? `<p class="td-gap">${b.gapTrang.map(g =>
       g.cach < 0.6 ? `${g.ten} đang nấp ngay sau Mặt Trăng, cách ${so1(g.cach)}°`
@@ -418,7 +420,9 @@ function mocLanNho(msDauNgay, thienThe) {
    thì không rời khỏi máy họ. */
 const MUA_URL = 'https://api.open-meteo.com/v1/forecast';
 const MUA_LAI = 600000;                                 // xin lại sau mười phút
-let mua = { luc: 0, tinh: 'chua', dong: [], dangXin: false };
+let mua = { luc: 0, tinh: 'chua', gio: null, dangXin: false };
+const cauMua = (luc) => mua.tinh === 'co' && self.TDTD_MUA
+  ? self.TDTD_MUA.cau(self.TDTD_MUA.doc(mua.gio, luc)) : [];
 
 async function xinMua() {
   if (mua.dangXin) return;
@@ -440,11 +444,12 @@ async function xinMua() {
     const kieu = r.headers.get('content-type') || '';
     if (!r.ok || !kieu.includes('json')) throw new Error('khong-phai-json');
     const d = await r.json();
-    const M = self.TDTD_MUA;
-    mua = { luc: Date.now(), tinh: 'co', dangXin: false,
-            dong: M ? M.cau(M.doc(d.hourly, Date.now())) : [] };
+    /* Giữ dữ liệu thô, câu chữ dựng lại theo giờ hiện tại mỗi lần vẽ. Trước đây câu dựng một lần
+       lúc xin dữ liệu rồi nằm yên mười phút, nên qua mốc 15 giờ mà chưa tới lượt xin lại thì
+       vẫn còn báo đợt mưa 14–15 giờ. */
+    mua = { luc: Date.now(), tinh: 'co', dangXin: false, gio: d.hourly };
   } catch (e) {
-    mua = { luc: Date.now(), tinh: 'hong', dangXin: false, dong: [] };
+    mua = { luc: Date.now(), tinh: 'hong', dangXin: false, gio: null };
   }
 }
 
@@ -644,7 +649,7 @@ function luuNoi() { try { localStorage.setItem(NOI_KEY, JSON.stringify(noi)); } 
 function doiNoi(moi, luu) {
   noi = moi;
   khoMocLan.clear();
-  mua = { luc: 0, tinh: 'chua', dong: [], dangXin: false };   // dự báo của nơi cũ hết giá trị
+  mua = { luc: 0, tinh: 'chua', gio: null, dangXin: false };   // dự báo của nơi cũ hết giá trị
   chon = null; ngam = null;
   const t = tam && tam.querySelector('.td-the');
   if (t) t.hidden = true;
@@ -740,8 +745,8 @@ self.TDTD_TROIDEM = { mo, dong,
   _mocLanNho: (ms, t) => mocLanNho(ms, t),
   _coNhoMocLan: () => khoMocLan.size,
   _xinMua: () => xinMua(),
-  _mua: () => ({ tinh: mua.tinh, dong: mua.dong.slice() }),
-  _quenMua: () => { mua = { luc: 0, tinh: 'chua', dong: [], dangXin: false }; },
+  _mua: () => ({ tinh: mua.tinh, dong: cauMua(Date.now()) }),
+  _quenMua: () => { mua = { luc: 0, tinh: 'chua', gio: null, dangXin: false }; },
   _moc: () => moc.map(m => ({ ten: m.ten, loai: m.loai, x: Math.round(m.x), y: Math.round(m.y), r: m.r })),
   _chonTai: (x, y) => { chonTai(x, y); return chon; },
   _chon: () => chon,
