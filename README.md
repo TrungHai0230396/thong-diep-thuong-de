@@ -157,13 +157,17 @@ Hai chỗ dễ sai khi lá biến mất, đều đã sửa và có bài kiểm b
 
 **Tiếng.** Hồ có tiếng, **sinh hết bằng Web Audio, không nhúng file âm thanh nào** — cả app vẫn 168 KB. **Mặc định tắt**; nút loa ở góc trên bên trái để bật, lựa chọn nhớ ở khoá `tdtd.tieng`. Đang tắt thì **không tạo `AudioContext` nào cả**, không tốn gì.
 
-Ba tiếng chính đều làm theo tài liệu chứ không mò:
+Giọt nước và tiếng dế làm theo tài liệu chứ không mò; tiếng ếch thì cố ý đi chệch tài liệu cho êm (xem dưới bảng):
 
 | Tiếng | Cách sinh | Căn cứ |
 |---|---|---|
 | Giọt nước | `A·sin(2π f(t)·t)·e^(−βt)` với `f(t) = f0(1+ξt)`, ξ = 0,1 và β = 0,043·f0. Gần như **thuần âm**, cao độ **nhích lên** trong lúc tắt. Bốn cỡ giọt 640 / 820 / 1150 / 1650 Hz; chạm mạnh thì bong bóng to nên chọn giọt trầm, hạt mưa nhỏ thì chọn giọt cao | mô hình bong bóng của van den Doel 2005; cộng hưởng Minnaert `f0 ≈ 3,26/R` cho bong bóng 2 mm ~1600 Hz, 5 mm ~650 Hz |
-| Tiếng ộp | bảy sóng hài của f0 (420–780 Hz) bị **băm biên độ 46–68 nhịp mỗi giây**, mỗi tiếng dài 190 ms, một câu có 1–3 tiếng | tiếng ếch là sóng hài bị băm biên độ 40–130 nhịp/giây, dải trội 400–4000 Hz |
+| Tiếng ộp | f0 **250–390 Hz** cộng ba bậc hài yếu dần (0,5 / 0,24 / 0,08), lọc bỏ phần trên 1,1 kHz. Cao độ vào thấp, nhích lên trong 25 ms rồi trùng xuống. Cổ họng rung 27 nhịp/giây nhưng chỉ sâu 18%. Mỗi tiếng 130 ms, vào mềm 14 ms, tắt về đúng 0; một câu 1–3 tiếng cách nhau 230 ms, tiếng sau nhỏ dần, tiếng cuối hạ giọng | cố ý **không** theo tài liệu, xem dưới |
 | Tiếng dế | **hình sin thuần 4,5 và 4,8 kHz**, bốn xung 17 ms cách nhau 18 ms, mỗi xung bọc cửa sổ `sin²` cho khỏi cạch hai đầu | carrier 4,5–4,8 kHz, xung 15–20 ms, nghỉ 15–20 ms, 3–5 xung một tiếng |
+
+**Tiếng ếch làm lại cho êm.** Bản đầu bám đúng tài liệu: bảy sóng hài của f0 420–780 Hz bị băm biên độ 46–68 nhịp mỗi giây. Đúng là tiếng ếch, nhưng người dùng thấy nó "không chill": chói và rè như còi. Hồ này để thư giãn, nên đổi sang một tiếng "ộp" tròn và trầm, như ếch đồng kêu xa xa ngoài ruộng đêm. Đo bằng số vì bài kiểm không nghe được bằng tai: trọng tâm phổ từ **650 Hz xuống 287 Hz**; độ to trong một tiếng không còn chỗ nào sụt quá nửa (bản cũ có 9 chỗ sụt về gần 0 trong 0,1 giây — đó chính là tiếng rè); hai đầu tiếng về đúng 0 nên không có tiếng tách. Vẫn giữ bậc hài 2 và 3 vì loa điện thoại gần như câm dưới 300 Hz, bỏ đi thì trên điện thoại chỉ còn im lặng.
+
+**Vang mặt nước và trái phải.** Mọi tiếng đi qua một lớp vang rất nhẹ (nhiễu tắt dần trong 1,4 giây, càng về sau càng tối, chừa 12 ms đầu trống như tiếng dội về từ bờ bên kia, trộn 22%), và nghiêng trái phải theo chỗ phát ra, tối đa 60% sang một bên. Tiếng dế thì ở đâu đó quanh bờ, nhỏ hơn trước. Vang chỉ là một node cho cả hồ, không tốn thêm gì cho mỗi tiếng.
 
 Thêm tiếng bẹt ướt khi ếch đạp chân rời lá hoặc đáp xuống lá (nhiễu qua một cực thông thấp 250–380 Hz, tắt trong 130–170 ms, kèm một chút cao cho ra cái sột của mặt lá), tiếng cá đớp, và tiếng lưỡi phóng.
 
@@ -176,7 +180,7 @@ Thêm tiếng bẹt ướt khi ếch đạp chân rời lá hoặc đáp xuống
 | Tiếng | Đỉnh phổ đo được | Khớp với |
 |---|---|---|
 | Giọt nước | 656 Hz, 0% năng lượng trên 3 kHz | Minnaert cho bong bóng 5 mm: 652 Hz |
-| Tiếng ộp | 375 Hz, 0% trên 3 kHz | dải trội quanh 400 Hz |
+| Tiếng ộp | 258 Hz (bản cũ 375 Hz) | giọng trầm nhất 250 Hz |
 | Tiếng dế | 4430 Hz, năng lượng gói trong dải 4359–4500 Hz, 100% trên 3 kHz | carrier 4,5 kHz gần như thuần âm |
 | Giữa hai tiếng | không một bin nào hữu hạn | đã bỏ tiếng nền |
 
@@ -924,7 +928,7 @@ data/cards.json            209 lá dùng trong app (49 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       38 kiểm thử lõi
-scripts/test-pond.js       38 kiểm thử hồ nước, chạy hồ ngoài trình duyệt
+scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
 scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số liệu ngoài
 scripts/test-troidem.js    44 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, hỏi nơi lần đầu, trôi êm, bẫy đơn vị
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
@@ -946,7 +950,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
-node scripts/test-pond.js        # chạy 38 kiểm thử hồ, gồm một tiếng mô phỏng
+node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 44 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa

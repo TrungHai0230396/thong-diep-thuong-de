@@ -1094,7 +1094,10 @@ function thanhEch(n) {
      Cao độ **nhích lên** chứ không tụt, và gần như thuần âm — cho nhiễu vào là ra tiếng rào.
      f0 theo cộng hưởng Minnaert `f0 ≈ 3,26/R`: bong bóng 2 mm ra ~1600 Hz, 5 mm ra ~650 Hz.
    - Tiếng dế: carrier 4,5–4,8 kHz gần như hình sin thuần, xung 15–20 ms, nghỉ 15–20 ms, 3–5 xung.
-   - Tiếng ếch: sóng hài bị băm biên độ 40–130 nhịp mỗi giây, dải trội 400–4000 Hz.
+   - Tiếng ếch: xem mauOp ở dưới. Bản đầu bám sát tài liệu (sóng hài băm biên độ 40–130 nhịp mỗi
+     giây, dải 400–4000 Hz) nên nghe ra tiếng rè như còi, đúng mà không êm. Hồ này để thư giãn.
+   - Tiếng vang: một lớp vang mặt nước rất nhẹ phủ lên mọi tiếng, và mỗi tiếng nghiêng trái phải
+     theo chỗ nó phát ra, nghe như hồ có bề rộng chứ không phải mọi thứ dồn vào giữa.
 
    **Không có tiếng nền.** Bản đầu tôi cho một vòng nhiễu lọc trầm chạy liên tục, nghe ra tiếng
    quạt rì rì chứ không ra hồ nước, và nghe lâu thì mệt. Hồ đêm thật thì im, chỉ có tiếng nước lẻ,
@@ -1107,7 +1110,7 @@ const TIENG_KEY = 'tdtd.tieng';                         // nhớ lựa chọn t�
 const LOA_MO = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z" fill="currentColor" stroke="none"/><path d="M15 9.2a4.3 4.3 0 010 5.6"/><path d="M17.9 6.7a8 8 0 010 10.6"/></svg>';
 const LOA_TAT = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z" fill="currentColor" stroke="none"/><path d="M15.4 9.6l5 4.8M20.4 9.6l-5 4.8"/></svg>';
 
-let ac = null, chung = null, mau = null, dangVang = 0, phanTich = null;
+let ac = null, chung = null, mau = null, dangVang = 0, phanTich = null, vang = null;
 let lanTum = 0, lanDap = 0, demTum = 0, demDap = 0, demKeu = 0, tConTrung = 0;
 let tiengBat = false;
 try { tiengBat = localStorage.getItem(TIENG_KEY) === '1'; } catch (e) {}   // mặc định tắt
@@ -1133,22 +1136,58 @@ function mauGiot(f0) {
   return dungMau(a);
 }
 
-function mauOp(f0, fp, so) {
-  const sr = ac.sampleRate, dot = .19, nghi = .075;
-  const n = Math.floor(sr * (so * dot + (so - 1) * nghi + .04));
+/* Tiếng ếch "ộp": tròn, trầm, êm — như ếch đồng kêu xa xa ngoài ruộng đêm, không phải tiếng còi.
+   Bản trước là sóng cưa bảy bậc hài ở 420–780 Hz, lại bị băm biên độ 46–68 lần mỗi giây, nên chói
+   và rè. Bản này:
+   - trầm hơn (250–390 Hz, trước là 420–780 Hz), chỉ ba bốn bậc hài yếu dần, lọc bỏ phần trên 1,1 kHz;
+   - cao độ vào thấp, nhích lên trong 25 ms rồi trùng xuống: miệng ra "ộp" chứ không ra "e";
+   - cổ họng rung nhẹ 27 lần mỗi giây nhưng chỉ sâu 18%, đủ nghe ra tiếng sống mà không rè;
+   - vào mềm trong 14 ms, tắt dần về đúng 0, nên không có tiếng tách ở hai đầu;
+   - kêu nhiều tiếng thì tiếng sau nhỏ dần, tiếng cuối hạ giọng một chút như cuối câu.
+   Giữ đủ bậc hài 2 và 3 vì loa điện thoại gần như câm dưới 300 Hz: bỏ đi thì trên điện thoại chỉ
+   còn nghe thấy im lặng. */
+function songOp(sr, f0, so) {
+  const not = .13, cach = .23;
+  const n = Math.floor(sr * ((so - 1) * cach + not + .05));
   const a = new Float32Array(n);
   for (let k = 0; k < so; k++) {
-    const bd = Math.floor(k * (dot + nghi) * sr), m = Math.floor(dot * sr);
+    const bd = Math.floor(k * cach * sr), m = Math.floor(not * sr);
+    const fk = f0 * (so > 1 && k === so - 1 ? .94 : 1);
+    const to = 1 - k * .12;
+    let pha = 0;
     for (let i = 0; i < m && bd + i < n; i++) {
-      const t = i / sr, tt = (bd + i) / sr;
-      let v = 0;
-      for (let h = 1; h <= 7; h++) v += Math.sin(2 * Math.PI * f0 * h * tt) / h;   // xấp xỉ sóng cưa
-      const bam = Math.pow(.5 + .5 * Math.sin(2 * Math.PI * fp * t), 2.2);         // băm biên độ
-      const vo = Math.min(1, t / .018) * Math.min(1, (dot - t) / .05);
-      a[bd + i] += v * bam * vo;
+      const t = i / sr, u = t / not;
+      const f = fk * (.82 + .18 * Math.min(1, t / .025) - .1 * u);
+      pha += 2 * Math.PI * f / sr;
+      const v = Math.sin(pha) + .5 * Math.sin(2 * pha) + .24 * Math.sin(3 * pha) + .08 * Math.sin(4 * pha);
+      const rung = 1 - .18 * (.5 + .5 * Math.sin(2 * Math.PI * 27 * t));
+      const vao = Math.sin(Math.PI / 2 * Math.min(1, t / .014)) ** 2;
+      a[bd + i] += v * rung * vao * Math.pow(1 - u, 1.6) * to;
     }
   }
-  return dungMau(a);
+  const kLoc = 1 - Math.exp(-2 * Math.PI * 1100 / sr);
+  let y = 0;
+  for (let i = 0; i < n; i++) { y += (a[i] - y) * kLoc; a[i] = y; }
+  return a;
+}
+const mauOp = (f0, so) => dungMau(songOp(ac.sampleRate, f0, so));
+
+/* Vang mặt nước: nhiễu tắt dần trong 1,4 giây, càng về sau càng tối (mất dần phần cao), chừa
+   12 ms đầu trống như tiếng dội về từ bờ bên kia. Chỉ một node cho cả hồ, không tốn thêm gì
+   cho mỗi tiếng. */
+function mauVang() {
+  const sr = ac.sampleRate, n = Math.floor(sr * 1.4), b = ac.createBuffer(2, n, sr);
+  for (let c = 0; c < 2; c++) {
+    const o = b.getChannelData(c);
+    let y = 0;
+    for (let i = 0; i < n; i++) {
+      const t = i / sr;
+      const k = 1 - Math.exp(-2 * Math.PI * (400 + 3000 * Math.exp(-t * 2.5)) / sr);
+      y += ((Math.random() * 2 - 1) - y) * k;
+      o[i] = i < sr * .012 ? 0 : y * Math.exp(-t * 4.2);
+    }
+  }
+  return b;
 }
 
 function mauDe(f) {
@@ -1204,15 +1243,21 @@ function mauTach() {                                    // lưỡi ếch phóng 
 
 /* --- phát --- */
 
-function phat(b, muc, toc) {
+/* Chỗ phát ra tiếng, từ mép trái (−) tới mép phải (+). Không dồn hẳn sang một tai: tối đa 60%. */
+const lech = (x) => typeof x === 'number' && W ? Math.max(-1, Math.min(1, x / W * 2 - 1)) * .6 : 0;
+
+function phat(b, muc, toc, pan) {
   if (tua) return false;                                // tua thì câm, kẻo dồn cả nghìn tiếng vào một lúc
   if (!ac || !tiengBat || ac.state !== 'running' || !b || dangVang > 8) return false;
   const s = ac.createBufferSource(); s.buffer = b;
   if (toc) s.playbackRate.value = toc;
   const g = ac.createGain(); g.gain.value = muc;
-  s.connect(g); g.connect(chung);
+  s.connect(g);
+  let p = null;
+  if (pan && ac.createStereoPanner) { p = ac.createStereoPanner(); p.pan.value = pan; g.connect(p); p.connect(chung); }
+  else g.connect(chung);
   dangVang++;
-  s.onended = () => { dangVang--; try { s.disconnect(); g.disconnect(); } catch (e) {} };
+  s.onended = () => { dangVang--; try { s.disconnect(); g.disconnect(); if (p) p.disconnect(); } catch (e) {} };
   s.start();
   return true;
 }
@@ -1227,11 +1272,16 @@ function moTieng() {
   chung.gain.setValueAtTime(.0001, ac.currentTime);
   chung.gain.linearRampToValueAtTime(tiengBat ? MUC : .0001, ac.currentTime + 2);   // vào từ từ
   chung.connect(ac.destination);
+  try {                                                 // máy nào không dựng được vang thì thôi, vẫn có tiếng
+    vang = ac.createConvolver(); vang.buffer = mauVang();
+    const uot = ac.createGain(); uot.gain.value = .22;
+    chung.connect(vang); vang.connect(uot); uot.connect(ac.destination);
+  } catch (e) { vang = null; }
 
   mau = {                                               // tính một lần, dùng mãi
     giot: [mauGiot(640), mauGiot(820), mauGiot(1150), mauGiot(1650)],
     bet: [mauBet(false), mauBet(false), mauBet(true), mauBet(true)],
-    op: [mauOp(420, 46, 2), mauOp(520, 58, 1), mauOp(640, 52, 3), mauOp(780, 68, 2)],
+    op: [mauOp(250, 2), mauOp(290, 1), mauOp(340, 3), mauOp(390, 2)],   // bốn giọng ếch, trầm tới cao
     de: [mauDe(4500), mauDe(4800)],
     thup: mauThup(), tach: mauTach(),
   };
@@ -1272,7 +1322,7 @@ function tum(x, manh) {
   if (t0 - lanTum < .11) return;
   const v = Math.min(1, manh);
   const i = Math.min(3, Math.max(0, Math.round((1 - v) * 3.4)));
-  if (phat(mau.giot[i], .3 * v, .93 + Math.random() * .16)) { lanTum = t0; demTum++; }
+  if (phat(mau.giot[i], .3 * v, .93 + Math.random() * .16, lech(x))) { lanTum = t0; demTum++; }
 }
 
 function dap(x, manh, xuong) {
@@ -1280,12 +1330,12 @@ function dap(x, manh, xuong) {
   const t0 = ac.currentTime;
   if (t0 - lanDap < .025) return;
   const i = (xuong ? 2 : 0) + (Math.random() < .5 ? 0 : 1);
-  if (phat(mau.bet[i], .34 * Math.min(1, manh), .92 + Math.random() * .18)) { lanDap = t0; demDap++; }
+  if (phat(mau.bet[i], .34 * Math.min(1, manh), .92 + Math.random() * .18, lech(x))) { lanDap = t0; demDap++; }
 }
 
 function keu(e) {
   if (!ac || !tiengBat) return;
-  if (!phat(mau.op[e.giong], .3, e.tocGiong)) return;
+  if (!phat(mau.op[e.giong], .36, e.tocGiong, lech(e.x))) return;
   demKeu++;
   e.nghiKeu = rnd(9000, 22000); e.henKeu = 0;
   for (const k of ech) {                                // một con bên cạnh đáp lời cho thành câu đối đáp
@@ -1294,9 +1344,9 @@ function keu(e) {
   }
 }
 
-const thup = (x) => { if (ac && tiengBat) phat(mau.thup, .3, .9 + Math.random() * .25); };
-const tach = (x) => { if (ac && tiengBat) phat(mau.tach, .16, .9 + Math.random() * .3); };
-const conTrung = () => { if (ac && tiengBat) phat(mau.de[Math.random() < .5 ? 0 : 1], .1, .96 + Math.random() * .09); };
+const thup = (x) => { if (ac && tiengBat) phat(mau.thup, .3, .9 + Math.random() * .25, lech(x)); };
+const tach = (x) => { if (ac && tiengBat) phat(mau.tach, .16, .9 + Math.random() * .3, lech(x)); };
+const conTrung = () => { if (ac && tiengBat) phat(mau.de[Math.random() < .5 ? 0 : 1], .07, .96 + Math.random() * .09, (Math.random() * 2 - 1) * .7); };   // dế ở đâu đó quanh bờ
 
 let tua = false;        // đang chạy bù thời gian: tính đủ, nhưng không vẽ và không kêu
 let nhanh = 1;          // hệ số tua nhanh khi người dùng nhấn giữ
@@ -1525,6 +1575,8 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTr
   },
   _keu: () => { const e = ech.find(nguoi); if (!e) return false; e.nghiKeu = 0; keu(e); return true; },
   _de: () => conTrung(),
+  _songOp: (sr, f0, so) => songOp(sr, f0, so),
+  _coVang: () => !!vang,
   _tieng: () => ({ co: !!ac, trangThai: ac ? ac.state : null, bat: tiengBat,
                    muc: ac ? +chung.gain.value.toFixed(3) : null, vang: dangVang,
                    soMau: mau ? Object.keys(mau).length : 0,

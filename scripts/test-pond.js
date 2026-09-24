@@ -297,5 +297,35 @@ for (let p = 0; p < 12; p++) { chay(290); soatBatBien(`bất biến ở phút ${
 d = HO._debug();
 console.log(`  một tiếng mô phỏng tốn ${Date.now() - batDau} ms — ếch ${d.ech}, lá ${d.la}, nòng nọc ${d.nong}`);
 
+console.log('\n— Tiếng ếch: tròn và êm, không rè —');
+/* Người dùng thấy tiếng ếch "không chill". Bản cũ là sóng cưa bảy bậc hài 420–780 Hz bị băm biên
+   độ 46–68 lần mỗi giây. Không nghe được bằng tai trong bài kiểm, nên đo bằng số: phổ, độ băm,
+   và tiếng tách ở hai đầu. */
+{
+  const sr = 44100;
+  const op = HO._songOp(sr, 250, 2);
+  const dinh = op.reduce((x, v) => Math.max(x, Math.abs(v)), 0);
+  let tu = 0, mau = 0;
+  for (let f = 50; f <= 6000; f += 25) {
+    let re = 0, im = 0;
+    for (let i = 0; i < op.length; i += 2) { const w = 2 * Math.PI * f * i / sr; re += op[i] * Math.cos(w); im += op[i] * Math.sin(w); }
+    tu += f * (re * re + im * im); mau += re * re + im * im;
+  }
+  ok('phổ dồn về dải trầm: trọng tâm dưới 450 Hz (bản cũ 650 Hz)', tu / mau < 450, `${Math.round(tu / mau)} Hz`);
+  /* Băm: trong một tiếng "ộp", độ to đo từng khúc 4 ms không được sụt quá nửa so với hai khúc hai
+     bên. Bản cũ sụt về gần 0 mỗi 1/46 giây — đó chính là tiếng rè. */
+  const w = Math.floor(sr * .004), rs = [];
+  for (let i = Math.floor(sr * .015); i + w < Math.floor(sr * .11); i += w) {
+    let q = 0; for (let j = 0; j < w; j++) q += op[i + j] ** 2; rs.push(Math.sqrt(q / w));
+  }
+  let sut = 0;
+  for (let i = 1; i < rs.length - 1; i++) if (rs[i] < .5 * (rs[i - 1] + rs[i + 1]) / 2) sut++;
+  ok('không bị băm thành tiếng rè: độ to không sụt quá nửa giữa hai khúc liền nhau', sut === 0, `${sut} chỗ sụt`);
+  ok('vào và tắt về đúng 0, không có tiếng tách ở hai đầu',
+     Math.abs(op[0]) / dinh < .01 && Math.abs(op[op.length - 1]) / dinh < .01);
+  const ba = HO._songOp(sr, 340, 3);
+  ok('kêu ba tiếng thì dài chưa tới một giây', ba.length / sr < 1, `${(ba.length / sr).toFixed(2)} giây`);
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);
