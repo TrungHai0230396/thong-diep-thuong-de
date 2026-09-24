@@ -61,7 +61,7 @@ global.performance = { now: () => Date.now() };
 /* Nạp mọi tệp trò, đúng thứ tự như index.html. */
 const TEP = ['core.js', 'game.js', 'share.js', 'lantern.js', 'pond.js', 'breath.js',
              'constellation.js', 'nghe.js', 'mua.js',
-             'astro.js', 'nightsky.js', 'lich.js', 'almanac.js', 'amvi.js', 'khauhinh.js', 'ipa.js'];
+             'astro.js', 'nightsky.js', 'lich.js', 'almanac.js', 'amvi.js', 'khauhinh.js', 'dophatam.js', 'ipa.js'];
 for (const t of TEP) new Function(fs.readFileSync(path.join(__dirname, '..', 'assets', t), 'utf8'))();
 
 /* Danh sách ngôi sao đọc THẲNG từ app.js, để thêm sao mới là bài kiểm tự biết. */

@@ -374,6 +374,33 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-the-chu b{font-weight:500;font-size:14.5px}
 .pa-the-chu i{font-style:normal;font-size:12px;line-height:1.5;color:var(--ink-dim)}
 .pa-sao{flex:0 0 auto;font-size:8px;letter-spacing:2px;color:rgba(232,195,122,.55)}
+.pa-do-nhan{position:absolute;top:7px;right:10px;font-size:9.5px;letter-spacing:.06em;color:rgba(150,205,160,.8)}
+.pa-the{position:relative}
+.pa-noithu{margin-left:auto;flex:0 0 auto;padding:6px 12px;border-radius:999px;cursor:pointer;font-size:12.5px;
+  border:1px solid rgba(232,195,122,.45);background:rgba(232,195,122,.1);color:#f0c48a}
+.pa-noithu:hover{background:rgba(232,195,122,.2)}
+.pa-do-chon{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 12px}
+.pa-do-tu{padding:6px 12px;border-radius:999px;cursor:pointer;font-size:13px;
+  border:1px solid rgba(255,255,255,.14);background:transparent;color:var(--ink-dim)}
+.pa-do-tu.dang{border-color:rgba(232,195,122,.6);background:rgba(232,195,122,.14);color:#f0c48a}
+.pa-do-hai{display:flex;align-items:center;justify-content:center;gap:8px;margin:0 0 10px;font-size:18px}
+.pa-do-hai span{color:rgba(244,239,230,.4)}
+.pa-do-hai span.nay{color:#f0c48a;font-weight:500}
+.pa-do-hai span.xong{color:#bfe2c6}
+.pa-do-hai i{font-style:normal;font-size:13px;color:rgba(244,239,230,.35)}
+.pa-do-mau{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:0 0 10px}
+.pa-do-muc{height:4px;margin:8px 0 0;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.pa-do-muc i{display:block;height:100%;width:0;background:#e8c37a;transition:width .08s linear}
+.pa-do-kq{margin:12px 0 10px;padding:11px 13px;border-radius:12px;border:1px solid var(--line)}
+.pa-do-kq b{display:block;margin:0 0 3px;font-size:15px;font-weight:500}
+.pa-do-kq span{font-size:13px;line-height:1.6;color:var(--ink)}
+.pa-do-kq.dat{border-color:rgba(150,205,160,.45);background:rgba(150,205,160,.1)}
+.pa-do-kq.dat b{color:#bfe2c6}
+.pa-do-kq.chua{border-color:rgba(226,140,134,.4);background:rgba(226,140,134,.08)}
+.pa-do-kq.chua b{color:#f0bcb8}
+.pa-do-kq.loi{border-style:dashed}
+.pa-do-kq.loi b{color:var(--ink-dim)}
+.pa-hoac{margin:4px 0 10px}
 .pa-thua{margin:20px 0 0;font-size:11.5px;line-height:1.65;color:rgba(185,178,204,.72)}
 
 .pa-dau{display:flex;align-items:center;gap:10px;margin:0 0 14px}

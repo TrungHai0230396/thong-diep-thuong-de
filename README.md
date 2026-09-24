@@ -420,7 +420,7 @@ rằng **cách làm cũ đúng là trượt** — bài kiểm nào đạt cả t
 
 **Ba chỗ app nói thật dù nói ra thì kém hấp dẫn hơn:**
 
-- **Không có điểm phát âm.** Máy nhận giọng trả về CHỮ chứ không trả về ÂM. Tôi có thử đưa một
+- **Không có "điểm phát âm" chung chung.** Máy nhận giọng trả về CHỮ chứ không trả về ÂM. Tôi có thử đưa một
   câu cố tình nuốt hết phụ âm cuối cho mô hình nghe: nó chép lại thành câu đúng và khen. Cái đo
   được thật thì hẹp hơn: bạn nói "ship", máy báo nó nghe ra từ nào — tức **máy có phân biệt được
   hai từ hay không**, chứ không phải giọng bạn hay dở. Màn kết quả còn nói thêm rằng giọng người
@@ -444,6 +444,69 @@ ngậm hơi (nên `/t/` với `/d/` gần như không phân biệt nổi), tiế
 chứ tiếng nổ quá ngắn để một mình nó đủ).
 
 Ghi chú tra cứu khi vẽ để ở `content/ghi-chu-khau-hinh-ipa.md`.
+
+#### Máy đo tiếng bạn, ngay trên máy
+
+Người dùng hỏi: trò phát âm chưa cho mình nói rồi chấm. Đúng vậy — phần nói cũ nằm sâu trong từng
+cặp từ, chỉ báo máy nhận giọng nghe ra chữ gì, và không chạy được khi mở app từ màn hình chính
+iPhone. Giờ **bảy âm có dấu hiệu âm học rõ** được đo thẳng vào tiếng người nói, bằng
+`assets/dophatam.js` (hàm thuần, kiểm bằng Node), không cần máy nhận giọng, không gửi gì đi đâu:
+
+| Âm | Nói | Máy đo cái gì |
+|---|---|---|
+| đuôi `/s/ /z/` | books, cats, eyes, dogs | sau nguyên âm có tiếng rít dải cao không, dài bao lâu |
+| `/t/ /d/` và `/k/ /g/` cuối | seat, night, made · back, like, week | âm cuối có được **nhả** (tiếng bật hoặc tiếng xì) hay bị ngậm mất |
+| cụm st- sp- sk- | stop, spin, school, star | có `/s/` trước âm bật không, và có chen âm "ơ" vào giữa không ("sờ-top") |
+| `/ʃ/` | she → see (nói lần lượt) | tiếng rít của "sh" phải trầm hơn "s" từ 700 Hz |
+| `/p/` và `/b/` | pat → bat | luồng hơi từ lúc bật môi tới lúc cổ rung: "p" từ 35 ms, và dài hơn "b" từ 25 ms |
+| `/iː/` và `/ɪ/` | sheep → ship | nguyên âm từ thứ nhất dài hơn từ 15% |
+
+Ba phép sau **so hai từ của cùng một người** chứ không so với một con số cố định: tiếng rít giọng nữ
+cao hơn giọng nam cả nghìn Hz, người nói nhanh nói chậm khác nhau, nên chỉ sự khác nhau giữa hai
+từ của chính người đó mới đáng tin. Kết quả là **từng dấu hiệu đạt hay chưa, kèm con số đo được**
+và một câu chỉ cách sửa — không quy ra điểm, không lưu, không cộng dồn qua ngày.
+
+Nút **Nói thử** giờ nằm ngay đầu mọi bước của âm đó, không phải bấm qua bốn bước mới tới.
+
+**Hiệu chỉnh trên tám giọng đọc tiếng Anh** của máy Mac (Mỹ nam nữ, Anh, Úc, Ireland, Nam Phi,
+Ấn Độ; `scripts/mau-am.js` tạo bằng lệnh `say`, không bỏ file âm thanh vào kho mã). Điều kiện gắt
+nhất: **không bao giờ chấm đạt cho từ sai** — đuôi s: "book" thay "books"; nhả âm cuối: "sea" thay
+"seat"; st-: "top" thay "stop" và "sờ-top"; so hai từ: nói đảo thứ tự. Kết quả hiện tại, từ sai
+lọt **0** ở mọi phép; từ đúng đạt: đuôi s 32/32, st- 32/32, sh/s 32/32, âm cuối 44/48,
+p/b 24/24, i dài/ngắn 34/35. Những chỗ phải sửa trong lúc hiệu chỉnh, đều có trong mã:
+
+- `say` xuất file **im tuyệt đối**, nên "nền ồn" đo ra −120 dB và mọi ngưỡng tương đối lệch hết.
+  Mẫu giờ trộn tiếng ồn giống phòng yên (ù trầm −45 dB, tiếng xì của micro −70 dB).
+- Nhận nguyên âm chỉ bằng độ tuần hoàn thì giọng nam trầm bị cắt vụn (chỉ đo ra 0,5–0,6); thêm dấu
+  hiệu "dải trầm lấn dải cao", và mở dải dò cao độ xuống 50 Hz.
+- "sh" giọng nam nằm ở 2–4 kHz, bộ dò ban đầu chỉ nhìn trên 4 kHz nên không thấy.
+- Luồng hơi bật của "top" cũng là tiếng xì nên "top" từng được tính là có `/s/`. `/s/` thật thì sau
+  nó có chỗ **ngậm** (lặng liền từ 15 ms) rồi mới bật; lấy chỗ tụt ngắn khi chuyển sang âm "ơ" làm
+  chỗ ngậm thì "sờ-pin" lọt, nên phải đòi lặng liền.
+- `/t/` cuối của giọng Ireland và Úc nhả thành một tiếng xì dài 60–115 ms, trông như `/s/`. Tách
+  bằng tỉ lệ dải trên 4 kHz (`/s/` thật 0,9–0,99, tiếng xì của `/t/` 0,4–0,7) và độ dài.
+- `/d/` cuối ngậm mà vẫn rung cổ, nên lúc bật độ to chỉ nhích 4 dB; dò thêm theo dải trên 4 kHz.
+- Giọng nào không dùng làm mẫu được thì **bỏ và nói lý do**: Rishi (tiếng Anh Ấn Độ vốn không bật
+  hơi ở `/p/`) và Daniel (máy đọc rung cổ ngay từ đầu "pat", không có tiếng bật) không dùng cho p/b;
+  Karen đọc "sheep" và "ship" dài bằng nhau nên không dùng cho i dài/ngắn.
+
+**Chỗ ồn thì báo ồn, không chấm trượt oan.** Tiếng rít và tiếng bật nằm ở dải cao, tiếng bật cuối
+thì rất nhỏ; với nhiễu trắng chỉ thấp hơn giọng 35 dB, "made" nói đúng mà chỉ 3/48 lần được chấm
+đạt. Nên đo xem tiếng ồn ở dải trên 4 kHz thấp hơn nguyên âm bao nhiêu; đo trên 431 bản thu trộn
+ồn nhiều kiểu nhiều mức thì tiếng rít cần 40 dB (chấm đúng 95–98%), tiếng bật cần 46 dB (đúng 89%).
+Dưới ngưỡng thì app nói "chỗ này hơi ồn" và không chấm. Bản đầu lấy "đỉnh dải cao của chính từ đó"
+làm thước nên "made", "pat" (ít tiếng cao) bị chặn ngay trong phòng yên — thước phải là tiếng ồn so
+với **giọng**, không phụ thuộc từ. Nói nhỏ đi 20 lần thì kết quả y như cũ.
+
+**Thu âm:** tắt bộ lọc ồn, bộ khử vọng và bộ tự chỉnh âm lượng của trình duyệt (bộ lọc ồn coi
+tiếng rít `/s/` là tiếng ồn và xoá mất), tự dừng khi lặng 0,6 giây, tối đa 3 giây, rồi **tắt micro
+ngay**. Đã thử đường thu thật bằng một "micro" giả phát bản ghi vào: tự dừng sau 1,8 giây, đo đúng,
+và micro ở trạng thái đã tắt.
+
+**Giới hạn phải nói ra:** ngưỡng hiệu chỉnh trên giọng máy đọc và tiếng ồn trộn vào, chưa trên
+giọng người Việt thật qua micro điện thoại thật. Máy chỉ đo **một dấu hiệu** của mỗi âm — đạt nghĩa
+là dấu hiệu đó có mặt, không phải cả giọng đã chuẩn. Mười âm còn lại (l cuối, r, th, v/w...) chưa
+có dấu hiệu nào đo được ổn định bằng cách này, nên vẫn dùng máy nhận giọng như cũ.
 
 ### Sao trắng ngà — nối sao thành chòm
 
@@ -935,6 +998,9 @@ assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hà
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-sao.js        47 kiểm thử vòng đời MỌI ngôi sao: mở, đóng, đóng rồi mở lại
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
+assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
+scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
+scripts/mau-am.js          tạo giọng mẫu bằng lệnh `say` của macOS, trộn tiếng ồn
 scripts/test-lich.js       40 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -958,6 +1024,7 @@ node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi 
 node scripts/test-lich.js        # chạy 40 kiểm thử lịch vạn niên
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm
+node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 ```
 
