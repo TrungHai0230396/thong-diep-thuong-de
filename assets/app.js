@@ -136,12 +136,12 @@ function tick() {
   $('#countdown').textContent = `Thông điệp mới sau ${p(s / 3600 | 0)}:${p((s % 3600) / 60 | 0)}:${p(s % 60)}`;
 }
 
-/* Chia sẻ ảnh: vẽ lá thành PNG rồi mở bảng chia sẻ của máy.
-   Máy không hỗ trợ chia sẻ tệp thì tải ảnh về. */
+/* Hai nút cùng vẽ một tấm ảnh: "Chia sẻ ảnh" mở bảng chia sẻ của máy, "Tải về" lưu thẳng tệp
+   PNG về máy. Máy không hỗ trợ chia sẻ tệp thì nút chia sẻ cũng tải ảnh về. */
 let dangVeAnh = false;
-async function chiaSeAnh() {
+async function lamAnh(nut, viec) {
   if (dangVeAnh || !self.TDTD_ANH) return;
-  const nut = $('#btn-anh'), chuCu = nut.innerHTML;
+  const chuCu = nut.innerHTML;
   dangVeAnh = true; nut.disabled = true; nut.innerHTML = '<span class="ico">◌</span>Đang vẽ…';
   try {
     const c = cardOfToday();
@@ -149,7 +149,15 @@ async function chiaSeAnh() {
       thongDiep: c.thong_diep, yNghia: c.y_nghia, ngayDep: prettyDate(today),
     });
     if (!blob) throw new Error('không tạo được ảnh');
-    const ten = `thong-diep-${today}.png`;
+    await viec(blob, `thong-diep-${today}.png`);
+  } catch (e) {
+    toast('Không tạo được ảnh, thử lại nhé');
+  } finally {
+    dangVeAnh = false; nut.disabled = false; nut.innerHTML = chuCu;
+  }
+}
+
+const chiaSeAnh = () => lamAnh($('#btn-anh'), async (blob, ten) => {
     const tep = new File([blob], ten, { type: 'image/png' });
     /* Gửi **mỗi tấm ảnh**, không kèm text. Trước đây gửi kèm cả câu thông điệp, và Zalo,
        Messenger hay Facebook nhận được cả hai thì chỉ lấy chữ rồi bỏ ảnh — người dùng bấm
@@ -161,12 +169,21 @@ async function chiaSeAnh() {
     } else {
       taiAnh(blob, ten);
     }
-  } catch (e) {
-    toast('Không tạo được ảnh, thử lại nhé');
-  } finally {
-    dangVeAnh = false; nut.disabled = false; nut.innerHTML = chuCu;
+});
+
+/* iPhone mở app từ biểu tượng ngoài màn hình chính thì bấm tải tệp là app mở tấm ảnh chiếm cả
+   màn hình mà không có đường quay lại. Ở đó dùng bảng chia sẻ của máy, có sẵn nút "Lưu hình ảnh"
+   để lưu thẳng vào ứng dụng Ảnh. */
+const IOS_CAI = !!navigator.standalone;
+const taiVe = () => lamAnh($('#btn-tai'), async (blob, ten) => {
+  const tep = new File([blob], ten, { type: 'image/png' });
+  if (IOS_CAI && navigator.canShare && navigator.canShare({ files: [tep] })) {
+    toast('Chọn "Lưu hình ảnh" để lưu vào Ảnh');
+    try { await navigator.share({ files: [tep] }); } catch (e) {}
+    return;
   }
-}
+  taiAnh(blob, ten);
+});
 
 function taiAnh(blob, ten) {
   const url = URL.createObjectURL(blob);
@@ -410,6 +427,7 @@ async function init() {
   addEventListener('resize', datLaiNgoiSao);
   addEventListener('orientationchange', datLaiNgoiSao);
   $('#btn-anh').onclick = chiaSeAnh;
+  $('#btn-tai').onclick = taiVe;
   $('#btn-about').onclick = about;
   $$('[data-close]').forEach(el => el.onclick = closeSheet);
   addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });

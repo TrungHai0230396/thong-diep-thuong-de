@@ -1002,6 +1002,8 @@ Cỡ chữ tự co giãn từ 84 xuống 46 pixel cho vừa khung, và cả kh�
 
 Bấm nút sẽ mở bảng chia sẻ của máy, **chỉ kèm tấm ảnh, không kèm chữ**. Máy không hỗ trợ chia sẻ tệp thì ảnh tự tải về.
 
+Nút **Tải về** nằm cạnh, vẽ đúng tấm ảnh đó rồi lưu thẳng thành tệp `thong-diep-YYYY-MM-DD.png`. Riêng iPhone mở app từ biểu tượng ngoài màn hình chính thì bấm tải tệp là app mở tấm ảnh chiếm cả màn hình mà không có đường quay lại, nên ở đó nút mở bảng chia sẻ và nhắc chọn **"Lưu hình ảnh"** để lưu thẳng vào ứng dụng Ảnh. iPhone mở bằng Safari thì ảnh vào mục Tải về của ứng dụng Tệp.
+
 Chỗ này từng hỏng. Bản đầu gọi `navigator.share({ files, text })` — gửi cả ảnh lẫn câu thông điệp. Zalo, Messenger và Facebook nhận được cả hai thì **chỉ lấy chữ rồi bỏ ảnh**: bấm "Chia sẻ ảnh" mà ra mỗi dòng chữ. MDN nói rõ bên nhận có quyền bỏ qua từng phần của dữ liệu chia sẻ. Nay chỉ gửi `files`. Bản thân tấm ảnh đã có sẵn câu thông điệp, ngày tháng và tên app nên bỏ text đi không mất gì.
 
 ## Xem thử ngày khác
