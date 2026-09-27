@@ -197,6 +197,52 @@ function mocLan(msDauNgay, viDo, kinhDo, thienThe) {
   };
 }
 
+/* Máy đang chĩa về đâu, tính từ ba góc cảm biến của trình duyệt.
+
+   Vì sao phải dựng cả ma trận quay chứ không lấy alpha làm hướng và beta làm độ cao:
+   cách rời rạc ấy ĐÚNG TUYỆT ĐỐI khi máy cầm thẳng không nghiêng (gamma = 0), nhưng nó bỏ hẳn
+   gamma, mà ngửa máy lên nhìn vật trên cao thì tay luôn nghiêng ít nhiều. Đo được: ngửa 50 độ
+   mà nghiêng 20 độ thì sai hướng 30 độ; chĩa gần thẳng đứng mà nghiêng có 5 độ thì sai 68 độ.
+   Bầu trời bị quăng đi hàng chục độ theo từng rung tay, và bộ làm mượt cứ đuổi theo một cái
+   đích đang nhảy — nhìn ra thì tưởng máy lag, thật ra là toạ độ sai.
+
+   Đặc tả W3C: R = Rz(alpha)·Rx(beta)·Ry(gamma), trục của máy là +X sang phải, +Y lên đỉnh màn
+   hình, +Z hướng ra phía người dùng. Mặt lưng máy — chỗ người ta chĩa vào bầu trời — là -Z. */
+function huongMay(alpha, beta, gamma) {
+  if (typeof beta !== 'number') return null;
+  const a = (alpha || 0) * RAD, b = beta * RAD, g = (gamma || 0) * RAD;
+  const cA = Math.cos(a), sA = Math.sin(a), cB = Math.cos(b), sB = Math.sin(b);
+  const cG = Math.cos(g), sG = Math.sin(g);
+  /* Cột thứ ba của R là +Z của máy; lấy âm của nó ra được -Z. */
+  const dong = -(cA * sG + sA * sB * cG);
+  const bac  = -(sA * sG - cA * sB * cG);
+  const len  = -(cB * cG);
+  const cao = Math.asin(Math.max(-1, Math.min(1, len))) / RAD;
+  let huong = Math.atan2(dong, bac) / RAD;
+  if (huong < 0) huong += 360;
+  return { huong, cao };
+}
+
+/* Đổi qua lại giữa (hướng, độ cao) và vector đơn vị. Cần cặp này để LÀM MƯỢT TRÊN VECTOR.
+
+   Lý do đo được chứ không phải cho đẹp: làm mượt trên góc thì gần thiên đỉnh nó vỡ. Với cùng
+   một bàn tay rung như nhau, con số "hướng" nhảy 3,1 độ mỗi khung lúc nhìn ngang nhưng vọt lên
+   12,3 độ lúc chĩa gần thẳng đứng — trong khi VECTOR hướng chỉ nhảy đều 3,9 độ ở cả ba tư thế.
+   Tức 12,3 độ kia không phải tay rung mạnh hơn, mà là méo mó của hệ toạ độ: chĩa thẳng lên thì
+   "hướng la bàn" gần như vô nghĩa, cổ tay xoay tí là nó quay cả vòng. Làm mượt trên vector thì
+   một cử động nhỏ của tay luôn ra một thay đổi nhỏ trên màn, bất kể đang nhìn đâu. */
+function vecHuong(huong, cao) {
+  const c = Math.cos(cao * RAD);
+  return { x: c * Math.sin(huong * RAD), y: c * Math.cos(huong * RAD), z: Math.sin(cao * RAD) };
+}
+function gocHuong(v) {
+  const d = Math.hypot(v.x, v.y, v.z) || 1;
+  const x = v.x / d, y = v.y / d, z = v.z / d;
+  let huong = Math.atan2(x, y) / RAD;
+  if (huong < 0) huong += 360;
+  return { huong, cao: Math.asin(Math.max(-1, Math.min(1, z))) / RAD };
+}
+
 /* Một thiên thể không ở trên trời thì có HAI lý do khác hẳn nhau: chưa mọc, hoặc đã lặn rồi.
    Trả về cái QUYẾT ĐỊNH, còn câu chữ để chỗ hiển thị tự lo — tách ra thì kiểm thử được bằng
    Node, mà chính vì trước đây nó nằm lẫn trong phần vẽ chữ nên không ai canh: dòng chữ gộp cả
@@ -222,7 +268,7 @@ function doToi(caoMatTroi) {
 }
 
 const API = { ngayJulius, matTroi, matTrang, hanhTinh, docCao, gioSao, khucXa,
-              mocLan, trangThaiMocLan, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG) };
+              mocLan, trangThaiMocLan, huongMay, vecHuong, gocHuong, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG) };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 else self.TDTD_ASTRO = API;

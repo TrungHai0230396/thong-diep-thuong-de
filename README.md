@@ -837,6 +837,48 @@ Các chuyển động đều tính theo thời gian thật giữa hai khung hìn
 trôi cùng một tốc độ. Kéo tay trong lúc đang xoay theo máy thì tắt xoay theo máy, và nút cũng tắt
 theo (trước đây nút vẫn ghi "Đang xoay theo máy").
 
+## "Xoay theo máy, nhìn mặt trời lag quá"
+
+Hoá ra không lag chút nào. Đo một khung vẽ khi **ngắm thẳng mặt trời**: 0,18 ms — rẻ như không.
+
+Lỗi nằm ở **toạ độ**. Bộ bắt cảm biến lấy `alpha` làm hướng và `beta` làm độ cao, rồi **bỏ hẳn
+`gamma`**. Cách ấy đúng tuyệt đối khi máy cầm thẳng đứng không nghiêng — nhưng ngửa máy lên nhìn
+mặt trời thì cổ tay luôn nghiêng ít nhiều. Đo ra:
+
+| tình huống | sai hướng |
+|---|---|
+| ngửa 50°, nghiêng 20° | **30°** |
+| ngửa 50°, nghiêng −30° | **42°** |
+| chĩa gần thẳng đứng, nghiêng 10° | **64°** |
+
+Và phép đo nói rõ nhất là phép này: giữ nguyên hướng tay, chỉ **xoay cổ tay 40°** — bầu trời
+**đứng yên tuyệt đối, 0,0°**. App bỏ qua hoàn toàn cử động đó. Bầu trời bị ghim sai chỗ, người
+dùng xoay cách mấy cũng không khớp được vào mặt trời. Rà mãi không tới — và đó chính là cái bị
+gọi là "lag".
+
+Chữa bằng cách dựng **cả ma trận quay** `Rz(α)·Rx(β)·Ry(γ)` theo đặc tả W3C rồi lấy trục −Z
+(mặt lưng máy, chỗ người ta chĩa vào bầu trời). Giờ cổ tay xoay bao nhiêu, bầu trời đi đúng bấy
+nhiêu, một ăn một.
+
+**Phép đo đầu tiên của tôi chỉ sai hướng, và suýt dẫn tới bản sửa tệ hơn.** Đo xong công thức
+mới, tôi thấy nó **nhảy nhiều hơn** công thức cũ: 12,3°/khung khi chĩa gần thẳng đứng, so với
+1,38° của cách cũ. Nhìn con số đó thì tưởng sửa hỏng. Nhưng đo lại trên **vector hướng** thay vì
+trên **góc** thì lòi ra sự thật: vector chỉ nhảy đều 3,9° ở mọi tư thế — đúng bằng biên độ rung
+tay. Con số 12,3° kia không phải tay rung mạnh hơn, mà là **méo mó của hệ toạ độ**: chĩa thẳng
+lên thì "hướng la bàn" gần như vô nghĩa, cổ tay xoay tí là nó quay cả vòng. Cách cũ "ổn định"
+chỉ vì nó **vứt bỏ thông tin**.
+
+Nên phần làm mượt cũng chuyển sang kéo **trên vector** rồi mới đổi ngược về góc. Đo lại sau khi
+làm mượt thì ba cách rung ngang nhau (0,2–0,45°/khung) — tức riêng việc đổi sang vector không
+làm màn hình êm hơn, và tôi ghi ra đây đúng như vậy chứ không nhận công. Giá trị của nó là
+**không thể vỡ**: một cử động nhỏ của tay luôn ra một thay đổi nhỏ trên màn, bất kể đang nhìn
+đâu.
+
+Chỗ này sống lâu được vì **máy bàn không bật được cảm biến** — trình duyệt từ chối cấp quyền,
+nên không cách nào thử bằng tay. Giờ có móc `_camBien()` cho phép bắn thẳng sự kiện cảm biến
+vào bộ xử lý trong Node. Gài lại cách cũ thì bài kiểm báo đúng *"lệch 0°"* — nguyên văn triệu
+chứng người dùng gặp.
+
 ## Bấm vào Mặt Trăng thì không có gì xảy ra
 
 Người dùng nói tiếp: *"bấm vô xem mặt trăng mặt trời thì ko xem đc"*. Soát ra thì app **chưa hề
@@ -992,8 +1034,8 @@ sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên m�
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       38 kiểm thử lõi
 scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
-scripts/test-astro.js      34 kiểm thử thiên văn, đối chiếu số liệu ngoài
-scripts/test-troidem.js    44 kiểm thử bầu trời: chạm chọn, quay nhìn, đổi nơi, hỏi nơi lần đầu, trôi êm, bẫy đơn vị
+scripts/test-astro.js      50 kiểm thử thiên văn, đối chiếu số liệu ngoài
+scripts/test-troidem.js    51 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-sao.js        47 kiểm thử vòng đời MỌI ngôi sao: mở, đóng, đóng rồi mở lại
@@ -1017,8 +1059,8 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
-node scripts/test-astro.js       # chạy 34 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 44 kiểm thử bầu trời đêm
+node scripts/test-astro.js       # chạy 50 kiểm thử thiên văn
+node scripts/test-troidem.js     # chạy 51 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 40 kiểm thử lịch vạn niên

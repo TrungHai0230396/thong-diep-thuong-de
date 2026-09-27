@@ -508,9 +508,15 @@ function keoNhin(dt = 16.7) {
      chứ không đứng khựng lại. */
 function troiNhin(dt) {
   if (theoMay && mucMay) {
+    /* Làm mượt TRÊN VECTOR, không trên góc. Trên góc thì gần thiên đỉnh nó vỡ: cùng một bàn
+       tay rung, con số hướng nhảy 3,1 độ mỗi khung lúc nhìn ngang nhưng vọt lên 12,3 độ lúc
+       chĩa gần thẳng đứng, trong khi vector chỉ nhảy đều 3,9 độ ở mọi tư thế. Kéo trên vector
+       thì một cử động nhỏ của tay luôn ra một thay đổi nhỏ trên màn. */
     const k = 1 - Math.exp(-dt / 100);
-    huongNhin = A().chuan(huongNhin + A().quanh(mucMay.h - huongNhin) * k);
-    caoNhin += (mucMay.c - caoNhin) * k;
+    const a = A().vecHuong(huongNhin, caoNhin), b = A().vecHuong(mucMay.h, mucMay.c);
+    const g = A().gocHuong({ x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k, z: a.z + (b.z - a.z) * k });
+    huongNhin = A().chuan(g.huong);
+    caoNhin = Math.max(-85, Math.min(88, g.cao));
   }
   if (quanTinh && !keo) {
     huongNhin = A().chuan(huongNhin + quanTinh.h * dt);
@@ -735,15 +741,19 @@ function xinViTri() {
 function ganCamBien() {
   batTheoMay = (e) => {
     if (!theoMay) return;
-    /* alpha là hướng la bàn, beta là ngẩng cúi. webkitCompassHeading của iOS chính xác hơn
-       vì nó đã trừ độ lệch từ; Android thì lấy alpha rồi đảo dấu. */
-    const h = typeof e.webkitCompassHeading === 'number' ? e.webkitCompassHeading
-            : (e.alpha === null ? null : 360 - e.alpha);
-    if (h === null && typeof e.beta !== 'number') return;
-    mucMay = {
-      h: h !== null ? A().chuan(h) : (mucMay ? mucMay.h : huongNhin),
-      c: typeof e.beta === 'number' ? Math.max(-20, Math.min(88, e.beta - 90)) : (mucMay ? mucMay.c : caoNhin),
-    };
+    /* Dựng CẢ ma trận quay từ alpha, beta, gamma thay vì lấy alpha làm hướng, beta làm độ cao.
+       Cách rời rạc ấy đúng khi máy cầm thẳng, nhưng bỏ hẳn gamma — mà ngửa máy lên nhìn mặt
+       trời thì tay luôn nghiêng. Đo được: ngửa 50 độ nghiêng 20 độ là sai hướng 30 độ; chĩa
+       gần thẳng đứng nghiêng 5 độ là sai 68 độ. Bầu trời bị quăng đi theo từng rung tay, bộ
+       làm mượt đuổi theo một cái đích đang nhảy, và nhìn ra thì tưởng máy lag.
+
+       iOS có webkitCompassHeading đã trừ sẵn độ lệch từ nên chính xác hơn alpha; nó tương ứng
+       với alpha theo công thức alpha = 360 - heading, nên thay vào rồi dựng ma trận như thường. */
+    const al = typeof e.webkitCompassHeading === 'number' ? 360 - e.webkitCompassHeading : e.alpha;
+    if (al === null && typeof e.beta !== 'number') return;
+    const v = A().huongMay(al, e.beta, e.gamma);
+    if (!v) return;
+    mucMay = { h: A().chuan(v.huong), c: Math.max(-85, Math.min(88, v.cao)) };
   };
   addEventListener('deviceorientation', batTheoMay, true);
 }
@@ -825,6 +835,9 @@ self.TDTD_TROIDEM = { mo, dong,
   _daChon: () => daChon,
   _troiNhin: (dt) => { troiNhin(dt); return { huongNhin, caoNhin, quanTinh }; },
   _quanTinh: (h, c) => { quanTinh = h === null ? null : { h, c }; },
+  /* Chạy thẳng bộ bắt cảm biến, không cần bật nút — máy bàn không có cảm biến nên không thể
+     bật được, mà đây lại đúng là đoạn mã từng sai. */
+  _camBien: (e) => { if (!batTheoMay) ganCamBien(); const t = theoMay; theoMay = true; batTheoMay(e); theoMay = t; return mucMay && { ...mucMay }; },
   _mucMay: (h, c) => { theoMay = true; mucMay = { h, c }; },
   _htmlChu: () => tam.querySelector('.td-tin')._html,
   _quenNoi: () => { daChon = false; },

@@ -243,5 +243,31 @@ console.log('\n— Trôi êm: cảm biến rung thì hình không rung theo, vu�
   T._quanTinh(null);
 }
 
+console.log('\n— Xoay theo máy: cổ tay xoay thì bầu trời phải đi theo —');
+/* Người dùng báo "nhìn mặt trời lag". Không phải lag: đo được một khung vẽ chỉ tốn 0,18ms kể
+   cả khi ngắm thẳng mặt trời. Lỗi là bộ bắt cảm biến lấy alpha làm hướng, beta làm độ cao và
+   BỎ HẲN gamma — nên xoay cổ tay bao nhiêu bầu trời cũng đứng yên, bị ghim sai chỗ, người ta
+   rà mãi không khớp vào mặt trời. Máy bàn không bật được cảm biến nên chỗ này chỉ kiểm được
+   bằng Node, và đó chính là lý do nó sống lâu vậy. */
+const bien = (al, be, ga) => T._camBien({ alpha: al, beta: be, gamma: ga });
+const lechH = (a, b) => { let d = Math.abs(a - b); return d > 180 ? 360 - d : d; };
+const thang = bien(30, 151, 0);
+ok('bắt được sự kiện cảm biến', !!thang && typeof thang.h === 'number', JSON.stringify(thang));
+const nghieng = bien(30, 151, 30);
+ok('xoay cổ tay 30° thì hướng ngắm đổi theo, không đứng yên',
+   lechH(thang.h, nghieng.h) > 10, `lệch ${lechH(thang.h, nghieng.h).toFixed(0)}°`);
+ok('cầm thẳng không nghiêng thì hướng khớp với la bàn như cũ',
+   lechH(bien(0, 120, 0).h, 0) < 1, `${bien(0, 120, 0).h.toFixed(1)}°`);
+ok('ngửa lên bao nhiêu thì độ cao ra bấy nhiêu',
+   Math.abs(bien(0, 140, 0).c - 50) < 1, `${bien(0, 140, 0).c.toFixed(1)}°`);
+ok('chúc xuống dưới chân trời cũng theo được, không bị chặn ở -20°',
+   bien(0, 40, 0).c < -20, `${bien(0, 40, 0).c.toFixed(1)}°`);
+ok('iOS có la bàn thật thì dùng la bàn, không dùng alpha',
+   (() => { const v = T._camBien({ alpha: 200, beta: 120, gamma: 0, webkitCompassHeading: 90 });
+            return lechH(v.h, 90) < 1; })());
+ok('thiếu hẳn dữ liệu thì bỏ qua, không nổ lỗi và không ghi bừa',
+   (() => { const truoc = bien(10, 120, 0); const sau = T._camBien({ alpha: null, beta: null, gamma: null });
+            return sau && Math.abs(sau.h - truoc.h) < .01; })());
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

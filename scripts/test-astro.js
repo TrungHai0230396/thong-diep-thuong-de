@@ -247,5 +247,81 @@ for (let h = 0; h < 24; h++) {
 }
 ok('suốt 24 giờ, giờ nào Trăng khuất cũng nói được vì sao khuất', mo === 0, `${mo} giờ không nói được`);
 
+console.log('\n— Máy đang chĩa về đâu —');
+/* Người dùng báo: xoay theo máy, nhìn mặt trời thì "lag". Không phải lag do vẽ — đo được một
+   khung chỉ tốn 0,18ms kể cả khi ngắm thẳng mặt trời. Lỗi nằm ở TOẠ ĐỘ: mã cũ lấy alpha làm
+   hướng và beta làm độ cao, bỏ hẳn gamma. Cách ấy đúng khi máy cầm thẳng, nhưng ngửa máy lên
+   nhìn vật trên cao thì tay luôn nghiêng, và sai số vọt lên hàng chục độ. */
+const HM = A.huongMay;
+const cuHuong = (al) => ((360 - al) % 360 + 360) % 360;
+const lechHuong = (a, b) => { let d = Math.abs(a - b); return d > 180 ? 360 - d : d; };
+
+ok('máy cầm thẳng đứng nhìn về Bắc thì ra hướng Bắc, độ cao 0',
+   (() => { const v = HM(0, 90, 0); return Math.abs(v.huong) < .5 && Math.abs(v.cao) < .5; })());
+ok('ngửa lên 50 độ thì ra đúng độ cao 50',
+   Math.abs(HM(0, 140, 0).cao - 50) < .5, `${HM(0, 140, 0).cao.toFixed(1)}°`);
+ok('quay sang Đông thì hướng đổi theo',
+   Math.abs(HM(90, 140, 0).huong - 270) < .5, `${HM(90, 140, 0).huong.toFixed(1)}°`);
+ok('máy cầm thẳng, không nghiêng thì khớp y hệt cách cũ — cách cũ vốn đúng ở đây',
+   [0, 45, 90, 180, 270].every(al => lechHuong(HM(al, 120, 0).huong, cuHuong(al)) < .5));
+
+/* Đây là chỗ cách cũ hỏng, và là lý do người dùng thấy bầu trời nhảy loạn. */
+const nghiengSai = [[140, 20], [140, -30], [165, 15], [175, 10]]
+  .map(([be, ga]) => lechHuong(HM(0, be, ga).huong, cuHuong(0)));
+ok('nghiêng máy thì hướng phải đổi — cách cũ giữ nguyên nên sai',
+   nghiengSai.every(d => d > 15), nghiengSai.map(d => Math.round(d) + '°').join(' '));
+ok('càng chĩa gần thẳng đứng, nghiêng càng ít mà sai càng nhiều',
+   lechHuong(HM(0, 175, 10).huong, cuHuong(0)) > lechHuong(HM(0, 140, 20).huong, cuHuong(0)),
+   `nghiêng 10° lúc gần đứng: ${Math.round(lechHuong(HM(0, 175, 10).huong, cuHuong(0)))}° · ` +
+   `nghiêng 20° lúc ngửa vừa: ${Math.round(lechHuong(HM(0, 140, 20).huong, cuHuong(0)))}°`);
+
+console.log('\n— Xoay cổ tay thì bầu trời phải đi theo, một ăn một —');
+/* Đây mới là thứ người dùng cảm thấy. Không phải rung, mà là TRÔI CÓ HỆ THỐNG: cách cũ bỏ hẳn
+   gamma nên xoay cổ tay 40 độ mà bầu trời đứng yên tuyệt đối. Bầu trời bị ghim sai chỗ, người
+   ta xoay cách mấy cũng không khớp được vào mặt trời — rà mãi không tới, và đó là cái bị gọi
+   là "lag". Gamma xoay quanh trục Y của máy, mà trục ngắm là -Z vuông góc với Y, nên một độ
+   cổ tay phải ra đúng một độ bầu trời. */
+const vg = (b) => A.vecHuong(b.huong, b.cao);
+const gocGiua = (a, b) => Math.acos(Math.max(-1, Math.min(1, a.x * b.x + a.y * b.y + a.z * b.z))) / (Math.PI / 180);
+const goc0 = vg(HM(30, 151, 0));
+for (const ga of [10, 20, 35]) {
+  ok(`cổ tay xoay ${ga}° thì bầu trời đi đúng ${ga}°`,
+     Math.abs(gocGiua(vg(HM(30, 151, ga)), goc0) - ga) < .6,
+     `${gocGiua(vg(HM(30, 151, ga)), goc0).toFixed(1)}°`);
+}
+ok('xoay hai chiều đều đi, không chỉ một chiều',
+   Math.abs(gocGiua(vg(HM(30, 151, -20)), goc0) - 20) < .6);
+ok('đúng một ăn một ở mọi độ ngửa, không riêng một tư thế',
+   [100, 130, 151, 170].every(be =>
+     Math.abs(gocGiua(vg(HM(30, be, 15)), vg(HM(30, be, 0))) - 15) < .6));
+
+console.log('\n— Hướng máy: không ra số vô nghĩa —');
+ok('độ cao luôn nằm trong khoảng -90 tới 90', (() => {
+  for (let be = -180; be <= 180; be += 7) for (let ga = -90; ga <= 90; ga += 11) {
+    const v = HM(37, be, ga);
+    if (!v || !(v.cao >= -90.01 && v.cao <= 90.01)) return false;
+  }
+  return true;
+})());
+ok('hướng luôn nằm trong khoảng 0 tới 360', (() => {
+  for (let al = 0; al < 360; al += 13) for (let be = -170; be <= 170; be += 17) {
+    const v = HM(al, be, 25);
+    if (!v || !(v.huong >= 0 && v.huong < 360.01)) return false;
+  }
+  return true;
+})());
+ok('không ra NaN ở bất kỳ góc nào', (() => {
+  for (let al = 0; al < 360; al += 29) for (let be = -180; be <= 180; be += 23) for (const ga of [-90, -45, 0, 45, 90]) {
+    const v = HM(al, be, ga);
+    if (!v || !Number.isFinite(v.huong) || !Number.isFinite(v.cao)) return false;
+  }
+  return true;
+})());
+ok('thiếu beta thì trả về rỗng chứ không đoán bừa', HM(0, null, 0) === null && HM(0, undefined, 0) === null);
+ok('thiếu alpha hoặc gamma thì coi như 0, vẫn tính được', (() => {
+  const v = HM(null, 140, null);
+  return v && Math.abs(v.cao - 50) < .5;
+})());
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);
