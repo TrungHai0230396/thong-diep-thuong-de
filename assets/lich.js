@@ -322,6 +322,30 @@ function tuoi(dd, mm, yy) {
 
 const xung = (chiTuoi, chiNgay) => chiNgay === (chiTuoi + 6) % 12;
 
+/* ---------- hướng xuất hành ----------
+   Hỷ thần và Tài thần theo CAN của ngày, Hạc thần (hướng nên tránh) theo vòng 60 ngày.
+   Đối chiếu bốn nguồn: xemlicham.com (30 ngày), lichvannien365.com (14 ngày), và hai bài viết
+   công bố nguyên bảng (dongphuonglyso.blogspot.com, ancotnam.vn).
+   - Hỷ thần: ba nguồn nhất trí như bảng dưới; riêng ancotnam đảo Ất/Canh với Bính/Tân.
+   - Tài thần: nhất trí ở tám can. Ngày Mậu: ba nguồn ghi Bắc, xemlicham ghi Nam — lấy Bắc.
+     Ngày Quý thì các nguồn chia ba: Tây Bắc (lichvannien365, ancotnam), Chính Tây (xemlicham),
+     Đông Nam (dongphuonglyso) — lấy Tây Bắc theo số đông, và nói ra chỗ này trong README.
+   - Hạc thần: từ ngày Kỷ Dậu ở Đông Bắc 6 ngày, rồi Đông 5, Đông Nam 6, Nam 5, Tây Nam 6, Tây 5,
+     Tây Bắc 6, Bắc 5, rồi 16 ngày "lên trời" (Quý Tỵ tới Mậu Thân) không phải tránh hướng nào.
+     Khớp cả 24 ngày trích được từ xemlicham và bảng của ancotnam. */
+const HY_THAN = ['Đông Bắc', 'Tây Bắc', 'Tây Nam', 'Chính Nam', 'Đông Nam',
+                 'Đông Bắc', 'Tây Bắc', 'Tây Nam', 'Chính Nam', 'Đông Nam'];
+const TAI_THAN = ['Đông Nam', 'Đông Nam', 'Chính Đông', 'Chính Đông', 'Chính Bắc',
+                  'Chính Nam', 'Tây Nam', 'Tây Nam', 'Chính Tây', 'Tây Bắc'];
+const HAC_DOAN = [[6, 'Đông Bắc'], [5, 'Chính Đông'], [6, 'Đông Nam'], [5, 'Chính Nam'],
+                  [6, 'Tây Nam'], [5, 'Chính Tây'], [6, 'Tây Bắc'], [5, 'Chính Bắc'], [16, null]];
+const soHoaGiap = (can, chi) => ((6 * can - 5 * chi) % 60 + 60) % 60;   // Giáp Tý là 0, Kỷ Dậu là 45
+function hacThan(can, chi) {
+  let k = (soHoaGiap(can, chi) - 45 + 60) % 60;
+  for (const [dai, huong] of HAC_DOAN) { if (k < dai) return huong; k -= dai; }
+  return null;
+}
+
 /* ---------- xem một ngày ---------- */
 
 function xemNgay(dd, mm, yy, sinh) {
@@ -347,6 +371,7 @@ function xemNgay(dd, mm, yy, sinh) {
     gio,
     tamNuong: TAM_NUONG.includes(ad),
     nguyetKy: NGUYET_KY.includes(ad),
+    huong: { hy: HY_THAN[ngay.can], tai: TAI_THAN[ngay.can], hac: hacThan(ngay.can, ngay.chi) },
   };
   if (sinh) r.xungTuoi = xung(sinh.chi, ngay.chi);
   return r;
@@ -385,11 +410,80 @@ function timNgay(viec, tu, soNgay, sinh, lay = 5) {
   return ds.slice(0, lay);
 }
 
+/* ---------- đổi ngày âm sang dương ----------
+   convertLunar2Solar không kêu khi nhận một ngày không có thật (30 của tháng thiếu, hay tháng
+   nhuận mà năm đó không nhuận) — nó cứ trả về một ngày nào đó. Nên đổi xong phải đổi NGƯỢC lại
+   xem có ra đúng ngày âm ban đầu không. */
+function amSangDuong(d, m, y, nhuan = false) {
+  if (!(d >= 1 && d <= 30 && m >= 1 && m <= 12 && y >= 1900 && y <= 2199)) return null;
+  const [dd, mm, yy] = convertLunar2Solar(d, m, y, nhuan ? 1 : 0, TZ);
+  if (!dd) return null;
+  const [a, b, c, l] = convertSolar2Lunar(dd, mm, yy, TZ);
+  if (a !== d || b !== m || c !== y || !!l !== !!nhuan) return null;
+  return { dd, mm, yy };
+}
+function thangNhuan(y) { for (let m = 1; m <= 12; m++) if (amSangDuong(1, m, y, true)) return m; return 0; }
+const thangDu = (m, y, nhuan = false) => !!amSangDuong(30, m, y, nhuan);
+
+/* Ngày âm lặp lại hằng năm (giỗ, sinh nhật âm): rơi vào ngày dương nào trong mấy năm tới. Năm nào
+   tháng đó chỉ có 29 ngày mà ngày cần tìm là 30 thì lấy ngày cuối tháng (29), như dân gian vẫn
+   làm giỗ, và đánh dấu để giao diện nói ra. */
+function amHangNam(d, m, tuNam, soNam = 3) {
+  const ds = [];
+  for (let y = tuNam; y < tuNam + soNam; y++) {
+    let r = amSangDuong(d, m, y), lui = false;
+    if (!r && d === 30) { r = amSangDuong(29, m, y); lui = true; }
+    if (r) ds.push({ namAm: y, ...r, lui });
+  }
+  return ds;
+}
+
+/* ---------- ngày lễ ----------
+   Lễ âm lịch theo mục "Theo âm lịch" của bài "Các ngày lễ ở Việt Nam" trên Wikipedia tiếng Việt,
+   thêm Tết Nguyên đán, Giỗ Tổ Hùng Vương (nghỉ lễ theo luật), Thất tịch và Tết Hạ nguyên (bài
+   đó cũng nhắc tới). Lễ âm lịch chỉ tính ở tháng thường, không tính tháng nhuận. */
+const LE_AM = [
+  [1, 1, 'Tết Nguyên đán'], [15, 1, 'Rằm tháng Giêng (Tết Nguyên tiêu)'], [3, 3, 'Tết Hàn thực'],
+  [10, 3, 'Giỗ Tổ Hùng Vương'], [15, 4, 'Lễ Phật đản'], [5, 5, 'Tết Đoan ngọ'],
+  [7, 7, 'Thất tịch (Tết Ngâu)'], [15, 7, 'Lễ Vu lan (Tết Trung nguyên)'], [15, 8, 'Tết Trung thu'],
+  [15, 10, 'Tết Hạ nguyên'], [23, 12, 'Ông Công ông Táo'],
+];
+const LE_DUONG = [
+  [1, 1, 'Tết Dương lịch'], [8, 3, 'Quốc tế Phụ nữ'], [30, 4, 'Ngày Giải phóng miền Nam'],
+  [1, 5, 'Quốc tế Lao động'], [2, 9, 'Quốc khánh'], [20, 10, 'Ngày Phụ nữ Việt Nam'],
+  [20, 11, 'Ngày Nhà giáo Việt Nam'], [25, 12, 'Giáng sinh'],
+];
+const TEN_THANG = ['', 'Giêng', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', 'Chạp'];
+
+/* Các ngày lễ, và mùng 1, rằm hằng tháng, từ một ngày cho trước trong số ngày cho trước.
+   Ngày vừa là rằm vừa là lễ (rằm tháng Bảy là Vu lan) thì chỉ ghi lễ. */
+function leSapToi(tu, soNgay = 366) {
+  const ds = [];
+  const N0 = jdFromDate(tu.dd, tu.mm, tu.yy);
+  for (let i = 0; i < soNgay; i++) {
+    const [dd, mm, yy] = jdToDate(N0 + i);
+    const [ad, am, ay, nh] = convertSolar2Lunar(dd, mm, yy, TZ);
+    const goc = { dd, mm, yy, cach: i, am: { ngay: ad, thang: am, nam: ay, nhuan: !!nh } };
+    const hom = [];
+    if (!nh) for (const [d, m, ten] of LE_AM) if (d === ad && m === am) hom.push({ ...goc, ten, loai: 'am' });
+    if (am === 12 && !nh) {                            // giao thừa: hôm sau là mùng 1 Tết
+      const [a2, m2] = convertSolar2Lunar(...jdToDate(N0 + i + 1), TZ);
+      if (a2 === 1 && m2 === 1) hom.push({ ...goc, ten: `Giao thừa (${ad} Tết)`, loai: 'am' });
+    }
+    for (const [d, m, ten] of LE_DUONG) if (d === dd && m === mm) hom.push({ ...goc, ten, loai: 'duong' });
+    if ((ad === 1 || ad === 15) && !hom.some(h => h.loai === 'am'))
+      hom.push({ ...goc, ten: `${ad === 1 ? 'Mùng 1' : 'Rằm'} tháng ${TEN_THANG[am]}${nh ? ' nhuận' : ''}`, loai: 'ram' });
+    ds.push(...hom);
+  }
+  return ds;
+}
+
 const API = {
   jdFromDate, jdToDate, convertSolar2Lunar, convertLunar2Solar, getNewMoonDay,
   canChiNam, canChiThang, canChiNgay, tenCC, chiThangTiet, tenTiet, kinhDoTrua,
   thanNgay, thanGio, xemNgay, cham, timNgay, nhanViec, tuoi, xung,
   CAN, CHI, CON, THAN, TRUC, TIET, VIEC, GIANG, TAM_NUONG, NGUYET_KY, KHUNG_GIO, TZ, tietTrongNgay,
+  hacThan, HY_THAN, TAI_THAN, amSangDuong, thangNhuan, thangDu, amHangNam, leSapToi, LE_AM, LE_DUONG, TEN_THANG,
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = API;

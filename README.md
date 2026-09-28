@@ -636,6 +636,20 @@ Một ngôi sao màu son đỏ, `#xem-ngay`. Ba phần trên một màn hình:
 
 **Chọn ngày sinh bằng ba ô Ngày / Tháng / Năm và nút Xong, không dùng ô lịch của máy.** Bản đầu dùng `<input type="date">` và lưu ngay khi ô báo đổi giá trị. Người dùng báo vừa chạm vào ô, chưa chọn gì đã thấy tự chọn: trình duyệt trên điện thoại điền sẵn một ngày ngay khi mở bảng chọn (thường là hôm nay) và báo đổi giá trị, app lưu luôn rồi vẽ lại khung, bảng chọn mất theo. Tôi không có iPhone để chạy lại đúng cảnh đó, nhưng chỗ lưu-ngay-khi-đổi là đủ để sinh ra đúng lỗi ấy. Giờ chỉ lưu khi bấm Xong; ngày không có thật (31/2) hay ngày ở tương lai thì báo lỗi chứ không lưu.
 
+**Bốn thẻ** ở đầu màn: **Ngày** (ba phần trên), **Tháng**, **Ngày lễ**, **Đổi ngày**.
+
+- **Tháng**: lịch cả tháng dạng lưới, tuần bắt đầu từ thứ hai. Mỗi ô có ngày dương, ngày âm (mùng 1 ghi cả tháng), ô vàng là ngày hoàng đạo, chữ xanh là mùng 1 và rằm, chấm đỏ là ngày lễ; bên dưới liệt kê các lễ trong tháng. Bấm một ô là sang thẻ Ngày xem chi tiết ngày đó.
+- **Ngày lễ**: các lễ âm lịch, lễ dương lịch, mùng 1 và rằm trong 12 tháng tới, kèm số ngày còn lại. Nút **"＋ Lịch"** ở từng dòng, và hai nút thêm cả loạt (các ngày lễ; mùng 1 và rằm), tạo tệp `.ics` ngay trên máy rồi mở bằng ứng dụng Lịch, **nhắc lúc 9 giờ sáng hôm trước**. Không gửi gì đi đâu. Tệp theo RFC 5545: CRLF, ngày trọn không giờ, dòng dài gập ở 75 **byte** (tiếng Việt có dấu một chữ hai ba byte). Lễ âm lịch theo mục "Theo âm lịch" của bài *Các ngày lễ ở Việt Nam* trên Wikipedia tiếng Việt, thêm Tết Nguyên đán, Giỗ Tổ Hùng Vương, Thất tịch, Tết Hạ nguyên; chỉ tính ở tháng thường, không tính tháng nhuận. Giao thừa ghi đúng "29 Tết" hay "30 Tết" theo tháng Chạp năm đó thiếu hay đủ. Danh sách **mùng 1 và rằm** đủ cả những ngày trùng lễ (rằm tháng Giêng, Vu lan, mùng 1 Tết) — bản đầu rơi mất sáu ngày đó.
+- **Đổi ngày**: dương sang âm (kèm can chi, hoàng đạo hay hắc đạo), và âm sang dương có ô *tháng nhuận* chỉ hiện khi năm đó nhuận đúng tháng ấy. Ngày âm nhập vào còn được tính cho **năm nay và hai năm tới** — dùng cho ngày giỗ, sinh nhật âm lịch — đặt tên rồi thêm cả loạt vào lịch điện thoại. `convertLunar2Solar` gặp ngày không có thật (30 của tháng thiếu, tháng nhuận năm không nhuận) vẫn trả ra một ngày; ví dụ "30 tháng Chạp 2029" ra đúng mùng 1 Tết 2030. Nên đổi xong phải đổi ngược lại để chặn. Giỗ ngày 30 mà năm đó tháng thiếu thì lùi về 29 và nói ra.
+
+**Hướng xuất hành** (trong thẻ Ngày): đón Hỷ thần, Tài thần ở hướng nào, tránh hướng nào vì Hạc thần. Hỷ thần và Tài thần theo can của ngày; Hạc thần theo vòng 60 ngày — từ ngày Kỷ Dậu ở Đông Bắc 6 ngày, rồi Đông 5, Đông Nam 6, Nam 5, Tây Nam 6, Tây 5, Tây Bắc 6, Bắc 5, rồi 16 ngày "lên trời" không phải tránh hướng nào. Đối chiếu bốn nguồn (xemlicham.com 30 ngày, lichvannien365.com 14 ngày, và hai bài công bố nguyên bảng ở dongphuonglyso.blogspot.com, ancotnam.vn), và **các nguồn không hoàn toàn nhất trí**:
+
+- Hỷ thần: ba nguồn như nhau; ancotnam đảo Ất/Canh với Bính/Tân. Lấy theo ba nguồn.
+- Tài thần: nhất trí ở tám can. Ngày **Mậu**: ba nguồn ghi Bắc, xemlicham ghi Nam — lấy Bắc. Ngày **Quý** các nguồn chia ba: Tây Bắc (lichvannien365, ancotnam), Chính Tây (xemlicham), Đông Nam (dongphuonglyso) — lấy Tây Bắc theo số đông.
+- Hạc thần: khớp cả 24 ngày trích được từ xemlicham và bảng của ancotnam.
+
+`scripts/test-lich.js` lên 97 bài: thêm hướng xuất hành (10 can, 24 ngày Hạc thần), đổi âm sang dương (1.565 ngày đổi đi đổi lại, ngày không có thật, các năm nhuận đã biết), ngày lễ (Tết và giao thừa 2027, Trung thu, không ghi trùng rằm với lễ). `scripts/test-sao.js` kiểm tệp `.ics`.
+
 **Không hỏi tên**, vì lịch vạn niên không có luật nào dùng tên người. Cái có luật thật là tuổi: ngày có chi đối với chi năm sinh (Tý–Ngọ, Sửu–Mùi...) là ngày xung. Tuổi tính theo **năm âm** — sinh 20/1/1990 là tuổi Kỷ Tỵ chứ không phải Canh Ngọ, vì Tết năm đó là 27/1.
 
 **Không tự đặt ra luật nào.** Nguồn của từng phần, ghi cả ở đầu `assets/lich.js`:
@@ -1048,12 +1062,12 @@ scripts/test-astro.js      50 kiểm thử thiên văn, đối chiếu số li�
 scripts/test-troidem.js    51 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        54 kiểm thử vòng đời MỌI ngôi sao, và chuyện tự tải lại khi có bản mới
+scripts/test-sao.js        61 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
 scripts/mau-am.js          tạo giọng mẫu bằng lệnh `say` của macOS, trộn tiếng ồn
-scripts/test-lich.js       73 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
+scripts/test-lich.js       97 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1073,7 +1087,7 @@ node scripts/test-astro.js       # chạy 50 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 51 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
-node scripts/test-lich.js        # chạy 73 kiểm thử lịch vạn niên
+node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

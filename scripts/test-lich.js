@@ -125,6 +125,81 @@ ok('ngày giữa tiết thì không ghi giờ bắt đầu', !L.xemNgay(28, 9, 2
   ok('giờ bắt đầu tiết không làm đổi trực: 7/9/2026 vẫn Kiến', L.xemNgay(7, 9, 2026).truc.ten === 'Kiến');
 }
 
+console.log('\n— Hướng xuất hành —');
+{
+  /* Hỷ thần, Tài thần theo can ngày: đúng như xemlicham.com ghi, trừ Tài thần ngày Mậu và Quý
+     (xem ghi chú trong lich.js) — hai chỗ đó lấy theo lichvannien365.com và số đông. */
+  const HT = [['23/9/2026', 'Canh Tý', 'Tây Bắc', 'Tây Nam'], ['28/9/2026', 'Ất Tỵ', 'Tây Bắc', 'Đông Nam'],
+              ['2/1/2026', 'Bính Tý', 'Tây Nam', 'Chính Đông'], ['3/1/2026', 'Đinh Sửu', 'Chính Nam', 'Chính Đông'],
+              ['4/1/2026', 'Mậu Dần', 'Đông Nam', 'Chính Bắc'], ['5/1/2026', 'Kỷ Mão', 'Đông Bắc', 'Chính Nam'],
+              ['25/9/2026', 'Nhâm Dần', 'Chính Nam', 'Chính Tây'], ['26/9/2026', 'Quý Mão', 'Đông Nam', 'Tây Bắc'],
+              ['27/9/2026', 'Giáp Thìn', 'Đông Bắc', 'Đông Nam'], ['4/9/2026', 'Tân Tỵ', 'Tây Nam', 'Tây Nam']];
+  for (const [ngay, cc, hy, tai] of HT) {
+    const [d, m, y] = ngay.split('/').map(Number), r = L.xemNgay(d, m, y);
+    ok(`${ngay} (${r.canChi.ngay}): Hỷ thần ${hy}, Tài thần ${tai}`,
+       r.canChi.ngay.startsWith(cc) && r.huong.hy === hy && r.huong.tai === tai, `${r.huong.hy} / ${r.huong.tai}`);
+  }
+  /* Hạc thần: 24 ngày trích từ xemlicham.com, đủ cả chín chặng của vòng 60 ngày */
+  const HAC = { 'Kỷ Dậu': 'Đông Bắc', 'Tân Hợi': 'Đông Bắc', 'Bính Thìn': 'Chính Đông', 'Quý Hợi': 'Đông Nam',
+    'Ất Sửu': 'Đông Nam', 'Bính Dần': 'Chính Nam', 'Đinh Mão': 'Chính Nam', 'Quý Dậu': 'Tây Nam', 'Bính Tý': 'Tây Nam',
+    'Đinh Sửu': 'Chính Tây', 'Kỷ Mão': 'Chính Tây', 'Canh Thìn': 'Chính Tây', 'Tân Tỵ': 'Chính Tây',
+    'Quý Mùi': 'Tây Bắc', 'Bính Tuất': 'Tây Bắc', 'Đinh Hợi': 'Tây Bắc', 'Mậu Tý': 'Chính Bắc', 'Tân Mão': 'Chính Bắc',
+    'Tân Sửu': null, 'Quý Mão': null, 'Giáp Thìn': null, 'Ất Tỵ': null, 'Bính Ngọ': null, 'Mậu Thân': null };
+  const idx = (t, ds) => ds.indexOf(t);
+  let sai = [];
+  for (const [cc, huong] of Object.entries(HAC)) {
+    const [can, chi] = cc.split(' ');
+    const ra = L.hacThan(idx(can, L.CAN), idx(chi, L.CHI));
+    if (ra !== huong) sai.push(`${cc}: ${ra} ≠ ${huong}`);
+  }
+  ok(`Hạc thần khớp cả ${Object.keys(HAC).length} ngày (16 ngày "lên trời" thì không tránh hướng nào)`, !sai.length, sai.slice(0, 3).join('; '));
+}
+
+console.log('\n— Đổi âm sang dương —');
+{
+  let sai = [], dem = 0;
+  const N0 = L.jdFromDate(1, 1, 2000);
+  for (let i = 0; i < 365 * 30; i += 7) {
+    const [dd, mm, yy] = L.jdToDate(N0 + i);
+    const [ad, am, ay, nh] = L.convertSolar2Lunar(dd, mm, yy, L.TZ);
+    const r = L.amSangDuong(ad, am, ay, !!nh);
+    dem++;
+    if (!r || r.dd !== dd || r.mm !== mm || r.yy !== yy) sai.push(`${dd}/${mm}/${yy}`);
+  }
+  ok(`${dem} ngày từ 2000 tới 2029: âm đổi về dương ra đúng ngày cũ`, !sai.length, sai.slice(0, 3).join(', '));
+  ok('mùng 1 Tết 2027 là 6/2/2027', JSON.stringify(L.amSangDuong(1, 1, 2027)) === JSON.stringify({ dd: 6, mm: 2, yy: 2027 }));
+  ok('1/5 nhuận năm 2028 là 23/6/2028', JSON.stringify(L.amSangDuong(1, 5, 2028, true)) === JSON.stringify({ dd: 23, mm: 6, yy: 2028 }));
+  ok('năm 2027 không có tháng 5 nhuận: không bịa ra ngày', L.amSangDuong(1, 5, 2027, true) === null);
+  /* Tết 2030 là 2/2/2030, nên tháng Chạp năm 2029 chỉ có 29 ngày. Hàm gốc vẫn trả ra một ngày cho
+     "30 tháng Chạp 2029" (đúng bằng mùng 1 Tết) — phải đổi ngược để chặn. */
+  ok('30 tháng Chạp 2029 không có thật (tháng thiếu)', L.amSangDuong(30, 12, 2029) === null);
+  ok('tháng nhuận các năm đã biết: 2023 nhuận tháng 2, 2025 tháng 6, 2028 tháng 5, 2026 không nhuận',
+     L.thangNhuan(2023) === 2 && L.thangNhuan(2025) === 6 && L.thangNhuan(2028) === 5 && L.thangNhuan(2026) === 0,
+     [2023, 2025, 2028, 2026].map(L.thangNhuan).join(','));
+  const g = L.amHangNam(30, 12, 2026, 2);
+  ok('giỗ 30 tháng Chạp, năm tháng thiếu thì lùi về 29 và nói ra', g.length === 2 && g.every(x => x.lui),
+     g.map(x => `${x.dd}/${x.mm}/${x.yy}${x.lui ? ' (29)' : ''}`).join(', '));
+}
+
+console.log('\n— Ngày lễ sắp tới —');
+{
+  const ds = L.leSapToi({ dd: 28, mm: 9, yy: 2026 }, 366);
+  const tim = (ten) => ds.find(e => e.ten.startsWith(ten));
+  const tet = tim('Tết Nguyên đán'), gt = tim('Giao thừa');
+  ok('Tết Nguyên đán 2027 rơi vào 6/2/2027', tet && tet.dd === 6 && tet.mm === 2 && tet.yy === 2027);
+  ok('giao thừa là hôm trước, ghi đúng "29 Tết" vì tháng Chạp năm đó thiếu',
+     gt && gt.dd === 5 && gt.mm === 2 && gt.ten.includes('29 Tết'), gt && gt.ten);
+  const trungThu = tim('Tết Trung thu');
+  ok('Trung thu 2027 là rằm tháng 8', trungThu && trungThu.am.ngay === 15 && trungThu.am.thang === 8);
+  const hom = {};
+  for (const e of ds) (hom[`${e.dd}/${e.mm}/${e.yy}`] = hom[`${e.dd}/${e.mm}/${e.yy}`] || []).push(e);
+  ok('ngày vừa là rằm vừa là lễ (rằm tháng 7 là Vu lan) thì chỉ ghi lễ, không ghi trùng',
+     Object.values(hom).every(h => !(h.some(e => e.loai === 'ram') && h.some(e => e.loai === 'am'))));
+  const mung1 = ds.filter(e => e.am.ngay === 1).length;
+  ok('một năm có 12 hoặc 13 lần mùng 1 (kể cả mùng 1 Tết)', mung1 === 12 || mung1 === 13, `${mung1}`);
+  ok('lễ âm lịch không tính ở tháng nhuận', ds.filter(e => e.loai === 'am').every(e => !e.am.nhuan));
+}
+
 console.log('\n— Mùng một Tết âm lịch —');
 for (const [nam, d, m] of [[2024, 10, 2], [2025, 29, 1], [2026, 17, 2]]) {
   const [ad, am, ay] = L.convertSolar2Lunar(d, m, nam, L.TZ);

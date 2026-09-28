@@ -187,5 +187,27 @@ console.log('\n— Tự nhận bản mới: không tải lại hai lần, không
   ok('lần cài đầu tiên (chưa có bản cũ): không tải lại', t.bang.tai === 0);
 }
 
+console.log('\n— Tệp lịch (.ics) của trang Xem ngày —');
+{
+  const X = global.TDTD_XEMNGAY;
+  const ics = X && X._ics && X._ics([
+    { dd: 6, mm: 2, yy: 2027, ten: 'Tết Nguyên đán', am: { ngay: 1, thang: 1, nhuan: false } },
+    { dd: 23, mm: 6, yy: 2028, ten: 'Mùng 1 tháng 5 nhuận; giỗ ông, bà — nhắc cả nhà về sớm để chuẩn bị cỗ cúng', am: { ngay: 1, thang: 5, nhuan: true } },
+  ]);
+  ok('tạo được tệp lịch', typeof ics === 'string' && ics.startsWith('BEGIN:VCALENDAR'));
+  if (ics) {
+    const dong = ics.split('\r\n');
+    ok('dòng kết thúc bằng CRLF như chuẩn RFC 5545', !/[^\r]\n/.test(ics) && ics.endsWith('\r\n'));
+    ok('không dòng nào quá 75 byte (tiếng Việt có dấu tính theo byte)',
+       dong.every(d => Buffer.byteLength(d, 'utf8') <= 75), Math.max(...dong.map(d => Buffer.byteLength(d, 'utf8'))) + ' byte');
+    ok('hai sự kiện, mỗi sự kiện một nhắc nhở', (ics.match(/BEGIN:VEVENT/g) || []).length === 2 && (ics.match(/BEGIN:VALARM/g) || []).length === 2);
+    ok('ngày trọn: DTSTART 20270206, DTEND hôm sau', ics.includes('DTSTART;VALUE=DATE:20270206') && ics.includes('DTEND;VALUE=DATE:20270207'));
+    ok('nhắc lúc 9 giờ sáng hôm trước', ics.includes('TRIGGER:-PT15H'));
+    const gop = ics.replace(/\r\n /g, '');
+    ok('dấu chấm phẩy và dấu phẩy trong tên được thoát, gập dòng không làm mất chữ',
+       gop.includes('SUMMARY:Mùng 1 tháng 5 nhuận\\; giỗ ông\\, bà — nhắc cả nhà về sớm để chuẩn bị cỗ cúng'));
+  }
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

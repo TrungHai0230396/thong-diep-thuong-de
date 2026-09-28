@@ -621,3 +621,64 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   border:1px solid rgba(255,255,255,.14);background:transparent;color:rgba(244,239,230,.55)}
 .xn-nguon{margin:4px auto 0;text-align:center;font-size:11px;line-height:1.6;color:rgba(244,239,230,.34)}
 .xn-truc-ten span,.xn-cc span{color:rgba(244,239,230,.5);font-size:12px}
+
+/* Xem ngày: bốn thẻ, lịch tháng, ngày lễ, đổi ngày, hướng xuất hành */
+.xn-the{display:flex;gap:4px;margin:0 auto 16px;padding:4px;border-radius:14px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:3;backdrop-filter:blur(8px)}
+.xn-the button{flex:1;padding:9px 4px;border-radius:10px;cursor:pointer;font-size:13px;border:0;background:transparent;
+  color:rgba(244,239,230,.62)}
+.xn-the button.dang{background:rgba(232,195,122,.16);color:#f0c48a}
+.xn-huong{margin:0 0 4px;font-size:13px;line-height:1.6;color:rgba(244,239,230,.78)}
+.xn-huong b{font-weight:500;color:#a8d8b0}
+.xn-huong.xn-tranh b{color:#e8a092}
+.xn-luoi{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:10px 0 8px}
+.xn-thu{text-align:center;font-size:11px;letter-spacing:.06em;color:rgba(244,239,230,.4);padding:2px 0 4px}
+.xn-o-ngay{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+  aspect-ratio:1/1.05;min-width:0;border-radius:10px;cursor:pointer;border:1px solid transparent;
+  background:rgba(255,255,255,.03);color:var(--ink);padding:0}
+.xn-o-ngay b{font-size:15px;font-weight:500;line-height:1.1}
+.xn-o-ngay i{font-style:normal;font-size:10px;color:rgba(244,239,230,.45)}
+.xn-o-ngay.hd{background:rgba(232,195,122,.09)}
+.xn-o-ngay.hd b{color:#f0c48a}
+.xn-o-ngay.hk b{color:rgba(244,239,230,.7)}
+.xn-o-ngay.ram i{color:#a8c8f0}
+.xn-o-ngay.le::after{content:'';position:absolute;top:4px;right:5px;width:5px;height:5px;border-radius:50%;background:#e8a092}
+.xn-o-ngay.nay{border-color:rgba(232,195,122,.7)}
+.xn-o-ngay:hover{background:rgba(255,255,255,.1)}
+.xn-chu-giai{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:4px 0 10px;font-size:11px;color:rgba(244,239,230,.5)}
+.xn-chu-giai span::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px;vertical-align:0}
+.xn-chu-giai .hd::before{background:rgba(232,195,122,.7)}
+.xn-chu-giai .hk::before{background:rgba(244,239,230,.25)}
+.xn-chu-giai .ram::before{background:#a8c8f0}
+.xn-chu-giai .le::before{background:#e8a092}
+.xn-le-thang p{margin:0 0 4px;font-size:12.5px;color:rgba(244,239,230,.7)}
+.xn-le-thang b{font-weight:500;color:#e8a092;margin-right:6px}
+.xn-loc{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.xn-loc button{padding:6px 12px;border-radius:999px;cursor:pointer;font-size:12.5px;border:1px solid rgba(255,255,255,.14);
+  background:transparent;color:rgba(244,239,230,.62)}
+.xn-loc button.dang{border-color:rgba(232,195,122,.6);background:rgba(232,195,122,.14);color:#f0c48a}
+.xn-mot-le{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.xn-mot-le-chu{flex:1;min-width:0}
+.xn-mot-le-ten{margin:0 0 2px;font-size:14px;color:rgba(244,239,230,.95)}
+.xn-mot-le.ram .xn-mot-le-ten{color:#a8c8f0}
+.xn-mot-le.duong .xn-mot-le-ten{color:rgba(244,239,230,.8)}
+.xn-mot-le-ngay{margin:0;font-size:11.5px;line-height:1.5;color:rgba(244,239,230,.45)}
+.xn-mot-le-con{flex:0 0 auto;font-size:11.5px;color:rgba(232,195,122,.8);white-space:nowrap}
+.xn-them{flex:0 0 auto;padding:6px 9px;border-radius:999px;cursor:pointer;font-size:11.5px;white-space:nowrap;
+  border:1px solid rgba(255,255,255,.14);background:transparent;color:rgba(244,239,230,.7)}
+.xn-them-het{display:flex;flex-direction:column;gap:8px;margin:14px 0 4px}
+.xn-them-het button,.xn-them-lap,.xn-xem{padding:10px 14px;border-radius:12px;cursor:pointer;font-size:13.5px;
+  border:1px solid rgba(232,195,122,.4);background:rgba(232,195,122,.1);color:#f0c48a}
+.xn-cach{margin-top:22px}
+.xn-chon-sinh input[type=number]{flex:1 1 0;min-width:0;padding:10px;border-radius:12px;font-size:16px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:var(--ink);color-scheme:dark}
+.xn-nhuan{display:none;margin:8px 0 0;font-size:13px;color:rgba(244,239,230,.75)}
+.xn-nhuan.co{display:block}
+.xn-doi-kq{margin:12px 0 0}
+.xn-doi-to{margin:0 0 4px;font-size:18px;color:#f0c48a}
+.xn-doi-phu{margin:0 0 10px;font-size:12.5px;line-height:1.6;color:rgba(244,239,230,.6)}
+.xn-lap p{margin:0 0 5px;font-size:13.5px;color:rgba(244,239,230,.9)}
+.xn-lap span{font-size:12px;color:rgba(244,239,230,.5)}
+.xn-ten-su{display:block;width:100%;margin:10px 0 8px;padding:10px 12px;border-radius:12px;font-size:16px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:var(--ink)}
+.xn-them-lap{width:100%}

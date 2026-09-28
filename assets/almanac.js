@@ -1,4 +1,6 @@
 /* Xem ngày — hôm nay tốt hay xấu, nên và không nên làm gì, và gợi ý ngày tốt cho một việc.
+   Bốn thẻ: Ngày (một ngày, tìm ngày tốt, tuổi), Tháng (lịch cả tháng), Ngày lễ (lễ, mùng 1 và rằm
+   sắp tới, thêm vào lịch điện thoại), Đổi ngày (âm ↔ dương, và ngày âm lặp lại hằng năm).
 
    Mọi phép tính nằm ở assets/lich.js, đã đối chiếu với lịch vạn niên công bố. File này chỉ
    dựng giao diện. Tuổi là tuỳ chọn, chỉ giữ trong máy; không hỏi tên vì lịch vạn niên không
@@ -13,6 +15,7 @@ const SO_NGAY_TIM = 60;
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 let tam, lech = 0, sinh = null, ngaySinh = null;
+let the = 'ngay', thangXem = null, locLe = 'le';
 
 try {
   const v = JSON.parse(localStorage.getItem(SINH_KEY) || 'null');
@@ -82,7 +85,11 @@ function veNgay() {
       <p class="xn-kieng"><b>Không nên</b> ${giang(r.truc.kieng)}</p>
     </div>
     <p class="xn-tieu">Giờ hoàng đạo</p>
-    <div class="xn-gio">${r.gio.map(g => `<span><b>${esc(g.chi)}</b> ${esc(g.khung)}</span>`).join('')}</div>`;
+    <div class="xn-gio">${r.gio.map(g => `<span><b>${esc(g.chi)}</b> ${esc(g.khung)}</span>`).join('')}</div>
+    <p class="xn-tieu">Hướng xuất hành</p>
+    <p class="xn-huong">Đón Hỷ thần ở hướng <b>${esc(r.huong.hy)}</b> · Tài thần ở hướng <b>${esc(r.huong.tai)}</b></p>
+    <p class="xn-huong xn-tranh">${r.huong.hac ? `Tránh hướng <b>${esc(r.huong.hac)}</b> vì gặp Hạc thần`
+      : 'Hôm nay Hạc thần "lên trời", không phải tránh hướng nào'}</p>`;
 
   tam.querySelector('.xn-lui').onclick = () => { lech--; veNgay(); };
   tam.querySelector('.xn-toi').onclick = () => { lech++; veNgay(); };
@@ -187,6 +194,237 @@ function veTuoi() {
   };
 }
 
+/* ---------- ngày đổi qua lại ---------- */
+
+const TEN_THANG_AM = (m) => L().TEN_THANG[m];
+const soNgay = (d) => L().jdFromDate(d.dd, d.mm, d.yy);
+const cachHomNay = (d) => soNgay(d) - soNgay(homNay(0));
+const conBaoLau = (n) => n === 0 ? 'hôm nay' : n === 1 ? 'ngày mai' : `còn ${n} ngày`;
+function xemNgayNay(d) { lech = cachHomNay(d); doiThe('ngay'); veNgay(); tam.querySelector('.xn-trong').scrollTop = 0; }
+
+/* ---------- thẻ Tháng: lịch cả tháng ---------- */
+
+function veThang() {
+  const o = tam.querySelector('.xn-thang');
+  const nay = homNay(0);
+  if (!thangXem) thangXem = { mm: nay.mm, yy: nay.yy };
+  const { mm, yy } = thangXem;
+  const soNgayThang = new Date(yy, mm, 0).getDate();
+  const thuDau = (new Date(yy, mm - 1, 1).getDay() + 6) % 7;          // tuần bắt đầu từ thứ hai
+  const le = {};
+  for (const e of L().leSapToi({ dd: 1, mm, yy }, soNgayThang)) if (e.loai !== 'ram') (le[e.dd] = le[e.dd] || []).push(e.ten);
+  const o1 = L().xemNgay(1, mm, yy), oN = L().xemNgay(soNgayThang, mm, yy);
+  const amThang = o1.am.thang === oN.am.thang ? `tháng ${TEN_THANG_AM(o1.am.thang)} âm lịch`
+    : `tháng ${TEN_THANG_AM(o1.am.thang)}${o1.am.nhuan ? ' nhuận' : ''} – ${TEN_THANG_AM(oN.am.thang)}${oN.am.nhuan ? ' nhuận' : ''} âm lịch`;
+  let o2 = '';
+  for (let i = 0; i < thuDau; i++) o2 += '<span class="xn-o-trong"></span>';
+  for (let d = 1; d <= soNgayThang; d++) {
+    const r = L().xemNgay(d, mm, yy);
+    const am = r.am.ngay === 1 ? `${r.am.ngay}/${r.am.thang}${r.am.nhuan ? 'n' : ''}` : r.am.ngay;
+    const lop = [r.hoangDao ? 'hd' : 'hk', (r.am.ngay === 1 || r.am.ngay === 15) ? 'ram' : '',
+                 le[d] ? 'le' : '', d === nay.dd && mm === nay.mm && yy === nay.yy ? 'nay' : ''].join(' ');
+    o2 += `<button class="xn-o-ngay ${lop}" data-d="${d}" type="button"
+      aria-label="${d}/${mm}: ${r.hoangDao ? 'hoàng đạo' : 'hắc đạo'}, ${r.am.ngay}/${r.am.thang} âm lịch${le[d] ? ', ' + esc(le[d].join(', ')) : ''}">
+      <b>${d}</b><i>${am}</i></button>`;
+  }
+  o.innerHTML = `
+    <div class="xn-dieu">
+      <button class="xn-lui" type="button" aria-label="Tháng trước">‹</button>
+      <p class="xn-nhan">Tháng ${mm}/${yy}</p>
+      <button class="xn-toi" type="button" aria-label="Tháng sau">›</button>
+    </div>
+    <p class="xn-duong">${amThang} · năm ${esc(o1.canChi.nam)}</p>
+    <div class="xn-luoi">
+      ${['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].map(t => `<span class="xn-thu">${t}</span>`).join('')}
+      ${o2}
+    </div>
+    <p class="xn-chu-giai"><span class="hd">hoàng đạo</span><span class="hk">hắc đạo</span>
+      <span class="ram">mùng 1, rằm</span><span class="le">ngày lễ</span></p>
+    ${Object.keys(le).length ? `<div class="xn-le-thang">${Object.entries(le).map(([d, ts]) =>
+      `<p><b>${d}/${mm}</b> ${ts.map(esc).join(', ')}</p>`).join('')}</div>` : ''}
+    <p class="xn-ghi">Bấm vào một ngày để xem chi tiết.</p>`;
+  o.querySelector('.xn-lui').onclick = () => { thangXem = mm === 1 ? { mm: 12, yy: yy - 1 } : { mm: mm - 1, yy }; veThang(); };
+  o.querySelector('.xn-toi').onclick = () => { thangXem = mm === 12 ? { mm: 1, yy: yy + 1 } : { mm: mm + 1, yy }; veThang(); };
+  o.querySelectorAll('.xn-o-ngay').forEach(b => { b.onclick = () => xemNgayNay({ dd: +b.dataset.d, mm, yy }); });
+}
+
+/* ---------- thẻ Ngày lễ, và thêm vào lịch điện thoại ---------- */
+
+/* Tệp .ics theo RFC 5545: mỗi sự kiện là một ngày trọn (không giờ), nhắc lúc 9 giờ sáng hôm trước
+   (TRIGGER -PT15H tính từ 0 giờ của ngày đó). Dòng dài quá 75 byte phải gập, mà tiếng Việt thì
+   một chữ có dấu chiếm hai ba byte, nên đếm theo byte chứ không đếm theo chữ. */
+const escIcs = (t) => String(t).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+function gap(dong) {
+  const ma = new TextEncoder();
+  let ra = '', hang = '', dai = 0;
+  for (const c of dong) {
+    const n = ma.encode(c).length;
+    if (dai + n > 75) { ra += hang + '\r\n '; hang = ''; dai = 1; }
+    hang += c; dai += n;
+  }
+  return ra + hang;
+}
+function bamChu(t) { let h = 5381; for (const c of t) h = (h * 33 + c.codePointAt(0)) >>> 0; return h.toString(36); }
+function taoIcs(ds) {
+  const z = (n) => String(n).padStart(2, '0');
+  const ngay = (e) => `${e.yy}${z(e.mm)}${z(e.dd)}`;
+  const sau = (e) => { const t = new Date(e.yy, e.mm - 1, e.dd + 1); return `${t.getFullYear()}${z(t.getMonth() + 1)}${z(t.getDate())}`; };
+  const dau = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d+/, '');
+  const d = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Thong Diep Cua Thuong De//Xem ngay//VI', 'CALSCALE:GREGORIAN'];
+  for (const e of ds) {
+    const am = `Ngày ${e.am.ngay}/${e.am.thang}${e.am.nhuan ? ' nhuận' : ''} âm lịch`;
+    d.push('BEGIN:VEVENT', `UID:${ngay(e)}-${bamChu(e.ten)}@thong-diep-thuong-de`, `DTSTAMP:${dau}`,
+      `DTSTART;VALUE=DATE:${ngay(e)}`, `DTEND;VALUE=DATE:${sau(e)}`, `SUMMARY:${escIcs(e.ten)}`,
+      `DESCRIPTION:${escIcs(am)}`, 'TRANSP:TRANSPARENT',
+      'BEGIN:VALARM', 'ACTION:DISPLAY', `DESCRIPTION:${escIcs(e.ten)}`, 'TRIGGER:-PT15H', 'END:VALARM',
+      'END:VEVENT');
+  }
+  d.push('END:VCALENDAR');
+  return d.map(gap).join('\r\n') + '\r\n';
+}
+
+/* Mở tệp lịch cho máy thêm vào ứng dụng Lịch. iPhone mở app từ màn hình chính thì tải tệp là mở
+   một trang không có đường quay lại, nên ở đó đưa qua bảng chia sẻ. */
+async function moLich(ds, ten) {
+  if (!ds.length) return;
+  const blob = new Blob([taoIcs(ds)], { type: 'text/calendar;charset=utf-8' });
+  const tep = new File([blob], ten, { type: 'text/calendar' });
+  if (navigator.standalone && navigator.canShare && navigator.canShare({ files: [tep] })) {
+    try { await navigator.share({ files: [tep] }); } catch (e) {}
+    return;
+  }
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = ten;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+
+function veLe() {
+  const o = tam.querySelector('.xn-le');
+  const tat = L().leSapToi(homNay(0), 366);
+  /* "Mùng 1 và rằm" phải đủ cả những ngày trùng lễ (rằm tháng Giêng, Vu lan, mùng 1 Tết...): người
+     cúng mùng 1, rằm cần đủ các ngày đó. Bản đầu chỉ lấy mục loại 'ram' nên rơi mất sáu ngày. */
+  const le = tat.filter(e => e.loai !== 'ram');
+  const ram = tat.filter(e => e.loai !== 'duong' && (e.am.ngay === 1 || e.am.ngay === 15));
+  const ds = locLe === 'ram' ? ram : locLe === 'tat' ? tat : le;
+  o.innerHTML = `
+    <div class="xn-loc">
+      ${[['le', 'Ngày lễ'], ['ram', 'Mùng 1 và rằm'], ['tat', 'Tất cả']].map(([k, t]) =>
+        `<button type="button" data-loc="${k}" class="${k === locLe ? 'dang' : ''}">${t}</button>`).join('')}
+    </div>
+    <div class="xn-ds-le">${ds.slice(0, 40).map((e, i) => `
+      <div class="xn-mot-le ${e.loai}">
+        <div class="xn-mot-le-chu">
+          <p class="xn-mot-le-ten">${esc(e.ten)}</p>
+          <p class="xn-mot-le-ngay">${THU[new Date(e.yy, e.mm - 1, e.dd).getDay()]}, ${e.dd}/${e.mm}/${e.yy}
+            · ${e.am.ngay}/${e.am.thang}${e.am.nhuan ? ' nhuận' : ''} âm lịch</p>
+        </div>
+        <span class="xn-mot-le-con">${conBaoLau(e.cach)}</span>
+        <button class="xn-them" type="button" data-i="${i}" aria-label="Thêm ${esc(e.ten)} vào lịch điện thoại">＋ Lịch</button>
+      </div>`).join('')}</div>
+    <div class="xn-them-het">
+      <button type="button" data-het="le">Thêm các ngày lễ 12 tháng tới vào lịch</button>
+      <button type="button" data-het="ram">Thêm mùng 1 và rằm 12 tháng tới vào lịch</button>
+    </div>
+    <p class="xn-ghi">Lịch điện thoại sẽ nhắc lúc 9 giờ sáng hôm trước. App không gửi gì đi đâu: tệp lịch được
+      tạo ngay trên máy rồi mở bằng ứng dụng Lịch của bạn.</p>`;
+  o.querySelectorAll('[data-loc]').forEach(b => { b.onclick = () => { locLe = b.dataset.loc; veLe(); }; });
+  o.querySelectorAll('.xn-them').forEach(b => { b.onclick = () => { const e = ds[+b.dataset.i]; moLich([e], `${e.yy}-${e.mm}-${e.dd}.ics`); }; });
+  o.querySelectorAll('[data-het]').forEach(b => {
+    b.onclick = () => b.dataset.het === 'le' ? moLich(le, 'ngay-le-12-thang.ics') : moLich(ram, 'mung-1-va-ram-12-thang.ics');
+  });
+}
+
+/* ---------- thẻ Đổi ngày ---------- */
+
+function veDoi() {
+  const o = tam.querySelector('.xn-doi');
+  const nay = homNay(0), amNay = L().xemNgay(nay.dd, nay.mm, nay.yy).am;
+  const chon = (lop, nhan, ds, chonSan, ten = (x) => x) => `<select class="${lop}" aria-label="${nhan}">
+      ${ds.map(n => `<option value="${n}"${n === chonSan ? ' selected' : ''}>${ten(n)}</option>`).join('')}</select>`;
+  const dem = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+  o.innerHTML = `
+    <p class="xn-hoi-nhan">Dương lịch sang âm lịch</p>
+    <div class="xn-chon-sinh">
+      ${chon('xn-d-ngay', 'Ngày dương', dem(1, 31), nay.dd)}
+      ${chon('xn-d-thang', 'Tháng dương', dem(1, 12), nay.mm, m => `tháng ${m}`)}
+      <input class="xn-d-nam" type="number" inputmode="numeric" min="1900" max="2199" value="${nay.yy}" aria-label="Năm dương">
+    </div>
+    <div class="xn-doi-kq xn-kq-duong"></div>
+
+    <p class="xn-hoi-nhan xn-cach">Âm lịch sang dương lịch</p>
+    <div class="xn-chon-sinh">
+      ${chon('xn-a-ngay', 'Ngày âm', dem(1, 30), amNay.ngay)}
+      ${chon('xn-a-thang', 'Tháng âm', dem(1, 12), amNay.thang, m => `tháng ${TEN_THANG_AM(m)}`)}
+      <input class="xn-a-nam" type="number" inputmode="numeric" min="1900" max="2199" value="${amNay.nam}" aria-label="Năm âm">
+    </div>
+    <label class="xn-nhuan"><input class="xn-a-nhuan" type="checkbox"> tháng nhuận</label>
+    <div class="xn-doi-kq xn-kq-am"></div>`;
+
+  const q = (s2) => o.querySelector(s2);
+  const tinhDuong = () => {
+    const dd = +q('.xn-d-ngay').value, mm = +q('.xn-d-thang').value, yy = +q('.xn-d-nam').value;
+    const kq = q('.xn-kq-duong');
+    if (!(yy >= 1900 && yy <= 2199)) { kq.innerHTML = '<p class="xn-rong">Năm phải từ 1900 tới 2199.</p>'; return; }
+    if (new Date(yy, mm - 1, dd).getDate() !== dd) { kq.innerHTML = `<p class="xn-rong">Tháng ${mm}/${yy} không có ngày ${dd}.</p>`; return; }
+    const r = L().xemNgay(dd, mm, yy);
+    kq.innerHTML = `<p class="xn-doi-to">${r.am.ngay}/${r.am.thang}${r.am.nhuan ? ' nhuận' : ''}/${r.am.nam} âm lịch</p>
+      <p class="xn-doi-phu">Ngày ${esc(r.canChi.ngay)} · tháng ${esc(r.canChi.thang)} · năm ${esc(r.canChi.nam)} · ${r.hoangDao ? 'hoàng đạo' : 'hắc đạo'}</p>
+      <button class="xn-xem" type="button">Xem ngày này</button>`;
+    kq.querySelector('.xn-xem').onclick = () => xemNgayNay({ dd, mm, yy });
+  };
+  const tinhAm = () => {
+    const d = +q('.xn-a-ngay').value, m = +q('.xn-a-thang').value, y = +q('.xn-a-nam').value;
+    const nhuan = q('.xn-a-nhuan').checked;
+    const kq = q('.xn-kq-am');
+    if (!(y >= 1900 && y <= 2199)) { kq.innerHTML = '<p class="xn-rong">Năm phải từ 1900 tới 2199.</p>'; return; }
+    const tn = L().thangNhuan(y);
+    q('.xn-nhuan').classList.toggle('co', tn === m);
+    if (nhuan && tn !== m) {
+      kq.innerHTML = `<p class="xn-rong">Năm ${y} ${tn ? `chỉ nhuận tháng ${TEN_THANG_AM(tn)}` : 'không có tháng nhuận'}, không có tháng ${TEN_THANG_AM(m)} nhuận.</p>`;
+      return;
+    }
+    const r = L().amSangDuong(d, m, y, nhuan);
+    if (!r) {
+      kq.innerHTML = `<p class="xn-rong">Tháng ${TEN_THANG_AM(m)}${nhuan ? ' nhuận' : ''} năm ${y} chỉ có 29 ngày, không có ngày 30.</p>`;
+      return;
+    }
+    const namAmNay = amNay.nam;
+    const lap = L().amHangNam(d, m, namAmNay, 3);
+    kq.innerHTML = `<p class="xn-doi-to">${THU[new Date(r.yy, r.mm - 1, r.dd).getDay()]}, ${r.dd}/${r.mm}/${r.yy}</p>
+      <button class="xn-xem" type="button">Xem ngày này</button>
+      ${nhuan ? '' : `<p class="xn-tieu">Nếu đây là ngày giỗ hay sinh nhật âm lịch</p>
+      <div class="xn-lap">${lap.map(x => `<p><b>${x.dd}/${x.mm}/${x.yy}</b> <span>năm âm ${x.namAm}${
+        x.lui ? ` — tháng này thiếu, lấy ngày 29` : ''} · ${conBaoLau(cachHomNay(x))}</span></p>`).join('')}</div>
+      <input class="xn-ten-su" type="text" placeholder="Tên, ví dụ: Giỗ ông nội" autocomplete="off" aria-label="Tên sự kiện">
+      <button class="xn-them-lap" type="button">Thêm ${lap.length} năm này vào lịch điện thoại</button>`}`;
+    kq.querySelector('.xn-xem').onclick = () => xemNgayNay(r);
+    const nut = kq.querySelector('.xn-them-lap');
+    if (nut) nut.onclick = () => {
+      const ten = (kq.querySelector('.xn-ten-su').value || '').trim() || `Ngày ${d}/${m} âm lịch`;
+      moLich(lap.filter(x => cachHomNay(x) >= 0).map(x => ({ ...x, ten, am: { ngay: x.lui ? 29 : d, thang: m, nhuan: false } })),
+             'ngay-am-hang-nam.ics');
+    };
+  };
+  ['.xn-d-ngay', '.xn-d-thang', '.xn-d-nam'].forEach(k => { q(k).oninput = tinhDuong; q(k).onchange = tinhDuong; });
+  ['.xn-a-ngay', '.xn-a-thang', '.xn-a-nam', '.xn-a-nhuan'].forEach(k => { q(k).oninput = tinhAm; q(k).onchange = tinhAm; });
+  tinhDuong(); tinhAm();
+}
+
+/* ---------- các thẻ ---------- */
+
+function doiThe(ten) {
+  the = ten;
+  tam.querySelectorAll('.xn-the button').forEach(b => {
+    const dang = b.dataset.the === ten;
+    b.classList.toggle('dang', dang); b.setAttribute('aria-selected', dang ? 'true' : 'false');
+  });
+  tam.querySelectorAll('[data-nhom]').forEach(s2 => { s2.hidden = s2.dataset.nhom !== ten; });
+  if (ten === 'thang') veThang();
+  if (ten === 'le') veLe();
+  if (ten === 'doi') veDoi();
+}
+
 /* ---------- khung ---------- */
 
 function dungKhung() {
@@ -197,8 +435,15 @@ function dungKhung() {
     <button class="xn-dong" type="button" aria-label="Đóng">✕</button>
     <div class="xn-trong">
       <p class="xn-tieude">Xem ngày</p>
-      <section class="xn-ngay"></section>
-      <section class="xn-khoi">
+      <div class="xn-the" role="tablist">
+        ${[['ngay', 'Ngày'], ['thang', 'Tháng'], ['le', 'Ngày lễ'], ['doi', 'Đổi ngày']].map(([k, t]) =>
+          `<button type="button" role="tab" data-the="${k}">${t}</button>`).join('')}
+      </div>
+      <section class="xn-ngay" data-nhom="ngay"></section>
+      <section class="xn-khoi xn-thang" data-nhom="thang" hidden></section>
+      <section class="xn-khoi xn-le" data-nhom="le" hidden></section>
+      <section class="xn-khoi xn-doi" data-nhom="doi" hidden></section>
+      <section class="xn-khoi" data-nhom="ngay">
         <p class="xn-hoi-nhan">Bạn muốn làm gì?</p>
         <div class="xn-o">
           <input class="xn-hoi" type="text" placeholder="ví dụ: khai trương quán, chuyển nhà…" autocomplete="off">
@@ -207,12 +452,14 @@ function dungKhung() {
         <div class="xn-viec"></div>
         <div class="xn-kq"></div>
       </section>
-      <section class="xn-khoi xn-tuoi"></section>
+      <section class="xn-khoi xn-tuoi" data-nhom="ngay"></section>
       <p class="xn-nguon">Theo lịch vạn niên dân gian, để tham khảo. Âm lịch theo thuật toán Hồ Ngọc Đức;
-        danh sách nên và không nên của từng trực theo lichvannien365.com.</p>
+        danh sách nên và không nên của từng trực theo lichvannien365.com; hướng xuất hành theo số đông
+        của bốn nguồn đối chiếu; ngày lễ âm lịch theo Wikipedia tiếng Việt.</p>
     </div>`;
   document.body.appendChild(tam);
   tam.querySelector('.xn-dong').onclick = dong;
+  tam.querySelectorAll('.xn-the button').forEach(b => { b.onclick = () => doiThe(b.dataset.the); });
   tam.querySelector('.xn-tim').onclick = tim;
   tam.querySelector('.xn-hoi').addEventListener('keydown', e => { if (e.key === 'Enter') tim(); });
 }
@@ -221,9 +468,10 @@ function mo() {
   dungKhung();
   document.body.classList.add('khoa-cuon');
   tam.classList.add('hien');
-  lech = 0;
+  lech = 0; thangXem = null;
   capNhatTuoi();
   veNgay(); veChonViec(); veTuoi();
+  doiThe('ngay');
   tam.querySelector('.xn-trong').scrollTop = 0;
 }
 
@@ -239,6 +487,9 @@ addEventListener('keydown', e => {
 self.TDTD_XEMNGAY = { mo, dong,
   _lech: (n) => { lech = n; veNgay(); return lech; },
   _hoi: (cau) => { tam.querySelector('.xn-hoi').value = cau; tim(); return tam.querySelector('.xn-kq').textContent; },
+  _the: (t) => { doiThe(t); return the; },
+  _thang: (mm, yy) => { thangXem = { mm, yy }; doiThe('thang'); return tam.querySelector('.xn-thang').textContent; },
+  _ics: (ds) => taoIcs(ds),
   _sinh: (dd, mm, yy) => { ngaySinh = dd ? { dd, mm, yy } : null; capNhatTuoi(); veTuoi(); veNgay(); return sinh; },
 };
 })();
