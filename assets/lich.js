@@ -174,6 +174,28 @@ function kinhDoTrua(N) { return kinhDoTroi(N + 0.5, TZ); }
 const chiThangTiet = (N) => (2 + INT((((kinhDoTrua(N) - 315) % 360) + 360) % 360 / 30)) % 12;
 const tenTiet = (N) => TIET[INT(kinhDoTrua(N) / 15) % 24];
 
+/* Tiết khí ghi cho một ngày. Các trang lịch ghi tên tiết mới NGAY từ ngày nó bắt đầu, bất kể giờ
+   ("Tiểu hàn, từ ngày 5/1"); bản trước lấy theo giữa trưa nên tiết bắt đầu buổi chiều tối thì app
+   còn ghi tiết cũ, so với lịch khác lệch mất một ngày. Giờ: có tiết bắt đầu trong ngày thì ghi tên
+   tiết mới kèm giờ bắt đầu, tìm bằng cách chia đôi khoảng thời gian cho tới khi còn dưới một phút.
+   Trực KHÔNG đổi theo — trực vẫn xét giữa trưa (xem chiThangTiet), vì cách đó khớp các trang. */
+function tietTrongNgay(N) {
+  /* kinhDoTroi là kinh độ HÌNH HỌC, đúng như thuật toán âm lịch cần và không được đụng vào. Mốc
+     tiết khí thì các trang tính theo kinh độ BIỂU KIẾN, nên trừ thêm quang sai và chương động
+     (Meeus, chương 25): đo trên hai mốc đã biết, sai số từ 12 phút còn chừng 5 phút. */
+  const bieuKien = (t) => {
+    const T = (t - 2451545.5 - TZ / 24) / 36525, om = (125.04 - 1934.136 * T) * PI / 180;
+    return kinhDoTroi(t, TZ) - 0.00569 - 0.00478 * Math.sin(om);
+  };
+  const cung = (t) => INT((((bieuKien(t) % 360) + 360) % 360) / 15);   // t là ngày Julius địa phương, N là 0 giờ
+  const dau = cung(N), cuoi = cung(N + 1);
+  if (dau === cuoi) return { ten: TIET[dau % 24], gio: null };
+  let a = N, b = N + 1;
+  while ((b - a) * 1440 > .5) { const g = (a + b) / 2; if (cung(g) === dau) a = g; else b = g; }
+  const phut = Math.round((b - N) * 1440);
+  return { ten: TIET[cuoi % 24], gio: `${String(INT(phut / 60)).padStart(2, '0')}:${String(phut % 60).padStart(2, '0')}` };
+}
+
 /* ---------- mười hai thần: ngày hoàng đạo, hắc đạo ---------- */
 
 const THAN = [
@@ -214,7 +236,7 @@ const TRUC = [
   { ten: 'Phá',   nen: ['dỡ nhà', 'phá vách', 'ra đi'], kieng: ['mở cửa hàng', 'may mặc', 'sửa kho', 'hội họp'] },
   { ten: 'Nguy',  nen: ['cúng lễ', 'may mặc', 'từ tụng'], kieng: ['hội họp', 'châm chích', 'giá thú', 'làm chuồng lục súc', 'khai trương'] },
   { ten: 'Thành', nen: ['nhập học', 'giá thú', 'may mặc', 'thượng lương'], kieng: ['kiện tụng', 'mai táng', 'châm chích', 'di cư'] },
-  { ten: 'Thu',   nen: ['khai trương', 'lập kho vựa', 'giao dịch', 'may mặc'], kieng: ['an táng', 'giá thú', 'nhậm chức', 'xuất nhập tài vật'] },
+  { ten: 'Thu',   khac: 'Thâu', nen: ['khai trương', 'lập kho vựa', 'giao dịch', 'may mặc'], kieng: ['an táng', 'giá thú', 'nhậm chức', 'xuất nhập tài vật'] },
   { ten: 'Khai',  nen: ['làm nhà', 'động thổ', 'làm chuồng gia súc', 'giá thú', 'đào giếng'], kieng: ['giao dịch', 'châm chích', 'trồng tỉa'] },
   { ten: 'Bế',    nen: ['làm cửa', 'thượng lương', 'giá thú', 'trị bệnh'], kieng: ['nhậm chức', 'châm chích', 'đào giếng', 'kiện thưa'] },
 ];
@@ -320,7 +342,8 @@ function xemNgay(dd, mm, yy, sinh) {
     chiNgay: ngay.chi,
     than: th, hoangDao: th.tot,
     truc: tr,
-    tiet: tenTiet(N),
+    tiet: tietTrongNgay(N).ten,
+    tietGio: tietTrongNgay(N).gio,                        // giờ tiết bắt đầu, nếu bắt đầu trong ngày này
     gio,
     tamNuong: TAM_NUONG.includes(ad),
     nguyetKy: NGUYET_KY.includes(ad),
@@ -366,7 +389,7 @@ const API = {
   jdFromDate, jdToDate, convertSolar2Lunar, convertLunar2Solar, getNewMoonDay,
   canChiNam, canChiThang, canChiNgay, tenCC, chiThangTiet, tenTiet, kinhDoTrua,
   thanNgay, thanGio, xemNgay, cham, timNgay, nhanViec, tuoi, xung,
-  CAN, CHI, CON, THAN, TRUC, TIET, VIEC, GIANG, TAM_NUONG, NGUYET_KY, KHUNG_GIO, TZ,
+  CAN, CHI, CON, THAN, TRUC, TIET, VIEC, GIANG, TAM_NUONG, NGUYET_KY, KHUNG_GIO, TZ, tietTrongNgay,
 };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = API;

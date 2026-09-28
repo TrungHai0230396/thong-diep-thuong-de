@@ -26,6 +26,14 @@ function homNay(them = 0) {
   return { dd: t.getDate(), mm: t.getMonth() + 1, yy: t.getFullYear() };
 }
 
+/* Giờ bắt đầu tiết tính ra còn sai chừng 5 phút so với các trang lịch, nên làm tròn tới 10 phút
+   và nói "khoảng", không ghi tới từng phút cho có vẻ chính xác. */
+function gioTron(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number), p = Math.round((h * 60 + m) / 10) * 10;
+  const gh = Math.floor(p / 60) % 24, gm = p % 60;
+  return gm ? `${gh} giờ ${gm}` : `${gh} giờ`;
+}
+
 const chuDuong = (r) => `${THU[r.duong.thu]}, ${r.duong.dd}/${r.duong.mm}/${r.duong.yy}`;
 const chuAm = (r) => `${r.am.ngay}/${r.am.thang}${r.am.nhuan ? ' nhuận' : ''} âm lịch`;
 
@@ -61,14 +69,15 @@ function veNgay() {
       <button class="xn-toi" type="button" aria-label="Ngày sau">›</button>
     </div>
     <p class="xn-duong">${chuDuong(r)} · ${chuAm(r)}</p>
-    <p class="xn-cc">Ngày ${esc(r.canChi.ngay)} · tháng ${esc(r.canChi.thang)} · năm ${esc(r.canChi.nam)} · tiết ${esc(r.tiet)}</p>
+    <p class="xn-cc">Ngày ${esc(r.canChi.ngay)} · tháng ${esc(r.canChi.thang)} · năm ${esc(r.canChi.nam)} · tiết ${esc(r.tiet)}${
+      r.tietGio ? ` <span>(bắt đầu hôm nay, khoảng ${gioTron(r.tietGio)})</span>` : ''}</p>
     <div class="xn-phan ${r.hoangDao ? 'tot' : 'xau'}">
       <p class="xn-loai">${r.hoangDao ? 'Ngày hoàng đạo' : 'Ngày hắc đạo'}</p>
       <p class="xn-than">${esc(r.than.ten)}${r.than.khac ? ` <span>(còn gọi ${esc(r.than.khac)})</span>` : ''} — ${esc(r.than.y)}</p>
     </div>
     ${canh.map(c => `<p class="xn-canh">${c}</p>`).join('')}
     <div class="xn-truc">
-      <p class="xn-truc-ten">Trực ${esc(r.truc.ten)}</p>
+      <p class="xn-truc-ten">Trực ${esc(r.truc.ten)}${r.truc.khac ? ` <span>(còn gọi ${esc(r.truc.khac)})</span>` : ''}</p>
       <p class="xn-nen"><b>Nên</b> ${giang(r.truc.nen)}</p>
       <p class="xn-kieng"><b>Không nên</b> ${giang(r.truc.kieng)}</p>
     </div>

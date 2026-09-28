@@ -620,3 +620,4 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .xn-xoa{padding:6px 12px;border-radius:999px;cursor:pointer;font-size:12px;
   border:1px solid rgba(255,255,255,.14);background:transparent;color:rgba(244,239,230,.55)}
 .xn-nguon{margin:4px auto 0;text-align:center;font-size:11px;line-height:1.6;color:rgba(244,239,230,.34)}
+.xn-truc-ten span,.xn-cc span{color:rgba(244,239,230,.5);font-size:12px}

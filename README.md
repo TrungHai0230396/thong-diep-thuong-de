@@ -661,6 +661,14 @@ Một ngôi sao màu son đỏ, `#xem-ngay`. Ba phần trên một màn hình:
 - mùng một Tết 2024, 2025, 2026
 - 3.650 ngày từ 2000 tới 2029 đổi dương sang âm rồi âm về dương vẫn đúng
 
+**Rà lại lần hai (28/9/2026), 30 ngày rải từ 2026 tới 2028** so với xemlicham.com: âm lịch, can chi, giờ hoàng đạo, Tam nương, Nguyệt kỵ khớp hết, kể cả Tết 2027 và **tháng 5 nhuận năm 2028** (23/6 là mùng 1 tháng 5 nhuận, 22/7 là mùng 1 tháng 6). Có ba chỗ lệch, đều đã xử lý:
+
+- **Trực những ngày 1–4/1.** xemlicham tính sang tháng Sửu ngay từ 1/1 mỗi năm, sớm hơn Tiểu hàn vài ngày, nên lệch trực ở 1/1/2027, 3/1/2026, 3/1/2028. Đem sang lichvannien365.com thì nó khớp app ở cả bốn ngày, và trực lặp đúng ở 5–6/1/2026 như luật trực lặp khi giao tiết. Lấy theo lichvannien365; mười ngày đầu tháng 1 nằm trong bài kiểm.
+- **Tên tiết ngày giao tiết.** Các trang ghi tên tiết mới ngay từ ngày nó bắt đầu ("Tiểu hàn, từ ngày 5/1"); app trước xét giữa trưa nên tiết bắt đầu buổi chiều tối thì còn ghi tiết cũ. Giờ ngày có tiết bắt đầu thì ghi tiết mới kèm **"bắt đầu hôm nay, khoảng 13 giờ 30"**. Giờ tính bằng kinh độ biểu kiến (thêm quang sai và chương động — `kinhDoTroi` của thuật toán âm lịch là kinh độ hình học và không được đụng vào), lệch với nguồn 1 và 6 phút ở hai mốc đã biết, nên làm tròn 10 phút và nói "khoảng". Trực vẫn xét giữa trưa như cũ.
+- **Trực "Thu"** các trang hay viết "Thâu" — cùng một trực, giờ ghi "Trực Thu (còn gọi Thâu)".
+
+`scripts/test-lich.js` lên 73 bài: thêm 12 ngày đối chiếu, mười ngày đầu tháng 1, tháng nhuận 2028, tên và giờ bắt đầu tiết.
+
 **Một lỗi tự bắt được ở phần nhận việc.** Bản đầu dò theo chuỗi con, nên *"tổ chức sự kiện"* ra kiện tụng, *"đi khám phá hang động"* ra khám bệnh, *"thiết kế lại phòng"* ra thi cử (vì "thiết" chứa "thi"), *"đăng ký tài khoản"* ra ký hợp đồng. Giờ dò theo **chữ trọn vẹn**, và gỡ mấy từ ghép hay gây nhầm ra trước khi dò. Chỗ ứng việc hiện đại ("khai trương quán") với chữ cổ trong sách ("mở tiệm", "giá thú") là phần biên soạn của app, không phải của nguồn.
 
 Chưa thử được tháng nhuận — không ngày mẫu nào rơi vào tháng nhuận. Thần của tháng nhuận đang dùng số của tháng nó lặp lại.
@@ -1045,7 +1053,7 @@ scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
 scripts/mau-am.js          tạo giọng mẫu bằng lệnh `say` của macOS, trộn tiếng ồn
-scripts/test-lich.js       40 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
+scripts/test-lich.js       73 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1065,7 +1073,7 @@ node scripts/test-astro.js       # chạy 50 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 51 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
-node scripts/test-lich.js        # chạy 40 kiểm thử lịch vạn niên
+node scripts/test-lich.js        # chạy 73 kiểm thử lịch vạn niên
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

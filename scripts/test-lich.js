@@ -62,6 +62,69 @@ console.log('\n— Trực lặp hai ngày khi giao tiết —');
      x.join(',') === 'Mãn,Bình,Định', x.join(', '));
 }
 
+console.log('\n— Mười hai ngày nữa, từ 9/2026 tới 2028, đối chiếu với xemlicham.com —');
+/* Rà lại ngày 28/9/2026: khớp âm lịch, can chi ngày và tháng, tiết, trực, sáu giờ hoàng đạo.
+   Trực "Thu" các trang hay viết "Thâu" — cùng một trực. */
+const MAU2 = [
+  ['28/9/2026', '18/8/2026', 'Ất Tỵ', 'Đinh Dậu', 'Thu phân', 'Thành', 'Sửu Thìn Ngọ Mùi Tuất Hợi'],
+  ['1/10/2026', '21/8/2026', 'Mậu Thân', 'Đinh Dậu', 'Thu phân', 'Bế', 'Tý Sửu Thìn Tỵ Mùi Tuất'],
+  ['15/10/2026', '6/9/2026', 'Nhâm Tuất', 'Mậu Tuất', 'Hàn lộ', 'Kiến', 'Dần Thìn Tỵ Thân Dậu Hợi'],
+  ['8/11/2026', '30/9/2026', 'Bính Tuất', 'Mậu Tuất', 'Lập đông', 'Bế', 'Dần Thìn Tỵ Thân Dậu Hợi'],
+  ['25/12/2026', '17/11/2026', 'Quý Dậu', 'Canh Tý', 'Đông chí', 'Thu', 'Tý Dần Mão Ngọ Mùi Dậu'],
+  ['6/2/2027', '1/1/2027', 'Bính Thìn', 'Nhâm Dần', 'Lập xuân', 'Mãn', 'Dần Thìn Tỵ Thân Dậu Hợi'],
+  ['15/2/2027', '10/1/2027', 'Ất Sửu', 'Nhâm Dần', 'Lập xuân', 'Bế', 'Dần Mão Tỵ Thân Tuất Hợi'],
+  ['13/3/2027', '6/2/2027', 'Tân Mão', 'Quý Mão', 'Kinh trập', 'Kiến', 'Tý Dần Mão Ngọ Mùi Dậu'],
+  ['3/7/2027', '29/5/2027', 'Quý Mùi', 'Bính Ngọ', 'Hạ chí', 'Trừ', 'Dần Mão Tỵ Thân Tuất Hợi'],
+  ['20/6/2028', '28/5/2028', 'Bính Tý', 'Mậu Ngọ', 'Mang chủng', 'Phá', 'Tý Sửu Mão Ngọ Thân Dậu'],
+  ['25/7/2028', '4/6/2028', 'Tân Hợi', 'Kỷ Mùi', 'Đại thử', 'Định', 'Sửu Thìn Ngọ Mùi Tuất Hợi'],
+  ['21/10/2028', '4/9/2028', 'Kỷ Mão', 'Nhâm Tuất', 'Hàn lộ', 'Chấp', 'Tý Dần Mão Ngọ Mùi Dậu'],
+];
+for (const [ngay, am, ccN, ccT, tiet, truc, gio] of MAU2) {
+  const [d, m, y] = ngay.split('/').map(Number), r = L.xemNgay(d, m, y);
+  const sai = [];
+  if (`${r.am.ngay}/${r.am.thang}/${r.am.nam}` !== am) sai.push(`âm ${r.am.ngay}/${r.am.thang}/${r.am.nam}`);
+  if (r.canChi.ngay !== ccN || r.canChi.thang !== ccT) sai.push(`can chi ${r.canChi.ngay}/${r.canChi.thang}`);
+  if (r.tiet !== tiet) sai.push(`tiết ${r.tiet}`);
+  if (r.truc.ten !== truc) sai.push(`trực ${r.truc.ten}`);
+  if (r.gio.map(g => g.chi).join(' ') !== gio) sai.push('giờ hoàng đạo');
+  ok(`${ngay} · ${am} âm · ${ccN} · trực ${truc}`, !sai.length, sai.join('; '));
+}
+
+console.log('\n— Trực những ngày đầu tháng 1, lúc hai nguồn cãi nhau —');
+/* xemlicham.com tính sang tháng Sửu ngay từ 1/1 mỗi năm, sớm hơn Tiểu hàn (5–6/1) vài ngày, nên
+   lệch ở 1–4/1. lichvannien365.com thì đổi tháng đúng ngày Tiểu hàn, trực lặp ở 5 và 6/1/2026
+   như luật trực lặp khi giao tiết. Lấy theo lichvannien365: nó đúng luật, và app khớp nó. */
+for (const [ngay, truc] of [['1/1/2026', 'Bế'], ['2/1/2026', 'Kiến'], ['3/1/2026', 'Trừ'], ['4/1/2026', 'Mãn'],
+                            ['5/1/2026', 'Bình'], ['6/1/2026', 'Bình'], ['1/1/2027', 'Định'], ['3/1/2027', 'Phá'],
+                            ['5/1/2027', 'Thành'], ['3/1/2028', 'Bế']]) {
+  const [d, m, y] = ngay.split('/').map(Number), r = L.xemNgay(d, m, y);
+  ok(`${ngay}: trực ${truc}`, r.truc.ten === truc, r.truc.ten);
+}
+
+console.log('\n— Tháng nhuận 2028 —');
+{
+  const a = L.xemNgay(23, 6, 2028), b = L.xemNgay(21, 7, 2028), c = L.xemNgay(22, 7, 2028);
+  ok('23/6/2028 là mùng 1 tháng 5 nhuận', a.am.ngay === 1 && a.am.thang === 5 && a.am.nhuan, `${a.am.ngay}/${a.am.thang}${a.am.nhuan ? ' nhuận' : ''}`);
+  ok('21/7/2028 là 29 tháng 5 nhuận', b.am.ngay === 29 && b.am.thang === 5 && b.am.nhuan);
+  ok('22/7/2028 là mùng 1 tháng 6, hết nhuận', c.am.ngay === 1 && c.am.thang === 6 && !c.am.nhuan);
+}
+
+console.log('\n— Ngày tiết khí bắt đầu thì ghi luôn tên tiết mới —');
+/* Các trang lịch ghi tên tiết mới ngay từ ngày nó bắt đầu, bất kể giờ. Bản trước xét giữa trưa
+   nên tiết bắt đầu buổi chiều tối thì còn ghi tiết cũ. */
+for (const [ngay, tiet] of [['5/1/2026', 'Tiểu hàn'], ['18/2/2026', 'Vũ thủy'], ['20/1/2028', 'Đại hàn'], ['7/9/2026', 'Bạch lộ']]) {
+  const [d, m, y] = ngay.split('/').map(Number), r = L.xemNgay(d, m, y);
+  ok(`${ngay}: tiết ${tiet}, có giờ bắt đầu`, r.tiet === tiet && !!r.tietGio, `${r.tiet} ${r.tietGio || ''}`);
+}
+ok('ngày giữa tiết thì không ghi giờ bắt đầu', !L.xemNgay(28, 9, 2026).tietGio);
+{
+  const lech = (hhmm, nguon) => { const f = (x) => { const [h, m] = x.split(':').map(Number); return h * 60 + m; }; return Math.abs(f(hhmm) - f(nguon)); };
+  const bl = L.xemNgay(7, 9, 2026).tietGio, lx = L.xemNgay(4, 2, 2026).tietGio;
+  ok('Bạch lộ 2026 bắt đầu lệch dưới 10 phút so với nguồn (21:41)', lech(bl, '21:41') < 10, bl);
+  ok('Lập xuân 2026 bắt đầu lệch dưới 10 phút so với nguồn (03:02)', lech(lx, '03:02') < 10, lx);
+  ok('giờ bắt đầu tiết không làm đổi trực: 7/9/2026 vẫn Kiến', L.xemNgay(7, 9, 2026).truc.ten === 'Kiến');
+}
+
 console.log('\n— Mùng một Tết âm lịch —');
 for (const [nam, d, m] of [[2024, 10, 2], [2025, 29, 1], [2026, 17, 2]]) {
   const [ad, am, ay] = L.convertSolar2Lunar(d, m, nam, L.TZ);
