@@ -437,22 +437,58 @@ async function init() {
     if (!PREVIEW && ymd() !== today) { revealed = false; render(); toast('Một ngày mới đã bắt đầu'); }
   }, 1000);
 
-  tuCapNhat();
 }
 
 /* Tự nhận bản mới mà không cần xoá cache tay.
    Trước đây đổi mã xong người dùng phải mở app hai lần mới thấy, vì bản cũ
    đã nằm trong bộ nhớ đệm của service worker. Giờ khi có bản mới, service worker
-   chiếm quyền ngay rồi trang tự tải lại đúng một lần. */
+   chiếm quyền ngay rồi trang tự tải lại.
+
+   Người dùng báo "mở trang chủ lâu lâu bị reset 2 lần". Ba chỗ hở của bản trước:
+   - Chỗ nghe tin có bản mới chỉ gắn SAU khi tải xong bộ bài. Trình duyệt tự dò bản mới ngay lúc
+     mở trang, nên có lúc tin tới trước khi có người nghe (trang chạy mã cũ tới lần mở sau), có
+     lúc cả lượt dò của trình duyệt lẫn lượt app tự gọi đều ra bản mới.
+   - Không có gì chặn trang VỪA tự tải lại khỏi tải lại lần nữa: hai bản lên sát nhau (dự án này
+     có ngày đưa lên mấy lần) là thành hai lần liền.
+   - Tin tới lúc người ta đang dùng dở (đã lật bài, đang mở một ngôi sao) cũng tải lại ngay,
+     trông như bị reset giữa chừng.
+   Giờ: nghe tin ngay từ lúc trang mở; vừa mở chưa tới 5 giây và chưa chạm gì thì tải lại luôn,
+   như một phần của lúc mở; đang dùng dở thì đợi lúc chuyển sang app khác mới lặng lẽ tải lại;
+   và trong 15 giây sau một lần tự tải lại thì không tải lại nữa. */
+const MO_LUC = Date.now();
+const TAI_LAI_KEY = 'tdtd.taiLai';
+let daTuongTac = false;
+for (const s of ['pointerdown', 'keydown'])
+  addEventListener(s, () => { daTuongTac = true; }, { capture: true, passive: true });
+
+/* Quyết định khi có bản mới: 'ngay' tải lại luôn, 'hoan' đợi lúc trang bị ẩn đi. */
+function nenTaiLai(bayGio, lanTruoc, tuongTac, moLuc) {
+  if (lanTruoc && bayGio - lanTruoc < 15000) return 'hoan';   // vừa tự tải lại xong: không tải lần hai trước mặt
+  if (!tuongTac && bayGio - moLuc < 5000) return 'ngay';       // vừa mở, chưa chạm gì
+  return 'hoan';                                               // đang dùng dở
+}
+
+let taiLai = () => location.reload();
 function tuCapNhat() {
   if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
-  const daCoBanCu = !!navigator.serviceWorker.controller;
-  let daTaiLai = false;
+  const daCoBanCu = !!navigator.serviceWorker.controller;   // tính ngay lúc trang mở, trước mọi chờ đợi
+  let daTaiLai = false, choTaiLai = false;
+  const lamTaiLai = () => {
+    if (daTaiLai) return;
+    daTaiLai = true;
+    try { sessionStorage.setItem(TAI_LAI_KEY, String(Date.now())); } catch (e) {}
+    taiLai();
+  };
 
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!daCoBanCu || daTaiLai) return;   // lần cài đầu tiên thì khỏi tải lại
-    daTaiLai = true;
-    location.reload();
+    let lanTruoc = 0;
+    try { lanTruoc = +sessionStorage.getItem(TAI_LAI_KEY) || 0; } catch (e) {}
+    if (nenTaiLai(Date.now(), lanTruoc, daTuongTac, MO_LUC) === 'ngay') lamTaiLai();
+    else choTaiLai = true;
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && choTaiLai) lamTaiLai();          // người dùng đã chuyển đi, tải lại không ai thấy
   });
 
   navigator.serviceWorker.register('sw.js').then(dk => {
@@ -463,11 +499,14 @@ function tuCapNhat() {
     });
   }).catch(() => {});
 }
+tuCapNhat();      // gắn chỗ nghe tin có bản mới NGAY, không đợi tải xong bộ bài
 init();
 
 /* Móc cho kiểm thử: gọi thẳng bộ rải sao mà không phải chờ sự kiện resize. */
 self.TDTD_SAO = {
   raiLai: () => datCacSao(),
+  _nenTaiLai: nenTaiLai,
+  _thayTaiLai: (f) => { taiLai = f; },
   themSaoThu: (n, mau) => {                       // chỉ dùng khi thử, không ảnh hưởng bản chạy thật
     const troi = $('#bau-troi-sao'), goc = troi.children[0];
     while (troi.children.length < n) { const c = goc.cloneNode(true); c.id = 'sao-thu-' + troi.children.length; troi.appendChild(c); }

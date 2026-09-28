@@ -125,5 +125,67 @@ for (const s of SAO) {
   ok(`${s.id}: đóng lúc chưa mở`, loi === null, loi || '');
 }
 
+console.log('\n— Tự nhận bản mới: không tải lại hai lần, không tải lại giữa lúc đang dùng —');
+{
+  /* Người dùng báo "mở trang chủ lâu lâu bị reset 2 lần". */
+  /* app.js dính DOM nên không chạy nguyên tệp ở đây; tách riêng hàm quyết định (hàm thuần) ra chạy */
+  const m = nguon.match(/function nenTaiLai\([^)]*\) \{[\s\S]*?\n\}/);
+  const Q = m ? new Function(m[0] + '; return nenTaiLai;')() : null;
+  ok('có hàm quyết định tải lại', typeof Q === 'function');
+  if (Q) {
+    const mo = 1e6;
+    ok('vừa mở 2 giây, chưa chạm gì: tải lại ngay', Q(mo + 2000, 0, false, mo) === 'ngay');
+    ok('vừa tự tải lại 8 giây trước: không tải lần hai', Q(mo + 2000, mo - 6000, false, mo) === 'hoan');
+    ok('đã chạm vào trang (lật bài, mở sao): đợi lúc chuyển đi mới tải', Q(mo + 2000, 0, true, mo) === 'hoan');
+    ok('mở đã lâu: đợi lúc chuyển đi mới tải', Q(mo + 60000, 0, false, mo) === 'hoan');
+    ok('lần tự tải lại trước đã qua lâu: lại được tải ngay', Q(mo + 2000, mo - 60000, false, mo) === 'ngay');
+  }
+}
+
+/* Chạy nguyên đoạn tự cập nhật của app.js trên một trình duyệt giả, kích các tình huống có bản mới
+   rồi đếm số lần trang tải lại. */
+{
+  const khoi = nguon.slice(nguon.indexOf('const MO_LUC = Date.now();'), nguon.indexOf('tuCapNhat();      //'));
+  function mo({ coBanCu = true, lanTruoc = 0, gioMo = 0 } = {}) {
+    const nghe = {}, ngheTrang = {}, ngheTaiLieu = {};
+    const bang = { tai: 0, gio: gioMo, kho: lanTruoc ? { 'tdtd.taiLai': String(lanTruoc) } : {} };
+    const moiTruong = {
+      navigator: { serviceWorker: {
+        controller: coBanCu ? {} : null,
+        addEventListener: (t, f) => { (nghe[t] = nghe[t] || []).push(f); },
+        register: () => Promise.resolve({ update: () => Promise.resolve() }),
+      } },
+      location: { protocol: 'https:', reload: () => { bang.tai++; } },
+      document: { hidden: false, addEventListener: (t, f) => { (ngheTaiLieu[t] = ngheTaiLieu[t] || []).push(f); } },
+      addEventListener: (t, f) => { (ngheTrang[t] = ngheTrang[t] || []).push(f); },
+      sessionStorage: { getItem: (k) => bang.kho[k] || null, setItem: (k, v) => { bang.kho[k] = v; } },
+      setInterval: () => 0,
+      Date: { now: () => bang.gio },
+    };
+    const chay = new Function(...Object.keys(moiTruong), khoi + '; tuCapNhat();');
+    chay(...Object.values(moiTruong));
+    return {
+      bang,
+      banMoi: () => (nghe.controllerchange || []).forEach(f => f()),
+      cham: () => (ngheTrang.pointerdown || []).forEach(f => f()),
+      an: () => { moiTruong.document.hidden = true; (ngheTaiLieu.visibilitychange || []).forEach(f => f()); },
+      troi: (ms) => { bang.gio += ms; },
+    };
+  }
+  let t = mo({ gioMo: 1e6 }); t.troi(1500); t.banMoi(); t.banMoi();
+  ok('vừa mở, có bản mới (kể cả tin tới hai lần): tải lại đúng một lần', t.bang.tai === 1, `${t.bang.tai} lần`);
+  const lan = +t.bang.kho['tdtd.taiLai'];
+  t = mo({ gioMo: lan + 800, lanTruoc: lan }); t.troi(1000); t.banMoi();
+  ok('trang vừa tự tải lại gặp thêm một bản mới nữa: không tải lại lần hai trước mặt', t.bang.tai === 0, `${t.bang.tai} lần`);
+  t.an();
+  ok('mà đợi tới lúc chuyển sang app khác mới tải', t.bang.tai === 1, `${t.bang.tai} lần`);
+  t = mo({ gioMo: 1e6 }); t.troi(1000); t.cham(); t.troi(500); t.banMoi();
+  ok('đang dùng dở (đã chạm vào trang): không tải lại giữa chừng', t.bang.tai === 0);
+  t.an();
+  ok('chuyển đi rồi mới tải lại', t.bang.tai === 1);
+  t = mo({ coBanCu: false, gioMo: 1e6 }); t.troi(1000); t.banMoi(); t.an();
+  ok('lần cài đầu tiên (chưa có bản cũ): không tải lại', t.bang.tai === 0);
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

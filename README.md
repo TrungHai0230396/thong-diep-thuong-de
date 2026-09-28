@@ -1040,7 +1040,7 @@ scripts/test-astro.js      50 kiểm thử thiên văn, đối chiếu số li�
 scripts/test-troidem.js    51 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        47 kiểm thử vòng đời MỌI ngôi sao: mở, đóng, đóng rồi mở lại
+scripts/test-sao.js        54 kiểm thử vòng đời MỌI ngôi sao, và chuyện tự tải lại khi có bản mới
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -1086,7 +1086,16 @@ node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 
 App tự cập nhật, người dùng không phải xoá cache hay thêm `?v=` gì cả.
 
-Khi mở app, và mỗi lần quay lại app sau khi chuyển sang cửa sổ khác, trình duyệt dò xem `sw.js` có đổi không. Nếu có, service worker mới cài rồi chiếm quyền ngay, và trang tự tải lại **đúng một lần**. Lần cài đầu tiên thì không tải lại, vì lúc đó chưa có bản cũ nào để thay.
+Khi mở app, và mỗi lần quay lại app sau khi chuyển sang cửa sổ khác, trình duyệt dò xem `sw.js` có đổi không. Nếu có, service worker mới cài rồi chiếm quyền ngay. Lần cài đầu tiên thì không tải lại, vì lúc đó chưa có bản cũ nào để thay.
+
+**Tải lại lúc nào.** Người dùng báo "mở trang chủ lâu lâu bị reset 2 lần". Bản trước gắn chỗ nghe tin có bản mới *sau* khi tải xong bộ bài (trong khi trình duyệt tự dò bản mới ngay lúc mở trang), không có gì chặn một trang vừa tự tải lại khỏi tải lại lần nữa (dự án này có ngày đưa lên mấy bản sát nhau), và tin tới giữa lúc đang dùng cũng tải lại ngay. Giờ:
+
+- nghe tin có bản mới ngay từ lúc trang mở;
+- trang vừa mở chưa tới 5 giây và chưa chạm gì thì tải lại luôn, như một phần của lúc mở;
+- đang dùng dở (đã lật bài, đang mở một ngôi sao) thì **đợi lúc chuyển sang app khác** mới lặng lẽ tải lại;
+- trong 15 giây sau một lần tự tải lại thì không tải lại trước mặt người dùng nữa, cũng đợi lúc chuyển đi.
+
+`scripts/test-sao.js` chạy nguyên đoạn này trên một trình duyệt giả, kích các tình huống có bản mới rồi đếm số lần tải lại; bản cũ trượt đúng hai tình huống người dùng gặp.
 
 Kiểm bằng Chrome thật: cài bản `tdtd-v52`, đổi số phiên bản trên máy chủ thành `tdtd-v53`, gọi dò bản mới. Trang tự tải lại, cache chuyển sang `tdtd-v53` và cache cũ bị xoá.
 
