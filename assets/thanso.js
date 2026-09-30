@@ -8,6 +8,7 @@ const SINH_KEY = 'tdtd.lich.sinh';                   // cùng khoá với Xem ng
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 let tam, sinh = null, dangNhap = false;
+let hoTen = '', tenGoi = '';                         // KHÔNG lưu: chỉ nằm trong bộ nhớ lúc trang đang mở
 
 function docSinh() {
   try { const v = JSON.parse(localStorage.getItem(SINH_KEY) || 'null'); return v && v.dd ? v : null; } catch (e) { return null; }
@@ -48,6 +49,60 @@ function veNhap() {
   };
 }
 
+/* ---------- lưới 3×3 và mũi tên, dùng chung ---------- */
+
+function luoi(dem, X) {
+  const hang = [[3, 6, 9], [2, 5, 8], [1, 4, 7]];
+  return `<div class="ts-luoi">${hang.map(h => `
+        <span class="ts-tang">${X.TANG[h[0]]}</span>
+        ${h.map(s2 => `<span class="ts-o${dem[s2] ? '' : ' trong'}" aria-label="số ${s2}: ${dem[s2]} lần">${
+          dem[s2] ? String(s2).repeat(dem[s2]) : s2}</span>`).join('')}`).join('')}
+      </div>`;
+}
+
+function dsMuiTen(mt) {
+  return `${mt.day.length ? `<p class="ts-nhom">Mũi tên đầy</p>${mt.day.map(m => `
+        <p class="ts-mt day"><b>${esc(m.day)}</b> <i>${m.so.join('-')}</i> — ${esc(m.yDay)}</p>`).join('')}` : ''}
+      ${mt.trong.length ? `<p class="ts-nhom">Mũi tên trống</p>${mt.trong.map(m => `
+        <p class="ts-mt trong"><b>${esc(m.trong)}</b> <i>trống ${m.so.join('-')}</i> — ${esc(m.yTrong)}</p>`).join('')}
+        <p class="xn-ghi">Mũi tên trống không phải điều xấu định sẵn, chỉ là chỗ nên để ý.</p>` : ''}
+      ${!mt.day.length && !mt.trong.length ? '<p class="xn-rong">Không có hàng nào đầy hay trống cả ba ô, nên không có mũi tên nào.</p>' : ''}`;
+}
+
+/* ---------- theo họ tên ---------- */
+
+function veTen() {
+  const o = tam.querySelector('.ts-ten-kq');
+  if (!o) return;
+  const X = S(), r = X.chiSoTen(hoTen);
+  if (!r.tu.length) { o.innerHTML = hoTen ? '<p class="xn-rong">Chưa đọc được chữ cái nào trong tên này.</p>' : ''; return; }
+  const goi = (tenGoi || '').trim() || hoTen.trim().split(/\s+/).pop();
+  const demTen = X.bieuDoTen(goi), demNgay = X.bieuDo(sinh.dd, sinh.mm, sinh.yy), demTong = X.tongHop(demNgay, demTen);
+  o.innerHTML = `
+    <div class="ts-chu-so">${r.tu.map(w => `
+      <p><b>${esc(w.tu)}</b> ${w.chu.map(x => `<span class="${x.nguyenAm ? 'na' : ''}">${x.c}<sub>${x.so}</sub></span>`).join('')}</p>`).join('')}
+      <p class="xn-ghi">Chữ tô màu là nguyên âm. Chữ Y sát một nguyên âm trong cùng chữ thì tính là phụ âm, đứng riêng thì là nguyên âm.</p>
+    </div>
+    ${['linhHon', 'nhanCach', 'suMenh'].map(k => {
+      const c = r[k], y = X.Y_TEN[k];
+      return `<div class="ts-cs">
+        <span class="ts-cs-so">${c.co ? esc(c.ten) : '—'}</span>
+        <div>
+          <p class="ts-cs-ten">${y.ten} <span>(cộng ${y.tu})</span></p>
+          <p class="ts-cs-y">${c.co ? `${y.y}: ${esc(X.NET[c.so])}.` : `Tên này không có ${y.tu} nào.`}</p>
+          <p class="ts-buoc ts-trai">${esc(c.buoc)}</p>
+        </div>
+      </div>`;
+    }).join('')}
+    <p class="ts-nhom">Biểu đồ tên "${esc(goi)}"</p>
+    ${luoi(demTen, X)}
+    <p class="ts-nhom">Biểu đồ tổng hợp (ngày sinh + tên "${esc(goi)}")</p>
+    ${luoi(demTong, X)}
+    ${dsMuiTen(X.muiTen(demTong))}
+    <p class="xn-ghi">Biểu đồ tên lấy theo tên bạn được gọi hằng ngày; biểu đồ tổng hợp cộng nó với biểu đồ ngày sinh.
+      Ba chỉ số ở trên tính trên họ tên khai sinh đầy đủ.</p>`;
+}
+
 /* ---------- kết quả ---------- */
 
 function veKetQua() {
@@ -60,8 +115,6 @@ function veKetQua() {
   const tuoi = namNay - yy;
   const dinhNay = dc.dinh.reduce((k, d, i) => (tuoi >= d.tuoi ? i : k), -1);   // đỉnh gần nhất đã qua
 
-  const o = (s) => (dem[s] ? String(s).repeat(dem[s]) : '');
-  const hang = [[3, 6, 9], [2, 5, 8], [1, 4, 7]];
 
   tam.querySelector('.ts-kq').innerHTML = `
     <section class="xn-khoi">
@@ -79,17 +132,9 @@ function veKetQua() {
 
     <section class="xn-khoi">
       <p class="xn-tieu">Biểu đồ ngày sinh</p>
-      <div class="ts-luoi">${hang.map(h => `
-        <span class="ts-tang">${X.TANG[h[0]]}</span>
-        ${h.map(s => `<span class="ts-o${dem[s] ? '' : ' trong'}" aria-label="số ${s}: ${dem[s]} lần">${dem[s] ? o(s) : s}</span>`).join('')}`).join('')}
-      </div>
+      ${luoi(dem, X)}
       <p class="xn-ghi ts-giua">Mỗi chữ số trong ngày sinh vào đúng ô của nó; số 0 không vào lưới. Ô mờ là số không có.</p>
-      ${mt.day.length ? `<p class="ts-nhom">Mũi tên đầy</p>${mt.day.map(m => `
-        <p class="ts-mt day"><b>${esc(m.day)}</b> <i>${m.so.join('-')}</i> — ${esc(m.yDay)}</p>`).join('')}` : ''}
-      ${mt.trong.length ? `<p class="ts-nhom">Mũi tên trống</p>${mt.trong.map(m => `
-        <p class="ts-mt trong"><b>${esc(m.trong)}</b> <i>trống ${m.so.join('-')}</i> — ${esc(m.yTrong)}</p>`).join('')}
-        <p class="xn-ghi">Mũi tên trống không phải điều xấu định sẵn, chỉ là chỗ nên để ý.</p>` : ''}
-      ${!mt.day.length && !mt.trong.length ? '<p class="xn-rong">Biểu đồ này không có hàng nào đầy hay trống cả ba ô, nên không có mũi tên nào.</p>' : ''}
+      ${dsMuiTen(mt)}
     </section>
 
     <section class="xn-khoi">
@@ -118,8 +163,27 @@ function veKetQua() {
       ${dc.chuaRo22 ? `<p class="xn-canh">Với số chủ đạo 22/4, các nguồn chỉ ghi "36 trừ số chủ đạo" mà không nói trừ 22 hay
         trừ 4. App trừ 22, như các nguồn làm với số 11 (đỉnh đầu ở 25 tuổi). Nếu trừ 4 thì bốn đỉnh sẽ ở
         ${[32, 41, 50, 59].join(', ')} tuổi.</p>` : ''}
+    </section>
+
+    <section class="xn-khoi ts-hoten">
+      <p class="xn-tieu">Theo họ tên</p>
+      <label class="ts-nhan">Họ tên khai sinh đầy đủ
+        <input class="xn-hoi ts-o-ten" type="text" placeholder="ví dụ: Nguyễn Thị Hòa" autocomplete="off" value="${esc(hoTen)}"></label>
+      <label class="ts-nhan">Tên thường gọi <span>(không bắt buộc — để trống thì lấy chữ cuối)</span>
+        <input class="xn-hoi ts-o-goi" type="text" placeholder="ví dụ: Hòa" autocomplete="off" value="${esc(tenGoi)}"></label>
+      <button class="xn-luu ts-xem-ten" type="button">Xem theo tên</button>
+      <p class="xn-ghi">Tên chỉ dùng để tính ngay trên máy, không lưu lại, đóng trang là mất.</p>
+      <div class="ts-ten-kq"></div>
     </section>`;
   tam.querySelector('.ts-doi').onclick = () => { dangNhap = true; ve(); };
+  const xemTen = () => {
+    hoTen = tam.querySelector('.ts-o-ten').value.trim();
+    tenGoi = tam.querySelector('.ts-o-goi').value.trim();
+    veTen();
+  };
+  tam.querySelector('.ts-xem-ten').onclick = xemTen;
+  tam.querySelectorAll('.ts-o-ten, .ts-o-goi').forEach(n => n.addEventListener('keydown', e => { if (e.key === 'Enter') xemTen(); }));
+  if (hoTen) veTen();
 }
 
 function ve() {
@@ -169,6 +233,7 @@ addEventListener('keydown', e => {
 });
 
 self.TDTD_THANSO = { mo, dong,
+  _ten: (ht, goi = '') => { hoTen = ht; tenGoi = goi; veTen(); return tam.querySelector('.ts-ten-kq').textContent; },
   _sinh: (dd, mm, yy) => { sinh = dd ? { dd, mm, yy } : null; dangNhap = false; ve(); return tam.querySelector('.ts-kq').textContent; },
 };
 })();

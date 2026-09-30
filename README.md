@@ -696,6 +696,7 @@ Một ngôi sao màu tím nhạt, `#than-so`. Nhập ngày sinh dương lịch (
 - **Biểu đồ ngày sinh** 3×3 (hàng trên 3-6-9 trí não, giữa 2-5-8 tinh thần, dưới 1-4-7 thể chất) và các **mũi tên**: 8 mũi tên đầy (Kế hoạch, Ý chí, Hoạt động, Thực tế, Cân bằng cảm xúc, Trí tuệ, Quyết tâm, Tâm linh) và 7 mũi tên trống (Uất giận, Thụ động, Thiếu trật tự, Nhạy cảm, Trí nhớ ngắn hạn, Trì hoãn, Hoài nghi). Không có mũi tên trống 1-2-3 vì năm sinh nào cũng có chữ số 1 hoặc 2.
 - **Năm cá nhân** năm nay và năm sau.
 - **Bốn đỉnh cao**: số, tuổi và năm của từng đỉnh, đánh dấu đỉnh đang ở.
+- **Theo họ tên** (mục cuối): nhập họ tên khai sinh, thêm tên thường gọi nếu muốn. Ra ba chỉ số **Linh hồn** (cộng nguyên âm), **Nhân cách** (cộng phụ âm), **Sứ mệnh** (cộng mọi chữ cái), mỗi chữ cái viết kèm số của nó để tự kiểm; **biểu đồ tên** theo tên thường gọi và **biểu đồ tổng hợp** (ngày sinh + tên) kèm mũi tên. **Tên không lưu** — chỉ nằm trong bộ nhớ lúc trang mở.
 
 **Không có sách gốc trong tay** — bản PDF trên mạng là bản sao không rõ quyền nên không dùng. Mọi quy tắc lấy từ chỗ các nguồn đối chiếu được (thansohoconline.com, viettopreview.vn, vietnamworks.com, tracuuthansohoc.com, arena.fpt.edu.vn, tinhte.vn, và một bài blog trích nguyên văn Phillips về 16 mũi tên) **nhất trí**, và chỗ nào lệch nhau thì ghi ra:
 
@@ -704,9 +705,15 @@ Một ngôi sao màu tím nhạt, `#than-so`. Nhập ngày sinh dương lịch (
 - **Tuổi đỉnh cao** là 36 trừ số chủ đạo; các trang ghi rõ số 11 thì đỉnh đầu ở 25 tuổi. Với **22/4 không trang nào nói trừ 22 hay trừ 4**; app trừ 22 như với 11, và giao diện nói thẳng chỗ chưa rõ này, kèm bốn tuổi nếu trừ 4.
 - Có trang nói 22/4 "chỉ khoảng 1–2%". Đếm thật trên mọi ngày từ 1920 tới 2030 thì ra 3,4% — con số đó không đúng.
 
-Lời giảng các con số viết lại bằng lời của app, ngắn, nói cả thế mạnh lẫn điều nên để ý, không phán chắc; cuối trang nói rõ thần số học không có cơ sở khoa học. Chưa làm phần tính theo **họ tên** (số linh hồn, số sứ mệnh…): cách đổi tên tiếng Việt có dấu và chữ Y mỗi nơi một kiểu.
+Lời giảng các con số viết lại bằng lời của app, ngắn, nói cả thế mạnh lẫn điều nên để ý, không phán chắc; cuối trang nói rõ thần số học không có cơ sở khoa học. Phần **họ tên** theo chỗ các nguồn nhất trí (viettopreview.vn, tracuuthansohoc.com, tracuuthansohoc.net, trathanso.com, bieudothansohoc.vn):
 
-`scripts/test-sohoc.js`, 29 bài: các ví dụ có lời giải trong nguồn (19/8/1991 ra 11; 29/11/1994 và 11/2/1985 ra 9; năm cá nhân của người sinh 31/1 các năm 2022–2026 và 27/2 các năm 2018–2020; chân kim tự tháp của 1/5/1974 và 10/5/2001; số 11 đỉnh đầu 25 tuổi), và các tính chất trên cả 40.542 ngày từ 1920 tới 2030: không có số chủ đạo 1, 22/4 khi và chỉ khi tổng bằng 22, năm cá nhân luôn 1–9, đỉnh 1 và 2 luôn một chữ số.
+- Bảng Pythagoras: A J S = 1, B K T = 2, C L U = 3, D M V = 4, E N W = 5, F O X = 6, G P Y = 7, H Q Z = 8, I R = 9. Bỏ dấu thanh và dấu mũ (Ơ, Ư, Â… về O, U, A), **Đ tính là D**.
+- **Chữ Y**: đứng cạnh một nguyên âm trong cùng chữ thì là phụ âm (Yến, Duyên, Huy, Quỳnh, Nguyễn), còn lại là nguyên âm (Mỹ, Vy, Ý, Thy).
+- Cộng cả tên rồi mới rút gọn, **giữ 11 và 22**. Ví dụ có lời giải khớp: *Nguyễn Thị Hòa* tên từng chữ 8, 9, 7, nguyên âm 24 → 6 (trathanso.com); *Nguyên* nguyên âm 3 + 5 = 8, phụ âm 24 → 6 (tracuuthansohoc.net).
+- Biểu đồ tên lấy theo **tên thường gọi** (tracuuthansohoc.com); để trống thì lấy chữ cuối của họ tên.
+- Có trang đưa ví dụ tính sai chính luật của nó (cộng Y như nguyên âm dù đứng cạnh U) — không dùng ví dụ đó. Chỉ số phụ âm có nơi gọi "Nhân cách", có nơi gọi "Biểu đạt"; app dùng "Nhân cách".
+
+`scripts/test-sohoc.js`, 43 bài: các ví dụ có lời giải trong nguồn (19/8/1991 ra 11; 29/11/1994 và 11/2/1985 ra 9; năm cá nhân của người sinh 31/1 các năm 2022–2026 và 27/2 các năm 2018–2020; chân kim tự tháp của 1/5/1974 và 10/5/2001; số 11 đỉnh đầu 25 tuổi), và các tính chất trên cả 40.542 ngày từ 1920 tới 2030: không có số chủ đạo 1, 22/4 khi và chỉ khi tổng bằng 22, năm cá nhân luôn 1–9, đỉnh 1 và 2 luôn một chữ số. Phần họ tên: hai ví dụ có lời giải ở trên, luật chữ Y trên 10 tên, Đ ra D, giữ 11 (Tuấn, Hương 29 → 11) và 22/4 (Hạnh), tên không có nguyên âm hay không có chữ cái nào.
 
 ## Bầu trời đêm nay
 
@@ -1129,7 +1136,7 @@ scripts/mau-am.js          tạo giọng mẫu bằng lệnh `say` của macOS, 
 scripts/test-lich.js       97 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
 assets/sohoc.js            thần số học: hàm thuần, ngày sinh vào, các con số ra
 assets/thanso.js           giao diện ngôi sao thần số học
-scripts/test-sohoc.js      29 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
+scripts/test-sohoc.js      43 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1150,7 +1157,7 @@ node scripts/test-troidem.js     # chạy 51 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
-node scripts/test-sohoc.js       # chạy 29 kiểm thử thần số học
+node scripts/test-sohoc.js       # chạy 43 kiểm thử thần số học
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 125 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

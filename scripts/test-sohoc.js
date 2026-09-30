@@ -92,6 +92,32 @@ console.log('\n— Bốn đỉnh cao —');
   ok('đỉnh 1, 2 luôn một chữ số; đỉnh 3, 4 không quá 11', sai === 0);
 }
 
+console.log('\n— Theo họ tên —');
+{
+  const t = S.chiSoTen('Nguyễn Thị Hòa');
+  ok('Nguyễn Thị Hòa: linh hồn 6, nhân cách 6, sứ mệnh 3 — tên 8, 9, 7 như ví dụ của trathanso.com',
+     t.linhHon.so === 6 && t.nhanCach.so === 6 && t.suMenh.so === 3, `${t.linhHon.so} ${t.nhanCach.so} ${t.suMenh.so}`);
+  ok('cộng cả tên rồi mới rút gọn: nguyên âm 3 + 5 + 9 + 6 + 1 = 24 → 6', t.linhHon.tong === 24);
+  const n = S.chiSoTen('Nguyên');
+  ok('Nguyên: nguyên âm U + E = 3 + 5 = 8, phụ âm N G Y N = 24 → 6 (tracuuthansohoc.net)',
+     n.linhHon.so === 8 && n.nhanCach.tong === 24 && n.nhanCach.so === 6);
+  ok('Đ đổi thành D (4), bỏ dấu: "Đỗ" ra D O', S.chiSoTen('Đỗ').tu[0].chu.map(x => x.c + x.so).join(' ') === 'D4 O6');
+  const y = (tu) => S.tachChu(S.tachTu(tu)[0]).find(x => x.c === 'Y').nguyenAm;
+  ok('chữ Y đứng riêng hay sát phụ âm là nguyên âm: Mỹ, Ý, Vy, Thy',
+     ['Mỹ', 'Ý', 'Vy', 'Thy'].every(y), ['Mỹ', 'Ý', 'Vy', 'Thy'].map(y).join());
+  const phuAm = ['Yến', 'Duyên', 'Huy', 'Nguyễn', 'Thủy', 'Quỳnh'];
+  ok('chữ Y sát một nguyên âm là phụ âm: ' + phuAm.join(', '), phuAm.every(w => !y(w)), phuAm.map(y).join());
+  ok('Tuấn: sứ mệnh 2 + 3 + 1 + 5 = 11, giữ nguyên 11', S.chiSoTen('Tuấn').suMenh.so === 11);
+  ok('Hương: sứ mệnh 29 → 11, dừng ở 11 chứ không rút tiếp về 2', S.chiSoTen('Hương').suMenh.so === 11);
+  const h = S.chiSoTen('Hạnh').suMenh;
+  ok('Hạnh: sứ mệnh 8 + 1 + 5 + 8 = 22, ghi 22/4', h.so === 22 && h.ten === '22/4');
+  ok('không có nguyên âm nào thì báo, không bịa ra số', S.chiSoTen('Nhg').linhHon.co === false);
+  ok('không đọc được chữ nào thì trả rỗng', S.chiSoTen('123 !!').tu.length === 0);
+  ok('biểu đồ tên "Phong": P 7, H 8, O 6, N 5, G 7', S.bieuDoTen('Phong').join() === '0,0,0,0,0,1,1,2,1,0');
+  ok('biểu đồ tổng hợp cộng từng ô', S.tongHop([0, 1, 2, 0, 0, 0, 0, 0, 0, 1], S.bieuDoTen('Phong')).join() === '0,1,2,0,0,1,1,2,1,1');
+  ok('mọi số tên có thể ra đều có lời giảng', [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22].every(k => S.NET[k]));
+}
+
 console.log('\n— Lời giảng có đủ —');
 ok('mỗi số chủ đạo có tên, thế mạnh và điều nên để ý', [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 22].every(n => S.Y_CHU_DAO[n] && S.Y_CHU_DAO[n].manh && S.Y_CHU_DAO[n].yeu));
 ok('mỗi năm cá nhân 1–9 có lời giảng', [1, 2, 3, 4, 5, 6, 7, 8, 9].every(n => S.Y_NAM[n]));

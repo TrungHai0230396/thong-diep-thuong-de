@@ -104,6 +104,65 @@ function dinhCao(dd, mm, yy) {
   };
 }
 
+/* ---------- theo họ tên ----------
+   Bảng Pythagoras: A J S = 1, B K T = 2, C L U = 3, D M V = 4, E N W = 5, F O X = 6, G P Y = 7,
+   H Q Z = 8, I R = 9. Tên tiếng Việt: bỏ dấu thanh, Ă Â về A, Ê về E, Ô Ơ về O, Ư về U, Đ về D.
+
+   Chữ Y: đứng sát một nguyên âm trong cùng âm tiết ("Yến", "Duyên", "Nguyễn", "Huy") là PHỤ ÂM;
+   đứng một mình hoặc giữa phụ âm ("Ý", "Mỹ", "Vy") là NGUYÊN ÂM. Theo viettopreview.vn và
+   tracuuthansohoc.com; hai ví dụ có lời giải cũng tính đúng như vậy — "Nguyễn Thị Hòa" có nguyên
+   âm 8, 9, 7 (trathanso.com: Y trong Nguyễn là phụ âm), tên "Nguyên" có nguyên âm 3 + 5 = 8
+   (tracuuthansohoc.net). Một trang khác phát biểu đúng luật này nhưng ví dụ lại tính Y là nguyên
+   âm — không theo ví dụ đó.
+
+   Ba chỉ số, tính trên họ tên KHAI SINH đầy đủ: Linh hồn (nguyên âm), Nhân cách (phụ âm — có trang
+   gọi là chỉ số biểu đạt), Sứ mệnh (tất cả chữ cái). Cộng dồn cả họ tên một lần rồi rút gọn, giữ
+   11 và 22. Có trang rút gọn từng chữ (họ, đệm, tên) rồi mới cộng, và có trang giữ cả 33 theo kiểu
+   phương Tây; hai cách đó chỉ khác khi gặp số 11, 22 — theo cách cộng dồn như phần ngày sinh. */
+const BANG_CHU = { A: 1, J: 1, S: 1, B: 2, K: 2, T: 2, C: 3, L: 3, U: 3, D: 4, M: 4, V: 4, E: 5, N: 5, W: 5,
+                   F: 6, O: 6, X: 6, G: 7, P: 7, Y: 7, H: 8, Q: 8, Z: 8, I: 9, R: 9 };
+const NGUYEN_AM = new Set(['A', 'E', 'I', 'O', 'U']);
+
+/* "Nguyễn Thị Hòa" → ['NGUYEN', 'THI', 'HOA'] */
+const tachTu = (ten) => String(ten || '').replace(/[đĐ]/g, 'D').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .toUpperCase().replace(/[^A-Z]+/g, ' ').trim().split(' ').filter(Boolean);
+
+function tachChu(tu) {
+  return [...tu].map((c, i) => {
+    const nguyenAm = c === 'Y' ? !(NGUYEN_AM.has(tu[i - 1]) || NGUYEN_AM.has(tu[i + 1])) : NGUYEN_AM.has(c);
+    return { c, so: BANG_CHU[c], nguyenAm };
+  });
+}
+
+const rutTen = (n) => { while (n > 9 && n !== 11 && n !== 22) n = congSo(n); return n; };
+function chiSo(ds) {
+  const tong = ds.reduce((a, x) => a + x.so, 0);
+  const buoc = [ds.length ? `${ds.map(x => x.so).join(' + ')} = ${tong}` : '—'];
+  let n = tong;
+  while (n > 9 && n !== 11 && n !== 22) { n = congSo(n); buoc.push(String(n)); }
+  return { so: n, ten: n === 22 ? '22/4' : String(n), tong, buoc: buoc.join(' → '), co: ds.length > 0 };
+}
+
+function chiSoTen(hoTen) {
+  const tu = tachTu(hoTen).map(w => ({ tu: w, chu: tachChu(w) }));
+  const het = tu.flatMap(w => w.chu);
+  return {
+    tu,
+    linhHon: chiSo(het.filter(x => x.nguyenAm)),
+    nhanCach: chiSo(het.filter(x => !x.nguyenAm)),
+    suMenh: chiSo(het),
+  };
+}
+
+/* Biểu đồ tên: đếm các số của TÊN THƯỜNG GỌI (tracuuthansohoc.com: dùng tên hay được gọi nhất).
+   Biểu đồ tổng hợp = biểu đồ ngày sinh cộng biểu đồ tên. */
+function bieuDoTen(ten) {
+  const dem = Array(10).fill(0);
+  for (const w of tachTu(ten)) for (const c of w) dem[BANG_CHU[c]]++;
+  return dem;
+}
+const tongHop = (a, b) => a.map((x, i) => x + b[i]);
+
 /* ---------- lời giảng ----------
    Viết lại bằng lời của app, ngắn, nói cả điểm mạnh lẫn điều nên để ý, và không phán chắc. */
 const Y_CHU_DAO = {
@@ -150,10 +209,24 @@ const Y_DINH = {
   10: 'khởi đầu mới ở tầm cao hơn, dễ được giúp đỡ', 11: 'trực giác, đời sống tinh thần, truyền cảm hứng',
 };
 
-const TANG = { 3: 'trí não', 2: 'tinh thần', 1: 'thể chất' };   // tên ba hàng của lưới, theo Phillips
+const TANG = { 3: 'trí não', 2: 'tinh thần', 1: 'thể chất' };
+
+/* Nét chung của từng con số, dùng cho ba chỉ số theo tên. */
+const NET = {
+  1: 'độc lập, chủ động, dám đi đầu', 2: 'tinh tế, hoà hợp, biết lắng nghe', 3: 'sáng tạo, vui vẻ, giỏi diễn đạt',
+  4: 'chắc chắn, kỷ luật, đáng tin', 5: 'tự do, ham trải nghiệm, linh hoạt', 6: 'yêu thương, trách nhiệm, chăm lo người khác',
+  7: 'sâu sắc, thích tìm hiểu, cần khoảng lặng riêng', 8: 'tự chủ, có tổ chức, hướng tới thành quả',
+  9: 'bao dung, lý tưởng, muốn giúp người', 11: 'trực giác mạnh, truyền cảm hứng', 22: 'tầm nhìn lớn và làm được việc lớn',
+};
+const Y_TEN = {
+  linhHon: { ten: 'Linh hồn', tu: 'nguyên âm', y: 'Điều bạn khao khát ở bên trong' },
+  nhanCach: { ten: 'Nhân cách', tu: 'phụ âm', y: 'Ấn tượng người khác thường thấy ở bạn lúc đầu' },
+  suMenh: { ten: 'Sứ mệnh', tu: 'mọi chữ cái', y: 'Năng lực và hướng bạn hợp để phát huy' },
+};   // tên ba hàng của lưới, theo Phillips
 
 const API = { soChuDao, bieuDo, muiTen, namCaNhan, dinhCao, congSo, veMot, veMuoiMot,
-              MUI_TEN, Y_CHU_DAO, Y_NAM, Y_DINH, TANG };
+              tachTu, tachChu, chiSoTen, bieuDoTen, tongHop, BANG_CHU,
+              MUI_TEN, Y_CHU_DAO, Y_NAM, Y_DINH, TANG, NET, Y_TEN };
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 else root.TDTD_SOHOC = API;
 })(typeof self !== 'undefined' ? self : this);
