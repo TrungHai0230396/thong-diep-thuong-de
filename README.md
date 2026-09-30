@@ -1044,6 +1044,44 @@ Xem nhanh 14 ngày liền của một hạt giống bất kỳ bằng dòng lệ
 node -e "const C=require('./assets/core.js'),k=require('./data/cards.json'),i=k.map(c=>c.id),m=new Map(k.map(c=>[c.id,c]));const s=42;let d=C.ymd();for(let n=0;n<14;n++){console.log(d,m.get(C.cardFor(i,d,s)).thong_diep.slice(0,60));d=C.addDays(d,1)}"
 ```
 
+## "Toàn một từ không vậy, cái này chủ yếu là luyện âm tiết mà"
+
+Đúng. Sau hai lần sửa, bước đầu của mỗi bài dẫn bằng TỪ do máy đọc (books, cats), còn âm /s/ đứng
+riêng chỉ là một nút phụ phát âm máy dựng — và chính chữ trên nút đó bảo người ta đừng tin nó. Người
+học muốn nghe /s/, /z/ đứng một mình bằng giọng người thì không có chỗ nào cho nghe.
+
+Muốn có cả hai thứ — giọng người, và âm đứng riêng — thì chỉ có một cách: một người thật thu âm nó.
+Máy đọc của hệ điều hành chỉ đọc được từ; âm dựng bằng toán thì đúng phổ mà tai không nghe ra. Nên
+giờ trò này dùng 22 bản thu của các bài IPA trên Wikipedia (Peter Isotalo, Erutuon, Denelson83 —
+CC BY-SA 3.0, ghi công ngay dưới mỗi màn và trong `assets/am/NGUON.md`):
+
+- **Bảng từng âm** ở đầu màn: 18 phụ âm, 4 nguyên âm. Bấm một âm là nghe nó đứng riêng ("chỉ âm
+  /s/"), nghe nó trong âm tiết ([sa] … [asa]), rồi bấm micro nói theo. Máy không chấm — một âm tiết
+  như [sa] không phải chữ nào nên máy nhận giọng chẳng biết gì để chấm. Việc nó làm được thật là
+  phát mẫu rồi phát tiếng bạn **ngay sau**, để tai bạn so. Tiếng bạn không lưu, không gửi đi.
+- **Bước 1 của mỗi bài** giờ là bản thu người thật của các âm trong bài, vế sai tô đỏ (/l/ cuối nói
+  thành /n/ thì nghe /n/ để biết mà tránh). Từ do máy đọc lùi xuống sau.
+- Bản "chỉ âm" chỉ có ở 10 âm kéo dài được (s z ʃ f v θ ð m n l). Âm tắc p t k cắt riêng ra chỉ còn
+  một tiếng tách, nên chúng chỉ có bản trong âm tiết, và màn hình nói rõ vì sao.
+
+Ba chuyện đáng ghi lại từ lúc làm:
+
+1. **Lần chuyển đổi đầu ra 18 trên 22 file câm hẳn.** Bộ lọc `loudnorm` của ffmpeg cần khoảng 3 giây
+   tín hiệu, gặp file ngắn thì trả về im lặng — mà nhìn danh sách thì kích cỡ file vẫn bình thường.
+   Tôi chỉ phát hiện ra khi đo đường năng lượng để tìm chỗ cắt. `scripts/kiem-am-nguoi.py` giờ canh
+   đúng lỗi này, và đã thử cho nó chạy trên chính bộ file câm đó: nó báo trượt cả 22 file.
+2. **Không tin nhãn trên Commons.** Mô tả của file /z/ ở đó ghi "voiceless bilabial". Nên mọi nhãn
+   được đo lại: /z/ và /v/ rung dây thanh còn /s/ và /f/ không; /s/ rít cao hơn /ʃ/ (5,3 kHz với 3,5
+   kHz); bốn nguyên âm có F1, F2 xếp đúng thứ tự theo vị trí lưỡi. Mỗi phép đo đã được thử trên chỗ
+   biết trước đáp án — tráo file /s/ với /z/, /s/ với /ʃ/, /iː/ với /æ/ — và đều bắt được. Hai chỗ
+   đo không được thì nói thẳng: /p/ với /b/, /θ/ với /ð/ khác nhau quá ít trong bản thu, máy đo của
+   tôi không tách được; nhãn của chúng dựa vào việc đây là file chuẩn của Wikipedia.
+3. **Máy đo cũng phải được kiểm.** Lần đầu đo formant ở 16 kHz mà giữ bậc LPC 12, nó ra F1 của /ɪ/
+   là 2260 Hz — vô lý. Bậc phải theo tần số lấy mẫu (số kHz + 2); đo ở 10 kHz thì ra 360 Hz, đúng.
+
+Một chỗ chưa thử trên máy thật: trên iPhone, tiếng phát bằng Web Audio thường bị tắt khi gạt công
+tắc im lặng (âm máy dựng trước đây cũng đi đường này). Không nghe thấy gì thì gạt công tắc lên trước.
+
 ## Cấu trúc
 
 ```
@@ -1089,9 +1127,10 @@ node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự bá
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 97 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 125 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
+python3 scripts/kiem-am-nguoi.py  # đo lại 32 file tiếng người trong assets/am (cần ffmpeg, numpy)
 ```
 
 ## Sửa chính tả trong nguồn

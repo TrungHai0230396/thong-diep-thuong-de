@@ -261,17 +261,82 @@ ok('âm kéo dài được thì hơi thoát đều suốt', self.TDTD_PHATAM._kh
 ok('mỗi khung là một tư thế khác nhau, không đứng yên',
    new Set(self.TDTD_PHATAM._khung(AM[2].kh, true).map(k => JSON.stringify(k.p))).size >= 3);
 
-console.log('\n— Nghe bằng giọng NGƯỜI, không phải âm máy dựng —');
-/* Bài học lớn nhất của vòng này: đo đúng phổ KHÔNG có nghĩa là tai người nghe ra. Bộ dựng âm
-   khớp số liệu ngữ âm học trên 47 phép đo, mà người dùng nghe vẫn không hiểu gì. Nên thứ dẫn
-   dắt người học phải là từ thật đọc bằng giọng người; âm dựng lùi xuống làm phần phụ. */
-ok('bước đầu dẫn bằng từ thật, không phát âm rời',
-   /Bước 1 — nghe cho quen tai[\s\S]{0,400}pa-tu-nut/.test(nguon)
-   && !/Bước 1[\s\S]{0,200}data-am="1">Nghe âm/.test(nguon));
-ok('có nói rõ đâu là giọng người', /Giọng người, do máy đọc của máy bạn phát/.test(nguon));
-ok('âm máy dựng còn giữ nhưng nói thẳng là tiếng máy',
-   /tách riêng \(tiếng máy dựng\)/.test(nguon) && /nghe máy móc và khó bắt/.test(nguon));
-ok('nói rõ vì sao máy đọc không đọc được âm rời', /tên chữ cái Hy Lạp/.test(nguon));
+console.log('\n— Bước đầu: NGƯỜI THẬT đọc chính cái âm, không phải từ, không phải máy dựng —');
+/* Hai bài học chồng lên nhau. Một: đo đúng phổ KHÔNG có nghĩa là tai người nghe ra — âm máy dựng
+   khớp 47 phép đo mà người dùng nghe không hiểu gì. Hai: thay nó bằng TỪ do máy đọc thì nghe được,
+   nhưng cả bài thành luyện từ, trong khi người học cần luyện chính cái âm /s/, /z/. Bản thu người
+   thật là cách duy nhất có cả giọng người lẫn âm đứng riêng. */
+const AN = require('../assets/amnguoi.js');
+self.TDTD_AMNGUOI = AN;
+const P = self.TDTD_PHATAM;
+ok('bước đầu dẫn bằng bản thu người thật',
+   /Bước 1 — nghe người thật đọc âm này[\s\S]{0,300}pa-nguoi/.test(nguon));
+ok('bước đầu không còn nút âm máy dựng', !/data-am="1"/.test(nguon) && !/tách riêng \(tiếng máy dựng\)/.test(nguon));
+ok('từ do máy đọc vẫn còn, nhưng lùi xuống sau bản thu',
+   /Bước 1 — nghe người thật[\s\S]{0,1500}<p class="pa-nhan">Trong từ<\/p>/.test(nguon));
+ok('vẫn nói rõ vì sao máy đọc không đọc được âm rời', /tên chữ cái Hy Lạp/.test(doc('amnguoi.js')));
+ok('bài nào cũng có ít nhất một âm do người thật đọc', AM.every(a => P._dsNguoi(a).length >= 1),
+   AM.filter(a => !P._dsNguoi(a).length).map(a => a.ipa).join(', '));
+ok('âm chính của bài đứng đầu và không bị tô là cái sai', AM.every(a => !P._dsNguoi(a)[0].startsWith('!')));
+const lCuoi = AM.find(a => a.ipa === '/l/ cuối');
+ok('vế sai được tô riêng: /l/ cuối nói thành /n/', lCuoi && P._dsNguoi(lCuoi).join(' ') === 'l !n',
+   lCuoi && P._dsNguoi(lCuoi).join(' '));
+ok('âm trùng nhau chỉ hiện một lần (cụm -ld: l-toi ở cả hai vế)',
+   AM.every(a => new Set(P._dsNguoi(a).map(x => x.replace('!', ''))).size === P._dsNguoi(a).length));
+
+console.log('\n— Bản thu người thật: đủ file, đúng chỗ, có ghi công —');
+ok('đủ 22 âm', AN.DS.length === 22, `${AN.DS.length}`);
+ok('mã âm không trùng', new Set(AN.DS.map(x => x.ma)).size === AN.DS.length);
+ok('âm nào cũng có người thu, file gốc, lời gợi ý, và nói rõ bản thu đọc gì',
+   AN.DS.every(x => x.tacGia && /\.ogg$/.test(x.tep) && x.goiY.length > 10 && /^\[/.test(x.noi)));
+ok('âm hay lẫn khai báo đều có thật', AN.DS.every(x => x.doi.every(m => AN.tim(m))),
+   AN.DS.flatMap(x => x.doi.filter(m => !AN.tim(m))).join(', '));
+ok('mọi mã âm dùng trong các bài đều tìm được bản thu',
+   AM.every(a => [].concat(a.am, a.am2 || []).every(m => AN.tim(m))),
+   AM.flatMap(a => [].concat(a.am, a.am2 || []).filter(m => !AN.tim(m))).join(', '));
+/* Âm tắc (p, t, k...) cắt riêng ra chỉ còn một tiếng tách — không được có bản "chỉ âm". */
+const TAC = ['p', 'b', 't', 'd', 'k', 'g'];
+ok('âm tắc không có bản "chỉ âm"', AN.DS.filter(x => TAC.includes(x.ma)).every(x => !x.cat));
+ok('nguyên âm không có bản "chỉ âm" (cả file đã là âm đứng riêng)', AN.DS.filter(x => x.nhom === 'nguyen').every(x => !x.cat));
+ok('mốc cắt hợp lý: 0,1–0,4 giây, nằm trong nửa giây đầu',
+   AN.DS.filter(x => x.cat).every(x => x.cat[0] >= 0 && x.cat[1] <= .6 && x.cat[1] - x.cat[0] >= .1 && x.cat[1] - x.cat[0] <= .4));
+const thieu = AN.DS.flatMap(x => [AN.duongDan(x.ma), x.cat && AN.duongDan(x.ma, true)].filter(Boolean))
+  .filter(f => !fs.existsSync(path.join(__dirname, '..', f)));
+ok('file nào khai báo cũng có trên đĩa', thieu.length === 0, thieu.join(', '));
+ok('âm không có bản "chỉ âm" thì không trả về đường dẫn ma', AN.duongDan('p', true) === null);
+ok('/l/ cuối dùng bản thu /l/', AN.duongDan('l-toi') === 'assets/am/l.mp3');
+const ghiCong = fs.readFileSync(path.join(__dirname, '..', 'assets', 'am', 'NGUON.md'), 'utf8');
+ok('file ghi nguồn có đủ người thu, giấy phép, và từng file',
+   AN.tacGia().every(t => ghiCong.includes(t)) && ghiCong.includes('CC BY-SA 3.0')
+   && AN.DS.every(x => ghiCong.includes('`' + x.ma + '.mp3`')));
+ok('trên màn hình có ghi công người thu và giấy phép', /Tiếng người thật:/.test(nguon) && /GIAY_PHEP\.url/.test(nguon));
+ok('sw.js cất sẵn danh sách âm', /'assets\/amnguoi\.js'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+const trang = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+ok('trang nạp danh sách âm trước ipa.js', trang.indexOf('amnguoi.js') > 0 && trang.indexOf('amnguoi.js') < trang.indexOf('ipa.js'));
+ok('mất mạng thì không đem trang HTML đi giải mã thành tiếng', /\/html\/i\.test\(r\.headers\.get\('content-type'\)/.test(nguon));
+ok('đóng sao giữa lúc đang thu thì tắt micro ngay', /function dong\(\) \{[\s\S]{0,160}if \(huyThu\) huyThu\(\)/.test(nguon));
+
+console.log('\n— Nói theo: gọt tiếng bạn vừa thu —');
+const SRT = 16000;
+const lamTieng = (phan) => {       // phan: [[giây, biên độ, tần số]] nối nhau; tần số 0 = nhiễu
+  const ra = []; let pha = 0, hat = 7;
+  for (const [giay, bien, tan] of phan) for (let i = 0; i < giay * SRT; i++) {
+    hat = (hat * 1103515245 + 12345) % 2147483648;
+    ra.push(tan ? bien * Math.sin(pha += 2 * Math.PI * tan / SRT) : bien * (hat / 1073741824 - 1));
+  }
+  return Float32Array.from(ra);
+};
+const dinhCua = (y) => y.reduce((m, v) => Math.max(m, Math.abs(v)), 0);
+ok('im lặng thì không có gì để nghe lại', P._gonTieng(new Float32Array(SRT), SRT) === null);
+ok('chỉ có tiếng ồn nền thì cũng không', P._gonTieng(lamTieng([[1, .003, 0]]), SRT) === null);
+const g1 = P._gonTieng(lamTieng([[.3, .002, 0], [.5, .3, 180], [.4, .002, 0]]), SRT);
+ok('bỏ được đoạn lặng hai đầu', g1 && g1.length / SRT > .5 && g1.length / SRT < .75, g1 && (g1.length / SRT).toFixed(2) + ' giây');
+ok('nâng lên ngang bản mẫu', g1 && Math.abs(dinhCua(g1) - .8) < .02, g1 && dinhCua(g1).toFixed(2));
+const g2 = P._gonTieng(lamTieng([[.3, .0005, 0], [.5, .02, 180], [.3, .0005, 0]]), SRT);
+ok('micro nhỏ vẫn nghe được: tiếng nhỏ được nâng lên', g2 && dinhCua(g2) > .35, g2 && dinhCua(g2).toFixed(2));
+ok('nhưng không nâng quá 20 lần, kẻo tiếng ồn gầm lên', g2 && dinhCua(g2) <= .02 * 20 + 1e-6);
+ok('vuốt hai đầu, không có tiếng tách', g1 && Math.abs(g1[0]) < 1e-3 && Math.abs(g1[g1.length - 1]) < 1e-3);
+
 ok('luyện tai đọc TỪ trong cặp, không phát âm rời',
    /function docLuot[\s\S]{0,160}am\.cap\[l\.c\]/.test(nguon));
 ok('câu hỏi hỏi về TỪ chứ không hỏi về âm', /Bạn vừa nghe từ nào/.test(nguon));
