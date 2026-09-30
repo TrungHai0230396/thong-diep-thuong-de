@@ -716,3 +716,41 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .xn-ten-su{display:block;width:100%;margin:10px 0 8px;padding:10px 12px;border-radius:12px;font-size:16px;
   border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:var(--ink)}
 .xn-them-lap{width:100%}
+
+/* ---------- thần số học ---------- */
+.thanso{position:fixed;inset:0;z-index:30;display:none;
+  background:radial-gradient(120% 80% at 50% 0%,#231a3a 0%,#15112a 55%,#0c0a17 100%)}
+.thanso.hien{display:block}
+.ts-dau{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 6px}
+.ts-sinh{margin:0;font-size:13px;color:rgba(244,239,230,.6)}
+.ts-so{margin:4px 0 0;text-align:center;font-size:58px;font-weight:200;line-height:1;color:#d7c3f5;font-variant-numeric:lining-nums}
+.ts-ten{margin:4px 0 8px;text-align:center;font-size:15px;color:rgba(244,239,230,.9)}
+.ts-buoc{margin:0 0 12px;text-align:center;font-size:11.5px;line-height:1.6;color:rgba(244,239,230,.45);word-break:break-word}
+.ts-manh,.ts-yeu{margin:0 0 6px;font-size:13.5px;line-height:1.65;color:rgba(244,239,230,.78)}
+.ts-manh b{color:#a8d8b0;font-weight:500;margin-right:6px}
+.ts-yeu b{color:#e8b492;font-weight:500;margin-right:6px}
+.ts-luoi{display:grid;grid-template-columns:auto repeat(3,1fr);gap:6px;align-items:center;max-width:320px;margin:8px auto 6px}
+.ts-tang{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:rgba(244,239,230,.4);padding-right:4px;text-align:right}
+.ts-o{display:grid;place-items:center;aspect-ratio:1/1;border-radius:12px;font-size:18px;letter-spacing:.04em;
+  border:1px solid rgba(215,195,245,.3);background:rgba(215,195,245,.08);color:#e6dafa;word-break:break-all;padding:4px;text-align:center}
+.ts-o.trong{border-style:dashed;border-color:rgba(255,255,255,.1);background:transparent;color:rgba(244,239,230,.18)}
+.ts-giua{text-align:center}
+.ts-nhom{margin:14px 0 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,239,230,.5)}
+.ts-mt{margin:0 0 7px;font-size:13px;line-height:1.6;color:rgba(244,239,230,.75)}
+.ts-mt b{font-weight:500}
+.ts-mt.day b{color:#a8d8b0}
+.ts-mt.trong b{color:#e8b492}
+.ts-mt i{font-style:normal;font-size:11.5px;color:rgba(244,239,230,.4)}
+.ts-nam-mot{margin:0 0 12px}
+.ts-nam-dau{margin:0 0 3px;font-size:15px;color:rgba(244,239,230,.92)}
+.ts-nam-dau b{color:#d7c3f5;font-weight:500}
+.ts-nam-y{margin:0 0 3px;font-size:13px;line-height:1.6;color:rgba(244,239,230,.72)}
+.ts-nam-mot .ts-buoc{text-align:left;margin:0}
+.ts-dinh{display:flex;gap:12px;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
+.ts-dinh.nay .ts-dinh-so{background:rgba(215,195,245,.22);border-color:rgba(215,195,245,.7)}
+.ts-dinh-so{flex:0 0 40px;height:40px;display:grid;place-items:center;border-radius:50%;font-size:17px;
+  border:1px solid rgba(215,195,245,.3);color:#e6dafa}
+.ts-dinh-dau{margin:0 0 2px;font-size:14px;color:rgba(244,239,230,.9)}
+.ts-dinh-dau span{font-size:12px;color:rgba(244,239,230,.45)}
+.ts-dinh-dau em{font-style:normal;font-size:11px;margin-left:6px;white-space:nowrap;padding:2px 7px;border-radius:999px;background:rgba(215,195,245,.18);color:#d7c3f5}
+.ts-dinh-y{margin:0;font-size:12.5px;line-height:1.55;color:rgba(244,239,230,.62)}

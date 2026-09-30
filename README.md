@@ -54,6 +54,7 @@ Gửi cho ai một trong những địa chỉ này là họ mở thẳng vào tr
 | Nối sao thành chòm | `#noi-sao` |
 | Bầu trời đêm nay | `#troi-dem` |
 | Xem ngày | `#xem-ngay` |
+| Thần số học | `#than-so` |
 
 Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và tự chạy được cả khi mất mạng. Bấm ngôi sao thì địa chỉ tự đổi theo, **đóng trò thì địa chỉ trở về trang chủ**. Nút Back của điện thoại cũng đóng trò lại chứ không thoát hẳn khỏi app.
 
@@ -76,7 +77,7 @@ Thêm một ngôi sao mới chỉ cần thêm một dòng vào mảng `SAO` ở 
 
 Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, lá bài lẫn các sao đã đặt (cách nhau tối thiểu 18 px). Hết chỗ thì chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài, nên chữ không bao giờ bị che. Đã thử 24 ngôi sao trên màn 375×812, rải 60 lần: không cặp nào đè nhau, không sao nào đè chữ hay lọt ra ngoài màn hình.
 
-Hiện có tám ngôi sao. Sáu ngôi đầu tả ngay dưới đây, hai ngôi mới nhất — xem ngày và bầu trời đêm nay — có mục riêng ở cuối:
+Hiện có chín ngôi sao. Sáu ngôi đầu tả ngay dưới đây, ba ngôi mới nhất — xem ngày, thần số học và bầu trời đêm nay — có mục riêng ở cuối:
 
 ### Sao xanh ngọc — Mùa Chín
 
@@ -687,6 +688,26 @@ Một ngôi sao màu son đỏ, `#xem-ngay`. Ba phần trên một màn hình:
 
 Chưa thử được tháng nhuận — không ngày mẫu nào rơi vào tháng nhuận. Thần của tháng nhuận đang dùng số của tháng nó lặp lại.
 
+## Thần số học
+
+Một ngôi sao màu tím nhạt, `#than-so`. Nhập ngày sinh dương lịch (dùng chung với Xem ngày, chỉ lưu trong máy), app tính theo **thần số học Pythagoras** — phương pháp của David A. Phillips mà bản tiếng Việt *Thay đổi cuộc sống với Nhân số học* (Lê Đỗ Quỳnh Hương) giới thiệu:
+
+- **Số chủ đạo**, kèm từng bước cộng để tự kiểm, tên gọi, thế mạnh và điều nên để ý.
+- **Biểu đồ ngày sinh** 3×3 (hàng trên 3-6-9 trí não, giữa 2-5-8 tinh thần, dưới 1-4-7 thể chất) và các **mũi tên**: 8 mũi tên đầy (Kế hoạch, Ý chí, Hoạt động, Thực tế, Cân bằng cảm xúc, Trí tuệ, Quyết tâm, Tâm linh) và 7 mũi tên trống (Uất giận, Thụ động, Thiếu trật tự, Nhạy cảm, Trí nhớ ngắn hạn, Trì hoãn, Hoài nghi). Không có mũi tên trống 1-2-3 vì năm sinh nào cũng có chữ số 1 hoặc 2.
+- **Năm cá nhân** năm nay và năm sau.
+- **Bốn đỉnh cao**: số, tuổi và năm của từng đỉnh, đánh dấu đỉnh đang ở.
+
+**Không có sách gốc trong tay** — bản PDF trên mạng là bản sao không rõ quyền nên không dùng. Mọi quy tắc lấy từ chỗ các nguồn đối chiếu được (thansohoconline.com, viettopreview.vn, vietnamworks.com, tracuuthansohoc.com, arena.fpt.edu.vn, tinhte.vn, và một bài blog trích nguyên văn Phillips về 16 mũi tên) **nhất trí**, và chỗ nào lệch nhau thì ghi ra:
+
+- **Số chủ đạo cộng thẳng mọi chữ số**, rút gọn tới khi được 2–11, tổng đúng bằng 22 thì ghi 22/4. Có trang rút gọn riêng ngày, tháng, năm rồi mới cộng; hai cách ra cùng kết quả gần như mọi ngày, chỉ lệch ở 22/4 (sinh 20/2/1971: cộng thẳng ra 22, rút gọn từng phần ra 4). Các trang định nghĩa 22/4 theo "số tổng" bằng 22, nên cộng thẳng. Có trang theo trường phái phương Tây giữ cả 33 và không có số 10 — không theo, vì không phải trường phái của sách.
+- **Năm cá nhân** rút về 1–9 theo chu kỳ 9 năm. Có trang giữ 11 và 22 — ghi nhận, không theo.
+- **Tuổi đỉnh cao** là 36 trừ số chủ đạo; các trang ghi rõ số 11 thì đỉnh đầu ở 25 tuổi. Với **22/4 không trang nào nói trừ 22 hay trừ 4**; app trừ 22 như với 11, và giao diện nói thẳng chỗ chưa rõ này, kèm bốn tuổi nếu trừ 4.
+- Có trang nói 22/4 "chỉ khoảng 1–2%". Đếm thật trên mọi ngày từ 1920 tới 2030 thì ra 3,4% — con số đó không đúng.
+
+Lời giảng các con số viết lại bằng lời của app, ngắn, nói cả thế mạnh lẫn điều nên để ý, không phán chắc; cuối trang nói rõ thần số học không có cơ sở khoa học. Chưa làm phần tính theo **họ tên** (số linh hồn, số sứ mệnh…): cách đổi tên tiếng Việt có dấu và chữ Y mỗi nơi một kiểu.
+
+`scripts/test-sohoc.js`, 29 bài: các ví dụ có lời giải trong nguồn (19/8/1991 ra 11; 29/11/1994 và 11/2/1985 ra 9; năm cá nhân của người sinh 31/1 các năm 2022–2026 và 27/2 các năm 2018–2020; chân kim tự tháp của 1/5/1974 và 10/5/2001; số 11 đỉnh đầu 25 tuổi), và các tính chất trên cả 40.542 ngày từ 1920 tới 2030: không có số chủ đạo 1, 22/4 khi và chỉ khi tổng bằng 22, năm cá nhân luôn 1–9, đỉnh 1 và 2 luôn một chữ số.
+
 ## Bầu trời đêm nay
 
 Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở chỗ bạn đang đứng, vào đúng lúc này**: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường thấy được, và tám chòm sao mượn lại toạ độ thật của trò Nối sao. Kéo để nhìn quanh, hoặc bấm *Xoay theo máy* rồi giơ điện thoại lên — hướng máy về phía nào thì thấy bầu trời phía đó.
@@ -1106,6 +1127,9 @@ assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận 
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
 scripts/mau-am.js          tạo giọng mẫu bằng lệnh `say` của macOS, trộn tiếng ồn
 scripts/test-lich.js       97 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
+assets/sohoc.js            thần số học: hàm thuần, ngày sinh vào, các con số ra
+assets/thanso.js           giao diện ngôi sao thần số học
+scripts/test-sohoc.js      29 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1126,6 +1150,7 @@ node scripts/test-troidem.js     # chạy 51 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
+node scripts/test-sohoc.js       # chạy 29 kiểm thử thần số học
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 125 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)
