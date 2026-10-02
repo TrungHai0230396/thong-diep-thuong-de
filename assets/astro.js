@@ -124,12 +124,29 @@ function nhatTam(ten, T) {
   const w = vp - On;                                   // đối số cận nhật
   const M = quanh(L - vp);
   const E = keplerE(M, e);
-  const x = a * (cos(E) - e), y = a * Math.sqrt(1 - e * e) * sin(E);
+  return xoayQuyDao(a * (cos(E) - e), a * Math.sqrt(1 - e * e) * sin(E), w, On, I);
+}
+
+/* Từ mặt phẳng quỹ đạo sang hệ hoàng đạo: quay theo đối số cận nhật, độ nghiêng, kinh độ nút lên. */
+function xoayQuyDao(x, y, w, On, I) {
   return {
     x: (cos(w) * cos(On) - sin(w) * sin(On) * cos(I)) * x + (-sin(w) * cos(On) - cos(w) * sin(On) * cos(I)) * y,
     y: (cos(w) * sin(On) + sin(w) * cos(On) * cos(I)) * x + (-sin(w) * sin(On) + cos(w) * cos(On) * cos(I)) * y,
     z: (sin(w) * sin(I)) * x + (cos(w) * sin(I)) * y,
   };
+}
+
+/* Cho mô hình Hệ Mặt Trời: vị trí nhật tâm lúc JD, và cả vòng quỹ đạo (n điểm đều theo dị thường lệch tâm). */
+const nhatTamJD = (ten, JD) => nhatTam(ten, (JD - 2451545.0) / 36525);
+function quyDao(ten, JD, n = 120) {
+  const T = (JD - 2451545.0) / 36525, b = BANG[ten];
+  const a = b[0] + b[1] * T, e = b[2] + b[3] * T, I = b[4] + b[5] * T, vp = b[8] + b[9] * T, On = b[10] + b[11] * T;
+  const ds = [];
+  for (let k = 0; k < n; k++) {
+    const E = k * 360 / n;
+    ds.push(xoayQuyDao(a * (cos(E) - e), a * Math.sqrt(1 - e * e) * sin(E), vp - On, On, I));
+  }
+  return ds;
 }
 
 function hanhTinh(ten, JD) {
@@ -327,7 +344,7 @@ function giaiSao(du, dem) {
 
 const API = { ngayJulius, matTroi, matTrang, hanhTinh, docCao, gioSao, khucXa,
               mocLan, trangThaiMocLan, huongMay, vecHuong, gocHuong, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG),
-              tueSai, tuThienHa, CUC_THIEN_HA, khoiKhi, nhietDoSao, mauSao, giaiSao };
+              tueSai, tuThienHa, CUC_THIEN_HA, khoiKhi, nhietDoSao, mauSao, giaiSao, nhatTamJD, quyDao, nghieng };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 else self.TDTD_ASTRO = API;

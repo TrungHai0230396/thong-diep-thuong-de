@@ -52,7 +52,7 @@ global.matchMedia = () => ({ matches: false, addEventListener() {} });
 
 /* Chòm sao do constellation.js cung cấp qua self.TDTD_CHOMSAO — thiếu nó thì bầu trời vẫn
    chạy nhưng không có chòm nào, nên phải nạp đủ mới kiểm được đúng thứ người dùng thấy. */
-for (const t of ['astro.js', 'constellation.js', 'saosang.js', 'nightsky.js'])
+for (const t of ['astro.js', 'constellation.js', 'saosang.js', 'nightsky.js', 'datlien.js', 'vutru.js'])
   new Function(fs.readFileSync(path.join(__dirname, '..', 'assets', t), 'utf8'))();
 const T = global.TDTD_TROIDEM;
 
@@ -325,6 +325,66 @@ console.log('\n— Chiều sâu: sao thật, Ngân Hà, Mặt Trăng hình cầu
   let loi = null;
   try { T._nhin(200, 35, 75); T._ve(DEM); T._datGoc(14); T._ve(DEM); T._nhin(0, 88, 75); T._ve(DEM); T._datGoc(75); T._ve(NGAY); } catch (e) { loi = e.message; }
   ok('vẽ đủ các tư thế (đêm, ngày, phóng to, nhìn thẳng lên đỉnh đầu) không nổ lỗi', loi === null, loi || '');
+}
+
+console.log('\n— Nhìn từ vũ trụ: Trái Đất, Mặt Trăng, Hệ Mặt Trời —');
+{
+  const V = global.TDTD_VUTRU, A = global.TDTD_ASTRO;
+  ok('có cảnh vũ trụ', !!V && typeof V.ve === 'function');
+  const DIEM = [['Hà Nội', 21.03, 105.85, 1], ['TP.HCM', 10.82, 106.63, 1], ['giữa Biển Đông', 14, 114, 0], ['giữa Thái Bình Dương', 0, -150, 0],
+                ['Sahara', 23, 13, 1], ['Nam Cực', -85, 0, 1], ['giữa Đại Tây Dương', 30, -40, 0], ['Mũi Cà Mau (đất liền)', 9.0, 105.0, 1]];
+  const sai = DIEM.filter(([, vi, kinh, la]) => Math.round(V._laDat(vi, kinh)) !== la).map(d => d[0]);
+  ok('bản đồ lục địa: đất ra đất, biển ra biển ở 8 điểm đã biết', !sai.length, sai.join(', '));
+
+  const noi = { ten: 'TP.HCM', vi: 10.8231, kinh: 106.6297 };
+  let lech = 0, lechTrang = 0;
+  for (let h = 0; h < 48; h++) {
+    const luc = DEM + h * 36e5, JD = A.ngayJulius(luc), c = V._canhTD(JD, noi);
+    const t = A.matTroi(JD), cao = A.docCao(t.ra, t.dec, noi.vi, noi.kinh, JD).cao;
+    lech = Math.max(lech, Math.abs((c.u.x * c.s.x + c.u.y * c.s.y + c.u.z * c.s.z) - Math.sin(cao * Math.PI / 180)));
+    const cosI = -(c.vM.x * c.s.x + c.vM.y * c.s.y + c.vM.z * c.s.z);
+    lechTrang = Math.max(lechTrang, Math.abs((1 + cosI) / 2 - c.sang));
+  }
+  ok('chấm "chỗ bạn đứng" quay theo Trái Đất đúng giờ: nửa ngày, nửa đêm khớp độ cao Mặt Trời ngoài trời (48 giờ liền)', lech < .01, lech.toExponential(1));
+  ok('phần Mặt Trăng được chiếu sáng trên quả cầu khớp phần đĩa sáng của trăng ngoài trời', lechTrang < .02, lechTrang.toFixed(3));
+
+  /* Mặt Trăng ở cảnh vũ trụ dùng cùng bản đồ biển, và quay đúng mặt gần về Trái Đất: chiếu như trăng tròn,
+     điểm Biển Nguy hiểm phải tối hơn cao nguyên phía Nam */
+  const c = V._canhTD(A.ngayJulius(DEM), noi), vM = c.vM;
+  const CUC = { x: 0, y: -Math.sin(23.4393 * Math.PI / 180), z: Math.cos(23.4393 * Math.PI / 180) };
+  const zl = { x: -vM.x, y: -vM.y, z: -vM.z }, d0 = CUC.x * zl.x + CUC.y * zl.y + CUC.z * zl.z;
+  let yl = { x: CUC.x - d0 * zl.x, y: CUC.y - d0 * zl.y, z: CUC.z - d0 * zl.z };
+  const ly = Math.hypot(yl.x, yl.y, yl.z); yl = { x: yl.x / ly, y: yl.y / ly, z: yl.z / ly };
+  const xl = { x: vM.y * yl.z - vM.z * yl.y, y: vM.z * yl.x - vM.x * yl.z, z: vM.x * yl.y - vM.y * yl.x };
+  const diem = (vi, kinh) => { const r = Math.PI / 180, X = Math.cos(vi * r) * Math.sin(kinh * r), Y = Math.sin(vi * r), Z = Math.cos(vi * r) * Math.cos(kinh * r);
+    return { x: X * xl.x + Y * yl.x + Z * zl.x, y: X * xl.y + Y * yl.y + Z * zl.y, z: X * xl.z + Y * yl.z + Z * zl.z }; };
+  const tron = { ...c, s: zl };
+  const bien = V._mauTrang(diem(16.18, 59.1), tron)[0], caoNguyen = V._mauTrang(diem(-50, 10), tron)[0];
+  ok('Mặt Trăng quay mặt gần về Trái Đất: Biển Nguy hiểm tối hơn cao nguyên phía Nam', bien < caoNguyen * .8, `${Math.round(bien)} so với ${Math.round(caoNguyen)}`);
+
+  const hm = V._homMai(A.ngayJulius(DEM));
+  ok('Sao Kim không xa Mặt Trời quá 48°, Sao Thuỷ không quá 28° — nên chỉ thấy lúc chiều tối hoặc rạng sáng',
+     Math.abs(hm[0].lech) <= 48 && Math.abs(hm[1].lech) <= 28, hm.map(h => `${h.ten} ${h.lech.toFixed(1)}°`).join(', '));
+
+  const k = V._datMay({ x: 1, y: 2, z: 3 }, { yaw: 30, pitch: 20, xa: 9 }, 380, 720), p = V._chieu({ x: 1, y: 2, z: 3 });
+  ok('máy quay nhìn đúng vào đích: đích nằm giữa màn', p && Math.abs(p.x - 190) < 1e-6 && Math.abs(p.y - 360) < 1e-6);
+  void k;
+  ok('nút tua: giờ thật → 1 giờ mỗi giây → 1 ngày mỗi giây → giờ thật', [V.doiTua(), V.doiTua(), V.doiTua()].join(' · ') === '1 giờ mỗi giây · 1 ngày mỗi giây · Giờ thật');
+  const cv = { measureText: () => ({ width: 40 }) };
+  const ctxGia = new Proxy(cv, { get: (o, k2) => k2 in o ? o[k2] : (k2 === 'createRadialGradient' || k2 === 'createLinearGradient') ? () => ({ addColorStop() {} }) : () => {}, set: () => true });
+  let loi = null;
+  try {
+    V.vao(); V.ve(ctxGia, 380, 720, 2, DEM, noi);
+    V.doiCanh(); V.ve(ctxGia, 380, 720, 2, DEM, noi); V.doiCanh();
+    V.batDauKeo(100, 100); V.keo(200, 50); V.thaKeo(); V.phong(.5); V.phong(100);
+  } catch (e) { loi = e.message; }
+  ok('vẽ hai cảnh, kéo xoay, phóng to thu nhỏ không nổ lỗi', loi === null, loi || '');
+  const cam = V._cam();
+  ok('phóng to thu nhỏ có giới hạn: không chui vào trong Trái Đất, không bay quá xa', cam.traiDat.xa >= 2.4 && cam.traiDat.xa <= 30, `${cam.traiDat.xa}`);
+  ok('ngước quá đầu không lộn ngược: góc ngẩng kẹp trong ±85°', Math.abs(cam.traiDat.pitch) <= 85);
+  T._vuTru(true);
+  ok('bật cảnh vũ trụ từ bầu trời, rồi đóng màn thì về lại bầu trời', T._vuTru() === true && (T.dong(), T._vuTru() === false));
+  T.mo();
 }
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);

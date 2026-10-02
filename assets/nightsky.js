@@ -56,6 +56,8 @@ let noi = { ten: 'TP.HCM', vi: 10.8231, kinh: 106.6297, tuMay: false };
 let daChon = false;
 let huongNhin = 180, caoNhin = 25, goc = 75;             // đang nhìn về đâu, và mở góc bao nhiêu
 let theoMay = false, batTheoMay = null;
+let vuTru = false;       // đang ở cảnh "nhìn từ vũ trụ" (assets/vutru.js)
+const V = () => self.TDTD_VUTRU;
 let keo = null, chon = null;
 let mucMay = null;       // hướng cảm biến vừa đọc; màn hình trôi dần về đó chứ không nhảy theo
 let quanTinh = null;     // vận tốc còn lại sau khi nhấc ngón, độ mỗi mili giây
@@ -947,9 +949,20 @@ function vong(t) {
   raf = requestAnimationFrame(vong);
   const dt = vong.tr && t ? Math.min(50, Math.max(0, t - vong.tr)) : 16.7;
   vong.tr = t;
+  const luc = Date.now();
+  if (vuTru && V()) {
+    const kq = V().ve(ctx, W, H, DPR, luc, noi);
+    if (!vong.t || luc - vong.t > 1000) {
+      vong.t = luc;
+      const q = tam.querySelector('.td-tin'), html = V().giaiThich(kq, noi);
+      if (q._html !== html) { q._html = html; q.innerHTML = html; }
+      const nt = tam.querySelector('.td-tua'), tt = 'Tua: ' + V().tua();
+      if (nt.textContent !== tt) nt.textContent = tt;
+    }
+    return;
+  }
   troiNhin(dt);
   keoNhin(dt);
-  const luc = Date.now();
   const b = ve(luc);
   veThe.b = b; veThe.luc = luc;
   if (!vong.t || luc - vong.t > 1000) {
@@ -984,6 +997,9 @@ function dungKhung() {
     <div class="td-thanh">
       <button class="td-noi" type="button">Đổi nơi</button>
       <button class="td-may" type="button">Xoay theo máy</button>
+      <button class="td-vutru" type="button">Nhìn từ vũ trụ</button>
+      <button class="td-canh" type="button" hidden>Hệ Mặt Trời</button>
+      <button class="td-tua" type="button" hidden>Tua: Giờ thật</button>
     </div>
     <div class="td-bang" hidden></div>`;
   document.body.appendChild(tam);
@@ -992,6 +1008,13 @@ function dungKhung() {
   tam.querySelector('.td-dong').onclick = dong;
   tam.querySelector('.td-noi').onclick = moBangChonNoi;
   tam.querySelector('.td-may').onclick = doiTheoMay;
+  tam.querySelector('.td-vutru').onclick = () => doiVuTru();
+  tam.querySelector('.td-canh').onclick = () => {
+    const c = V().doiCanh();
+    tam.querySelector('.td-canh').textContent = c === 'traiDat' ? 'Hệ Mặt Trời' : 'Trái Đất – Mặt Trăng';
+    vong.t = 0;
+  };
+  tam.querySelector('.td-tua').onclick = () => { tam.querySelector('.td-tua').textContent = 'Tua: ' + V().doiTua(); vong.t = 0; };
 
   /* Hai ngón chạm cùng lúc là chụm để phóng to/thu nhỏ: khoảng cách hai ngón đổi bao nhiêu lần thì
      góc nhìn đổi ngược lại bấy nhiêu lần. Đang chụm thì thôi kéo, kẻo bầu trời vừa phóng vừa trượt. */
@@ -999,14 +1022,19 @@ function dungKhung() {
   cv.addEventListener('pointerdown', e => {
     chamTay.set(e.pointerId, { x: e.clientX, y: e.clientY });
     quanTinh = null; ngam = null;
-    if (chamTay.size === 2) { chum = { d: kc(), goc }; keo = null; return; }
+    if (chamTay.size === 2) { chum = { d: kc(), dTruoc: kc(), goc }; keo = null; if (vuTru) V().thaKeo(); return; }
     if (chamTay.size > 2) return;
+    if (vuTru) { V().batDauKeo(e.clientX, e.clientY); return; }
     keo = { x: e.clientX, y: e.clientY, h: huongNhin, c: caoNhin, luc: Date.now(), xa: 0,
             tr: e.timeStamp, vh: 0, vc: 0 };
   });
   cv.addEventListener('pointermove', e => {
     if (chamTay.has(e.pointerId)) chamTay.set(e.pointerId, { x: e.clientX, y: e.clientY });
-    if (chum && chamTay.size >= 2) { datGoc(chum.goc * chum.d / kc()); return; }
+    if (chum && chamTay.size >= 2) {
+      if (vuTru) { V().phong(chum.dTruoc / kc()); chum.dTruoc = kc(); } else datGoc(chum.goc * chum.d / kc());
+      return;
+    }
+    if (vuTru) { V().keo(e.clientX, e.clientY); return; }
     if (!keo) return;
     if (theoMay) doiTheoMay();              // tự kéo tay thì tắt xoay theo máy, và nút cũng tắt theo
     keo.xa = Math.max(keo.xa, Math.hypot(e.clientX - keo.x, e.clientY - keo.y));
@@ -1024,6 +1052,7 @@ function dungKhung() {
   /* Chạm hay kéo? Nhích dưới 9px và nhả trong 450ms thì tính là CHẠM. Ngưỡng rộng tay vì
      ngón tay trên điện thoại không bao giờ đứng yên tuyệt đối. */
   cv.addEventListener('pointerup', e => {
+    if (vuTru) { V().thaKeo(); return; }
     if (keo && keo.xa < 9 && Date.now() - keo.luc < 450) {
       const r = cv.getBoundingClientRect();
       chonTai(e.clientX - r.left, e.clientY - r.top);
@@ -1041,10 +1070,27 @@ function dungKhung() {
   for (const s of ['pointercancel', 'pointerleave']) cv.addEventListener(s, (e) => { keo = null; nhac(e); });
   cv.addEventListener('wheel', e => {
     e.preventDefault();
-    datGoc(goc * Math.pow(1.0015, e.deltaY));
+    if (vuTru) V().phong(Math.pow(1.0015, e.deltaY)); else datGoc(goc * Math.pow(1.0015, e.deltaY));
   }, { passive: false });
   tam.querySelector('.td-phong').onclick = () => datGoc(GOC_THUONG);
   addEventListener('resize', () => { if (tam && tam.classList.contains('hien')) doCo(); });
+}
+
+/* Bật tắt cảnh nhìn từ vũ trụ. Vào thì tắt xoay theo máy (không có nghĩa ở ngoài vũ trụ), ẩn thẻ thiên
+   thể và nút phóng; ra thì về bầu trời như cũ. */
+function doiVuTru(bat = !vuTru) {
+  if (bat && !V()) return;
+  vuTru = bat;
+  if (bat && theoMay) doiTheoMay();
+  if (bat) { V().vao(); chon = null; ngam = null; }
+  const q = (k) => tam.querySelector(k);
+  q('.td-vutru').textContent = bat ? 'Về bầu trời' : 'Nhìn từ vũ trụ';
+  q('.td-may').hidden = bat; q('.td-noi').hidden = bat; q('.td-canh').hidden = !bat; q('.td-tua').hidden = !bat;
+  q('.td-the').hidden = true;
+  q('.td-phong').hidden = bat || Math.abs(GOC_THUONG / goc - 1) < .08;
+  if (bat) { q('.td-canh').textContent = V().canh() === 'traiDat' ? 'Hệ Mặt Trời' : 'Trái Đất – Mặt Trăng'; q('.td-tua').textContent = 'Tua: ' + V().tua(); }
+  q('.td-tin')._html = null; vong.t = 0;
+  tam.classList.toggle('vu-tru', bat);
 }
 
 /* Góc nhìn 12°–110°: hẹp nhất cỡ ống nhòm, rộng nhất cỡ mắt người. Lệch khỏi mặc định thì hiện
@@ -1175,6 +1221,7 @@ function mo() {
 
 function dong() {
   if (raf) { cancelAnimationFrame(raf); raf = null; }
+  if (vuTru && tam) doiVuTru(false);
   theoMay = false; mucMay = null; quanTinh = null;
   if (tam) {                               // mở lại màn thì nút không còn ghi "Đang xoay theo máy" nữa
     const nut = tam.querySelector('.td-may');
@@ -1229,5 +1276,6 @@ self.TDTD_TROIDEM = { mo, dong,
   _vien: vienTai,
   _bien: BIEN,
   _ketCauTrang: (R, cosI, gocSang, dem) => { khoTrang = null; return ketCauTrang(R, cosI, gocSang, dem); },
+  _vuTru: (b) => { if (b !== undefined) doiVuTru(b); return vuTru; },
   _chum: (d0, d1) => { chum = { d: d0, goc }; datGoc(chum.goc * d0 / d1); chum = null; return goc; } };
 })();

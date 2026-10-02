@@ -799,6 +799,18 @@ Vẽ một khung mất dưới 1 ms trên máy tính: sao xếp từ sáng tới
 
 `scripts/test-astro.js` thêm 14 bài: tuế sai đúng ví dụ 21.b của Meeus tới 0,004 giây cung; tâm, đối tâm, cực thiên hà đúng bảng Wikipedia; khối khí quyển; nhiệt độ Mặt Trời từ B−V; năm sao đối chiếu toạ độ, cấp sáng, màu với danh mục. `scripts/test-troidem.js` thêm 14 bài: Sao Bắc Cực đứng ở độ cao bằng vĩ độ, Ngân Hà dày về tâm thiên hà, ngưỡng sao theo trăng, trời, độ phóng; chụm hai ngón; hướng xoay kết cấu trăng; vị trí các biển; vẽ mọi tư thế không nổ.
 
+### Nhìn từ vũ trụ
+
+Nút **Nhìn từ vũ trụ** dưới đáy màn Trời đêm đổi sang cảnh 3D thứ hai, cũng đúng vị trí **thật lúc này** (`assets/vutru.js`, không thư viện 3D: phép chiếu phối cảnh tự viết, quả cầu tô từng điểm ảnh bằng tia chiếu):
+
+- **Trái Đất – Mặt Trăng.** Quả địa cầu có lục địa từ bản đồ *Natural Earth 1:110m* (public domain), đổi thành mặt nạ đất/biển 720 × 360 bằng `scripts/lam-datlien.py` (tô theo từng vĩ tuyến, luật chẵn lẻ), nén còn 10,6 KB trong `assets/datlien.js`. Trái Đất quay theo giờ sao: nửa quay về Mặt Trời là ban ngày, có dải chạng vạng mềm, biển loá nắng, viền khí quyển. **Chấm chỗ bạn đứng** ghi luôn "ban ngày" hay "ban đêm". Mặt Trăng ở đúng hướng của nó, nửa quay về Mặt Trời sáng — nhìn là hiểu vì sao đêm nay trăng khuyết — và luôn quay **cùng một mặt** về Trái Đất, dùng chung bản đồ biển với trăng ngoài trời. Mặt Trời ở rất xa: trong khung thì vẽ quầng, ngoài khung thì một mũi tên ở mép chỉ về phía nó. Khoảng cách Trái Đất – Mặt Trăng thật là 60 bán kính Trái Đất, vẽ thật thì trăng chỉ còn một chấm, nên **kéo lại gần 15 lần** và nói rõ trên màn; kích cỡ hai quả cầu đúng tỉ lệ.
+- **Hệ Mặt Trời.** Sáu hành tinh trên quỹ đạo theo bảng phần tử Kepler của JPL (đã dùng cho vị trí hành tinh trên trời). Khoảng cách tới Mặt Trời **nén theo căn bậc hai** (Sao Thổ xa gấp 25 lần Sao Thuỷ, vẽ thành 5 lần), hành tinh phóng to cho dễ thấy, nửa quay về Mặt Trời sáng. Dòng chữ nói Sao Kim, Sao Thuỷ đang ở phía Đông hay phía Tây Mặt Trời — tức đang là **Sao Hôm** (thấy lúc chiều tối) hay **Sao Mai** (thấy lúc rạng sáng).
+- Kéo để xoay, chụm hai ngón (hoặc lăn chuột) để phóng to; nút **Tua** cho thời gian chạy nhanh (1 giờ hay 1 ngày mỗi giây ở cảnh Trái Đất; 1 hay 10 ngày mỗi giây ở Hệ Mặt Trời) để thấy Trái Đất quay, Mặt Trăng đi quanh, hành tinh chạy trên quỹ đạo. Sao nền là 1.500 sao sáng nhất của cùng danh mục, đúng hướng thật.
+
+Ba chỗ sửa khi tự xem: Siberia trắng xoá vì băng tô cho mọi vùng đất trên 64° — giờ chỉ Nam Cực và vùng trên 70° Bắc; Sao Thổ bị cắt ngoài mép và tên các hành tinh gần Mặt Trời đè lên nhau — giờ góc nhìn theo cạnh ngắn của màn, ghi tên theo thứ tự ưu tiên và tránh chỗ đã có chữ; mũi tên chỉ Mặt Trời rơi vào khối chữ dưới đáy — giờ chỉ nằm trong vùng trống.
+
+`scripts/test-troidem.js` thêm 12 bài: mặt nạ đất đúng ở 8 điểm đã biết; chấm chỗ bạn đứng khớp độ cao Mặt Trời ngoài trời suốt 48 giờ (đã thử đảo chiều quay Trái Đất: bài kiểm bắt ngay); phần trăng được chiếu khớp phần đĩa sáng ngoài trời; trăng quay đúng mặt gần; Sao Kim không quá 48°, Sao Thuỷ không quá 28° khỏi Mặt Trời; máy quay, nút tua, giới hạn phóng; vẽ hai cảnh không nổ.
+
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
 Người dùng báo: *"bấm vô ngôi sao thì ko ra"*. Đây là lỗi tôi tự gây ra và tự đẩy lên mạng.
@@ -1179,7 +1191,10 @@ scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trì
 scripts/test-astro.js      64 kiểm thử thiên văn, đối chiếu số liệu ngoài
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
-scripts/test-troidem.js    65 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà
+scripts/test-troidem.js    77 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
+assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
+assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
+scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-sao.js        75 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
@@ -1210,7 +1225,7 @@ python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 64 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 65 kiểm thử bầu trời đêm
+node scripts/test-troidem.js     # chạy 77 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
