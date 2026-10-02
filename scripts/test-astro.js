@@ -323,5 +323,44 @@ ok('thiếu alpha hoặc gamma thì coi như 0, vẫn tính được', (() => {
   return v && Math.abs(v.cao - 50) < .5;
 })());
 
+console.log('\n— Sao thật: tuế sai, toạ độ thiên hà, khí quyển, màu sao —');
+{
+  /* Meeus, ví dụ 21.b: θ Persei J2000 (đã cộng chuyển động riêng) tới 13/11/2028 */
+  const JD = 2462088.69, nam = (JD - 2451545) / 365.25;
+  const ra0 = (2 + 44 / 60 + 11.986 / 3600) * 15 + 0.03425 * nam * 15 / 3600, de0 = 49 + 13 / 60 + 42.48 / 3600 - 0.0895 * nam / 3600;
+  const p = A.tueSai(ra0, de0, JD);
+  const raDung = (2 + 46 / 60 + 11.331 / 3600) * 15, deDung = 49 + 20 / 60 + 54.54 / 3600;
+  ok('tuế sai: đúng ví dụ 21.b của Meeus tới 0,1 giây cung (2h46m11,331s, +49°20′54,54″)',
+     Math.abs(p.ra - raDung) * 3600 < 0.1 && Math.abs(p.dec - deDung) * 3600 < 0.1,
+     `lệch ${((p.ra - raDung) * 3600).toFixed(3)}″, ${((p.dec - deDung) * 3600).toFixed(3)}″`);
+  const q = A.tueSai(120, 30, 2451545);
+  ok('tại chính J2000 thì toạ độ không đổi', Math.abs(q.ra - 120) < 1e-9 && Math.abs(q.dec - 30) < 1e-9);
+  const tam = A.tuThienHa(0, 0), doi = A.tuThienHa(180, 0), cuc = A.tuThienHa(0, 90);
+  ok('tâm thiên hà ở 17h45,6m −28,94° (chòm Nhân Mã), như bảng của Wikipedia',
+     Math.abs(tam.ra / 15 - (17 + 45.6 / 60)) < 0.003 && Math.abs(tam.dec + 28.94) < 0.01, `${(tam.ra / 15).toFixed(3)}h ${tam.dec.toFixed(2)}°`);
+  ok('đối tâm ở 5h45,6m +28,94° (chòm Ngự Phu)', Math.abs(doi.ra / 15 - (5 + 45.6 / 60)) < 0.003 && Math.abs(doi.dec - 28.94) < 0.01);
+  ok('cực Bắc thiên hà ở 12h51,4m +27,13° (chòm Hậu Phát)', Math.abs(cuc.ra / 15 - (12 + 51.4 / 60)) < 0.003 && Math.abs(cuc.dec - 27.13) < 0.01);
+  ok('khối khí quyển: 1 ở đỉnh đầu, 2,0 ở 30°, 5,6 ở 10° (Kasten & Young 1989)',
+     Math.abs(A.khoiKhi(90) - 1) < .001 && Math.abs(A.khoiKhi(30) - 1.99) < .02 && Math.abs(A.khoiKhi(10) - 5.59) < .03);
+  ok('nhiệt độ từ B−V: Mặt Trời (0,65) ra khoảng 5.800 K', Math.abs(A.nhietDoSao(0.65) - 5800) < 100, `${Math.round(A.nhietDoSao(0.65))} K`);
+  const [rV, , bVe] = A.mauSao(0), [rA, , bA] = A.mauSao(1.83);
+  ok('sao nóng (B−V 0) ngả xanh, sao nguội như Tâm Đại Hoả (1,83) ngả đỏ', bVe > rV && rA > bA);
+}
+{
+  const S = require('../assets/saosang.js'), g = A.giaiSao(S.du, S.dem);
+  ok('danh mục: 5.080 sao tới cấp 6, xếp từ sáng tới mờ', S.dem === 5080 && g.v.every((v, i) => i === 0 || v >= g.v[i - 1]));
+  const tim = (ra, de) => { let k = -1, d = 9; for (let i = 0; i < S.dem; i++) { const x = Math.hypot((g.ra[i] - ra) * Math.cos(de * Math.PI / 180), g.dec[i] - de); if (x < d) { d = x; k = i; } } return d < .05 ? k : -1; };
+  /* Toạ độ J2000, cấp sáng, chỉ số màu chép từ danh mục, so với chuỗi đã gói */
+  const MAU = [['Thiên Lang (Sirius)', 101.2872, -16.7161, -1.46, 0.00], ['Chức Nữ (Vega)', 279.2347, 38.7837, 0.03, 0.00],
+               ['Đại Giác (Arcturus)', 213.9153, 19.1824, -0.04, 1.23], ['Sâm Tú Tứ (Betelgeuse)', 88.7929, 7.4071, 0.50, 1.85],
+               ['Bắc Cực (Polaris)', 37.9529, 89.2641, 2.02, 0.60]];
+  for (const [ten, ra, de, v, bv] of MAU) {
+    const i = tim(ra, de);
+    ok(`${ten}: có trong danh mục, đúng chỗ, cấp sáng sai không quá 0,13, màu sai không quá 0,05`,
+       i >= 0 && Math.abs(g.v[i] - v) <= 0.13 && Math.abs(g.bv[i] - bv) <= 0.051,
+       i >= 0 ? `V ${g.v[i]}, B−V ${g.bv[i].toFixed(1)}` : 'không thấy');
+  }
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

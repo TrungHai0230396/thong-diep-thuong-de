@@ -52,7 +52,7 @@ global.matchMedia = () => ({ matches: false, addEventListener() {} });
 
 /* Chòm sao do constellation.js cung cấp qua self.TDTD_CHOMSAO — thiếu nó thì bầu trời vẫn
    chạy nhưng không có chòm nào, nên phải nạp đủ mới kiểm được đúng thứ người dùng thấy. */
-for (const t of ['astro.js', 'constellation.js', 'nightsky.js'])
+for (const t of ['astro.js', 'constellation.js', 'saosang.js', 'nightsky.js'])
   new Function(fs.readFileSync(path.join(__dirname, '..', 'assets', t), 'utf8'))();
 const T = global.TDTD_TROIDEM;
 
@@ -268,6 +268,64 @@ ok('iOS có la bàn thật thì dùng la bàn, không dùng alpha',
 ok('thiếu hẳn dữ liệu thì bỏ qua, không nổ lỗi và không ghi bừa',
    (() => { const truoc = bien(10, 120, 0); const sau = T._camBien({ alpha: null, beta: null, gamma: null });
             return sau && Math.abs(sau.h - truoc.h) < .01; })());
+
+console.log('\n— Chiều sâu: sao thật, Ngân Hà, Mặt Trăng hình cầu, chụm để phóng to —');
+{
+  T._noi(10.8231, 106.6297, 'TP.HCM');
+  const S = T._sao(DEM);
+  ok('nạp đủ 5.080 sao thật', S && S.n === 5080);
+  let dai = 0;
+  for (let i = 0; i < S.n; i++) dai = Math.max(dai, Math.abs(Math.hypot(S.x[i], S.y[i], S.z[i]) - 1));
+  ok('vector chân trời của mọi sao dài đúng 1', dai < 1e-5, dai.toExponential(1));
+  /* Sao Bắc Cực: độ cao luôn xấp xỉ vĩ độ chỗ đứng (TP.HCM 10,8°), xê dịch theo vòng nhỏ 0,66° quanh cực */
+  let bc = -1;
+  for (let i = 0; i < S.n; i++) if (S.dec[i] > 89) bc = i;
+  const caoBC = Math.asin(S.z[bc]) * 180 / Math.PI;
+  ok('Sao Bắc Cực đứng ở độ cao bằng vĩ độ TP.HCM, sai dưới 0,8°', bc >= 0 && Math.abs(caoBC - 10.82) < 0.8, `${caoBC.toFixed(2)}°`);
+  ok('đã tính tuế sai: Sao Bắc Cực năm 2026 nằm sát cực hơn năm 2000 (89,26°)', S.dec[bc] > 89.3, `${S.dec[bc].toFixed(3)}°`);
+  const N = T._nganHa(DEM), tam = T._vecto(0, 0);
+  const thu = (ra, dec) => ({ x: Math.cos(dec * Math.PI / 180) * Math.cos(ra * Math.PI / 180), y: Math.cos(dec * Math.PI / 180) * Math.sin(ra * Math.PI / 180), z: Math.sin(dec * Math.PI / 180) });
+  const tamTH = thu(266.405, -28.936), doiTH = thu(86.405, 28.936);
+  let gan = 0, xa = 0, trongDai = 0;
+  for (let i = 0; i < N.n; i++) {
+    const v = thu(N.ra[i], N.dec[i]);
+    const cTam = v.x * tamTH.x + v.y * tamTH.y + v.z * tamTH.z, cDoi = v.x * doiTH.x + v.y * doiTH.y + v.z * doiTH.z;
+    if (cTam > Math.cos(40 * Math.PI / 180)) gan++;
+    if (cDoi > Math.cos(40 * Math.PI / 180)) xa++;
+  }
+  ok('Ngân Hà dày về phía tâm thiên hà (Nhân Mã) hơn hẳn phía đối tâm', gan > 2.5 * xa, `${gan} so với ${xa} đám`);
+  void tam; void trongDai;
+
+  const bToi = { trang: { cao: -10, sang: 0 } }, bTrangTron = { trang: { cao: 60, sang: 1 } };
+  T._datGoc(75);
+  const dem = T._nguong(0, bToi).lim, ngay = T._nguong(1, bToi).lim, trang = T._nguong(0, bTrangTron).lim;
+  T._datGoc(30); const phong = T._nguong(0, bToi).lim; T._datGoc(75);
+  ok('đêm tối không trăng thấy tới cấp 5; phóng to thấy thêm sao mờ, tối đa cấp 6', Math.abs(dem - 5) < 1e-9 && phong > 5.5 && phong <= 6, `${dem} / ${phong.toFixed(2)}`);
+  ok('trăng tròn trên cao mất chừng 1,3 cấp; ban ngày không còn sao nào', Math.abs(dem - trang - 1.3) < 1e-9 && ngay < -1.5);
+
+  ok('chụm hai ngón: ngón dang gấp đôi thì góc nhìn hẹp lại một nửa', Math.abs(T._chum(100, 200) - 37.5) < 1e-9);
+  T._datGoc(75);
+  ok('góc nhìn không hẹp quá 12° (cỡ ống nhòm), không rộng quá 110°', T._datGoc(3) === 12 && T._datGoc(500) === 110);
+  T._datGoc(75);
+
+  /* Hướng trên màn: đứng nhìn về Nam ở độ cao 30°, điểm cao hơn cùng phương vị phải ở phía "lên",
+     điểm lệch về phía Đông (bên trái khi nhìn về Nam) phải ở bên trái. */
+  T._nhin(180, 30, 75);
+  const v = T._vecto(30, 180);
+  const len = T._gocTrenMan(v, T._vecto(40, 180)) * 180 / Math.PI, trai = T._gocTrenMan(v, T._vecto(30, 179.5)) * 180 / Math.PI;
+  ok('xoay kết cấu Mặt Trăng: tính đúng hướng "lên" và hướng "trái" trên màn', Math.abs(len) < 1 && Math.abs(trai + 90) < 2,
+     `lên ${len.toFixed(1)}°, phía Đông ${trai.toFixed(1)}°`);
+  const BIEN = T._bien;
+  ok('30 vùng tròn ghép thành các biển trên Mặt Trăng, tất cả ở mặt quay về Trái Đất', BIEN.length === 30 && BIEN.every(m => m.z > 0));
+  ok('Biển Nguy hiểm (Mare Crisium, kinh độ 59° Đông) nằm bên phải khi Bắc lên trên, Biển Mưa (Imbrium) ở trên trái',
+     BIEN[3].x > .7 && BIEN[0].x < 0 && BIEN[0].y > .5);
+  let thap = 9, cao = 0;
+  for (let h = 0; h < 360; h += .5) { thap = Math.min(thap, T._vien(h)); cao = Math.max(cao, T._vien(h)); }
+  ok('viền cây đồi thấp: 0,1°–2,8°, che rất ít trời', thap >= .1 && cao <= 2.8, `${thap.toFixed(2)}°–${cao.toFixed(2)}°`);
+  let loi = null;
+  try { T._nhin(200, 35, 75); T._ve(DEM); T._datGoc(14); T._ve(DEM); T._nhin(0, 88, 75); T._ve(DEM); T._datGoc(75); T._ve(NGAY); } catch (e) { loi = e.message; }
+  ok('vẽ đủ các tư thế (đêm, ngày, phóng to, nhìn thẳng lên đỉnh đầu) không nổ lỗi', loi === null, loi || '');
+}
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

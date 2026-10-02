@@ -267,8 +267,67 @@ function doToi(caoMatTroi) {
   return { muc: 'toi', ten: 'tối hẳn, thấy cả sao mờ' };
 }
 
+/* ---------- sao, Ngân Hà, khí quyển ---------- */
+
+/* Tuế sai: trục Trái Đất lắc chậm như con quay, nên toạ độ trong danh mục sao (gốc J2000) trôi chừng
+   50 giây cung mỗi năm — tới 2026 là 0,36 độ, đủ để đường nối chòm lệch khỏi sao khi phóng to.
+   Công thức chặt của Meeus chương 21 (hằng số IAU 1976), từ J2000 tới ngày JD. */
+function tueSai(ra, dec, JD) {
+  const t = (JD - 2451545.0) / 36525, g = 1 / 3600;
+  const zeta = (2306.2181 * t + 0.30188 * t * t + 0.017998 * t * t * t) * g;
+  const z = (2306.2181 * t + 1.09468 * t * t + 0.018203 * t * t * t) * g;
+  const th = (2004.3109 * t - 0.42665 * t * t - 0.041833 * t * t * t) * g;
+  const A = cos(dec) * sin(ra + zeta);
+  const B = cos(th) * cos(dec) * cos(ra + zeta) - sin(th) * sin(dec);
+  const C = sin(th) * cos(dec) * cos(ra + zeta) + cos(th) * sin(dec);
+  return { ra: chuan(Math.atan2(A, B) / RAD + z), dec: Math.asin(Math.max(-1, Math.min(1, C))) / RAD };
+}
+
+/* Toạ độ thiên hà (l, b) -> xích đạo J2000. Cực Bắc thiên hà và kinh độ thiên hà của cực Bắc trời
+   theo hệ J2000 (bài "Galactic coordinate system" trên Wikipedia: 12h51,4m, +27,13°, 122,93°). */
+const CUC_THIEN_HA = { ra: 192.85948, dec: 27.12825, l: 122.93192 };
+function tuThienHa(l, b) {
+  const G = CUC_THIEN_HA;
+  const dec = Math.asin(sin(G.dec) * sin(b) + cos(G.dec) * cos(b) * cos(G.l - l)) / RAD;
+  const y = cos(b) * sin(G.l - l), x = cos(G.dec) * sin(b) - sin(G.dec) * cos(b) * cos(G.l - l);
+  return { ra: chuan(G.ra + Math.atan2(y, x) / RAD), dec };
+}
+
+/* Khối khí quyển ánh sao phải xuyên qua, so với lúc ở đỉnh đầu (= 1). Kasten & Young (1989):
+   ở độ cao 10° là 5,6 lần — vì vậy sao sát chân trời mờ hẳn đi. */
+function khoiKhi(cao) {
+  if (cao <= 0) return 40;
+  return 1 / (sin(cao) + 0.50572 * Math.pow(cao + 6.07995, -1.6364));
+}
+
+/* Màu sao. Chỉ số màu B−V ra nhiệt độ bề mặt theo Ballesteros (2012); nhiệt độ ra màu RGB theo
+   cách xấp xỉ màu vật đen của Tanner Helland. Rồi pha nửa phần với trắng: mắt người nhìn sao ban đêm
+   thấy màu rất nhạt, chỉ sao thật đỏ (Tâm Đại Hoả) hay thật xanh (Chức Nữ) mới nhận ra. */
+const nhietDoSao = (bv) => 4600 * (1 / (0.92 * bv + 1.7) + 1 / (0.92 * bv + 0.62));
+function mauSao(bv) {
+  const t = nhietDoSao(bv) / 100, kep = (x) => Math.max(0, Math.min(255, x));
+  const r = t <= 66 ? 255 : kep(329.698727446 * Math.pow(t - 60, -0.1332047592));
+  const g = t <= 66 ? kep(99.4708025861 * Math.log(t) - 161.1195681661) : kep(288.1221695283 * Math.pow(t - 60, -0.0755148492));
+  const b = t >= 66 ? 255 : t <= 19 ? 0 : kep(138.5177312231 * Math.log(t - 10) - 305.0447927307);
+  return [r, g, b].map(c => Math.round((c + 255) / 2));
+}
+
+/* Giải chuỗi sao trong saosang.js (xem scripts/lam-saosang.py): 8 ký tự cơ số 36 mỗi sao. */
+function giaiSao(du, dem) {
+  const ra = new Float64Array(dem), dec = new Float64Array(dem), v = new Float32Array(dem), bv = new Float32Array(dem);
+  for (let i = 0; i < dem; i++) {
+    const o = i * 8;
+    ra[i] = parseInt(du.substr(o, 3), 36) / 100;
+    dec[i] = parseInt(du.substr(o + 3, 3), 36) / 100 - 90;
+    v[i] = parseInt(du[o + 6], 36) / 4 - 1.5;
+    bv[i] = parseInt(du[o + 7], 36) / 10 - 0.4;
+  }
+  return { ra, dec, v, bv };
+}
+
 const API = { ngayJulius, matTroi, matTrang, hanhTinh, docCao, gioSao, khucXa,
-              mocLan, trangThaiMocLan, huongMay, vecHuong, gocHuong, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG) };
+              mocLan, trangThaiMocLan, huongMay, vecHuong, gocHuong, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG),
+              tueSai, tuThienHa, CUC_THIEN_HA, khoiKhi, nhietDoSao, mauSao, giaiSao };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 else self.TDTD_ASTRO = API;

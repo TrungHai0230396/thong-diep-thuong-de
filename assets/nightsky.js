@@ -1,7 +1,8 @@
 /* Bầu trời đêm nay — bầu trời thật, ở chỗ bạn đang đứng, vào đúng lúc này.
 
    Toàn bộ vị trí lấy từ assets/astro.js: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường
-   thấy được, cùng tám chòm sao mượn lại toạ độ thật của trò Nối sao.
+   thấy được, 5.080 sao của Danh mục sao sáng Yale (assets/saosang.js), và tám chòm sao mượn lại
+   toạ độ thật của trò Nối sao.
 
    Phần thiên văn KHÔNG gọi mạng: máy tự giải phương trình nên ngoại tuyến vẫn đúng từng độ.
    Riêng phần DỰ BÁO MƯA thì có gọi mạng, ra dịch vụ Open-Meteo — nói rõ ở đây vì trước đó
@@ -62,6 +63,11 @@ let quanTinh = null;     // vận tốc còn lại sau khi nhấc ngón, độ m
    Trước đây biến `chon` khai báo rồi bỏ không, tức app chưa hề có chức năng chạm chọn —
    người dùng bấm vào Mặt Trăng mà không có gì xảy ra là vì thế. */
 let moc = [], ngam = null;
+/* Ngón tay đang chạm (để nhận ra cú chụm hai ngón phóng to), và cú chụm đang diễn ra. */
+const chamTay = new Map();
+let chum = null;
+const GOC_THUONG = 75;                                   // góc nhìn mặc định, độ
+const giamDong = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
 
 try {
   const l = JSON.parse(localStorage.getItem(NOI_KEY) || 'null');
@@ -83,8 +89,12 @@ const gocGiua = (c1, h1, c2, h2) => {
   return Math.acos(Math.max(-1, Math.min(1, cham(a, b)))) / RAD;
 };
 
-/* Phép chiếu tâm: điểm nào ở sau lưng thì bỏ. Trả về toạ độ trên mặt kính, hoặc null. */
-function chieu(cao, huong) {
+/* Khung nhìn: hướng nhìn thẳng (f), trục phải (ph), trục lên (tr) của mặt kính, và tỉ lệ ti.
+   Tính MỘT lần cho mỗi hướng nhìn rồi nhớ lại: giờ mỗi khung hình chiếu cả nghìn ngôi sao, tính
+   lại ba vector cho từng sao là phí. */
+let co = null;
+function coSo() {
+  if (co && co.h === huongNhin && co.c === caoNhin && co.g === goc && co.W === W && co.H === H) return co;
   const f = vecto(caoNhin, huongNhin);
   const len = { x: 0, y: 0, z: 1 };
   let ph = { x: f.y * len.z - f.z * len.y, y: f.z * len.x - f.x * len.z, z: f.x * len.y - f.y * len.x };
@@ -92,12 +102,17 @@ function chieu(cao, huong) {
   if (d < 1e-6) { ph = { x: 1, y: 0, z: 0 }; d = 1; }     // nhìn thẳng lên thì chọn bừa một hướng
   ph = { x: ph.x / d, y: ph.y / d, z: ph.z / d };
   const tr = { x: ph.y * f.z - ph.z * f.y, y: ph.z * f.x - ph.x * f.z, z: ph.x * f.y - ph.y * f.x };
-  const v = vecto(cao, huong);
-  const s = cham(v, f);
-  if (s <= .12) return null;                              // sau lưng hoặc sát mép, bỏ
-  const ti = (W / 2) / Math.tan(goc / 2 * RAD);
-  return { x: W / 2 + cham(v, ph) / s * ti, y: H / 2 - cham(v, tr) / s * ti, s };
+  co = { h: huongNhin, c: caoNhin, g: goc, W, H, f, ph, tr, ti: (W / 2) / Math.tan(goc / 2 * RAD) };
+  return co;
 }
+
+/* Phép chiếu tâm: điểm nào ở sau lưng thì bỏ. Trả về toạ độ trên mặt kính, hoặc null. */
+function chieuV(v) {
+  const k = coSo(), s = cham(v, k.f);
+  if (s <= .12) return null;                              // sau lưng hoặc sát mép, bỏ
+  return { x: W / 2 + cham(v, k.ph) / s * k.ti, y: H / 2 - cham(v, k.tr) / s * k.ti, s };
+}
+const chieu = (cao, huong) => chieuV(vecto(cao, huong));
 
 /* ---------- gom hết mọi thứ đang ở trên trời ---------- */
 
@@ -117,7 +132,7 @@ function bauTroi(luc) {
   const chom = [];
   const nguon = self.TDTD_CHOMSAO && self.TDTD_CHOMSAO._chom;
   if (nguon) for (const c of nguon) {
-    const sao = c.sao.map(([ten, raGio, dec]) => ({ ten: ten.split(' (')[0], ...dat({ ra: raGio * 15, dec }) }));
+    const sao = c.sao.map(([ten, raGio, dec]) => ({ ten: ten.split(' (')[0], ...dat(A().tueSai(raGio * 15, dec, JD)) }));
     chom.push({ ten: c.ten, sao, noi: c.noi || null });
   }
 
@@ -131,6 +146,335 @@ function bauTroi(luc) {
     .sort((a, b) => a.cach - b.cach);
 
   return { JD, troi: { ...t, ...vtTroi }, trang: { ...tr, ...vtTrang }, toi, ht, chom, gapTrang };
+}
+
+/* ---------- sao thật và Ngân Hà ----------
+   5.080 sao tới cấp 6 của Danh mục sao sáng Yale (assets/saosang.js). Mỗi sao: toạ độ J2000 đã tính
+   tuế sai về hôm nay, rồi cứ hai giây đổi sang vector chân trời một lần — sao trôi 0,008° mỗi giây,
+   hai giây là chưa tới một phần mười điểm ảnh. Mỗi khung hình chỉ còn phép chiếu.
+
+   Sao xếp từ sáng tới mờ và chia theo màu, nên mỗi màu chỉ đặt fillStyle một lần, và gặp sao mờ
+   hơn ngưỡng là dừng luôn cả nhóm. */
+const KHI = 0.25;                       // cấp sáng mất đi mỗi khối khí quyển, mức thường gặp ở vùng thấp, ẩm
+function ngauNhien(hat) {
+  let a = hat >>> 0;
+  return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+}
+
+let saoThat = null, nganHa = null;
+function taoTap(ra, dec, JD) {          // một tập điểm trên thiên cầu, kèm chỗ chứa vector chân trời
+  const n = ra.length, ra2 = new Float64Array(n), de2 = new Float64Array(n);
+  for (let i = 0; i < n; i++) { const p = A().tueSai(ra[i], dec[i], JD); ra2[i] = p.ra; de2[i] = p.dec; }
+  return { n, ra: ra2, dec: de2, x: new Float32Array(n), y: new Float32Array(n), z: new Float32Array(n), luc: -1e15, noi: '' };
+}
+function napSao(luc) {
+  if (saoThat || !self.TDTD_SAOSANG) return saoThat;
+  const S = self.TDTD_SAOSANG, g = A().giaiSao(S.du, S.dem), JD = A().ngayJulius(luc);
+  saoThat = taoTap(g.ra, g.dec, JD);
+  saoThat.v = g.v;
+  const r = ngauNhien(7), ph = new Float32Array(g.v.length);
+  for (let i = 0; i < ph.length; i++) ph[i] = r();
+  saoThat.ph = ph;                                       // pha lấp lánh riêng của từng sao
+  /* Chia theo màu: B−V làm tròn 0,3 — mắt không phân biệt nổi mịn hơn thế */
+  const nhom = new Map();
+  for (let i = 0; i < g.v.length; i++) {
+    const k = Math.max(-0.3, Math.min(1.8, Math.round(g.bv[i] / 0.3) * 0.3));
+    if (!nhom.has(k)) nhom.set(k, []);
+    nhom.get(k).push(i);
+  }
+  saoThat.nhom = [...nhom.entries()].map(([bv, ds]) => ({ mau: `rgb(${A().mauSao(bv).join(',')})`, ds: Int32Array.from(ds) }));
+  return saoThat;
+}
+
+/* Ngân Hà: không có ảnh chụp nào ở đây. Rải 1.500 đám mờ dọc đường xích đạo thiên hà (b = 0), dày và
+   sáng dần về phía tâm thiên hà ở chòm Nhân Mã, sáng thêm ở mây sao Thiên Nga, và bị vệt bụi tối
+   Great Rift chẻ đôi từ Thiên Nga qua tâm tới Bán Nhân Mã (l từ 80° xuống −50°, một phần ba dải).
+   Vị trí đúng theo toạ độ thiên hà; còn độ sáng từng vùng là phỏng theo mô tả, không phải đo. */
+function napNganHa(luc) {
+  if (nganHa) return nganHa;
+  const r = ngauNhien(2026), ra = [], dec = [], to = [], co2 = [];
+  const gauss = () => Math.sqrt(-2 * Math.log(r() + 1e-12)) * Math.cos(2 * Math.PI * r());
+  while (ra.length < 1500) {
+    const l = r() * 360, dl = ((l + 180) % 360) - 180;
+    const b = gauss() * (3.5 + 7 * Math.exp(-(((dl / 35)) ** 2)));
+    let w = 0.3 + 0.7 * Math.exp(-(((dl / 45)) ** 2)) + 0.35 * Math.exp(-(((dl - 75) / 16) ** 2));
+    if (dl > -50 && dl < 80) w *= 1 - 0.6 * Math.exp(-(((b - 1) / 1.8) ** 2)) * Math.min(1, (dl + 50) / 15, (80 - dl) / 15);
+    if (r() * 1.35 > w) continue;
+    const q = A().tuThienHa(l, b);
+    ra.push(q.ra); dec.push(q.dec); to.push(0.6 + 0.4 * r()); co2.push(2 + 2 * r());
+  }
+  nganHa = taoTap(ra, dec, A().ngayJulius(luc));
+  nganHa.to = to; nganHa.co = co2;
+  return nganHa;
+}
+
+/* Vector chân trời (đông, bắc, lên) của cả tập, tính lại mỗi hai giây hoặc khi đổi nơi. */
+function capNhatTap(T, luc) {
+  const khoa = noi.vi + ',' + noi.kinh;
+  if (Math.abs(luc - T.luc) < 2000 && T.noi === khoa) return T;
+  const gst = A().gioSao(A().ngayJulius(luc)), phi = noi.vi * RAD, sp = Math.sin(phi), cp = Math.cos(phi);
+  for (let i = 0; i < T.n; i++) {
+    const Hg = (gst + noi.kinh - T.ra[i]) * RAD, d = T.dec[i] * RAD;
+    const sd = Math.sin(d), cd = Math.cos(d), ch = Math.cos(Hg);
+    T.x[i] = -cd * Math.sin(Hg); T.y[i] = sd * cp - cd * sp * ch; T.z[i] = sd * sp + cd * cp * ch;
+  }
+  T.luc = luc; T.noi = khoa;
+  return T;
+}
+
+/* Mẫu chấm mờ vẽ sẵn một lần: quầng của sao sáng và đám mây Ngân Hà dùng chung, khỏi tạo
+   gradient mới cho từng cái mỗi khung hình. */
+let mauMo = null;
+function chamMo() {
+  if (mauMo) return mauMo;
+  const c = document.createElement('canvas'); c.width = c.height = 64;
+  const g = c.getContext('2d');
+  if (g && g.createRadialGradient) {
+    const rg = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    if (rg) { rg.addColorStop(0, 'rgba(255,255,255,1)'); rg.addColorStop(.35, 'rgba(255,255,255,.45)'); rg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = rg; }
+    g.fillRect && g.fillRect(0, 0, 64, 64);
+  }
+  return (mauMo = c);
+}
+
+/* Ngưỡng cấp sáng còn thấy được: phóng to thì thấy thêm sao mờ (như cầm ống nhòm), trời còn sáng
+   hay trăng sáng trên cao thì mất sao mờ. */
+function nguongSao(sangTroi, b) {
+  const trangSang = b.trang.cao > 0 ? b.trang.sang * Math.min(1, b.trang.cao / 20) : 0;
+  return { lim: Math.min(6, 5 + 1.3 * Math.log2(GOC_THUONG / goc)) - 7 * Math.sqrt(sangTroi) - 1.3 * trangSang, trangSang };
+}
+
+function veNganHa(luc, sangTroi, trangSang) {
+  const dam = Math.max(0, 1 - sangTroi * 9) * (1 - 0.75 * trangSang);
+  if (dam < .03) return;
+  const T = capNhatTap(napNganHa(luc), luc), k = coSo(), anh = chamMo();
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < T.n; i++) {
+    const z = T.z[i];
+    if (z < 0) continue;
+    const vx = T.x[i], vy = T.y[i];
+    const s = vx * k.f.x + vy * k.f.y + z * k.f.z;
+    if (s <= .2) continue;
+    const r = Math.tan(T.co[i] * RAD) * k.ti / s;
+    const px = W / 2 + (vx * k.ph.x + vy * k.ph.y + z * k.ph.z) / s * k.ti;
+    const py = H / 2 - (vx * k.tr.x + vy * k.tr.y + z * k.tr.z) / s * k.ti;
+    if (px < -r || px > W + r || py < -r || py > H + r) continue;
+    ctx.globalAlpha = 0.034 * T.to[i] * dam * Math.min(1, z / 0.25);     // sát chân trời thì chìm vào khí quyển
+    ctx.drawImage(anh, px - r, py - r, 2 * r, 2 * r);
+  }
+  ctx.restore();
+}
+
+function veSaoThat(luc, sangTroi, b) {
+  const S0 = napSao(luc);
+  if (!S0) return false;
+  const { lim } = nguongSao(sangTroi, b);
+  if (lim < -1.6) return true;
+  const S = capNhatTap(S0, luc), k = coSo(), phong = Math.pow(GOC_THUONG / goc, .3), anh = chamMo();
+  const nhap = giamDong ? 0 : luc * 0.0055;
+  const sang = [];
+  for (const nh of S.nhom) {
+    ctx.fillStyle = nh.mau;
+    const ds = nh.ds;
+    for (let j = 0; j < ds.length; j++) {
+      const i = ds[j], v0 = S.v[i];
+      if (v0 > lim) break;                              // từ đây trở đi trong nhóm đều mờ hơn
+      const z = S.z[i];
+      if (z < 0) continue;
+      const vx = S.x[i], vy = S.y[i];
+      const s = vx * k.f.x + vy * k.f.y + z * k.f.z;
+      if (s <= .12) continue;
+      const px = W / 2 + (vx * k.ph.x + vy * k.ph.y + z * k.ph.z) / s * k.ti;
+      if (px < -4 || px > W + 4) continue;
+      const py = H / 2 - (vx * k.tr.x + vy * k.tr.y + z * k.tr.z) / s * k.ti;
+      if (py < -4 || py > H + 4) continue;
+      const X = A().khoiKhi(Math.max(.5, Math.asin(z) / RAD));
+      const m = v0 + KHI * (X - 1);                     // sát chân trời mờ đi vì xuyên nhiều khí quyển
+      if (m > lim) continue;
+      let a = Math.min(1, (lim - m) / 1.2);
+      /* Lấp lánh: chỉ sao sáng mới thấy rõ, và càng sát chân trời càng mạnh (nhiều lớp khí rung) */
+      if (nhap && m < 3) a *= 1 + Math.min(.35, .08 + .05 * X) * Math.sin(nhap * (1 + S.ph[i]) + S.ph[i] * 40) * Math.sin(nhap * .37 + S.ph[i] * 9);
+      const r = (0.5 + 0.42 * Math.max(0, 4.6 - m)) * phong;
+      ctx.globalAlpha = Math.max(0, Math.min(1, a));
+      if (r < 1.15) ctx.fillRect(px - r, py - r, 2 * r, 2 * r);
+      else { ctx.beginPath(); ctx.arc(px, py, r, 0, 6.2832); ctx.fill(); }
+      if (m < 1.3) sang.push(px, py, r, a);
+    }
+  }
+  ctx.globalAlpha = 1;
+  if (sang.length) {                                    // quầng sáng của mười mấy sao sáng nhất
+    ctx.save(); ctx.globalCompositeOperation = 'lighter';
+    for (let j = 0; j < sang.length; j += 4) {
+      const R = sang[j + 2] * 5;
+      ctx.globalAlpha = .22 * sang[j + 3];
+      ctx.drawImage(anh, sang[j] - R, sang[j + 1] - R, 2 * R, 2 * R);
+    }
+    ctx.restore();
+  }
+  return true;
+}
+
+/* ---------- Mặt Trăng hình cầu ----------
+   Vẽ từng điểm ảnh của một quả cầu: điểm nào quay về Mặt Trời thì sáng, theo định luật Lommel–
+   Seeliger (bề mặt bụi như Mặt Trăng: trăng tròn trông phẳng đều chứ không tối dần ra mép như quả
+   bóng). Mặt tối có ánh đất hắt lên mờ mờ, rõ nhất lúc trăng lưỡi liềm.
+   Các biển (mare) — vệt tối người Việt nhìn ra chú Cuội ngồi gốc cây đa — lấy vị trí và đường kính
+   từ bài "List of maria on the Moon" trên Wikipedia; mỗi biển vẽ thành một vùng tròn mờ mép. Biển
+   méo dài như Biển Lạnh, Đại dương Bão tố thì ghép vài vùng tròn: hình dạng gần đúng, vị trí đúng.
+   Kết cấu vẽ theo khung của chính Mặt Trăng (Bắc lên trên) rồi xoay theo hướng cực Bắc hoàng đạo
+   trên màn — trục quay Mặt Trăng chỉ lệch cực đó 1,5°. */
+const BIEN = [   // vĩ độ (+Bắc), kinh độ (+Đông), bán kính km, độ tối (1 = tối như biển lớn)
+  [34.72, -14.91, 573, 1], [27.29, 18.36, 337, 1], [8.35, 30.83, 438, 1], [16.18, 59.10, 278, 1],
+  [-7.83, 53.67, 420, .9], [-15.19, 34.60, 170, .9], [-20.59, -17.29, 357, .85], [-24.48, -38.57, 210, .9],
+  [-10.53, -22.31, 175, .8], [7.79, -30.64, 256, .8], [13.20, 4.09, 121, .8],
+  [56, -36, 200, .75], [58, -12, 210, .75], [58, 12, 210, .75], [56, 36, 190, .7],              // Biển Lạnh
+  [36, -55, 380, .95], [22, -62, 430, .95], [8, -58, 400, .95], [-4, -50, 300, .9], [28, -44, 260, .9],   // Đại dương Bão tố
+  [1.63, 1.03, 143, .6], [12.1, -8.34, 158, .7], [45.01, -31.67, 125, .8], [37.56, 30.8, 212, .45],
+  [27.36, 0, 90, .6], [22.43, 67.58, 73, .8], [1.3, 65.3, 72, .8], [7.49, 68.66, 122, .75],
+  [12.7, 86.52, 179, .7], [-1.71, 87.05, 187, .7],
+].map(([vi, kinh, km, toi]) => ({
+  x: Math.cos(vi * RAD) * Math.sin(kinh * RAD), y: Math.sin(vi * RAD), z: Math.cos(vi * RAD) * Math.cos(kinh * RAD),
+  goc: km / 1737.4, gocNgoai: km / 1737.4 * .95, toi,      // mép mềm nằm gọn trong đường kính
+}));
+
+let khoTrang = null;
+function ketCauTrang(R, cosI, gocSang, dem) {
+  const n = Math.max(8, Math.round(R * 2 * DPR));
+  const khoa = `${n}|${cosI.toFixed(2)}|${Math.round(gocSang * 40)}|${dem.toFixed(2)}`;
+  if (khoTrang && khoTrang.khoa === khoa) return khoTrang.c;
+  const c = document.createElement('canvas'); c.width = c.height = n;
+  const g = c.getContext('2d');
+  const img = g && g.createImageData ? g.createImageData(n, n) : null;
+  if (!img || !img.data) return null;                  // trình duyệt giả trong bài kiểm: vẽ kiểu cũ
+  const sinI = Math.sqrt(Math.max(0, 1 - cosI * cosI));
+  const sx = sinI * Math.sin(gocSang), sy = sinI * Math.cos(gocSang), sz = cosI;   // hướng Mặt Trời (phải, lên, về phía ta)
+  const anhDat = 0.05 * Math.pow(Math.max(0, 1 - (1 + cosI) / 2), 1.5);
+  const d = img.data, bk = n / 2;
+  for (let py = 0; py < n; py++) for (let px = 0; px < n; px++) {
+    const x = (px + .5 - bk) / bk, y = -(py + .5 - bk) / bk, rr = x * x + y * y;
+    const o = (py * n + px) * 4;
+    if (rr > 1.02) { d[o + 3] = 0; continue; }
+    const zz = Math.sqrt(Math.max(0, 1 - rr));
+    let alb = 1;
+    /* mép biển gồ ghề: co giãn bán kính theo một nhiễu chậm trên mặt cầu, cho khỏi tròn vo như compa */
+    const gg = 1 + .16 * (Math.sin(9 * x + 4 * zz) + Math.sin(7 * y - 5 * x) + Math.sin(11 * zz + 3 * y)) / 3
+             + .06 * Math.sin(23 * x - 17 * y) * Math.sin(19 * zz + 13 * x);
+    for (const m of BIEN) {
+      const goc2 = Math.acos(Math.max(-1, Math.min(1, x * m.x + y * m.y + zz * m.z))) * gg;
+      if (goc2 < m.gocNgoai) {
+        const u = Math.min(1, (m.gocNgoai - goc2) / (m.gocNgoai * .16)), mem = u * u * (3 - 2 * u);  // mép mềm vừa đủ
+        alb *= 1 - 0.45 * m.toi * mem;
+      }
+    }
+    alb = Math.max(.45, alb);
+    alb *= 0.97 + 0.03 * Math.sin(px * 1.7 + py * 2.3) * Math.sin(px * .9 - py * 1.3);   // sần nhẹ
+    const mu0 = x * sx + y * sy + zz * sz, mu = Math.max(.02, zz);
+    const I = mu0 > 0 ? Math.min(1.25, 2 * mu0 / (mu0 + mu)) : 0;
+    const vien = Math.max(0, Math.min(1, (1 - Math.sqrt(rr)) * bk + .5));             // mép mịn
+    /* Bù gamma cho độ chiếu sáng (màn hình không hiện tuyến tính): không bù thì dải gần ranh giới sáng
+       tối tối quá, trăng 59% trông như chưa được một nửa. Độ tối của biển thì giữ tuyến tính. */
+    const sang = Math.pow(I, .5) * alb, toiMo = anhDat * alb;
+    d[o] = Math.min(255, 246 * sang + 120 * toiMo);
+    d[o + 1] = Math.min(255, 240 * sang + 130 * toiMo);
+    d[o + 2] = Math.min(255, 214 * sang + 160 * toiMo);
+    d[o + 3] = 255 * vien * Math.max(dem, Math.min(1, I * 4));          // phần được chiếu luôn đục; mặt tối ban ngày trong suốt như thật
+  }
+  g.putImageData(img, 0, 0);
+  khoTrang = { khoa, c };
+  return c;
+}
+
+/* Hướng trên màn (góc tính theo chiều kim đồng hồ từ "lên") từ điểm v tới phía điểm w trên thiên cầu. */
+function gocTrenMan(v, w) {
+  const d = cham(v, w);
+  let t = { x: w.x - d * v.x, y: w.y - d * v.y, z: w.z - d * v.z };
+  const l = Math.hypot(t.x, t.y, t.z) || 1;
+  const q = { x: v.x + .002 * t.x / l, y: v.y + .002 * t.y / l, z: v.z + .002 * t.z / l };
+  const a = chieuV(v), b = chieuV(q);
+  if (!a || !b) return 0;
+  return Math.atan2(b.x - a.x, -(b.y - a.y));
+}
+
+function veTrang3D(p, b, R, sangTroi) {
+  const vT = vecto(b.trang.cao, b.trang.huong);
+  const JD = b.JD, cucHD = A().docCao(270, 66.56, noi.vi, noi.kinh, JD);   // cực Bắc hoàng đạo
+  const gocBac = gocTrenMan(vT, vecto(cucHD.cao, cucHD.huong));
+  const gocTroi = gocTrenMan(vT, vecto(b.troi.cao, b.troi.huong));
+  const cosI = 2 * Math.max(0, Math.min(1, b.trang.sang)) - 1;              // góc pha từ phần đĩa sáng
+  const dem = 0.92 * (1 - Math.min(1, sangTroi * 3));
+  const tex = ketCauTrang(R, cosI, gocTroi - gocBac, dem);
+  /* quầng */
+  const g = ctx.createRadialGradient(p.x, p.y, R * .2, p.x, p.y, R * 4.5);
+  const quang = .1 + .2 * b.trang.sang;
+  g.addColorStop(0, `rgba(246,240,214,${quang})`); g.addColorStop(1, 'rgba(246,240,214,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, R * 4.5, 0, 6.284); ctx.fill();
+  if (!tex) { veTrang(p, chieu(b.troi.cao, b.troi.huong), R, b.trang.sang); return; }
+  ctx.save();
+  ctx.translate(p.x, p.y); ctx.rotate(gocBac);
+  ctx.drawImage(tex, -R, -R, 2 * R, 2 * R);
+  ctx.restore();
+}
+
+/* ---------- chân trời: viền cây đồi, sương mù ----------
+   Viền cây và đồi chỉ để có chiều sâu khi xoay — không phải cảnh thật chỗ bạn đứng. Cao nhất chừng
+   2,7°, nên che rất ít trời. */
+const VIEN = (() => {
+  const r = ngauNhien(1975), n = 720, h = new Float32Array(n);
+  const p1 = r() * 6.28, p2 = r() * 6.28, p3 = r() * 6.28;
+  for (let i = 0; i < n; i++) {
+    const a = i / n * 2 * Math.PI;
+    h[i] = Math.max(.12, .45 + .35 * Math.sin(3 * a + p1) + .22 * Math.sin(7 * a + p2) + .12 * Math.sin(13 * a + p3));
+  }
+  for (let c = 0; c < 64; c++) {                        // các cụm tán cây tròn
+    const tam = Math.floor(r() * n), rong = 2 + Math.floor(r() * 6), cao = .45 + r() * 1.4;
+    for (let j = -rong; j <= rong; j++) {
+      const i = ((tam + j) % n + n) % n, u = j / rong;
+      h[i] = Math.max(h[i], h[i] * .6 + cao * Math.sqrt(1 - u * u));
+    }
+  }
+  return h;
+})();
+const vienTai = (huong) => VIEN[Math.round(A().chuan(huong) * 2) % 720];
+
+/* Sương mù sát chân trời: trời luôn sáng hơn ở gần chân trời vì nhìn qua nhiều lớp khí. Vẽ thành
+   ba dải theo ĐỘ CAO thật nên ngẩng đầu thì nó lùi xuống, cúi xuống thì nó dâng lên. Lúc chạng vạng
+   thêm vầng sáng cam ở phía Mặt Trời vừa lặn. */
+function veSuongMu(sangTroi, b) {
+  const dai = [[0, 4, .16], [4, 10, .09], [10, 20, .045]];
+  const mau = sangTroi > .3 ? '225,236,250' : sangTroi > .05 ? '150,170,205' : '70,90,125';
+  /* Mỗi dải vẽ thành nhiều mảnh liền nhau, chỉ lấy điểm nằm rõ ở phía trước (s > 0,3). Lấy cả điểm sát
+     mép tầm nhìn thì phép chiếu ném nó ra xa hàng vạn điểm ảnh, và mảnh nối tới đó phủ kín nửa màn hình —
+     lỗi thấy được ngay khi phóng to rồi ngẩng lên. */
+  const toManh = (duoi, tren) => {
+    if (duoi.length < 2) return;
+    ctx.beginPath(); ctx.moveTo(duoi[0].x, duoi[0].y);
+    for (const p of duoi) ctx.lineTo(p.x, p.y);
+    for (let i = tren.length - 1; i >= 0; i--) ctx.lineTo(tren[i].x, tren[i].y);
+    ctx.closePath(); ctx.fill();
+  };
+  for (const [c1, c2, a] of dai) {
+    ctx.fillStyle = `rgba(${mau},${a * (sangTroi > .3 ? 1.6 : 1)})`;
+    let duoi = [], tren = [];
+    for (let h = 0; h <= 360; h += 3) {
+      const p = chieu(c1, h), q = chieu(c2, h);
+      if (!p || !q || p.s < .3 || q.s < .3) { toManh(duoi, tren); duoi = []; tren = []; continue; }
+      duoi.push(p); tren.push(q);
+    }
+    toManh(duoi, tren);
+  }
+  const ct = b.troi.cao;
+  if (ct > -14 && ct < 4) {
+    const s = chieu(0, b.troi.huong);
+    if (s) {
+      const manh = Math.max(0, 1 - Math.abs(ct + 3) / 11);
+      const R = W * .7, g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, R);
+      g.addColorStop(0, `rgba(255,150,80,${.32 * manh})`); g.addColorStop(.5, `rgba(240,120,90,${.12 * manh})`);
+      g.addColorStop(1, 'rgba(200,100,120,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(s.x, s.y, R, 0, 6.284); ctx.fill();
+    }
+  }
 }
 
 /* ---------- vẽ ---------- */
@@ -149,33 +493,37 @@ function veNen(caoTroi) {
   return p;
 }
 
-/* Đường chân trời và nền đất, vẽ theo đúng phép chiếu nên nó cong khi ngẩng đầu. */
+/* Đường chân trời và nền đất, vẽ theo đúng phép chiếu nên nó cong khi ngẩng đầu. Mép đất là viền
+   cây đồi, mỗi nửa độ một điểm; đường chân trời thật vẫn vẽ mảnh bên dưới để biết đâu là độ cao 0. */
 function veChanTroi() {
   ctx.save();
-  ctx.beginPath();
   let dau = true, diem = [];
+  ctx.beginPath();
   for (let h = 0; h <= 360; h += 2) {
     const p = chieu(0, h);
     if (!p) { dau = true; continue; }
-    diem.push(p);
     if (dau) { ctx.moveTo(p.x, p.y); dau = false; } else ctx.lineTo(p.x, p.y);
   }
-  ctx.strokeStyle = 'rgba(190,215,235,.4)'; ctx.lineWidth = 1.4; ctx.stroke();
-
-  if (diem.length > 1) {                                  // tô đất bên dưới
+  ctx.strokeStyle = 'rgba(190,215,235,.25)'; ctx.lineWidth = 1; ctx.stroke();
+  const buoc = goc < 40 ? .5 : 1;                         // phóng to thì viền cây phải mịn hơn
+  for (let h = 0; h <= 360; h += buoc) {
+    const p = chieu(vienTai(h), h);
+    if (p) diem.push(p);
+  }
+  if (diem.length > 1) {                                  // tô đất và viền cây
     ctx.beginPath();
     ctx.moveTo(diem[0].x, diem[0].y);
     for (const p of diem) ctx.lineTo(p.x, p.y);
     ctx.lineTo(diem[diem.length - 1].x, H); ctx.lineTo(diem[0].x, H);
     ctx.closePath();
-    ctx.fillStyle = 'rgba(6,10,16,.86)'; ctx.fill();
+    ctx.fillStyle = 'rgba(5,8,13,.94)'; ctx.fill();
   }
   ctx.restore();
 
   ctx.font = '600 12px "Be Vietnam Pro", system-ui, sans-serif';
   ctx.textAlign = 'center';
   for (let i = 0; i < 8; i++) {
-    const p = chieu(0, i * 45);
+    const p = chieu(vienTai(i * 45) + 1.2, i * 45);
     if (!p) continue;
     ctx.fillStyle = i === 0 ? 'rgba(240,196,138,.95)' : 'rgba(190,215,235,.6)';
     ctx.fillText(TAM_HUONG[i], p.x, p.y - 9);            // ghi phía trên chân trời, kẻo nền đất che mất
@@ -236,8 +584,11 @@ function ve(luc) {
   const b = bauTroi(luc);
   moc = [];
   const sangTroi = veNen(b.troi.cao);
+  const { trangSang } = nguongSao(sangTroi, b);
+  veNganHa(luc, sangTroi, trangSang);
+  const coSaoThat = veSaoThat(luc, sangTroi, b);
 
-  /* Sao chỉ hiện khi trời đủ tối, và mờ dần theo độ sáng còn lại của bầu trời. */
+  /* Chòm sao: đường nối và tên. Có sao thật rồi thì không chấm lại sao của chòm. */
   const roSao = Math.max(0, 1 - sangTroi * 2.4);
   if (roSao > .02) {
     ctx.lineWidth = 1;
@@ -252,7 +603,7 @@ function ve(luc) {
       let giua = null;
       for (let i = 0; i < diem.length; i++) {
         if (!diem[i]) continue;
-        veSao(diem[i], 1.8, `rgba(232,238,255,${roSao})`);
+        if (!coSaoThat) veSao(diem[i], 1.8, `rgba(232,238,255,${roSao})`);
         if (!giua || diem[i].y < giua.y) giua = diem[i];
       }
       if (giua && roSao > .35) {
@@ -319,16 +670,16 @@ function ve(luc) {
   veBong(b.trang.cao, b.trang.huong, 'Mặt Trăng', 'rgba(246,240,214,.9)', 12);
   for (const p of b.ht) if (p.cao <= -1) veBong(p.cao, p.huong, p.ten, p.mau, 7);
 
-  /* Mặt Trăng. */
+  /* Mặt Trăng: phóng to thì to theo, để thấy rõ các biển. */
   if (b.trang.cao > -2) {
     const s = chieu(b.trang.cao, b.trang.huong);
     if (s) {
-      const sTroi = b.troi.cao > -30 ? chieu(b.troi.cao, b.troi.huong) : null;
-      veTrang(s, sTroi, 17, b.trang.sang);
-      moc.push({ x: s.x, y: s.y, r: 26, ten: 'Mặt Trăng', loai: 'trang' });
+      const R = 17 * Math.pow(GOC_THUONG / goc, .75);
+      veTrang3D(s, b, R, sangTroi);
+      moc.push({ x: s.x, y: s.y, r: Math.max(26, R + 8), ten: 'Mặt Trăng', loai: 'trang' });
       ctx.font = '500 12px "Be Vietnam Pro", system-ui, sans-serif';
       ctx.textAlign = 'center'; ctx.fillStyle = 'rgba(246,240,214,.85)';
-      ctx.fillText('Mặt Trăng', s.x, s.y + 34);
+      ctx.fillText('Mặt Trăng', s.x, s.y + R + 17);
     }
   }
 
@@ -348,6 +699,7 @@ function ve(luc) {
     }
   }
 
+  veSuongMu(sangTroi, b);
   veChanTroi();
   return b;
 }
@@ -628,6 +980,7 @@ function dungKhung() {
     <button class="td-dong" aria-label="Đóng">✕</button>
     <div class="td-tin"></div>
     <div class="td-the" hidden></div>
+    <button class="td-phong" type="button" hidden></button>
     <div class="td-thanh">
       <button class="td-noi" type="button">Đổi nơi</button>
       <button class="td-may" type="button">Xoay theo máy</button>
@@ -640,12 +993,20 @@ function dungKhung() {
   tam.querySelector('.td-noi').onclick = moBangChonNoi;
   tam.querySelector('.td-may').onclick = doiTheoMay;
 
+  /* Hai ngón chạm cùng lúc là chụm để phóng to/thu nhỏ: khoảng cách hai ngón đổi bao nhiêu lần thì
+     góc nhìn đổi ngược lại bấy nhiêu lần. Đang chụm thì thôi kéo, kẻo bầu trời vừa phóng vừa trượt. */
+  const kc = () => { const [a, b] = [...chamTay.values()]; return Math.hypot(a.x - b.x, a.y - b.y) || 1; };
   cv.addEventListener('pointerdown', e => {
+    chamTay.set(e.pointerId, { x: e.clientX, y: e.clientY });
     quanTinh = null; ngam = null;
+    if (chamTay.size === 2) { chum = { d: kc(), goc }; keo = null; return; }
+    if (chamTay.size > 2) return;
     keo = { x: e.clientX, y: e.clientY, h: huongNhin, c: caoNhin, luc: Date.now(), xa: 0,
             tr: e.timeStamp, vh: 0, vc: 0 };
   });
   cv.addEventListener('pointermove', e => {
+    if (chamTay.has(e.pointerId)) chamTay.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (chum && chamTay.size >= 2) { datGoc(chum.goc * chum.d / kc()); return; }
     if (!keo) return;
     if (theoMay) doiTheoMay();              // tự kéo tay thì tắt xoay theo máy, và nút cũng tắt theo
     keo.xa = Math.max(keo.xa, Math.hypot(e.clientX - keo.x, e.clientY - keo.y));
@@ -672,12 +1033,29 @@ function dungKhung() {
     }
     keo = null;
   });
-  for (const s of ['pointercancel', 'pointerleave']) cv.addEventListener(s, () => { keo = null; });
+  const nhac = (e) => {
+    chamTay.delete(e.pointerId);
+    if (chamTay.size < 2) chum = null;
+  };
+  cv.addEventListener('pointerup', nhac);
+  for (const s of ['pointercancel', 'pointerleave']) cv.addEventListener(s, (e) => { keo = null; nhac(e); });
   cv.addEventListener('wheel', e => {
     e.preventDefault();
-    goc = Math.max(25, Math.min(110, goc + Math.sign(e.deltaY) * 4));
+    datGoc(goc * Math.pow(1.0015, e.deltaY));
   }, { passive: false });
+  tam.querySelector('.td-phong').onclick = () => datGoc(GOC_THUONG);
   addEventListener('resize', () => { if (tam && tam.classList.contains('hien')) doCo(); });
+}
+
+/* Góc nhìn 12°–110°: hẹp nhất cỡ ống nhòm, rộng nhất cỡ mắt người. Lệch khỏi mặc định thì hiện
+   nút nhỏ ghi độ phóng, bấm vào là về như cũ. */
+function datGoc(g) {
+  goc = Math.max(12, Math.min(110, g));
+  const n = tam && tam.querySelector('.td-phong');
+  if (!n) return;
+  const lan = GOC_THUONG / goc;
+  n.hidden = Math.abs(lan - 1) < .08;
+  n.textContent = lan > 1 ? `Phóng ×${so1(lan)} · bấm để về` : `Thu ×${so1(1 / lan)} · bấm để về`;
 }
 
 /* ---------- chọn nơi đứng ---------- */
@@ -841,5 +1219,15 @@ self.TDTD_TROIDEM = { mo, dong,
   _mucMay: (h, c) => { theoMay = true; mucMay = { h, c }; },
   _htmlChu: () => tam.querySelector('.td-tin')._html,
   _quenNoi: () => { daChon = false; },
-  _debug: () => ({ noi, daChon, huongNhin: Math.round(huongNhin), caoNhin: Math.round(caoNhin), goc, theoMay, W, H }) };
+  _debug: () => ({ noi, daChon, huongNhin: Math.round(huongNhin), caoNhin: Math.round(caoNhin), goc, theoMay, W, H }),
+  _datGoc: (g) => { datGoc(g); return goc; },
+  _sao: (luc) => { const S = napSao(luc || Date.now()); return S && capNhatTap(S, luc || Date.now()); },
+  _nganHa: (luc) => capNhatTap(napNganHa(luc || Date.now()), luc || Date.now()),
+  _nguong: (sangTroi, b) => nguongSao(sangTroi, b),
+  _gocTrenMan: (v, w) => gocTrenMan(v, w),
+  _vecto: vecto,
+  _vien: vienTai,
+  _bien: BIEN,
+  _ketCauTrang: (R, cosI, gocSang, dem) => { khoTrang = null; return ketCauTrang(R, cosI, gocSang, dem); },
+  _chum: (d0, d1) => { chum = { d: d0, goc }; datGoc(chum.goc * d0 / d1); chum = null; return goc; } };
 })();

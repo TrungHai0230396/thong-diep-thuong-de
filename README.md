@@ -751,7 +751,7 @@ Ngôi sao hình trăng lưỡi liềm, `#nhac-ngu`. Chọn một âm, hẹn gi�
 
 ## Bầu trời đêm nay
 
-Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở chỗ bạn đang đứng, vào đúng lúc này**: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường thấy được, và tám chòm sao mượn lại toạ độ thật của trò Nối sao. Kéo để nhìn quanh, hoặc bấm *Xoay theo máy* rồi giơ điện thoại lên — hướng máy về phía nào thì thấy bầu trời phía đó.
+Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở chỗ bạn đang đứng, vào đúng lúc này**: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường thấy được, 5.080 sao thật, dải Ngân Hà, và tám chòm sao mượn lại toạ độ thật của trò Nối sao. Kéo để nhìn quanh, chụm hai ngón để phóng to, hoặc bấm *Xoay theo máy* rồi giơ điện thoại lên — hướng máy về phía nào thì thấy bầu trời phía đó.
 
 Đây là trò duy nhất trong app **kiểm chứng được bằng cách bước ra sân ngước lên**.
 
@@ -780,6 +780,24 @@ Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở
 **Ba chỗ sửa khi vẽ.** Lưỡi liềm lúc đầu vẽ ngược — trăng 12% ra thành trăng khuyết gần tròn, vì tôi lấy sai dấu của nửa elip ranh giới sáng tối; đúng ra nó phải đi qua điểm `x = (1 − 2k)·r`. Bầu trời chạng vạng sáng quá nên đổi sang đường cong bình phương. Và quầng sáng quanh hành tinh vẽ thành một cục đặc, vì `mau.replace('rgb','rgba')` không ăn gì với chuỗi mã hex — phải tự đổi hex sang rgba mới đặt được độ mờ.
 
 Bề sáng của Mặt Trăng luôn quay về phía Mặt Trời, nên ở vĩ độ Việt Nam lưỡi liềm **nằm ngang như cái thuyền** chứ không dựng đứng — cái đó ra được từ phép tính, không phải vẽ sẵn.
+
+### Chiều sâu: sao thật, Ngân Hà, Mặt Trăng hình cầu
+
+Người dùng hỏi *"phần trời đêm làm 3D được không"*. Về kỹ thuật nó vốn đã 3D — đứng giữa một thiên cầu, phép chiếu tâm, kéo hay xoay máy để nhìn quanh — nhưng nhìn phẳng: cả bầu trời chỉ có 50 sao của tám chòm, Mặt Trăng là một cái đĩa, mặt đất là một mảng tối. Giờ:
+
+- **5.080 sao thật** tới cấp 6, lọc từ *Danh mục sao sáng Yale*, bản 5 (Hoffleit & Warren 1991, bản V/50 của [CDS Strasbourg](https://cdsarc.cds.unistra.fr/ftp/V/50/)) bằng `scripts/lam-saosang.py`, gói 8 ký tự mỗi sao vào `assets/saosang.js` (41 KB). Toạ độ J2000 được tính **tuế sai** về hôm nay (Meeus chương 21; tới 2026 sao đã trôi 0,36°, đủ để đường nối chòm lệch khỏi sao khi phóng to — nên chòm sao cũ cũng tính tuế sai theo).
+- **Màu sao** theo chỉ số B−V (nhiệt độ theo Ballesteros 2012, ra màu theo cách xấp xỉ vật đen của Tanner Helland), pha nửa với trắng vì mắt người thấy màu sao rất nhạt.
+- **Sát chân trời sao mờ đi** vì xuyên nhiều khí quyển: khối khí theo Kasten & Young (1989), mất 0,25 cấp mỗi khối. Sao sáng **lấp lánh**, sát chân trời lấp lánh mạnh hơn (tắt nếu máy bật giảm chuyển động).
+- **Thấy tới đâu**: đêm tối không trăng thấy tới cấp 5 (ở thành phố mắt thường thường chỉ tới cấp 3–4); trời còn sáng, trăng sáng trên cao thì mất sao mờ; **chụm hai ngón để phóng to** (12°–110°, như cầm ống nhòm) thì thấy thêm sao tới cấp 6.
+- **Ngân Hà**: không có ảnh chụp. 1.500 đám mờ rải dọc xích đạo thiên hà theo đúng toạ độ thiên hà (hằng số J2000 trên Wikipedia), dày về phía tâm thiên hà ở chòm Nhân Mã, sáng thêm ở mây sao Thiên Nga, bị vệt bụi tối Great Rift chẻ đôi từ Thiên Nga tới Bán Nhân Mã. Vị trí đúng; còn độ sáng từng vùng là phỏng theo mô tả, không phải đo.
+- **Mặt Trăng hình cầu**: vẽ từng điểm ảnh, sáng theo định luật Lommel–Seeliger (bề mặt bụi: trăng tròn trông phẳng đều, không tối dần ra mép như quả bóng), mặt tối có ánh đất hắt lên. Các **biển** — vệt tối người Việt nhìn ra chú Cuội — lấy vị trí, đường kính từ bài *List of maria on the Moon* trên Wikipedia; biển méo dài (Biển Lạnh, Đại dương Bão tố) ghép vài vùng tròn, mép hơi gồ ghề. Đo trên ảnh trăng tròn: biển chiếm 37% đĩa (Wikipedia: biển phủ 16% toàn Mặt Trăng, hầu hết ở mặt gần, tức khoảng 30% mặt gần — trên đĩa nhỉnh hơn vì biển dồn về giữa). Kết cấu xoay theo cực Bắc hoàng đạo, vì trục Mặt Trăng chỉ lệch cực đó 1,5°. Phóng to thì trăng to theo.
+- **Viền cây đồi** ở chân trời (cao nhất 2,7°, chỉ để có chiều sâu khi xoay — không phải cảnh chỗ bạn), **sương mù** sát chân trời vẽ theo độ cao thật, và **vầng cam** phía Mặt Trời vừa lặn lúc chạng vạng.
+
+Ba lỗi bắt được khi tự xem: (1) phóng to rồi ngẩng lên thì cả nửa màn hình sáng thành một mảng — dải sương mù lấy cả điểm sát mép tầm nhìn, phép chiếu ném nó ra xa hàng vạn điểm ảnh; giờ chỉ lấy điểm nằm rõ phía trước, vẽ từng mảnh. (2) Trăng sáng 59% trông chưa tới một nửa — độ chiếu sáng chưa bù gamma của màn hình. (3) Các biển thoạt đầu chỉ chiếm 7% đĩa, trông như mấy đốm tròn; lần đo sau ra 5% là do chính phép đo bỏ qua điểm ảnh hơi trong suốt — và đó lại là lỗi thật: biển đang bị vẽ hơi trong suốt, sao phía sau lấp ló xuyên qua. Giờ phần được chiếu luôn đục.
+
+Vẽ một khung mất dưới 1 ms trên máy tính: sao xếp từ sáng tới mờ và chia theo màu (mỗi màu đặt `fillStyle` một lần, gặp sao mờ hơn ngưỡng là dừng), vector chân trời của sao tính lại hai giây một lần, khung nhìn tính một lần mỗi hướng nhìn.
+
+`scripts/test-astro.js` thêm 14 bài: tuế sai đúng ví dụ 21.b của Meeus tới 0,004 giây cung; tâm, đối tâm, cực thiên hà đúng bảng Wikipedia; khối khí quyển; nhiệt độ Mặt Trời từ B−V; năm sao đối chiếu toạ độ, cấp sáng, màu với danh mục. `scripts/test-troidem.js` thêm 14 bài: Sao Bắc Cực đứng ở độ cao bằng vĩ độ, Ngân Hà dày về tâm thiên hà, ngưỡng sao theo trăng, trời, độ phóng; chụm hai ngón; hướng xoay kết cấu trăng; vị trí các biển; vẽ mọi tư thế không nổ.
 
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
@@ -1158,8 +1176,10 @@ sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên m�
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       38 kiểm thử lõi
 scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
-scripts/test-astro.js      50 kiểm thử thiên văn, đối chiếu số liệu ngoài
-scripts/test-troidem.js    51 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị
+scripts/test-astro.js      64 kiểm thử thiên văn, đối chiếu số liệu ngoài
+assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
+scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
+scripts/test-troidem.js    65 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-sao.js        75 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
@@ -1189,8 +1209,8 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
-node scripts/test-astro.js       # chạy 50 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 51 kiểm thử bầu trời đêm
+node scripts/test-astro.js       # chạy 64 kiểm thử thiên văn
+node scripts/test-troidem.js     # chạy 65 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
