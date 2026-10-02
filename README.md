@@ -811,6 +811,21 @@ Ba chỗ sửa khi tự xem: Siberia trắng xoá vì băng tô cho mọi vùng 
 
 `scripts/test-troidem.js` thêm 12 bài: mặt nạ đất đúng ở 8 điểm đã biết; chấm chỗ bạn đứng khớp độ cao Mặt Trời ngoài trời suốt 48 giờ (đã thử đảo chiều quay Trái Đất: bài kiểm bắt ngay); phần trăng được chiếu khớp phần đĩa sáng ngoài trời; trăng quay đúng mặt gần; Sao Kim không quá 48°, Sao Thuỷ không quá 28° khỏi Mặt Trời; máy quay, nút tua, giới hạn phóng; vẽ hai cảnh không nổ.
 
+### "Không cho thấy sao hoặc trăng ở dưới chân trời hả", "chỉ thấy hướng Mặt Trời"
+
+Bốn chỗ người dùng chỉ ra sau khi xem, đều đúng:
+
+- **Mặt đất đen đục che mất mọi thứ dưới chân trời.** Trước đó Mặt Trăng, Mặt Trời, hành tinh đã lặn hiện mờ xuyên qua đất; lần thêm viền cây đồi đã tô đất đục 94% và che luôn. Giờ phần dưới chân trời vẽ **sau** mặt đất, bằng chính hình của nó nhưng mờ đi — Mặt Trăng vẫn đúng hình khuyết — kèm chữ "dưới chân trời", cùng sao sáng tới cấp 4,3 và đường chòm sao. Đó là bầu trời của phía bên kia Trái Đất, nên ban ngày ở đây vẫn thấy sao dưới đất là đúng: bên đó đang đêm.
+- **Cúi xuống thì đất chỉ còn một dải mỏng, bên dưới lại là màu trời** — lỗi có từ bản đầu: đất tô bằng đa giác nối các điểm chân trời theo phương vị 0° → 360°, nhìn về hướng Bắc thì chuỗi điểm gãy đôi giữa màn và đa giác tự cắt. Giờ dùng một tính chất của phép chiếu tâm: đường chân trời thật là vòng tròn lớn nên luôn hiện thành **đường thẳng nằm ngang**, ở y = H/2 + ti·tan(độ ngẩng); đất là cả phần màn bên dưới. Viền cây đồi vẽ riêng thành dải, đi từ sau lưng vòng ra trước cho các điểm luôn liền.
+- **Trời ban ngày có ba sọc ngang, đất đen kịt — "trắng đen".** Sương mù chân trời giờ là 16 dải mỏng giảm dần theo hàm mũ, không còn bậc; đất ban ngày xanh lá sẫm, đêm xanh đen.
+- **Ở cảnh vũ trụ chỉ thấy mũi tên chỉ hướng Mặt Trời.** Mặt Trời cách 23.500 lần bán kính Trái Đất, không kéo lại gần được như Mặt Trăng mà không sai. Giờ **chạm vào mũi tên** thì máy quay xoay ra phía sau Trái Đất, lệch 16° với hướng Mặt Trời: thấy Mặt Trời đúng cỡ thật (0,53° — bằng Mặt Trăng nhìn từ Trái Đất, vì nó to gấp chừng 400 lần mà xa gấp chừng 400 lần), còn Trái Đất thành hình lưỡi liềm. Bản đầu vẽ Mặt Trời thành quầng to 80 điểm ảnh — sai cỡ.
+
+Soát lại cảnh vũ trụ còn thấy ba chỗ sai và sửa: **vành Sao Thổ** vẽ thành elip nghiêng cố định — giờ nằm trong mặt phẳng xích đạo thật, trục theo IAU (xích kinh 40,589°, xích vĩ 83,537°), kiểm lại ra đúng độ nghiêng 26,73° so với quỹ đạo; **lớp khí quyển** quanh Trái Đất phủ một lớp xanh 35% lên cả quả cầu (gradient tròn tô phần bên trong vòng đầu bằng màu mốc 0) nên mặt đêm ra xanh nhạt; **tên hành tinh** lúc Sao Kim sát Trái Đất bị tráo chỗ cho nhau — giờ coi các hành tinh là chỗ đã chiếm, tên dời chỗ thì kẻ vạch nối về hành tinh.
+
+Người dùng cũng hỏi Mặt Trăng có tự quay không: có — mỗi vòng quanh Trái Đất (27,3 ngày) nó tự quay đúng một vòng, nên luôn quay một mặt về phía ta. Mô hình vốn làm đúng vậy (kết cấu trăng luôn hướng kinh độ 0 về Trái Đất) nhưng không nói ra; giờ dòng chữ ở cảnh vũ trụ nói rõ, và bấm Tua là thấy. Chưa vẽ sự lắc nhẹ (bình động) khiến ta thấy thêm chừng 9% bề mặt.
+
+`scripts/test-troidem.js` thêm 7 bài: đường chân trời ở đúng chỗ khi nhìn ngang, cúi xuống, cúi hẳn; Mặt Trăng dưới đất vẫn vẽ và chạm được; chạm mũi tên thì máy quay xoay tới khi Mặt Trời nằm trong khung; trục vành Sao Thổ nghiêng 26,73°.
+
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
 Người dùng báo: *"bấm vô ngôi sao thì ko ra"*. Đây là lỗi tôi tự gây ra và tự đẩy lên mạng.
@@ -1191,7 +1206,7 @@ scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trì
 scripts/test-astro.js      64 kiểm thử thiên văn, đối chiếu số liệu ngoài
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
-scripts/test-troidem.js    77 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
+scripts/test-troidem.js    84 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
 assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
@@ -1225,7 +1240,7 @@ python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 64 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 77 kiểm thử bầu trời đêm
+node scripts/test-troidem.js     # chạy 84 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên

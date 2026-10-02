@@ -37,6 +37,9 @@ let tua = 0, lech = 0, lucTruoc = 0;          // tua nhanh: 0 thật, 1 một gi
 const TUA = [{ k: 0, ten: 'Giờ thật' }, { k: 3600, ten: '1 giờ mỗi giây' }, { k: 86400, ten: '1 ngày mỗi giây' }];
 const TUA_HMT = [{ k: 0, ten: 'Giờ thật' }, { k: 86400, ten: '1 ngày mỗi giây' }, { k: 864000, ten: '10 ngày mỗi giây' }];
 let keo = null;
+let quay = null;                     // đích quay máy (yaw, pitch) khi chạm mũi tên Mặt Trời
+let muiTen = null;                   // chỗ mũi tên Mặt Trời trên màn ở khung vừa vẽ, để chạm vào
+let huongTroi = null;                // hướng Mặt Trời ở khung vừa vẽ
 
 /* ---------- dữ liệu ---------- */
 
@@ -180,9 +183,11 @@ function veTraiDat(ctx, JD, noi, luc) {
   let pD, pT;
   if (xaDat > xaTrang) { pD = veD(); pT = veT(); } else { pT = veT(); pD = veD(); }
   /* khí quyển: viền xanh mỏng quanh Trái Đất */
+  /* Gradient tròn tô cả phần BÊN TRONG vòng đầu bằng màu của mốc 0 — bản đầu để mốc 0 là xanh 35% nên
+     cả quả địa cầu bị phủ một lớp mờ, mặt đêm ra xanh nhạt. Giờ mốc 0 trong suốt, chỉ còn viền ở mép. */
   if (pD && pD.rs) {
-    const g = ctx.createRadialGradient(pD.x, pD.y, pD.rs * .98, pD.x, pD.y, pD.rs * 1.12);
-    g.addColorStop(0, 'rgba(120,170,255,.35)'); g.addColorStop(1, 'rgba(120,170,255,0)');
+    const g = ctx.createRadialGradient(pD.x, pD.y, pD.rs * .9, pD.x, pD.y, pD.rs * 1.12);
+    g.addColorStop(0, 'rgba(120,170,255,0)'); g.addColorStop(.45, 'rgba(120,170,255,.3)'); g.addColorStop(1, 'rgba(120,170,255,0)');
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(pD.x, pD.y, pD.rs * 1.12, 0, 6.2832); ctx.fill();
   }
   /* chỗ bạn đứng */
@@ -278,17 +283,79 @@ function veHeMatTroi(ctx, JD) {
     const ve = p0 ? don({ x: p0.x - p.x, y: p0.y - p.y, z: 0 }) : { x: 0, y: -1 };
     const g = ctx.createRadialGradient(p.x + ve.x * r * .5, p.y + ve.y * r * .5, r * .1, p.x, p.y, r * 1.05);
     g.addColorStop(0, h.mau); g.addColorStop(.75, h.mau); g.addColorStop(1, 'rgba(20,24,40,1)');
-    if (h.ma === 'tho') {                                  // vành Sao Thổ
-      ctx.strokeStyle = 'rgba(232,217,160,.55)'; ctx.lineWidth = 1.4;
-      ctx.beginPath(); ctx.ellipse(p.x, p.y, r * 2, r * .7, -.35, 0, 6.2832); ctx.stroke();
-    }
+    const vanh = h.ma === 'tho' ? vanhThoTren(h.X, r, p) : null;
+    if (vanh) veVanh(ctx, vanh, false);                    // nửa vành phía sau hành tinh
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.2832); ctx.fill();
+    if (vanh) veVanh(ctx, vanh, true);                     // nửa vành phía trước
     h.rv = r;
   }
+  /* Ghi tên: coi các hành tinh và Mặt Trời là chỗ đã chiếm, rồi thử dưới, trên, phải, trái của từng
+     hành tinh theo thứ tự ưu tiên. Tên nào phải dời khỏi chỗ ngay dưới thì kẻ một vạch nối về hành tinh
+     của nó — lúc Sao Kim đứng sát Trái Đất, bản đầu để chữ "Trái Đất" nằm ngay dưới chấm Sao Kim. */
+  for (const h of vt) daGhi.push({ x0: h.p.x - h.rv - 2, x1: h.p.x + h.rv + 2, y0: h.p.y - h.rv - 2, y1: h.p.y + h.rv + 2 });
+  if (p0) daGhi.push({ x0: p0.x - 10, x1: p0.x + 10, y0: p0.y - 10, y1: p0.y + 10 });
   const THU_TU = ['dat', 'kim', 'hoa', 'moc', 'tho', 'thuy'];
-  for (const h of vt.slice().sort((a, b) => THU_TU.indexOf(a.ma) - THU_TU.indexOf(b.ma)))
-    chu(ctx, h.ma === 'dat' ? 'Trái Đất · bạn ở đây' : h.ten, h.p.x, h.p.y + h.rv + 14, h.ma === 'dat' ? 'rgba(190,215,250,.95)' : 'rgba(235,228,210,.85)');
-  if (p0) chu(ctx, 'Mặt Trời', p0.x, p0.y + 26, 'rgba(255,232,180,.95)');
+  for (const h of vt.slice().sort((a, b) => THU_TU.indexOf(a.ma) - THU_TU.indexOf(b.ma))) {
+    const ten = h.ma === 'dat' ? 'Trái Đất · bạn ở đây' : h.ten, { x, y } = h.p, r = h.rv;
+    const w = rong(ctx, ten);
+    const cho = [[x, y + r + 14], [x, y - r - 7], [x + r + 8 + w / 2, y + 4], [x - r - 8 - w / 2, y + 4],
+                 [x, y + r + 30], [x, y - r - 23]];
+    const o = ghiTen(ctx, ten, cho, h.ma === 'dat' ? 'rgba(190,215,250,.95)' : 'rgba(235,228,210,.85)');
+    if (o && o !== cho[0]) {                              // dời chỗ: kẻ vạch nối
+      ctx.strokeStyle = 'rgba(220,225,240,.35)'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(o[0], o[1] - 4 * Math.sign(o[1] - y || 1)); ctx.stroke();
+    }
+  }
+  if (p0) ghiTen(ctx, 'Mặt Trời', [[p0.x, p0.y + 26], [p0.x, p0.y - 16]], 'rgba(255,232,180,.95)');
+}
+
+const rong = (ctx, s) => { ctx.font = '500 12px "Be Vietnam Pro", system-ui, sans-serif'; return ctx.measureText ? (ctx.measureText(s).width || s.length * 6.5) : s.length * 6.5; };
+/* Ghi chữ vào chỗ đầu tiên còn trống trong danh sách; trả về chỗ đã chọn, hoặc null nếu chật hết. */
+function ghiTen(ctx, s, cho, mau) {
+  const w = rong(ctx, s);
+  for (const c of cho) {
+    const o = { x0: c[0] - w / 2 - 3, x1: c[0] + w / 2 + 3, y0: c[1] - 12, y1: c[1] + 3 };
+    if (o.x0 < 2 || o.x1 > W - 2 || daGhi.some(d => o.x0 < d.x1 && o.x1 > d.x0 && o.y0 < d.y1 && o.y1 > d.y0)) continue;
+    daGhi.push(o);
+    ctx.textAlign = 'center'; ctx.fillStyle = mau; ctx.fillText(s, c[0], c[1]);
+    return c;
+  }
+  return null;
+}
+
+/* Vành Sao Thổ nằm trong mặt phẳng xích đạo của nó, trục quay chỉ về xích kinh 40,589°, xích vĩ 83,537°
+   (J2000, theo IAU) — nghiêng 26,7° so với quỹ đạo, và giữ nguyên hướng trong không gian khi Sao Thổ đi
+   quanh Mặt Trời. Vì thế từ Trái Đất có năm thấy vành mở rộng, có năm thấy nó gần như một vạch.
+   Mép ngoài vành A rộng 2,27 lần bán kính hành tinh. */
+const TRUC_THO = (() => {
+  const e = 23.4393 * RAD, v = tuXichDao(40.589, 83.537);
+  return { x: v.x, y: v.y * Math.cos(e) + v.z * Math.sin(e), z: -v.y * Math.sin(e) + v.z * Math.cos(e) };   // sang hệ hoàng đạo
+})();
+function vanhThoTren(X, rPx, p) {
+  const rThe = rPx * p.z / f;                             // bán kính hành tinh trên màn, đổi ra đơn vị cảnh
+  const e1 = don(cheo(TRUC_THO, { x: 0, y: 0, z: 1 })), e2 = cheo(TRUC_THO, e1);
+  const ds = [];
+  for (let k = 0; k <= 72; k++) {
+    const a = k / 72 * 2 * Math.PI;
+    for (const m of [1.52, 2.27]) {                       // mép trong vành B, mép ngoài vành A
+      const Q = cong(X, nhan(cong(nhan(e1, Math.cos(a)), nhan(e2, Math.sin(a))), m * rThe));
+      const q = chieu(Q);
+      if (q) ds.push({ k, m, x: q.x, y: q.y, gan: q.z < p.z });
+    }
+  }
+  return ds;
+}
+function veVanh(ctx, ds, truoc) {
+  ctx.strokeStyle = 'rgba(232,217,160,.6)'; ctx.lineWidth = 1.3;
+  for (const m of [1.52, 2.27]) {
+    const vong = ds.filter(d => d.m === m);
+    ctx.beginPath();
+    for (let i = 1; i < vong.length; i++) {
+      if (vong[i].gan !== truoc || vong[i - 1].gan !== truoc) continue;
+      ctx.moveTo(vong[i - 1].x, vong[i - 1].y); ctx.lineTo(vong[i].x, vong[i].y);
+    }
+    ctx.stroke();
+  }
 }
 
 /* Sao Kim, Sao Thuỷ ở phía Đông hay phía Tây Mặt Trời (nhìn từ Trái Đất): phía Đông thì thấy lúc
@@ -315,13 +382,20 @@ function veNen(ctx, doi) {
   ctx.globalAlpha = 1;
 }
 
+/* Mặt Trời cách 150 triệu km — 23.500 lần bán kính Trái Đất — nên ở cảnh này nó là một hướng, không
+   kéo lại gần được như Mặt Trăng. Vẽ ĐÚNG CỠ nhìn thấy: đường kính 0,53°, bằng Mặt Trăng nhìn từ Trái Đất
+   (Mặt Trời to gấp chừng 400 lần Mặt Trăng mà cũng xa gấp chừng 400 lần). Quầng sáng quanh nó là ánh chói
+   như khi chụp ảnh, không phải kích thước. */
 function veMatTroiXa(ctx, s) {
+  huongTroi = s; muiTen = null;
   const p = chieuHuong(s);
   if (p && p.x > -60 && p.x < W + 60 && p.y > -60 && p.y < H + 60) {
-    const g = ctx.createRadialGradient(p.x, p.y, 3, p.x, p.y, 80);
-    g.addColorStop(0, 'rgba(255,244,205,1)'); g.addColorStop(.18, 'rgba(255,214,130,.55)'); g.addColorStop(1, 'rgba(255,190,100,0)');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, 80, 0, 6.2832); ctx.fill();
-    chu(ctx, 'Mặt Trời (rất xa)', p.x, p.y + 30, 'rgba(255,232,180,.95)');
+    const r = Math.max(2.5, f * Math.tan(.2666 * RAD) / p.z);
+    const g = ctx.createRadialGradient(p.x, p.y, r, p.x, p.y, r + 46);
+    g.addColorStop(0, 'rgba(255,240,200,.75)'); g.addColorStop(.25, 'rgba(255,214,130,.28)'); g.addColorStop(1, 'rgba(255,190,100,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r + 46, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#fffbea'; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, 6.2832); ctx.fill();
+    chu(ctx, 'Mặt Trời · cách 150 triệu km', p.x, p.y + r + 22, 'rgba(255,232,180,.95)', true);
     return;
   }
   /* ngoài khung: mũi tên ở mép, chỉ đúng hướng của nó trên mặt phẳng màn */
@@ -335,7 +409,24 @@ function veMatTroiXa(ctx, s) {
   ctx.fillStyle = 'rgba(255,214,130,.9)';
   ctx.beginPath(); ctx.moveTo(12, 0); ctx.lineTo(-6, -7); ctx.lineTo(-6, 7); ctx.closePath(); ctx.fill();
   ctx.restore();
-  chu(ctx, 'Mặt Trời', x - dx * 24, y - dy * 24 + 4, 'rgba(255,226,170,.9)');
+  const lx = x - dx * 52, ly = y - dy * 30;             // chữ lùi vào trong, khỏi đè lên mũi tên
+  chu(ctx, 'Mặt Trời', lx, ly - 2, 'rgba(255,226,170,.95)', true);
+  chu(ctx, 'chạm để nhìn', lx, ly + 13, 'rgba(255,226,170,.6)', true);
+  muiTen = { x, y };
+}
+
+/* Quay máy để thấy cả Mặt Trời lẫn Trái Đất: máy vẫn nhìn vào Trái Đất, nhưng đứng ở phía sau nó, lệch
+   16° so với hướng Mặt Trời — Mặt Trời hiện trong khung, và Trái Đất lúc đó là hình lưỡi liềm (nửa
+   ngày quay về phía Mặt Trời, gần như quay lưng lại với ta). */
+function quayVeMatTroi() {
+  const s = huongTroi;
+  if (!s) return false;
+  let w = tru(F, nhan(s, cham(F, s)));
+  if (Math.hypot(w.x, w.y, w.z) < 1e-3) w = cheo(s, { x: 0, y: 0, z: 1 });
+  w = don(w);
+  const v = don(cong(nhan(s, Math.cos(16 * RAD)), nhan(w, Math.sin(16 * RAD))));   // hướng máy nhìn
+  quay = { yaw: Math.atan2(-v.y, -v.x) / RAD, pitch: Math.max(-85, Math.min(85, Math.asin(-v.z) / RAD)) };
+  return true;
 }
 
 /* Ghi chữ, tránh đè lên chữ đã ghi trong khung này: thử dưới, trên, phải, trái; chật quá thì thôi. */
@@ -365,6 +456,12 @@ function ve(ctx, w, h, dpr, lucThat, noi) {
   lech += dt * ds[tua].k;
   const luc = lucThat + lech, JD = A().ngayJulius(luc);
   daGhi = [];
+  if (quay && canh === 'traiDat') {
+    const c = cam.traiDat, k = 1 - Math.pow(.86, Math.max(1, dt) / 16.7);
+    const dy = ((quay.yaw - c.yaw) % 360 + 540) % 360 - 180;
+    c.yaw += dy * k; c.pitch += (quay.pitch - c.pitch) * k;
+    if (Math.abs(dy) < .3 && Math.abs(quay.pitch - c.pitch) < .3) quay = null;
+  }
   if (canh === 'traiDat') return { canh, luc, ...veTraiDat(ctx, JD, noi, luc) };
   veHeMatTroi(ctx, JD);
   return { canh, luc, hm: homMai(JD) };
@@ -380,7 +477,7 @@ function giaiThich(kq, noi) {
     return `<p class="td-dong1">Nhìn từ vũ trụ · ${gio}${tuaChu}</p>
       <p class="td-dong2">Nửa Trái Đất quay về Mặt Trời là ban ngày — ${noi.ten === 'chỗ bạn đứng' ? 'chỗ bạn' : noi.ten} đang là <b>${kq.ngay ? 'ban ngày' : 'ban đêm'}</b>.
       Mặt Trăng cũng luôn sáng một nửa; từ Trái Đất ta thấy được ${pt}% đĩa sáng, nên đêm nay là trăng ${pt > 97 ? 'tròn' : pt < 3 ? 'non' : pt > 50 ? 'khuyết' : 'lưỡi liềm'}.</p>
-      <p class="td-dong3">Mặt Trăng kéo lại gần 15 lần (thật: ${Math.round(kq.kc / 1000)} nghìn km), kích cỡ đúng tỉ lệ. Kéo để xoay, chụm để phóng.</p>`;
+      <p class="td-dong3">Mặt Trăng có tự quay: mỗi vòng quanh Trái Đất (27,3 ngày) nó tự quay đúng một vòng, nên luôn quay một mặt về phía ta — bấm Tua để xem. Trăng kéo lại gần 15 lần (thật: ${Math.round(kq.kc / 1000)} nghìn km), kích cỡ đúng tỉ lệ.</p>`;
   }
   const hm = kq.hm.map(h => `${h.ten} đang ở phía ${h.lech > 0 ? 'Đông' : 'Tây'} Mặt Trời ${Math.abs(Math.round(h.lech))}° — ${h.lech > 0 ? 'thấy lúc chiều tối (Sao Hôm)' : 'thấy lúc rạng sáng (Sao Mai)'}`);
   return `<p class="td-dong1">Hệ Mặt Trời · ${gio}${tuaChu}</p>
@@ -395,7 +492,9 @@ self.TDTD_VUTRU = {
   tua: () => (canh === 'traiDat' ? TUA : TUA_HMT)[tua].ten,
   doiTua: () => { tua = (tua + 1) % 3; if (!tua) lech = 0; return (canh === 'traiDat' ? TUA : TUA_HMT)[tua].ten; },
   vao: () => { tua = 0; lech = 0; lucTruoc = 0; daDatCam = false; },
-  batDauKeo: (x, y) => { keo = { x, y, ...cam[canh] }; },
+  batDauKeo: (x, y) => { keo = { x, y, ...cam[canh] }; quay = null; },
+  /* chạm (không kéo): trúng mũi tên Mặt Trời thì quay máy về phía nó */
+  cham: (x, y) => (canh === 'traiDat' && muiTen && Math.hypot(x - muiTen.x, y - muiTen.y) < 44 ? quayVeMatTroi() : false),
   keo: (x, y) => {
     if (!keo) return;
     const c = cam[canh];
@@ -411,5 +510,10 @@ self.TDTD_VUTRU = {
   _cam: () => cam,
   _datMay: (dich, c, w, h) => { W = w || W; H = h || H; datMay(dich, c); return { P, F, Rt, U, f }; },
   _chieu: (X) => chieu(X),
+  _chieuHuong: (v) => chieuHuong(v),
+  _quayVeMatTroi: () => quayVeMatTroi(),
+  _quay: () => quay,
+  _muiTen: () => muiTen,
+  _trucTho: TRUC_THO,
 };
 })();

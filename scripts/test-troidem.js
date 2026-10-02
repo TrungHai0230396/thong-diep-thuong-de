@@ -387,5 +387,44 @@ console.log('\n— Nhìn từ vũ trụ: Trái Đất, Mặt Trăng, Hệ Mặt 
   T.mo();
 }
 
+console.log('\n— Dưới chân trời, và Mặt Trời trong cảnh vũ trụ —');
+{
+  /* Người dùng hỏi "không cho thấy sao hoặc trăng ở dưới đường chân trời hả": mặt đất đục che mất, và cúi
+     xuống thì đất chỉ còn một dải mỏng (đa giác chân trời gãy đôi ở hướng Bắc). */
+  T._noi(10.8231, 106.6297, 'TP.HCM');
+  T._nhin(0, 0, 75);
+  ok('nhìn ngang: đường chân trời ở đúng giữa màn', Math.abs(T._yChanTroi() - 360) < 1e-6);
+  T._nhin(0, -30, 75);
+  ok('cúi xuống: đường chân trời lên trên, đất phủ từ đó xuống hết đáy', T._yChanTroi() < 360);
+  T._nhin(0, -70, 75);
+  ok('cúi hẳn xuống: đường chân trời ra khỏi mép trên, đất phủ kín cả màn', T._yChanTroi() < 0);
+  /* Nhìn về đúng hướng Mặt Trăng đang ở dưới đất: phải vẽ và chạm được nó */
+  let luc = DEM, bb = T._bauTroi(luc);
+  for (let h = 0; h < 30 && bb.trang.cao > -10; h++) { luc += 36e5; bb = T._bauTroi(luc); }
+  T._nhin(bb.trang.huong, Math.max(-80, bb.trang.cao), 75);
+  T._ve(luc);
+  ok('Mặt Trăng ở dưới chân trời vẫn vẽ ra và chạm được, ghi "dưới chân trời"', T._moc().some(m => m.ten === 'Mặt Trăng' && m.loai === 'bong'),
+     `trăng ở ${bb.trang.cao.toFixed(0)}°`);
+  T._nhin(180, 25, 75);
+
+  const V = global.TDTD_VUTRU, A = global.TDTD_ASTRO, noi = { ten: 'TP.HCM', vi: 10.8231, kinh: 106.6297 };
+  const cv = { measureText: () => ({ width: 40 }) };
+  const ctxGia = new Proxy(cv, { get: (o, k2) => k2 in o ? o[k2] : (k2 === 'createRadialGradient' || k2 === 'createLinearGradient') ? () => ({ addColorStop() {} }) : () => {}, set: () => true });
+  if (V.canh() !== 'traiDat') V.doiCanh();
+  V.vao();
+  let t = DEM;
+  V.ve(ctxGia, 380, 720, 2, t, noi);
+  ok('chạm mũi tên Mặt Trời thì máy quay bắt đầu xoay về phía nó', V._quayVeMatTroi() === true && V._quay() !== null);
+  for (let i = 0; i < 400 && V._quay(); i++) { t += 16; V.ve(ctxGia, 380, 720, 2, t, noi); }
+  const s = V._canhTD(A.ngayJulius(t), noi).s, p = V._chieuHuong(s);
+  ok('xoay xong: Mặt Trời nằm trong khung, Trái Đất vẫn ở giữa', V._quay() === null && p && p.x > 0 && p.x < 380 && p.y > 0 && p.y < 720,
+     p ? `Mặt Trời ở (${p.x.toFixed(0)}, ${p.y.toFixed(0)})` : 'không thấy');
+  /* Vành Sao Thổ: trục quay (IAU, J2000) nghiêng so với pháp tuyến quỹ đạo đúng 26,73° */
+  const Tr = V._trucTho, R = Math.PI / 180, I = 2.48599187 * R, O = 113.66242448 * R;
+  const n = { x: Math.sin(I) * Math.sin(O), y: -Math.sin(I) * Math.cos(O), z: Math.cos(I) };
+  const nghieng = Math.acos(Tr.x * n.x + Tr.y * n.y + Tr.z * n.z) / R;
+  ok('vành Sao Thổ nằm trong mặt phẳng xích đạo thật: trục nghiêng 26,73° so với quỹ đạo', Math.abs(nghieng - 26.73) < .05, `${nghieng.toFixed(2)}°`);
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);
