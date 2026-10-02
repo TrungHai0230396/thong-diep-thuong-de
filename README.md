@@ -735,6 +735,7 @@ Ngôi sao hình trăng lưỡi liềm, `#nhac-ngu`. Chọn một âm, hẹn gi�
 - **Luôn tự tắt.** Hẹn 15, 30 (mặc định), 45, 60 hoặc 90 phút; **không có chế độ cả đêm**, vì thử nghiệm năm 2026 ở trên. To dần 6 giây lúc đầu cho khỏi giật mình; nhỏ dần trong 1/6 thời gian cuối (ít nhất 2, nhiều nhất 10 phút) theo hàm mũ, tức đều theo dB, xuống −60 dB rồi tắt hẳn. Có nút +15 phút, tạm dừng (giờ tắt dừng theo), tắt ngay.
 - **Phần "Để dễ ngủ hơn"** ở cuối trang: hẹn 30–45 phút, đừng mở suốt đêm, để nhỏ, nằm 20 phút vẫn tỉnh thì dậy, tối màn hình, mất ngủ từ ba đêm mỗi tuần kéo dài hơn ba tháng thì gặp bác sĩ. Ghi nguồn, và nói rõ đây không thay lời khuyên của bác sĩ.
 - Màn đang phát gần như đen; chỉ lưu ba lựa chọn (âm, giờ, âm lượng) để tối sau mở ra là sẵn.
+- **Quay lại mà không tắt nhạc.** Người dùng báo "không có nút back": màn đang phát chỉ có ✕ (đóng hẳn, tắt nhạc) và Tắt. Giờ có nút **‹ Chọn âm** ở góc trái: về danh sách, nhạc vẫn chạy; đầu danh sách có thanh *Đang phát… còn mm:ss* để quay lại màn phát hoặc tắt. Chọn âm khác thì nút thành *Đổi sang …*: âm cũ nhỏ đi trong 0,4 giây, âm mới to dần như lúc bắt đầu, hẹn giờ tính lại theo số phút đang chọn.
 
 **Kỹ thuật: phải chạy được khi màn hình đã tắt.**
 

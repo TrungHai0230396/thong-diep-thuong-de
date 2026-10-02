@@ -34,6 +34,8 @@ let ac = null, nguon = null, nhanh = null, gAm = null, t0 = 0, hg = null;
 let trangThai = 'nghi';                     // nghi · chuanBi · phat · dung (tạm dừng)
 let daTao = null, dangTao = null, tho = null, thoHong = false;
 let khung = 0, giayCu = -1, khoaMan = null;
+let xemDs = false;                          // đang phát mà quay về danh sách âm (nhạc vẫn chạy)
+let baiPhat = null, nhipPhat = null;        // âm ĐANG PHÁT — khác âm đang chọn khi người dùng xem danh sách
 
 /* ---------- lựa chọn đã lưu ---------- */
 
@@ -85,6 +87,8 @@ function taoAm(id) {
 const heSo = (am) => (am / 100) ** 2;                    // thanh trượt theo tai nghe, không theo biên độ
 const viTri = () => (ac ? Math.max(0, ac.currentTime - t0) : 0);
 const baiDangChon = () => R().BAI.find(b => b.id === chon.bai) || R().BAI[0];
+const baiDangPhat = () => R().BAI.find(b => b.id === baiPhat) || baiDangChon();
+const dangPhat = () => ['chuanBi', 'phat', 'dung', 'tat'].includes(trangThai);
 
 /* Một "nhánh" = gain theo lịch hẹn giờ, nối sau nó một gain để cắt êm. Lúc kéo dài thời gian thì
    KHÔNG huỷ lịch cũ (huỷ một đường đang dốc dở làm âm lượng nhảy, nghe "bụp"), mà mở nhánh mới với lịch
@@ -119,9 +123,24 @@ function batDau() {
     const im = ac.createBufferSource();                  // một mẫu lặng phát NGAY trong lúc chạm: iPhone mới chịu mở tiếng
     im.buffer = ac.createBuffer(1, 1, 22050); im.connect(ac.destination); im.start(0);
   } catch (e) { baoLoi('Không mở được âm thanh trên máy này.'); return; }
-  trangThai = 'chuanBi'; ve();
+  baiPhat = chon.bai; trangThai = 'chuanBi'; xemDs = false; ve();
   taoAm(chon.bai).then(kq => { if (trangThai === 'chuanBi' && ac) phat(kq); })
     .catch(() => { trangThai = 'nghi'; dongAc(); ve(); baoLoi('Tạo âm thanh không được, thử lại nhé.'); });
+}
+
+/* Đang phát mà chọn âm khác: âm cũ nhỏ đi trong 0,4 giây, âm mới to dần như lúc bắt đầu, hẹn giờ tính lại
+   từ đầu theo số phút đang chọn. Dùng lại luồng âm thanh cũ, khỏi phải xin mở tiếng lần nữa. */
+function doiAm() {
+  if (!['phat', 'dung'].includes(trangThai) || !ac || !nguon) { batDau(); return; }
+  const cu = nguon;
+  if (trangThai === 'dung') { try { ac.resume(); } catch (e) {} }
+  cu.onended = null;
+  boNhanh(nhanh, 0.4);
+  try { cu.stop(ac.currentTime + 0.45); } catch (e) {}
+  nguon = null; nhanh = null;
+  baiPhat = chon.bai; trangThai = 'chuanBi'; xemDs = false; ve();
+  taoAm(chon.bai).then(kq => { if (trangThai === 'chuanBi' && ac) phat(kq); })
+    .catch(() => { het(); baoLoi('Tạo âm thanh không được, thử lại nhé.'); });
 }
 
 function phat(kq) {
@@ -132,6 +151,7 @@ function phat(kq) {
   hg = X.henGio(chon.phut);
   t0 = ac.currentTime + 0.08;
   nhanh = moNhanh(X.lich(hg), false);
+  baiPhat = kq.id || chon.bai; nhipPhat = kq.nhip || null;
   const ng = nguon;
   ng.onended = () => { if (nguon === ng) het(); };
   ng.start(t0);
@@ -177,7 +197,7 @@ function het() {
   nguon = null; nhanh = null;
   if (ng) { ng.onended = null; try { ng.stop(); } catch (e) {} }
   dongAc();
-  trangThai = 'nghi';
+  trangThai = 'nghi'; xemDs = false;
   giuMan(false);
   try { nav.mediaSession.playbackState = 'none'; } catch (e) {}
   try { self.dispatchEvent(new Event('tdtd-ngu-het')); } catch (e) {}   // app.js đợi lúc này mới tự cập nhật bản mới
@@ -195,7 +215,7 @@ function dongAc() {
 function phienMedia() {
   const ms = nav.mediaSession;
   if (!ms) return;
-  try { ms.metadata = new MediaMetadata({ title: baiDangChon().ten, artist: 'Nhạc ngủ', album: 'Thông Điệp Của Thượng Đế' }); } catch (e) {}
+  try { ms.metadata = new MediaMetadata({ title: baiDangPhat().ten, artist: 'Nhạc ngủ', album: 'Thông Điệp Của Thượng Đế' }); } catch (e) {}
   const dat = (a, f) => { try { ms.setActionHandler(a, f); } catch (e) {} };
   dat('play', tiepTuc); dat('pause', tamDung); dat('stop', () => tat());
   trangThaiMedia();
@@ -225,7 +245,7 @@ function baoLoi(s) { const o = tam && tam.querySelector('.ng-loi'); if (o) { o.t
 
 function ve() {
   if (!tam) return;
-  const dangNghe = ['phat', 'dung', 'tat', 'chuanBi'].includes(trangThai);
+  const dangNghe = dangPhat() && !xemDs;
   tam.querySelector('.ng-chon').hidden = dangNghe;
   tam.querySelector('.ng-nghe').hidden = !dangNghe;
   tam.classList.toggle('dang-nghe', dangNghe);
@@ -235,9 +255,15 @@ function ve() {
 
 function veChon() {
   const X = R(), o = tam.querySelector('.ng-chon'), b = baiDangChon(), hgThu = X.henGio(chon.phut);
+  const dp = dangPhat(), cungBai = dp && chon.bai === baiPhat;
+  const nhanNut = !dp ? 'Bắt đầu' : cungBai ? 'Quay lại màn đang phát' : `Đổi sang ${b.ten}`;
   o.innerHTML = `
     <p class="xn-tieude">Nhạc ngủ</p>
-    <p class="ng-mo">Chọn một âm, hẹn giờ, rồi tắt màn hình. Âm nhỏ dần rồi tự tắt. Âm thanh tạo ngay trên máy, không cần mạng.</p>
+    ${dp ? `<div class="ng-dp">
+      <button class="ng-dp-mo" type="button" aria-label="Quay lại màn đang phát">
+        <span class="ng-dp-ten">Đang phát: ${esc(baiDangPhat().ten)}</span><span class="ng-dp-dem"></span></button>
+      <button class="ng-dp-tat" type="button">Tắt</button>
+    </div>` : `<p class="ng-mo">Chọn một âm, hẹn giờ, rồi tắt màn hình. Âm nhỏ dần rồi tự tắt. Âm thanh tạo ngay trên máy, không cần mạng.</p>`}
 
     <section class="xn-khoi">
       <p class="xn-tieu">Âm thanh</p>
@@ -260,7 +286,7 @@ function veChon() {
       <p class="xn-ghi">Để nhỏ, vừa đủ nghe. Chỉnh thêm bằng nút âm lượng của máy.</p>
     </section>
 
-    <button class="ng-batdau" type="button">Bắt đầu</button>
+    <button class="ng-batdau" type="button"${['chuanBi', 'tat'].includes(trangThai) ? ' disabled' : ''}>${esc(nhanNut)}</button>
     <p class="ng-loi" hidden></p>
     ${iOSCu ? `<p class="ng-canh">iPhone chạy iOS cũ hơn 17.5 sẽ dừng nhạc khi khoá màn hình, nên trong lúc phát trang sẽ giữ màn hình sáng
       (nền đen) — hạ độ sáng xuống thấp nhất. Nếu không nghe tiếng, gạt tắt chế độ im lặng. Cập nhật iOS thì tắt màn hình thoải mái.</p>` : ''}
@@ -285,13 +311,25 @@ function veChon() {
   }; });
   o.querySelectorAll('.ng-gio button').forEach(n => { n.onclick = () => { chon.phut = +n.dataset.phut; luuChon(); veChon(); }; });
   const am = o.querySelector('.ng-am');
-  am.oninput = () => { chon.am = +am.value; luuChon(); };
-  o.querySelector('.ng-batdau').onclick = batDau;
+  am.oninput = () => { chon.am = +am.value; luuChon(); datAm(); };
+  o.querySelector('.ng-batdau').onclick = () => {
+    if (!dp) batDau();
+    else if (cungBai) { xemDs = false; ve(); }
+    else doiAm();
+  };
+  if (dp) {
+    o.querySelector('.ng-dp-mo').onclick = () => { xemDs = false; ve(); };
+    o.querySelector('.ng-dp-tat').onclick = () => tat();
+    giayCu = -1; veDem(true);
+  }
 }
 
+function datAm() { if (gAm && ac) gAm.gain.setTargetAtTime(heSo(chon.am), ac.currentTime, 0.05); }
+
 function veNghe() {
-  const o = tam.querySelector('.ng-nghe'), b = baiDangChon();
+  const o = tam.querySelector('.ng-nghe'), b = baiDangPhat();
   o.innerHTML = `
+    <button class="ng-lui" type="button" aria-label="Quay về danh sách âm, nhạc vẫn chạy">‹ Chọn âm</button>
     <div class="ng-vong" aria-hidden="true"><span></span></div>
     <p class="ng-ten">${esc(b.ten)}</p>
     <p class="ng-dem" aria-live="off">${trangThai === 'chuanBi' ? '…' : R().dongHo(hg ? hg.tong : chon.phut * 60)}</p>
@@ -309,10 +347,8 @@ function veNghe() {
   o.querySelector('.ng-them').onclick = () => themGio(15);
   o.querySelector('.ng-tat').onclick = () => tat();
   const am = o.querySelector('.ng-am');
-  am.oninput = () => {
-    chon.am = +am.value; luuChon();
-    if (gAm && ac) gAm.gain.setTargetAtTime(heSo(chon.am), ac.currentTime, 0.05);
-  };
+  am.oninput = () => { chon.am = +am.value; luuChon(); datAm(); };
+  o.querySelector('.ng-lui').onclick = () => { xemDs = true; ve(); };
   giayCu = -1;
   veDieuKhien(); veDem(true);
 }
@@ -329,20 +365,29 @@ function veDieuKhien() {
 
 function veDem(ep) {
   if (!tam || !hg && trangThai !== 'chuanBi') return;
-  const X = R(), dem = tam.querySelector('.ng-dem'), tt = tam.querySelector('.ng-trangthai');
-  if (!dem) return;
-  if (trangThai === 'chuanBi') { tt.textContent = 'Đang tạo âm thanh…'; return; }
+  const X = R(), dem = tam.querySelector('.ng-dem'), tt = tam.querySelector('.ng-trangthai'), thanh = tam.querySelector('.ng-dp-dem');
+  const nghe = !tam.querySelector('.ng-nghe').hidden;
+  if (trangThai === 'chuanBi') {
+    if (nghe && tt) tt.textContent = 'Đang tạo âm thanh…';
+    if (!nghe && thanh) thanh.textContent = 'đang tạo âm…';
+    return;
+  }
   const t = viTri(), giay = Math.ceil(hg.tong - t);
   if (ep || giay !== giayCu) {
     giayCu = giay;
-    dem.textContent = X.dongHo(hg.tong - t);
-    tt.textContent = trangThai === 'dung' ? 'Đang tạm dừng — giờ tắt cũng dừng theo'
-      : trangThai === 'tat' ? 'Đang tắt…'
-      : t < hg.batDauGiam ? `Bắt đầu nhỏ dần lúc còn ${Math.round(hg.giam / 60)} phút` : 'Đang nhỏ dần…';
+    const con = X.dongHo(hg.tong - t);
+    if (nghe && dem) {
+      dem.textContent = con;
+      tt.textContent = trangThai === 'dung' ? 'Đang tạm dừng — giờ tắt cũng dừng theo'
+        : trangThai === 'tat' ? 'Đang tắt…'
+        : t < hg.batDauGiam ? `Bắt đầu nhỏ dần lúc còn ${Math.round(hg.giam / 60)} phút` : 'Đang nhỏ dần…';
+    }
+    if (!nghe && thanh) thanh.textContent = trangThai === 'dung' ? `tạm dừng · còn ${con}` : trangThai === 'tat' ? 'đang tắt…' : `còn ${con}`;
   }
+  if (!nghe) return;
   /* vòng tròn: mờ theo âm lượng; với sóng biển thì phồng xẹp theo đúng con sóng đang phát */
   const vong = tam.querySelector('.ng-vong span'), tho = tam.querySelector('.ng-tho');
-  const g = X.amLuong(t, hg), nhip = daTao && daTao.id === chon.bai && daTao.nhip;
+  const g = X.amLuong(t, hg), nhip = nhipPhat;
   let co = 0.86;
   if (nhip && trangThai !== 'tat') {
     const vt = ((t % X.DAI) + X.DAI) % X.DAI, i = Math.floor(vt * 20) % nhip.length, j = (i + 4) % nhip.length;
@@ -383,6 +428,7 @@ function dungKhung() {
 function mo() {
   dungKhung();
   docChon();
+  xemDs = false;
   document.body.classList.add('khoa-cuon');
   tam.classList.add('hien');
   ve();
@@ -401,7 +447,8 @@ addEventListener('keydown', e => {
 });
 
 self.TDTD_NGU = { mo, dong,
-  dangPhat: () => ['chuanBi', 'phat', 'dung', 'tat'].includes(trangThai),
+  dangPhat,
+  _xemDs: () => xemDs, _baiPhat: () => baiPhat,
   _trangThai: () => trangThai,
   _hg: () => hg,
   _viTri: () => viTri(),
