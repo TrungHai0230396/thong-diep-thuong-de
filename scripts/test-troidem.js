@@ -426,5 +426,44 @@ console.log('\n— Dưới chân trời, và Mặt Trời trong cảnh vũ trụ
   ok('vành Sao Thổ nằm trong mặt phẳng xích đạo thật: trục nghiêng 26,73° so với quỹ đạo', Math.abs(nghieng - 26.73) < .05, `${nghieng.toFixed(2)}°`);
 }
 
+console.log('\n— To nhỏ: đúng tỉ lệ ở đâu, nén ở đâu, và nói rõ —');
+{
+  const V = global.TDTD_VUTRU;
+  /* Đường kính NASA (Planetary Fact Sheet, Sun Fact Sheet), chép lại để đối chiếu */
+  const NASA = { troi: 1391400, moc: 142984, tho: 120536, dat: 12756, kim: 12104, hoa: 6792, thuy: 4879, trang: 3475 };
+  const ds = V._boKichThuoc(375, 812), dat = ds.find(b => b.ma === 'dat');
+  const sai = ds.filter(b => Math.abs(b.r / dat.r - NASA[b.ma] / NASA.dat) > 1e-9).map(b => b.ten);
+  ok('cảnh So kích thước: mọi bán kính đúng tỉ lệ đường kính thật của NASA', ds.length === 8 && !sai.length, sai.join(', '));
+  ok('Mặt Trời rộng gấp 109 lần Trái Đất, Sao Mộc 11,2 lần, Mặt Trăng 0,27 lần',
+     Math.abs(V._soTD('troi') - 109.08) < .05 && Math.abs(V._soTD('moc') - 11.21) < .01 && Math.abs(V._soTD('trang') - .2724) < .001);
+  const moc = ds.find(b => b.ma === 'moc'), tho = ds.find(b => b.ma === 'tho'), troi = ds.find(b => b.ma === 'troi');
+  ok('xếp dọc không chồng nhau: cung Mặt Trời, rồi Sao Mộc, Sao Thổ, rồi hàng hành tinh nhỏ',
+     troi.y + troi.r < moc.y - moc.r && moc.y + moc.r < tho.y - tho.r && tho.y + tho.r < dat.y);
+  ok('mặc định Sao Mộc và cả vành Sao Thổ (2,27 lần bán kính) nằm gọn trong bề ngang màn',
+     2 * moc.r < 375 && 2 * tho.r * 2.27 < 375);
+  const co = ['troi', 'moc', 'tho', 'dat', 'kim', 'hoa', 'thuy'].map(V._coNen);
+  ok('cảnh Hệ Mặt Trời: cỡ nén theo căn bậc ba nhưng thứ tự to nhỏ đúng (Mặt Trời > Mộc > Thổ > Đất > Kim > Hoả > Thuỷ)',
+     co.every((c, i) => i === 0 || c < co[i - 1]), co.map(c => c.toFixed(1)).join(' > '));
+  ok('Sao Mộc vẽ to hơn Trái Đất hẳn (bản đầu: chỉ 1,6 lần)', V._coNen('moc') / V._coNen('dat') > 2);
+
+  /* Bầu trời: Mặt Trăng vẽ to hơn thật thì thẻ phải nói rõ gấp mấy lần */
+  T._noi(10.8231, 106.6297, 'TP.HCM');
+  let luc = DEM, bb = T._bauTroi(luc);
+  for (let h = 0; h < 30 && bb.trang.cao < 15; h++) { luc += 36e5; bb = T._bauTroi(luc); }
+  T._nhin(bb.trang.huong, bb.trang.cao, 75); T._datGoc(75);
+  T._ve(luc);
+  const mT = T._moc().find(m => m.ten === 'Mặt Trăng' && m.loai === 'trang');
+  const tam = than.children.find(c => c.className === 'troidem');
+  if (mT) T._chonTai(mT.x, mT.y);
+  const html = T._the(luc) || '';
+  void tam;
+  const lan = +(html.match(/to gấp (\d+) lần thật/) || [])[1];
+  ok('thẻ Mặt Trăng nói rõ "vẽ to gấp N lần thật", N khoảng 15 ở góc nhìn thường', !!mT && lan > 8 && lan < 25, lan ? `gấp ${lan} lần` : html.slice(0, 80));
+  T._datGoc(12);
+  const lan2 = +((T._the(luc) || '').match(/to gấp (\d+) lần thật/) || [])[1];
+  ok('phóng to thì trăng gần cỡ thật hơn, con số nhỏ lại', lan2 > 0 && lan2 < lan, `gấp ${lan2} lần`);
+  T._datGoc(75);
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

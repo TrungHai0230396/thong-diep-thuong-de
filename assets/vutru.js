@@ -31,7 +31,14 @@ const tuXichDao = (ra, dec) => ({ x: Math.cos(dec * RAD) * Math.cos(ra * RAD), y
 /* ---------- trạng thái ---------- */
 
 let canh = 'traiDat';               // 'traiDat' | 'heMatTroi'
-const cam = { traiDat: { yaw: 0, pitch: 18, xa: 9 }, heMatTroi: { yaw: -90, pitch: 58, xa: 30 } };
+const cam = { traiDat: { yaw: 0, pitch: 18, xa: 9 }, heMatTroi: { yaw: -90, pitch: 58, xa: 30 }, kichThuoc: { k: 0, dy: 0 } };
+const THU_TU_CANH = ['traiDat', 'heMatTroi', 'kichThuoc'];
+const TEN_CANH = { traiDat: 'Trái Đất', heMatTroi: 'Hệ Mặt Trời', kichThuoc: 'So kích thước' };
+
+/* Đường kính thật, km — bảng Planetary Fact Sheet của NASA (đường kính xích đạo); Mặt Trời: bán kính
+   695.700 km theo Sun Fact Sheet của NASA. */
+const DUONG_KINH = { troi: 1391400, thuy: 4879, kim: 12104, dat: 12756, trang: 3475, hoa: 6792, moc: 142984, tho: 120536 };
+const soTD = (ma) => DUONG_KINH[ma] / DUONG_KINH.dat;     // gấp bao nhiêu lần Trái Đất
 let daDatCam = false;
 let tua = 0, lech = 0, lucTruoc = 0;          // tua nhanh: 0 thật, 1 một giờ mỗi giây, 2 một ngày mỗi giây
 const TUA = [{ k: 0, ten: 'Giờ thật' }, { k: 3600, ten: '1 giờ mỗi giây' }, { k: 86400, ten: '1 ngày mỗi giây' }];
@@ -244,10 +251,16 @@ function mauTrang(n, c) {
 
 /* ---------- cảnh Hệ Mặt Trời ---------- */
 
+/* Cỡ vẽ ở cảnh này: không thể đúng tỉ lệ (Trái Đất chỉ bằng 1/11.700 bề rộng quỹ đạo của nó), nên nén
+   theo CĂN BẬC BA của đường kính thật — một quy tắc cho tất cả, kể cả Mặt Trời: thứ tự to nhỏ giữ đúng,
+   Sao Mộc vẫn to hơn hẳn Trái Đất, Mặt Trời to nhất mà vẫn nằm gọn trong quỹ đạo Sao Thuỷ.
+   Bản đầu đặt cỡ tay: Sao Mộc chỉ gấp 1,6 lần Trái Đất (thật: 11 lần), Mặt Trời gấp 1,6 lần (thật: 109). */
+const CO_TD = 4.2;                                         // bán kính Trái Đất trên màn, điểm ảnh
+const coNen = (ma) => CO_TD * Math.cbrt(soTD(ma));
 const HANH = [
-  ['thuy', 'Sao Thuỷ', '#c8bda8', 3], ['kim', 'Sao Kim', '#f2e2b4', 5], ['dat', 'Trái Đất', '#6fa0e8', 5.5],
-  ['hoa', 'Sao Hoả', '#e08b6a', 4], ['moc', 'Sao Mộc', '#e9d6ae', 9], ['tho', 'Sao Thổ', '#e8d9a0', 8],
-];
+  ['thuy', 'Sao Thuỷ', '#c8bda8'], ['kim', 'Sao Kim', '#f2e2b4'], ['dat', 'Trái Đất', '#6fa0e8'],
+  ['hoa', 'Sao Hoả', '#e08b6a'], ['moc', 'Sao Mộc', '#e9d6ae'], ['tho', 'Sao Thổ', '#e8d9a0'],
+].map(([ma, ten, mau]) => [ma, ten, mau, coNen(ma)]);
 const nen2 = (p) => { const r = Math.hypot(p.x, p.y, p.z) || 1e-9, k = 3 * Math.sqrt(r) / r; return nhan(p, k); };   // nén căn bậc hai
 
 function veHeMatTroi(ctx, JD) {
@@ -256,11 +269,12 @@ function veHeMatTroi(ctx, JD) {
   veNen(ctx, (v) => ({ x: v.x, y: v.y * Math.cos(e) + v.z * Math.sin(e), z: -v.y * Math.sin(e) + v.z * Math.cos(e) }));   // sao nền trong hệ hoàng đạo
   /* Mặt Trời */
   const p0 = chieu({ x: 0, y: 0, z: 0 });
+  const rTroi = coNen('troi');
   if (p0) {
-    const g = ctx.createRadialGradient(p0.x, p0.y, 2, p0.x, p0.y, 46);
-    g.addColorStop(0, 'rgba(255,240,190,1)'); g.addColorStop(.3, 'rgba(255,200,110,.5)'); g.addColorStop(1, 'rgba(255,180,90,0)');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p0.x, p0.y, 46, 0, 6.2832); ctx.fill();
-    ctx.fillStyle = '#fff3cc'; ctx.beginPath(); ctx.arc(p0.x, p0.y, 9, 0, 6.2832); ctx.fill();
+    const g = ctx.createRadialGradient(p0.x, p0.y, rTroi, p0.x, p0.y, rTroi * 2.6);
+    g.addColorStop(0, 'rgba(255,220,140,.45)'); g.addColorStop(1, 'rgba(255,180,90,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p0.x, p0.y, rTroi * 2.6, 0, 6.2832); ctx.fill();
+    ctx.fillStyle = '#fff3cc'; ctx.beginPath(); ctx.arc(p0.x, p0.y, rTroi, 0, 6.2832); ctx.fill();
   }
   const vt = [];
   for (const [ma, ten, mau, r] of HANH) {
@@ -293,25 +307,33 @@ function veHeMatTroi(ctx, JD) {
      hành tinh theo thứ tự ưu tiên. Tên nào phải dời khỏi chỗ ngay dưới thì kẻ một vạch nối về hành tinh
      của nó — lúc Sao Kim đứng sát Trái Đất, bản đầu để chữ "Trái Đất" nằm ngay dưới chấm Sao Kim. */
   for (const h of vt) daGhi.push({ x0: h.p.x - h.rv - 2, x1: h.p.x + h.rv + 2, y0: h.p.y - h.rv - 2, y1: h.p.y + h.rv + 2 });
-  if (p0) daGhi.push({ x0: p0.x - 10, x1: p0.x + 10, y0: p0.y - 10, y1: p0.y + 10 });
+  if (p0) daGhi.push({ x0: p0.x - rTroi, x1: p0.x + rTroi, y0: p0.y - rTroi, y1: p0.y + rTroi });
   const THU_TU = ['dat', 'kim', 'hoa', 'moc', 'tho', 'thuy'];
   for (const h of vt.slice().sort((a, b) => THU_TU.indexOf(a.ma) - THU_TU.indexOf(b.ma))) {
     const ten = h.ma === 'dat' ? 'Trái Đất · bạn ở đây' : h.ten, { x, y } = h.p, r = h.rv;
     const w = rong(ctx, ten);
-    const cho = [[x, y + r + 14], [x, y - r - 7], [x + r + 8 + w / 2, y + 4], [x - r - 8 - w / 2, y + 4],
-                 [x, y + r + 30], [x, y - r - 23]];
-    const o = ghiTen(ctx, ten, cho, h.ma === 'dat' ? 'rgba(190,215,250,.95)' : 'rgba(235,228,210,.85)');
-    if (o && o !== cho[0]) {                              // dời chỗ: kẻ vạch nối
+    const cho = choQuanh(x, y, r, w);
+    const o = ghiTen(ctx, ten, cho, h.ma === 'dat' ? 'rgba(190,215,250,.95)' : 'rgba(235,228,210,.85)', h.ma === 'dat');
+    if (o && o !== cho[0] && Math.hypot(o[0] - x, o[1] - y) > r + 24) {   // dời xa: kẻ vạch nối về hành tinh
       ctx.strokeStyle = 'rgba(220,225,240,.35)'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(o[0], o[1] - 4 * Math.sign(o[1] - y || 1)); ctx.stroke();
+      const dx = o[0] - x, dy = o[1] - 4 - y, l = Math.hypot(dx, dy) || 1;
+      ctx.beginPath(); ctx.moveTo(x + dx / l * (r + 2), y + dy / l * (r + 2)); ctx.lineTo(o[0] - dx / l * 10, o[1] - 4 - dy / l * 8); ctx.stroke();
     }
   }
-  if (p0) ghiTen(ctx, 'Mặt Trời', [[p0.x, p0.y + 26], [p0.x, p0.y - 16]], 'rgba(255,232,180,.95)');
+  if (p0) ghiTen(ctx, 'Mặt Trời', choQuanh(p0.x, p0.y, rTroi, rong(ctx, 'Mặt Trời')), 'rgba(255,232,180,.95)');
 }
 
 const rong = (ctx, s) => { ctx.font = '500 12px "Be Vietnam Pro", system-ui, sans-serif'; return ctx.measureText ? (ctx.measureText(s).width || s.length * 6.5) : s.length * 6.5; };
-/* Ghi chữ vào chỗ đầu tiên còn trống trong danh sách; trả về chỗ đã chọn, hoặc null nếu chật hết. */
-function ghiTen(ctx, s, cho, mau) {
+/* Các chỗ có thể ghi tên quanh một vật: ngay dưới, ngay trên, rồi phải, trái, dưới, trên xa dần. */
+function choQuanh(x, y, r, w) {
+  const cho = [[x, y + r + 14], [x, y - r - 7]];
+  for (const d of [0, 18, 36, 54, 72]) cho.push([x + r + 8 + w / 2, y + 4 - d], [x + r + 8 + w / 2, y + 4 + d],
+    [x - r - 8 - w / 2, y + 4 - d], [x - r - 8 - w / 2, y + 4 + d], [x, y + r + 30 + d], [x, y - r - 23 - d]);
+  return cho;
+}
+/* Ghi chữ vào chỗ đầu tiên còn trống trong danh sách; trả về chỗ đã chọn, hoặc null nếu chật hết.
+   ep = true: chật hết thì vẫn ghi ở chỗ thứ hai (ngay trên) — dùng cho tên Trái Đất, không được mất. */
+function ghiTen(ctx, s, cho, mau, ep) {
   const w = rong(ctx, s);
   for (const c of cho) {
     const o = { x0: c[0] - w / 2 - 3, x1: c[0] + w / 2 + 3, y0: c[1] - 12, y1: c[1] + 3 };
@@ -320,7 +342,86 @@ function ghiTen(ctx, s, cho, mau) {
     ctx.textAlign = 'center'; ctx.fillStyle = mau; ctx.fillText(s, c[0], c[1]);
     return c;
   }
+  if (ep && cho[1]) { ctx.textAlign = 'center'; ctx.fillStyle = mau; ctx.fillText(s, cho[1][0], cho[1][1]); return cho[1]; }
   return null;
+}
+
+/* ---------- cảnh So kích thước: đúng tỉ lệ to nhỏ, không có khoảng cách ----------
+   Xếp dọc: Mặt Trời to tới mức chỉ thấy một cung ở trên cùng, rồi Sao Mộc, Sao Thổ (cả vành, đúng cỡ
+   theo bảng vành của NASA), rồi một hàng Trái Đất, Sao Kim, Sao Hoả, Sao Thuỷ, Mặt Trăng. Mọi bán kính là
+   CÙNG MỘT tỉ lệ k điểm ảnh cho mỗi bán kính Trái Đất. Kéo lên xuống, chụm để phóng. */
+const VANH = { bTrong: 1.526, bNgoai: 1.950, aTrong: 2.030, aNgoai: 2.270 };   // NASA, Saturnian Rings Fact Sheet
+const NHO = [['dat', 'Trái Đất', ['#9cc4f5', '#2c5ea8']], ['kim', 'Sao Kim', ['#fbf0cf', '#c9b37a']], ['hoa', 'Sao Hoả', ['#f0a07c', '#9c4a2c']],
+             ['thuy', 'Sao Thuỷ', ['#d9d2c4', '#8a8275']], ['trang', 'Mặt Trăng', ['#e8e6e0', '#8d8c88']]];
+const so2 = (x) => (x >= 10 ? Math.round(x).toString() : x.toFixed(x >= 1 ? 1 : 2)).replace('.', ',');
+
+function boKichThuoc(w, h) {
+  const c = cam.kichThuoc;
+  if (!c.k) c.k = Math.min(.44 * w / (2 * soTD('moc')), (h - 360) / (2 * soTD('moc') + 2 * .45 * VANH.aNgoai * soTD('tho') + 40));
+  const k = c.k, R = (ma) => k * soTD(ma);                  // bán kính trên màn
+  const ds = [], x = w / 2;
+  let y = 92 + c.dy;                                       // cung Mặt Trời dưới hàng nút đóng
+  ds.push({ ma: 'troi', ten: 'Mặt Trời', x, y: y - R('troi'), r: R('troi') });
+  y += 34 + R('moc');
+  ds.push({ ma: 'moc', ten: 'Sao Mộc', x, y, r: R('moc') });
+  const ryVanh = R('tho') * VANH.aNgoai * .42;
+  y += R('moc') + 40 + Math.max(R('tho'), ryVanh);
+  ds.push({ ma: 'tho', ten: 'Sao Thổ', x, y, r: R('tho') });
+  y += Math.max(R('tho'), ryVanh) + 40 + Math.max(R('dat'), 4);
+  const buoc = Math.max(w / 5.4, R('dat') * 2.6);
+  NHO.forEach(([ma, ten], i) => ds.push({ ma, ten, x: w / 2 + (i - 2) * buoc, y, r: R(ma) }));
+  return ds;
+}
+
+function cauPhang(ctx, x, y, r, sang, toi) {              // quả cầu đơn giản, nắng từ phía trên trái
+  const g = ctx.createRadialGradient(x - r * .35, y - r * .4, r * .1, x, y, r);
+  g.addColorStop(0, sang); g.addColorStop(1, toi);
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, Math.max(.6, r), 0, 6.2832); ctx.fill();
+}
+
+function veKichThuoc(ctx) {
+  ctx.fillStyle = '#03050b'; ctx.fillRect(0, 0, W, H);
+  const ds = boKichThuoc(W, H);
+  for (const b of ds) {
+    const { x, y, r } = b;
+    if (b.ma === 'troi') {
+      const g = ctx.createRadialGradient(x, y, r * .9, x, y, r * 1.03);
+      g.addColorStop(0, '#ffe7a3'); g.addColorStop(.85, '#ffc861'); g.addColorStop(1, 'rgba(255,170,60,0)');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r * 1.03, 0, 6.2832); ctx.fill();
+      ghiTen(ctx, `Mặt Trời · rộng gấp ${so2(soTD('troi'))} lần Trái Đất`, [[x, y + r - 14]], 'rgba(90,50,10,.9)');
+      continue;
+    }
+    if (b.ma === 'moc') {
+      cauPhang(ctx, x, y, r, '#f4e6c8', '#a58a62');
+      ctx.save(); ctx.beginPath(); ctx.arc(x, y, r, 0, 6.2832); ctx.clip();            // các dải mây của Sao Mộc
+      for (const [v, m] of [[-.62, 'rgba(150,110,80,.35)'], [-.28, 'rgba(170,120,85,.4)'], [.18, 'rgba(160,115,80,.38)'], [.52, 'rgba(150,110,80,.3)']]) {
+        ctx.fillStyle = m; ctx.fillRect(x - r, y + v * r, 2 * r, r * .12);
+      }
+      ctx.restore();
+    } else if (b.ma === 'tho') {
+      const vanh = (truoc) => {
+        ctx.save();
+        if (truoc) { ctx.beginPath(); ctx.rect(x - r * 3, y, r * 6, r * 3); ctx.clip(); }
+        for (const [a, b2, m] of [[VANH.bTrong, VANH.bNgoai, 'rgba(232,214,165,.85)'], [VANH.aTrong, VANH.aNgoai, 'rgba(214,196,150,.7)']]) {
+          ctx.fillStyle = m; ctx.beginPath();
+          ctx.ellipse(x, y, r * b2, r * b2 * .42, 0, 0, 6.2832);
+          ctx.ellipse(x, y, r * a, r * a * .42, 0, 0, 6.2832, true);
+          ctx.fill('evenodd');
+        }
+        ctx.restore();
+      };
+      vanh(false);
+      cauPhang(ctx, x, y, r, '#f6e7bd', '#a8915a');
+      vanh(true);
+    } else {
+      const m = NHO.find(n => n[0] === b.ma)[2];
+      cauPhang(ctx, x, y, r, m[0], m[1]);
+    }
+    const lan = b.ma === 'dat' ? 'mốc so sánh' : `${so2(soTD(b.ma))} lần`;
+    const yChu = b.ma === 'tho' ? y + Math.max(r, r * VANH.aNgoai * .42) + 16 : y + Math.max(r, 4) + 15;
+    ghiTen(ctx, b.ten, [[x, yChu]], 'rgba(235,232,220,.92)');
+    ghiTen(ctx, lan, [[x, yChu + 16]], 'rgba(235,232,220,.55)');
+  }
 }
 
 /* Vành Sao Thổ nằm trong mặt phẳng xích đạo của nó, trục quay chỉ về xích kinh 40,589°, xích vĩ 83,537°
@@ -463,6 +564,7 @@ function ve(ctx, w, h, dpr, lucThat, noi) {
     if (Math.abs(dy) < .3 && Math.abs(quay.pitch - c.pitch) < .3) quay = null;
   }
   if (canh === 'traiDat') return { canh, luc, ...veTraiDat(ctx, JD, noi, luc) };
+  if (canh === 'kichThuoc') { veKichThuoc(ctx); return { canh, luc }; }
   veHeMatTroi(ctx, JD);
   return { canh, luc, hm: homMai(JD) };
 }
@@ -479,16 +581,21 @@ function giaiThich(kq, noi) {
       Mặt Trăng cũng luôn sáng một nửa; từ Trái Đất ta thấy được ${pt}% đĩa sáng, nên đêm nay là trăng ${pt > 97 ? 'tròn' : pt < 3 ? 'non' : pt > 50 ? 'khuyết' : 'lưỡi liềm'}.</p>
       <p class="td-dong3">Mặt Trăng có tự quay: mỗi vòng quanh Trái Đất (27,3 ngày) nó tự quay đúng một vòng, nên luôn quay một mặt về phía ta — bấm Tua để xem. Trăng kéo lại gần 15 lần (thật: ${Math.round(kq.kc / 1000)} nghìn km), kích cỡ đúng tỉ lệ.</p>`;
   }
+  if (kq.canh === 'kichThuoc')
+    return `<p class="td-dong1">So kích thước · đúng tỉ lệ to nhỏ</p>
+      <p class="td-dong2">Mặt Trời rộng gấp 109 lần Trái Đất — trong lòng nó chứa vừa khoảng 1,3 triệu Trái Đất. Sao Mộc rộng gấp 11 lần, Sao Thổ gấp 9,4 lần; Mặt Trăng chỉ bằng hơn một phần tư Trái Đất.</p>
+      <p class="td-dong3">Đường kính theo bảng số liệu của NASA. Cảnh này đúng to nhỏ nhưng không có khoảng cách. Kéo lên xuống, chụm để phóng.</p>`;
   const hm = kq.hm.map(h => `${h.ten} đang ở phía ${h.lech > 0 ? 'Đông' : 'Tây'} Mặt Trời ${Math.abs(Math.round(h.lech))}° — ${h.lech > 0 ? 'thấy lúc chiều tối (Sao Hôm)' : 'thấy lúc rạng sáng (Sao Mai)'}`);
   return `<p class="td-dong1">Hệ Mặt Trời · ${gio}${tuaChu}</p>
     <p class="td-dong2">${hm[0]}.</p>
-    <p class="td-dong3">Vị trí thật lúc này (bảng JPL); khoảng cách nén theo căn bậc hai, hành tinh phóng to cho dễ thấy.</p>`;
+    <p class="td-dong3">Vị trí thật lúc này (bảng JPL). Không thể đúng cả to nhỏ lẫn khoảng cách: khoảng cách nén theo căn bậc hai, kích cỡ theo căn bậc ba. Muốn thấy đúng to nhỏ, bấm So kích thước.</p>`;
 }
 
 self.TDTD_VUTRU = {
   ve, giaiThich,
   canh: () => canh,
-  doiCanh: () => { canh = canh === 'traiDat' ? 'heMatTroi' : 'traiDat'; tua = 0; lech = 0; return canh; },
+  doiCanh: () => { canh = THU_TU_CANH[(THU_TU_CANH.indexOf(canh) + 1) % 3]; tua = 0; lech = 0; return canh; },
+  tenCanhSau: () => TEN_CANH[THU_TU_CANH[(THU_TU_CANH.indexOf(canh) + 1) % 3]],
   tua: () => (canh === 'traiDat' ? TUA : TUA_HMT)[tua].ten,
   doiTua: () => { tua = (tua + 1) % 3; if (!tua) lech = 0; return (canh === 'traiDat' ? TUA : TUA_HMT)[tua].ten; },
   vao: () => { tua = 0; lech = 0; lucTruoc = 0; daDatCam = false; },
@@ -498,10 +605,15 @@ self.TDTD_VUTRU = {
   keo: (x, y) => {
     if (!keo) return;
     const c = cam[canh];
+    if (canh === 'kichThuoc') { c.dy = keo.dy + (y - keo.y); return; }      // kéo lên xuống
     c.yaw = keo.yaw - (x - keo.x) * .4; c.pitch = Math.max(-85, Math.min(85, keo.pitch + (y - keo.y) * .4));
   },
   thaKeo: () => { keo = null; },
-  phong: (k) => { const c = cam[canh]; c.xa = Math.max(canh === 'traiDat' ? 2.4 : 6, Math.min(canh === 'traiDat' ? 30 : 60, c.xa * k)); return c.xa; },
+  phong: (k) => {
+    const c = cam[canh];
+    if (canh === 'kichThuoc') { if (!c.k) boKichThuoc(W, H); c.k = Math.max(.5, Math.min(400, c.k / k)); return c.k; }
+    c.xa = Math.max(canh === 'traiDat' ? 2.4 : 6, Math.min(canh === 'traiDat' ? 30 : 60, c.xa * k)); return c.xa;
+  },
   /* móc cho kiểm thử */
   _laDat: laDat,
   _canhTD: (JD, noi) => traiDatMatTrang(JD, noi),
@@ -515,5 +627,8 @@ self.TDTD_VUTRU = {
   _quay: () => quay,
   _muiTen: () => muiTen,
   _trucTho: TRUC_THO,
+  _boKichThuoc: (w, h) => boKichThuoc(w, h),
+  _coNen: coNen,
+  _soTD: soTD,
 };
 })();

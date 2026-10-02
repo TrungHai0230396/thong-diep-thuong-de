@@ -826,6 +826,26 @@ Người dùng cũng hỏi Mặt Trăng có tự quay không: có — mỗi vòn
 
 `scripts/test-troidem.js` thêm 7 bài: đường chân trời ở đúng chỗ khi nhìn ngang, cúi xuống, cúi hẳn; Mặt Trăng dưới đất vẫn vẽ và chạm được; chạm mũi tên thì máy quay xoay tới khi Mặt Trời nằm trong khung; trục vành Sao Thổ nghiêng 26,73°.
 
+### "Kích thước đúng hết chưa, về độ to nhỏ"
+
+Chưa. Soát lại với số liệu của NASA ([Planetary Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/), [Sun Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html), [Saturnian Rings Fact Sheet](https://nssdc.gsfc.nasa.gov/planetary/factsheet/satringfact.html)):
+
+| Cảnh | To nhỏ | Khoảng cách |
+|---|---|---|
+| Trái Đất – Mặt Trăng | đúng: Mặt Trăng rộng 0,27 lần Trái Đất; Mặt Trời đúng cỡ nhìn thấy 0,53° | Mặt Trăng kéo lại gần 15 lần — có ghi |
+| Hệ Mặt Trời | **sai, không nói ra**: cỡ đặt tay, Sao Mộc chỉ gấp 1,6 lần Trái Đất (thật 11,2), Mặt Trời 1,6 lần (thật 109) | nén căn bậc hai — có ghi |
+| Bầu trời | Mặt Trăng, Mặt Trời vẽ to hơn thật chừng 15 lần — **không nói ra** | — |
+
+Một hình không thể vừa đúng to nhỏ vừa đúng khoảng cách (Trái Đất chỉ bằng 1/11.700 bề rộng quỹ đạo của nó). Nên:
+
+- **Cảnh mới "So kích thước"** (bấm nút đổi cảnh lần thứ hai): Mặt Trời, sáu hành tinh và Mặt Trăng đặt cạnh nhau, **cùng một tỉ lệ** theo đường kính NASA. Mặt Trời to tới mức chỉ thấy một cung ở trên cùng; Sao Thổ có cả vành, đúng cỡ theo bảng vành (vành B từ 1,526, vành A tới 2,270 lần bán kính, có khe Cassini); dưới mỗi cái ghi "gấp mấy lần Trái Đất". Kéo lên xuống, chụm để phóng.
+- **Hệ Mặt Trời**: cỡ nén theo căn bậc ba của đường kính thật — một quy tắc cho tất cả, kể cả Mặt Trời — nên thứ tự to nhỏ đúng (Mặt Trời > Mộc > Thổ > Đất > Kim > Hoả > Thuỷ), Mặt Trời vẫn nằm gọn trong quỹ đạo Sao Thuỷ; dòng chữ nói rõ cách nén và chỉ sang cảnh So kích thước.
+- **Bầu trời**: thẻ Mặt Trăng, Mặt Trời ghi *"trên màn vẽ to gấp N lần thật cho dễ thấy (thật rộng 0,5°)"*, N tính theo độ phóng lúc đó (chừng 16 ở góc thường, 9 khi phóng hết cỡ).
+
+Lúc thêm cỡ mới, tên Trái Đất bị mất hẳn: Mặt Trời to ra chiếm chỗ, sáu chỗ thử ghi tên đều vướng. Giờ chỗ thử tỏa xa dần theo tám hướng, dời xa thì kẻ vạch nối, và riêng tên Trái Đất không bao giờ bị bỏ.
+
+`scripts/test-troidem.js` thêm 8 bài: mọi bán kính ở cảnh So kích thước đúng tỉ lệ đường kính NASA; xếp dọc không chồng; thứ tự to nhỏ ở Hệ Mặt Trời; thẻ Mặt Trăng ghi đúng "to gấp N lần", phóng to thì N nhỏ lại.
+
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
 Người dùng báo: *"bấm vô ngôi sao thì ko ra"*. Đây là lỗi tôi tự gây ra và tự đẩy lên mạng.
@@ -1206,7 +1226,7 @@ scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trì
 scripts/test-astro.js      64 kiểm thử thiên văn, đối chiếu số liệu ngoài
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
-scripts/test-troidem.js    84 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
+scripts/test-troidem.js    92 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
 assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
@@ -1240,7 +1260,7 @@ python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 64 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 84 kiểm thử bầu trời đêm
+node scripts/test-troidem.js     # chạy 92 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên

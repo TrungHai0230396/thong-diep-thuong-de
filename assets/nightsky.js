@@ -939,7 +939,7 @@ function veThe() {
   if (chon === 'Mặt Trời') {
     v = b.troi;
     phu = dangODau(v.cao, v.huong, mocLanNho(dau.getTime()),
-                   mocLanNho(mai.getTime()), luc);
+                   mocLanNho(mai.getTime()), luc) + toHonThat(15, v.gocNhin);
   } else if (chon === 'Mặt Trăng') {
     v = b.trang;
     /* CẨN THẬN đơn vị: kc của Trăng tính bằng KM (~385000), còn kc của Mặt Trời và hành tinh
@@ -948,7 +948,8 @@ function veThe() {
     phu = `${tenTrang(v.tuoi, v.sang)}, sáng ${Math.round(v.sang * 100)}% · ` +
       dangODau(v.cao, v.huong, mocLanNho(dau.getTime(), 'trang'),
                mocLanNho(mai.getTime(), 'trang'), luc) +
-      ` · cách Trái Đất ${Math.round(v.kc / 1000)} nghìn km, ánh sáng đi hết ${so1(v.kc / 299792.458)} giây`;
+      ` · cách Trái Đất ${Math.round(v.kc / 1000)} nghìn km, ánh sáng đi hết ${so1(v.kc / 299792.458)} giây` +
+      toHonThat(17 * Math.pow(GOC_THUONG / goc, .75), v.gocNhin);
   } else {
     v = b.ht.find(p => p.ten === chon);
     if (v) phu = (v.cao > 0 ? `đang ở ${Math.round(v.cao)}° trên ${huongChu(v.huong)}`
@@ -967,6 +968,14 @@ function veThe() {
   if (o._html !== html) { o._html = html; o.innerHTML = html; }
   o.querySelector('.td-the-thoi').onclick = () => { chon = null; o.hidden = true; };
   o.querySelector('.td-the-nhin').onclick = () => nhinToi(v.cao, v.huong);
+}
+
+/* Mặt Trăng, Mặt Trời rộng chừng nửa độ — ở góc nhìn thường chỉ hơn 1 điểm ảnh — nên được vẽ to hơn thật.
+   Nói rõ to hơn mấy lần, tính theo độ phóng lúc này, thay vì để người xem tưởng đó là cỡ thật. */
+function toHonThat(rVe, gocNhin) {
+  if (!gocNhin) return '';
+  const lan = rVe / (coSo().ti * Math.tan(gocNhin / 2 * RAD));
+  return lan > 1.3 ? ` · trên màn vẽ to gấp ${Math.round(lan)} lần thật cho dễ thấy (thật rộng ${so1(gocNhin)}°)` : '';
 }
 
 /* Một thiên thể không ở trên trời thì có HAI lý do khác hẳn nhau: chưa mọc, hoặc đã lặn rồi.
@@ -1054,7 +1063,8 @@ function dungKhung() {
   tam.querySelector('.td-vutru').onclick = () => doiVuTru();
   tam.querySelector('.td-canh').onclick = () => {
     const c = V().doiCanh();
-    tam.querySelector('.td-canh').textContent = c === 'traiDat' ? 'Hệ Mặt Trời' : 'Trái Đất';
+    tam.querySelector('.td-canh').textContent = V().tenCanhSau();
+    tam.querySelector('.td-tua').hidden = c === 'kichThuoc';          // so kích thước thì không có thời gian để tua
     vong.t = 0;
   };
   tam.querySelector('.td-tua').onclick = () => { tam.querySelector('.td-tua').textContent = 'Tua: ' + V().doiTua(); vong.t = 0; };
@@ -1139,7 +1149,7 @@ function doiVuTru(bat = !vuTru) {
   q('.td-may').hidden = bat; q('.td-noi').hidden = bat; q('.td-canh').hidden = !bat; q('.td-tua').hidden = !bat;
   q('.td-the').hidden = true;
   q('.td-phong').hidden = bat || Math.abs(GOC_THUONG / goc - 1) < .08;
-  if (bat) { q('.td-canh').textContent = V().canh() === 'traiDat' ? 'Hệ Mặt Trời' : 'Trái Đất'; q('.td-tua').textContent = 'Tua: ' + V().tua(); }
+  if (bat) { q('.td-canh').textContent = V().tenCanhSau(); q('.td-tua').hidden = V().canh() === 'kichThuoc'; q('.td-tua').textContent = 'Tua: ' + V().tua(); }
   q('.td-tin')._html = null; vong.t = 0;
   tam.classList.toggle('vu-tru', bat);
 }
@@ -1293,6 +1303,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classLis
 self.TDTD_TROIDEM = { mo, dong,
   _bauTroi: (luc) => bauTroi(luc || Date.now()),
   _ve: (luc) => ve(luc || Date.now()),
+  _the: (luc) => { veThe.b = bauTroi(luc); veThe.luc = luc; veThe(); const o = tam.querySelector('.td-the'); return o.hidden ? '' : o._html; },
   _keoNhin: () => keoNhin(),
   _noi: (v, k, ten) => doiNoi({ ten: ten || 'thử', vi: v, kinh: k, tuMay: false }),
   _nhin: (h, c, g) => { huongNhin = h; caoNhin = c; if (g) goc = g; return { huongNhin, caoNhin, goc }; },
