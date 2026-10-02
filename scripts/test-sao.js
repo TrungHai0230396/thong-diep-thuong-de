@@ -61,7 +61,7 @@ global.performance = { now: () => Date.now() };
 /* Nạp mọi tệp trò, đúng thứ tự như index.html. */
 const TEP = ['core.js', 'game.js', 'share.js', 'lantern.js', 'pond.js', 'breath.js',
              'constellation.js', 'nghe.js', 'mua.js',
-             'astro.js', 'nightsky.js', 'lich.js', 'almanac.js', 'sohoc.js', 'thanso.js', 'amvi.js', 'khauhinh.js', 'dophatam.js', 'ipa.js'];
+             'astro.js', 'nightsky.js', 'lich.js', 'almanac.js', 'sohoc.js', 'thanso.js', 'rungu.js', 'nhacngu.js', 'amvi.js', 'khauhinh.js', 'dophatam.js', 'ipa.js'];
 for (const t of TEP) new Function(fs.readFileSync(path.join(__dirname, '..', 'assets', t), 'utf8'))();
 
 /* Danh sách ngôi sao đọc THẲNG từ app.js, để thêm sao mới là bài kiểm tự biết. */
@@ -146,9 +146,9 @@ console.log('\n— Tự nhận bản mới: không tải lại hai lần, không
    rồi đếm số lần trang tải lại. */
 {
   const khoi = nguon.slice(nguon.indexOf('const MO_LUC = Date.now();'), nguon.indexOf('tuCapNhat();      //'));
-  function mo({ coBanCu = true, lanTruoc = 0, gioMo = 0 } = {}) {
+  function mo({ coBanCu = true, lanTruoc = 0, gioMo = 0, nhac = false } = {}) {
     const nghe = {}, ngheTrang = {}, ngheTaiLieu = {};
-    const bang = { tai: 0, gio: gioMo, kho: lanTruoc ? { 'tdtd.taiLai': String(lanTruoc) } : {} };
+    const bang = { tai: 0, gio: gioMo, nhac, kho: lanTruoc ? { 'tdtd.taiLai': String(lanTruoc) } : {} };
     const moiTruong = {
       navigator: { serviceWorker: {
         controller: coBanCu ? {} : null,
@@ -161,6 +161,7 @@ console.log('\n— Tự nhận bản mới: không tải lại hai lần, không
       sessionStorage: { getItem: (k) => bang.kho[k] || null, setItem: (k, v) => { bang.kho[k] = v; } },
       setInterval: () => 0,
       Date: { now: () => bang.gio },
+      self: { TDTD_NGU: { dangPhat: () => bang.nhac } },
     };
     const chay = new Function(...Object.keys(moiTruong), khoi + '; tuCapNhat();');
     chay(...Object.values(moiTruong));
@@ -170,6 +171,8 @@ console.log('\n— Tự nhận bản mới: không tải lại hai lần, không
       cham: () => (ngheTrang.pointerdown || []).forEach(f => f()),
       an: () => { moiTruong.document.hidden = true; (ngheTaiLieu.visibilitychange || []).forEach(f => f()); },
       troi: (ms) => { bang.gio += ms; },
+      hien: () => { moiTruong.document.hidden = false; (ngheTaiLieu.visibilitychange || []).forEach(f => f()); },
+      hetNhac: () => { bang.nhac = false; (ngheTrang['tdtd-ngu-het'] || []).forEach(f => f()); },
     };
   }
   let t = mo({ gioMo: 1e6 }); t.troi(1500); t.banMoi(); t.banMoi();
@@ -185,6 +188,15 @@ console.log('\n— Tự nhận bản mới: không tải lại hai lần, không
   ok('chuyển đi rồi mới tải lại', t.bang.tai === 1);
   t = mo({ coBanCu: false, gioMo: 1e6 }); t.troi(1000); t.banMoi(); t.an();
   ok('lần cài đầu tiên (chưa có bản cũ): không tải lại', t.bang.tai === 0);
+  /* Nhạc ngủ: khoá màn hình cũng làm trang bị ẩn. Tải lại lúc đó là tắt nhạc của người đang ngủ. */
+  t = mo({ gioMo: 1e6, nhac: true }); t.troi(1000); t.cham(); t.banMoi(); t.an();
+  ok('đang phát nhạc ngủ mà khoá màn hình: không tải lại', t.bang.tai === 0, `${t.bang.tai} lần`);
+  t.hetNhac();
+  ok('nhạc tự tắt xong, màn hình vẫn khoá: lúc đó mới lặng lẽ tải lại', t.bang.tai === 1, `${t.bang.tai} lần`);
+  t = mo({ gioMo: 1e6, nhac: true }); t.troi(1000); t.cham(); t.banMoi(); t.an(); t.hien(); t.hetNhac();
+  ok('nhạc tắt lúc người dùng đang nhìn trang: không tải lại trước mặt', t.bang.tai === 0, `${t.bang.tai} lần`);
+  t.an();
+  ok('chuyển đi rồi mới tải', t.bang.tai === 1, `${t.bang.tai} lần`);
 }
 
 console.log('\n— Tệp lịch (.ics) của trang Xem ngày —');

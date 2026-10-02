@@ -55,6 +55,7 @@ Gửi cho ai một trong những địa chỉ này là họ mở thẳng vào tr
 | Bầu trời đêm nay | `#troi-dem` |
 | Xem ngày | `#xem-ngay` |
 | Thần số học | `#than-so` |
+| Nhạc ngủ | `#nhac-ngu` |
 
 Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và tự chạy được cả khi mất mạng. Bấm ngôi sao thì địa chỉ tự đổi theo, **đóng trò thì địa chỉ trở về trang chủ**. Nút Back của điện thoại cũng đóng trò lại chứ không thoát hẳn khỏi app.
 
@@ -77,7 +78,7 @@ Thêm một ngôi sao mới chỉ cần thêm một dòng vào mảng `SAO` ở 
 
 Cách rải: thuật toán thử nới dần điều kiện, tránh cả chữ, lá bài lẫn các sao đã đặt (cách nhau tối thiểu 18 px). Hết chỗ thì chọn ô đè ít nhất, tính chữ nặng gấp 40 lần lá bài, nên chữ không bao giờ bị che. Đã thử 24 ngôi sao trên màn 375×812, rải 60 lần: không cặp nào đè nhau, không sao nào đè chữ hay lọt ra ngoài màn hình.
 
-Hiện có chín ngôi sao. Sáu ngôi đầu tả ngay dưới đây, ba ngôi mới nhất — xem ngày, thần số học và bầu trời đêm nay — có mục riêng ở cuối:
+Hiện có mười ngôi sao. Sáu ngôi đầu tả ngay dưới đây, bốn ngôi mới nhất — xem ngày, thần số học, nhạc ngủ và bầu trời đêm nay — có mục riêng ở cuối:
 
 ### Sao xanh ngọc — Mùa Chín
 
@@ -715,6 +716,38 @@ Lời giảng các con số viết lại bằng lời của app, ngắn, nói c�
 
 `scripts/test-sohoc.js`, 43 bài: các ví dụ có lời giải trong nguồn (19/8/1991 ra 11; 29/11/1994 và 11/2/1985 ra 9; năm cá nhân của người sinh 31/1 các năm 2022–2026 và 27/2 các năm 2018–2020; chân kim tự tháp của 1/5/1974 và 10/5/2001; số 11 đỉnh đầu 25 tuổi), và các tính chất trên cả 40.542 ngày từ 1920 tới 2030: không có số chủ đạo 1, 22/4 khi và chỉ khi tổng bằng 22, năm cá nhân luôn 1–9, đỉnh 1 và 2 luôn một chữ số. Phần họ tên: hai ví dụ có lời giải ở trên, luật chữ Y trên 10 tên, Đ ra D, giữ 11 (Tuấn, Hương 29 → 11) và 22/4 (Hạnh), tên không có nguyên âm hay không có chữ cái nào.
 
+## Nhạc ngủ
+
+Ngôi sao hình trăng lưỡi liềm, `#nhac-ngu`. Chọn một âm, hẹn giờ, rồi tắt màn hình: âm nhỏ dần rồi tự tắt.
+
+**Bối cảnh người khó ngủ, và app dựa vào đâu.** Tra trước khi làm, không đoán:
+
+- **Nhạc là thứ có bằng chứng nhất.** Tổng hợp Cochrane 2022 (Jespersen và cs.: 13 nghiên cứu, 1.007 người lớn mất ngủ) thấy nghe nhạc *có lẽ* giúp ngủ ngon hơn nhiều so với không làm gì (độ tin cậy vừa); thời gian vào giấc, độ dài giấc ngủ chỉ khá lên chút ít (độ tin cậy thấp). Người ta nghe 25–50 phút mỗi ngày, từ ba ngày tới ba tháng. Tổng quan của Pan và cs. (Frontiers in Sleep 2025) tóm nét chung của nhạc hiệu quả: chậm 60–80 phách mỗi phút, nhẹ, êm, không lời, cấu trúc đơn giản; nghe 30–45 phút trước khi ngủ, âm lượng dễ chịu (nghiên cứu nào ghi thì để 50–60 dB).
+- **Tiếng ồn nền (trắng, hồng, nâu) chưa được chứng minh.** Tổng quan 38 nghiên cứu (Riedy và cs., Sleep Medicine Reviews 2021) xếp bằng chứng vào loại rất thấp, và nhắc nó còn có thể hại giấc ngủ, hại tai. Thử nghiệm trong phòng ngủ thí nghiệm của Basner và cs. (tạp chí Sleep, 2026; 25 người, 7 đêm): tiếng ồn hồng 50 dB **mở cả đêm** làm bớt gần 19 phút giấc REM; nút tai chặn tiếng máy bay tốt hơn. Tác giả cảnh báo riêng cho trẻ nhỏ.
+- **Nhịp hai tai (binaural beats)**: tổng quan có hệ thống của Ingendoh và cs. (PLOS ONE 2023) xét 14 nghiên cứu xem sóng não có "bắt nhịp" theo không: 5 thấy có, 8 thấy không, 1 lẫn lộn. Một nghiên cứu (Jirakittayakorn & Wongsawat, Frontiers in Human Neuroscience 2018) phát nhịp 3 Hz trên âm nền 250 Hz *lúc người ta đã vào giai đoạn N2* thì giấc sâu N3 đến sớm và dài hơn.
+- **432 Hz**: chỉ có một nghiên cứu thí điểm 12 người (Calamassi và cs., Acta Biomedica 2020).
+- **Thở chậm** khoảng 6 lần mỗi phút làm nhịp tim dịu lại ngay, nhưng thử nghiệm 20 người trên Scientific Reports (2020) chưa thấy tác dụng chắc chắn lên giấc ngủ.
+- **Điều trị thật là hành vi.** Trong hướng dẫn của AASM (Edinger và cs., 2021), CBT-I là cách duy nhất được xếp mức khuyên mạnh; riêng "kiểm soát kích thích" (nằm khoảng 20 phút chưa ngủ được thì dậy, buồn ngủ mới quay lại giường) cũng được khuyên dùng.
+
+**Nên app làm thế này:**
+
+- **Sáu âm**, mỗi âm ghi rõ bằng chứng của nó tới đâu: *Nhạc ru* (60 phách mỗi phút, Fa trưởng, giai điệu chỉ đi trên năm nốt ngũ cung, nền hợp âm, không trống, không nốt cao quá La 5), *Sóng biển* (mỗi con sóng đúng 10 giây — kèm vòng tròn phồng xẹp và chữ "hít vào / thở ra" theo đúng con sóng đang phát, thành 6 nhịp thở mỗi phút), *Mưa nhẹ*, *Tiếng ồn nâu*, *Sóng delta 3 Hz* (đúng thông số nghiên cứu 2018: tai trái 250 Hz, tai phải 253 Hz, ghi "cần tai nghe"), *Tần số 432 Hz* (hợp âm La trưởng chỉnh theo La = 432 Hz, quãng năm 3/2 và quãng ba 5/4 cho khỏi tiếng đập). Không làm 528 Hz hay các "tần số chữa lành" khác: nghiên cứu hay được dẫn về 528 Hz (2018) chỉ có 9 người, đo hormone căng thẳng sau vài phút nghe, không đo giấc ngủ.
+- **Luôn tự tắt.** Hẹn 15, 30 (mặc định), 45, 60 hoặc 90 phút; **không có chế độ cả đêm**, vì thử nghiệm năm 2026 ở trên. To dần 6 giây lúc đầu cho khỏi giật mình; nhỏ dần trong 1/6 thời gian cuối (ít nhất 2, nhiều nhất 10 phút) theo hàm mũ, tức đều theo dB, xuống −60 dB rồi tắt hẳn. Có nút +15 phút, tạm dừng (giờ tắt dừng theo), tắt ngay.
+- **Phần "Để dễ ngủ hơn"** ở cuối trang: hẹn 30–45 phút, đừng mở suốt đêm, để nhỏ, nằm 20 phút vẫn tỉnh thì dậy, tối màn hình, mất ngủ từ ba đêm mỗi tuần kéo dài hơn ba tháng thì gặp bác sĩ. Ghi nguồn, và nói rõ đây không thay lời khuyên của bác sĩ.
+- Màn đang phát gần như đen; chỉ lưu ba lựa chọn (âm, giờ, âm lượng) để tối sau mở ra là sẵn.
+
+**Kỹ thuật: phải chạy được khi màn hình đã tắt.**
+
+- Khoá màn hình rồi thì trình duyệt bóp JS, nhưng luồng âm thanh vẫn chạy. Nên **không phát từng nốt bằng JS**: mỗi âm được tạo sẵn thành một đoạn 80 giây (24 kHz, hai kênh) nối đầu với đuôi liền mạch, cho nguồn phát tự lặp; to dần, nhỏ dần và lúc dừng thì hẹn trước hết trên đồng hồ của luồng âm thanh (`setValueAtTime`, `linearRampToValueAtTime`, `exponentialRampToValueAtTime`, `stop`) ngay lúc bấm Bắt đầu. Sau đó không cần JS chạy thêm dòng nào.
+- Đoạn lặp liền mạch: bộ lọc tiếng ồn chạy *vòng* (cho bộ lọc "ấm" lên bằng 2 giây cuối mảng trước khi lọc từ đầu, nên trạng thái ở mẫu đầu đúng bằng ở mẫu cuối); âm có cao độ chọn tần số để 80 giây chứa tròn chu kỳ; nốt nhạc, giọt mưa ngân quá cuối thì cộng vòng về đầu.
+- Tạo âm mất chừng 0,4–1 giây trên máy tính, nên chạy trong **Web Worker** (cùng tệp `rungu.js`) cho màn hình khỏi đứng; máy không chạy được worker thì làm trên luồng chính. Bấm chọn âm là bắt đầu tạo sẵn.
+- **iPhone**: Web Audio mặc định bị nút im lặng tắt tiếng và bị dừng khi khoá máy. Từ iOS 17 có `navigator.audioSession.type = 'playback'` để đi đường như app nhạc ([WebKit bug 237322](https://bugs.webkit.org/show_bug.cgi?id=237322)); lỗi vẫn bị dừng dù đã đặt `playback` được sửa ở iOS 17.5 ([bug 261554](https://bugs.webkit.org/show_bug.cgi?id=261554)). iOS cũ hơn: giữ màn hình sáng (nền đen) trong lúc phát và nói thẳng điều đó với người dùng. Có mục trên màn hình khoá (Media Session).
+- **Kéo dài giữa chừng** không huỷ lịch cũ — huỷ một đường đang dốc dở làm âm lượng nhảy, nghe "bụp" — mà mở một nhánh gain mới với lịch mới rồi chuyển êm 0,3 giây. Nhánh mới đặt sẵn mức ban đầu, vì mặc định của gain là 1: nếu luồng âm thanh kịp chạy một nhịp trước khi lịch được áp, nó sẽ kêu ở mức đủ. Đối chiếu bằng `OfflineAudioContext` trong Chrome: đường âm lượng thật lệch công thức dưới 1e-7, bấm +15 phút giữa lúc nhỏ dần không còn bước nhảy nào lớn hơn 0,001.
+- **Không tự cập nhật giữa giấc ngủ**: app tự tải lại khi có bản mới lúc trang bị ẩn — mà khoá màn hình cũng là trang bị ẩn. Đang phát nhạc ngủ thì không tải; nhạc tự tắt xong (`tdtd-ngu-het`) mà màn hình vẫn khoá thì lúc đó mới tải.
+- Đóng trang là tắt nhạc, để không có âm chạy ngầm mà không ai thấy.
+
+`scripts/test-ngu.js`, 53 bài: phổ ồn hồng bằng nhau ở mọi quãng tám 63 Hz–4 kHz (lệch 0,2 dB), ồn nâu dốc −3,3 dB năng lượng mỗi quãng tám; nhịp hai tai đúng 250/253 Hz, không lẫn kênh (59–61 dB); hợp âm có đủ sáu nốt theo 432 Hz và không có 440; nhịp sóng tự tương quan 0,97 ở 10 giây, đúng 8 đỉnh, không bao giờ im hẳn; nhạc 60 phách, mọi nốt trên phách, chỉ năm nốt ngũ cung; mọi âm nối đuôi vào đầu không có tiếng "tách" (xét cả từng mẫu lẫn độ to từng khung 20 ms); lịch nhỏ dần chạy qua một bộ mô phỏng AudioParam theo luật Web Audio ra đúng đường âm lượng, cả khi kéo dài giữa chừng; đường worker. Đã thử phá cố ý (bỏ phần "làm ấm" bộ lọc; bỏ một bước trong lịch): bài kiểm bắt được cả hai. `scripts/test-sao.js` thêm ba tình huống tự cập nhật lúc đang phát nhạc ngủ.
+
 ## Bầu trời đêm nay
 
 Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở chỗ bạn đang đứng, vào đúng lúc này**: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường thấy được, và tám chòm sao mượn lại toạ độ thật của trò Nối sao. Kéo để nhìn quanh, hoặc bấm *Xoay theo máy* rồi giơ điện thoại lên — hướng máy về phía nào thì thấy bầu trời phía đó.
@@ -1128,7 +1161,7 @@ scripts/test-astro.js      50 kiểm thử thiên văn, đối chiếu số li�
 scripts/test-troidem.js    51 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        61 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        75 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -1137,6 +1170,9 @@ scripts/test-lich.js       97 kiểm thử lịch vạn niên, đối chiếu l�
 assets/sohoc.js            thần số học: hàm thuần, ngày sinh vào, các con số ra
 assets/thanso.js           giao diện ngôi sao thần số học
 scripts/test-sohoc.js      43 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
+assets/rungu.js            nhạc ngủ: tạo âm thành đoạn lặp liền mạch, tính hẹn giờ; chạy được làm Web Worker
+assets/nhacngu.js          giao diện ngôi sao nhạc ngủ, phát bằng Web Audio
+scripts/test-ngu.js        53 kiểm thử nhạc ngủ: phổ, tần số, mối nối, lịch nhỏ dần
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1158,6 +1194,7 @@ node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự bá
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 43 kiểm thử thần số học
+node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 125 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)
@@ -1186,7 +1223,8 @@ Khi mở app, và mỗi lần quay lại app sau khi chuyển sang cửa sổ kh
 - nghe tin có bản mới ngay từ lúc trang mở;
 - trang vừa mở chưa tới 5 giây và chưa chạm gì thì tải lại luôn, như một phần của lúc mở;
 - đang dùng dở (đã lật bài, đang mở một ngôi sao) thì **đợi lúc chuyển sang app khác** mới lặng lẽ tải lại;
-- trong 15 giây sau một lần tự tải lại thì không tải lại trước mặt người dùng nữa, cũng đợi lúc chuyển đi.
+- trong 15 giây sau một lần tự tải lại thì không tải lại trước mặt người dùng nữa, cũng đợi lúc chuyển đi;
+- đang phát nhạc ngủ thì khoá màn hình không tính là "chuyển đi" (tải lại là tắt nhạc của người đang ngủ); đợi nhạc tự tắt xong mới tải.
 
 `scripts/test-sao.js` chạy nguyên đoạn này trên một trình duyệt giả, kích các tình huống có bản mới rồi đếm số lần tải lại; bản cũ trượt đúng hai tình huống người dùng gặp.
 
