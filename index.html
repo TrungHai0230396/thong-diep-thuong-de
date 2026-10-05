@@ -83,6 +83,18 @@
 <!-- Các ngôi sao do assets/app.js tự sinh, xem danh sách SAO trong file đó -->
 <div id="bau-troi-sao"></div>
 
+<!-- Bảng trượt dùng chung (Giới thiệu, xáo lại bộ bài). Ngày 9/9 lỡ xoá mất cùng nút "số may mắn" cũ,
+     nên nút "?" bấm vào không mở gì suốt từ đó — scripts/test-sao.js giờ kiểm mọi #id mà app.js cần. -->
+<div class="sheet-wrap" id="sheet-wrap" hidden>
+  <div class="sheet-bg" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="handle" data-close></div>
+    <h3 id="sheet-title"></h3>
+    <div id="sheet-body"></div>
+    <button class="primary wide" data-close>Đóng</button>
+  </div>
+</div>
+
 <div class="toast" id="toast" hidden></div>
 <script src="assets/core.js"></script>
 <script src="assets/game.js"></script>

@@ -221,5 +221,17 @@ console.log('\n— Tệp lịch (.ics) của trang Xem ngày —');
   }
 }
 
+console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
+{
+  /* Ngày 9/9 khung bảng trượt bị xoá nhầm khỏi index.html; app.js vẫn gọi $('#sheet-title') nên nút "?"
+     ném lỗi và không mở gì — gần một tháng không ai biết, vì không bài kiểm nào đọc index.html. */
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const can = [...new Set([...nguon.matchAll(/\$\('#([\w-]+)'\)/g)].map(m => m[1]))];
+  const tuSinh = new Set(['nut-chep-link']);                // phần tử app.js tự tạo bằng createElement
+  /* id nằm trong chuỗi HTML do chính app.js dựng (như nút xáo lại trong bảng Giới thiệu) cũng tính là có */
+  const thieu = can.filter(id => !tuSinh.has(id) && !html.includes(`id="${id}"`) && !nguon.includes(`id="${id}"`));
+  ok(`${can.length} #id mà app.js dùng đều có trong index.html`, !thieu.length, thieu.join(', '));
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

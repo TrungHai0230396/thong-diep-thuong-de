@@ -628,6 +628,10 @@ Kết quả: 100 + 109 = **209 lá**. Khoảng cách gần nhất giữa hai l�
 
 Mười phép thử giữ chỗ này: đủ 209 lá, thông điệp không có dấu chấm cuối câu, không lọt đuôi `(Thông điệp ngày N)`, không lọt lời giảng dán mẫu, không lời giảng nào dùng cho hai lá, không hai lá nào nói lại cùng một điều, không nháy đơn thẳng, không thừa dấu chấm sau ngoặc kép, không mũi tên gõ tay, không con số phần trăm.
 
+**"Lá của tôi với bạn tôi hay bị trùng."** Kiểm lại cách chọn bằng mô phỏng chạy chính `core.js`: mỗi máy tự sinh hạt giống ngẫu nhiên, không đường nào để hai máy dùng chung (link chia sẻ không mang hạt giống). Hai máy riêng ra cùng một lá **cùng ngày** đúng tỉ lệ 1/209 như rút độc lập — một tháng trung bình 0,14 lần, 13% số cặp gặp một lần; ba lần trở lên trong một tháng chỉ 0,05%, gần như không thể là ngẫu nhiên. Còn *lá của người kia hôm nay là lá mình gặp hôm trước* thì tăng dần theo thời gian (14% số ngày sau một tháng, 43% sau ba tháng) vì ai cũng rút trong cùng 209 lá — muốn ít hơn chỉ có cách thêm lá. Trong 400.000 lần xáo, mỗi lá ra đều nhau (chi bình phương 231, ngưỡng 5% là 243). Có một chỗ chưa khéo không gây trùng: phép nhân trong công thức xáo vượt 2^53 nên bị làm tròn, chừng 0,7% hạt giống dồn về cùng thứ tự bài với một hạt khác — để nguyên, vì sửa thì bộ bài của mọi người đổi hết, ai đã lật lá hôm nay sẽ thấy nó biến thành lá khác.
+
+Để hai người tự so, bảng Giới thiệu có thêm **mã bộ bài của máy** (băm FNV-1a tám lá đầu của vòng đầu, 7 ký tự): khác mã là hai bộ riêng. Lúc thêm thì phát hiện bảng Giới thiệu **không mở được từ 9/9**: khung bảng trượt bị xoá nhầm khỏi `index.html` cùng nút "số may mắn" cũ, `app.js` gọi `$('#sheet-title')` ra `null` rồi ném lỗi — kéo theo nút *Xáo lại bộ bài* cũng không ai bấm được. Đã khôi phục; `scripts/test-sao.js` giờ kiểm mọi `#id` mà `app.js` dùng đều có trong `index.html`. Câu "trong vòng 209 ngày không lá nào lặp lại" ở bảng Giới thiệu cũng nói quá — đúng với ai bắt đầu từ đầu vòng; ai bắt đầu giữa vòng thì một lá có thể quay lại sau ít nhất 105 ngày — đã sửa.
+
 ## Xem ngày
 
 Một ngôi sao màu son đỏ, `#xem-ngay`. Ba phần trên một màn hình:

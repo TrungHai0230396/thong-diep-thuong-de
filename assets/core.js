@@ -63,6 +63,18 @@ const cardFor = (ids, dateStr, seed) => {
   return deckOf(ids, Math.floor(i / n), seed)[((i % n) + n) % n];
 };
 
+/**
+ * Mã ngắn của bộ bài một máy, để hai người so xem có đang dùng chung một bộ không.
+ * Băm (FNV-1a 32 bit) tám lá đầu của vòng đầu — lấy từ chính thứ tự bộ bài chứ không từ hạt giống, nên
+ * hai hạt giống khác nhau mà ra cùng thứ tự bài thì vẫn hiện cùng mã. Hai bộ khác nhau trùng mã chừng
+ * 1 trên 4 tỉ.
+ */
+const maBoBai = (ids, seed) => {
+  let h = 0x811c9dc5;
+  for (const x of deckOf(ids, 0, seed).slice(0, 8)) { h ^= x; h = Math.imul(h, 0x01000193); }
+  return (h >>> 0).toString(36).toUpperCase().padStart(7, '0');
+};
+
 /** Sinh hạt giống mới, ngẫu nhiên thật. */
 const newSeed = () => {
   const c = (typeof crypto !== 'undefined' && crypto.getRandomValues) ? crypto : null;
@@ -70,6 +82,6 @@ const newSeed = () => {
   return (Math.random() * 2 ** 32) | 0;
 };
 
-const API = { ymd, addDays, dayIndex, mulberry32, shuffle, deckOf, cardFor, newSeed };
+const API = { ymd, addDays, dayIndex, mulberry32, shuffle, deckOf, cardFor, newSeed, maBoBai };
 if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.TDTD = API;
 })(typeof self !== 'undefined' ? self : this);

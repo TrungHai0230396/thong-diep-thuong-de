@@ -100,5 +100,25 @@ ok('không lọt "HEBs"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('
 ok('không lọt tên riêng "Kiên"', !cards.some(c => (c.thong_diep + c.y_nghia).includes('Kiên')));
 ok('không còn ghi chú cơ chế game trong bundle', !cards.some(c => 'ghi_chu_thiet_ke' in c || 'co_che_game' in c));
 
+console.log('\n— Hai người, hai máy: bộ bài riêng, mã bộ bài để so —');
+{
+  /* Người dùng báo "lá của tôi với bạn tôi hay bị trùng". Mỗi máy tự sinh hạt giống riêng, không có đường
+     nào để hai máy dùng chung — link chia sẻ không mang hạt giống. Đo: cùng một ngày, hai máy riêng trùng lá
+     đúng tỉ lệ 1/209 như rút ngẫu nhiên độc lập. */
+  const ids = cards.map(c => c.id), n = ids.length, r = C.mulberry32(99);
+  let trung = 0, tong = 0;
+  for (let k = 0; k < 2000; k++) {
+    const a = (r() * 2 ** 32) | 0, b = (r() * 2 ** 32) | 0;
+    for (let d = 0; d < 60; d++) { const ds = C.addDays('2026-09-08', d); if (C.cardFor(ids, ds, a) === C.cardFor(ids, ds, b)) trung++; tong++; }
+  }
+  const tiLe = trung / tong;
+  ok(`hai máy riêng trùng lá cùng ngày đúng tỉ lệ 1/${n} (±30%)`, Math.abs(tiLe * n - 1) < .3, `1/${(1 / tiLe).toFixed(0)}`);
+  const ma = C.maBoBai(ids, 12345);
+  ok('mã bộ bài: 7 ký tự, cùng hạt giống luôn ra cùng mã', /^[0-9A-Z]{7}$/.test(ma) && C.maBoBai(ids, 12345) === ma, ma);
+  const ma2 = new Set(), bo = new Set();
+  for (let k = 0; k < 5000; k++) { const s = (r() * 2 ** 32) | 0; ma2.add(C.maBoBai(ids, s)); bo.add(C.deckOf(ids, 0, s).join(',')); }
+  ok('mã trùng nhau khi và chỉ khi bộ bài trùng nhau (5.000 máy ngẫu nhiên)', ma2.size === bo.size, `${ma2.size} mã, ${bo.size} bộ bài`);
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

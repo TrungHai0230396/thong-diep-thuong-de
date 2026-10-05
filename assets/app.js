@@ -2,7 +2,7 @@
 (() => {
 'use strict';
 
-const { ymd, cardFor, newSeed } = self.TDTD;
+const { ymd, cardFor, newSeed, maBoBai } = self.TDTD;
 /* ─────────────────────────────────────────────────────────────
    BẦU TRỜI SAO
    Mỗi ngôi sao là một trò nhỏ nằm rải trên nền. Thêm sao mới chỉ cần
@@ -204,8 +204,9 @@ function about() {
   openSheet('Giới thiệu', `
     <p>Mỗi ngày, một thông điệp. Mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
     <p>Ứng dụng không giữ lịch sử: không bộ sưu tập, không nhật ký, không tài khoản. Thông điệp cũ không xem lại được. Mỗi ngày chỉ nhận một lần, ngày mai sẽ có lá khác.</p>
-    <p>Bộ bài gồm ${CARDS.length} thông điệp và được xáo riêng cho từng người, nên hai người mở cùng một ngày vẫn nhận hai thông điệp khác nhau. Đi hết ${CARDS.length} ngày mới trọn một vòng, trong vòng đó không thông điệp nào lặp lại.</p>
+    <p>Bộ bài gồm ${CARDS.length} thông điệp và được xáo riêng cho từng người, nên hai người mở cùng một ngày vẫn nhận hai thông điệp khác nhau. Một thông điệp đã nhận thì phải ít nhất 105 ngày sau mới gặp lại.</p>
     <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>
+    <p style="font-size:13px;opacity:.75">Mã bộ bài của máy này: <b style="letter-spacing:.08em">${maBoBai(IDS, seed)}</b>. Hai máy khác mã là hai bộ bài riêng — cùng một ngày, hai bộ riêng chỉ trùng lá chừng một lần trong 209 ngày. Còn lá của người kia là lá mình từng gặp hôm trước thì càng lâu càng hay xảy ra, vì ai cũng rút trong cùng 209 lá.</p>
     <button class="ghost" id="btn-reshuffle" style="margin-top:4px">Xáo lại bộ bài của tôi</button>`);
   $('#btn-reshuffle').onclick = () => {
     if (!confirm('Xáo lại bộ bài? Thông điệp hôm nay sẽ đổi sang lá khác.')) return;
