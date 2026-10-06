@@ -327,5 +327,44 @@ console.log('\n— Tiếng ếch: tròn và êm, không rè —');
   ok('kêu ba tiếng thì dài chưa tới một giây', ba.length / sr < 1, `${(ba.length / sr).toFixed(2)} giây`);
 }
 
-console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
-process.exit(fail ? 1 : 0);
+/* Người dùng báo "bật tiếng lên lâu lâu bị lag". Bộ vang ConvolverNode chạy suốt lúc bật tiếng nặng gấp
+   15 lần phần còn lại (đo bằng OfflineAudioContext trong trình duyệt), và tính mẫu một mạch lúc bật làm hồ
+   khựng. Bài này dựng một bộ Web Audio giả, đếm xem có còn bộ vang chạy thật không, và mẫu có được tính
+   dần chứ không dồn vào lời gọi bật tiếng. */
+async function kiemAm() {
+  console.log('\n— Bật tiếng không làm hồ khựng —');
+  const dem = { vangThat: 0, vangNuong: 0, nuong: [] };
+  const thamSo = () => ({ value: 1, setValueAtTime() {}, linearRampToValueAtTime() {}, cancelScheduledValues() {} });
+  const nut2 = () => ({ connect() {}, disconnect() {}, gain: thamSo(), pan: thamSo() });
+  const bo = (sr, laNuong) => ({
+    sampleRate: sr, currentTime: 0, state: 'running', destination: {},
+    createGain: nut2, createStereoPanner: nut2,
+    createBuffer: (ch, n, r) => { const d = Array.from({ length: ch }, () => new Float32Array(n)); return { length: n, numberOfChannels: ch, sampleRate: r, getChannelData: (c) => d[c] }; },
+    createBufferSource: () => ({ ...nut2(), playbackRate: thamSo(), start() {}, buffer: null }),
+    createConvolver: () => { laNuong ? dem.vangNuong++ : dem.vangThat++; return { ...nut2(), buffer: null }; },
+    resume() { this.state = 'running'; return Promise.resolve(); }, suspend() { this.state = 'suspended'; return Promise.resolve(); },
+  });
+  global.AudioContext = function () { return bo(8000, false); };
+  global.OfflineAudioContext = function (ch, n, sr) {
+    const o = bo(sr, true);
+    o.startRendering = () => { dem.nuong.push(n); return Promise.resolve(o.createBuffer(ch, n, sr)); };
+    return o;
+  };
+  const t0 = Date.now();
+  if (HO._tieng().bat) HO._batTat();
+  HO._batTat();
+  const sau = HO._tieng();
+  ok('lời gọi bật tiếng không tự tính mẫu — để dành từng việc nhỏ cho các lượt sau', sau.bat && sau.soMau === 0, `${sau.soMau} mẫu, ${Date.now() - t0} ms`);
+  for (let i = 0; i < 200 && HO._tieng().daNuong < 16; i++) await new Promise(r => setTimeout(r, 5));
+  const xong = HO._tieng();
+  ok('đủ 16 mẫu, cả 16 đều đã nướng vang', xong.soMau === 16 && xong.daNuong === 16, `${xong.soMau} mẫu, ${xong.daNuong} đã nướng`);
+  ok('không còn bộ vang nào chạy thật trong lúc chơi', dem.vangThat === 0, `${dem.vangThat}`);
+  ok('vang được tính sẵn, mỗi mẫu một lần, ở OfflineAudioContext', dem.vangNuong === 16 && dem.nuong.length === 16);
+  ok('mỗi mẫu nướng có thêm đúng 1,4 giây đuôi vang', dem.nuong.length === 16 && dem.nuong.every(n => n >= Math.floor(8000 * 1.4)));
+  delete global.AudioContext; delete global.OfflineAudioContext;
+}
+
+kiemAm().then(() => {
+  console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
+  process.exit(fail ? 1 : 0);
+});

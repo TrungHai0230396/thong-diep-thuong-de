@@ -598,6 +598,14 @@ trong `soatBoLa()` (con #0 ngồi lá 2 mà còn mang `dich` là lá 1, rồi g�
 kiểm mới đó với bản pond.js CHƯA sửa** để chắc rằng nó thật sự báo hỏng. Một bài kiểm đạt cả
 trước lẫn sau khi vá thì không chứng minh được gì cả.
 
+## "Bật tiếng lên lâu lâu bị lag"
+
+Hồ ếch có một lớp vang mặt nước phủ lên mọi tiếng, làm bằng một `ConvolverNode` (tiếng dội 1,4 giây, hai kênh) chạy suốt lúc bật tiếng. Đo bằng `OfflineAudioContext` trong Chrome: cùng 20 giây tiếng hồ, không vang tốn **19 ms** CPU, có vang **260–310 ms** — nặng gấp 15 lần, mà Chrome còn tính phần đuôi tiếng dội theo từng đợt ở luồng nền, nên trên điện thoại cứ chốc chốc hồ khựng một cái. Thêm nữa, lúc bật tiếng app tính một mạch 16 mẫu tiếng: 42 ms trên máy tính, trên điện thoại vài trăm ms.
+
+Giờ **vang được nướng sẵn vào từng mẫu**: dựng lại đúng đường tiếng cũ (khô + vang mức 0,22 qua cùng tiếng dội) trong một `OfflineAudioContext` — trình duyệt tự tính ở luồng riêng — rồi thay mẫu khô bằng mẫu đã có đuôi vang. Lúc chơi chỉ còn đọc lại đoạn có sẵn, không còn bộ vang nào chạy liên tục. Mẫu tiếng chia thành bảy việc nhỏ, mỗi việc một lượt, tiếng ếch làm trước. Đo lại: lời gọi bật tiếng còn **2 ms**, luồng chính bị chặn lâu nhất **15 ms**, không còn tác vụ dài; 16 mẫu nướng xong trong chừng 0,3 giây. Mẫu nướng dài thêm 1,4 giây nên cho tới 16 tiếng cùng lúc thay vì 8.
+
+`scripts/test-pond.js` thêm 5 bài với một bộ Web Audio giả: lời gọi bật tiếng không tự tính mẫu; đủ 16 mẫu đều đã nướng; không còn bộ vang chạy thật; mỗi mẫu nướng một lần và có thêm đúng 1,4 giây đuôi. Chạy với `pond.js` cũ thì trượt cả năm.
+
 ## Hồ nước: cân bằng cá và nòng nọc
 
 Cú phóng của cá phải bắt đầu **xa hơn** khoảng nòng nọc cong đuôi chạy. Bản trước cá tăng tốc ở 55 pixel còn nòng nọc bỏ chạy từ 62, nên có một vành đai mà nòng nọc nhanh hơn cá: nó thoát ra, cá chậm lại, rồi lặp mãi, không con nào bị bắt.

@@ -1110,7 +1110,7 @@ const TIENG_KEY = 'tdtd.tieng';                         // nhớ lựa chọn t�
 const LOA_MO = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z" fill="currentColor" stroke="none"/><path d="M15 9.2a4.3 4.3 0 010 5.6"/><path d="M17.9 6.7a8 8 0 010 10.6"/></svg>';
 const LOA_TAT = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 9.5h3.2L11.5 6v12L7.2 14.5H4z" fill="currentColor" stroke="none"/><path d="M15.4 9.6l5 4.8M20.4 9.6l-5 4.8"/></svg>';
 
-let ac = null, chung = null, mau = null, dangVang = 0, phanTich = null, vang = null;
+let ac = null, chung = null, mau = null, dangVang = 0, phanTich = null, daNuong = 0;
 let lanTum = 0, lanDap = 0, demTum = 0, demDap = 0, demKeu = 0, tConTrung = 0;
 let tiengBat = false;
 try { tiengBat = localStorage.getItem(TIENG_KEY) === '1'; } catch (e) {}   // mặc định tắt
@@ -1173,8 +1173,12 @@ function songOp(sr, f0, so) {
 const mauOp = (f0, so) => dungMau(songOp(ac.sampleRate, f0, so));
 
 /* Vang mặt nước: nhiễu tắt dần trong 1,4 giây, càng về sau càng tối (mất dần phần cao), chừa
-   12 ms đầu trống như tiếng dội về từ bờ bên kia. Chỉ một node cho cả hồ, không tốn thêm gì
-   cho mỗi tiếng. */
+   12 ms đầu trống như tiếng dội về từ bờ bên kia.
+   Bản trước để một ConvolverNode chạy suốt lúc bật tiếng. Người dùng báo "bật tiếng lên lâu lâu bị
+   lag": đo bằng OfflineAudioContext, cùng 20 giây tiếng hồ, không vang tốn 19 ms CPU, có vang 260–310
+   ms — nặng gấp 15 lần, mà Chrome còn tính phần đuôi tiếng dội theo từng đợt ở luồng nền, nên trên
+   điện thoại cứ chốc chốc hồ khựng một cái. Giờ vang được NƯỚNG SẴN vào từng mẫu một lần (xem
+   nuongVang), lúc phát chỉ là đọc lại một đoạn có sẵn. Tiếng dội y như cũ: cùng IR, cùng mức .22. */
 function mauVang() {
   const sr = ac.sampleRate, n = Math.floor(sr * 1.4), b = ac.createBuffer(2, n, sr);
   for (let c = 0; c < 2; c++) {
@@ -1248,7 +1252,8 @@ const lech = (x) => typeof x === 'number' && W ? Math.max(-1, Math.min(1, x / W 
 
 function phat(b, muc, toc, pan) {
   if (tua) return false;                                // tua thì câm, kẻo dồn cả nghìn tiếng vào một lúc
-  if (!ac || !tiengBat || ac.state !== 'running' || !b || dangVang > 8) return false;
+  /* mẫu đã nướng vang dài thêm 1,4 giây nên mỗi tiếng sống lâu hơn: cho tới 16 tiếng cùng lúc */
+  if (!ac || !tiengBat || ac.state !== 'running' || !b || dangVang > 16) return false;
   const s = ac.createBufferSource(); s.buffer = b;
   if (toc) s.playbackRate.value = toc;
   const g = ac.createGain(); g.gain.value = muc;
@@ -1272,19 +1277,60 @@ function moTieng() {
   chung.gain.setValueAtTime(.0001, ac.currentTime);
   chung.gain.linearRampToValueAtTime(tiengBat ? MUC : .0001, ac.currentTime + 2);   // vào từ từ
   chung.connect(ac.destination);
-  try {                                                 // máy nào không dựng được vang thì thôi, vẫn có tiếng
-    vang = ac.createConvolver(); vang.buffer = mauVang();
-    const uot = ac.createGain(); uot.gain.value = .22;
-    chung.connect(vang); vang.connect(uot); uot.connect(ac.destination);
-  } catch (e) { vang = null; }
 
-  mau = {                                               // tính một lần, dùng mãi
-    giot: [mauGiot(640), mauGiot(820), mauGiot(1150), mauGiot(1650)],
-    bet: [mauBet(false), mauBet(false), mauBet(true), mauBet(true)],
-    op: [mauOp(250, 2), mauOp(290, 1), mauOp(340, 3), mauOp(390, 2)],   // bốn giọng ếch, trầm tới cao
-    de: [mauDe(4500), mauDe(4800)],
-    thup: mauThup(), tach: mauTach(),
+  /* Tính mẫu một lần, dùng mãi — nhưng chia thành từng việc nhỏ, mỗi việc một lượt, thay vì làm liền một
+     mạch (42 ms trên máy tính, trên điện thoại vài trăm ms: hồ khựng ngay lúc mở). Mẫu nào chưa xong thì
+     phat() bỏ qua. Tiếng ếch làm trước vì dễ nghe thấy nhất. */
+  mau = { op: [], giot: [], bet: [], de: [], thup: null, tach: null };
+  const viec = [
+    () => { mau.op[0] = mauOp(250, 2); }, () => { mau.op[1] = mauOp(290, 1); },     // bốn giọng ếch, trầm tới cao
+    () => { mau.op[2] = mauOp(340, 3); }, () => { mau.op[3] = mauOp(390, 2); },
+    () => { mau.giot = [mauGiot(640), mauGiot(820), mauGiot(1150), mauGiot(1650)]; },
+    () => { mau.bet = [mauBet(false), mauBet(false), mauBet(true), mauBet(true)]; },
+    () => { mau.de = [mauDe(4500), mauDe(4800)]; mau.thup = mauThup(); mau.tach = mauTach(); },
+  ];
+  const acNay = ac;
+  const lam = () => {
+    if (ac !== acNay) return;
+    const v = viec.shift();
+    if (!v) { nuongVang(acNay); return; }
+    try { v(); } catch (e) {}
+    setTimeout(lam, 0);
   };
+  setTimeout(lam, 0);
+}
+
+/* Nướng vang vào từng mẫu: dựng lại đúng đường tiếng cũ (khô + vang .22 qua cùng IR, ConvolverNode chuẩn
+   hoá như cũ) trong một OfflineAudioContext — trình duyệt tự tính ở luồng riêng, không chặn màn hình — rồi
+   thay mẫu khô bằng mẫu đã có đuôi vang. Làm lần lượt từng mẫu. Máy nào không có OfflineAudioContext thì
+   giữ tiếng khô, vẫn chạy được. */
+async function nuongVang(acNay) {
+  const OAC = self.OfflineAudioContext || self.webkitOfflineAudioContext;
+  if (!OAC || ac !== acNay) return;
+  let ir;
+  try { ir = mauVang(); } catch (e) { return; }
+  const sr = acNay.sampleRate, duoi = ir.length;
+  const nuong = async (b) => {
+    const oc = new OAC(2, b.length + duoi, sr);
+    const s = oc.createBufferSource(); s.buffer = b;
+    const v = oc.createConvolver(); v.buffer = ir;
+    const uot = oc.createGain(); uot.gain.value = .22;
+    s.connect(oc.destination); s.connect(v); v.connect(uot); uot.connect(oc.destination);
+    s.start(0);
+    return oc.startRendering();
+  };
+  for (const ten of ['op', 'giot', 'bet', 'de', 'thup', 'tach']) {
+    const ds = Array.isArray(mau[ten]) ? mau[ten] : [mau[ten]];
+    for (let i = 0; i < ds.length; i++) {
+      if (ac !== acNay || !ds[i]) return;
+      try {
+        const kq = await nuong(ds[i]);
+        if (ac !== acNay) return;
+        if (Array.isArray(mau[ten])) mau[ten][i] = kq; else mau[ten] = kq;
+        daNuong++;
+      } catch (e) { return; }                           // hỏng giữa chừng thì giữ phần tiếng khô còn lại
+    }
+  }
 }
 
 function dongTieng() {
@@ -1576,10 +1622,11 @@ self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTr
   _keu: () => { const e = ech.find(nguoi); if (!e) return false; e.nghiKeu = 0; keu(e); return true; },
   _de: () => conTrung(),
   _songOp: (sr, f0, so) => songOp(sr, f0, so),
-  _coVang: () => !!vang,
+  _coVang: () => daNuong > 0,                 // đã có mẫu nướng vang
   _tieng: () => ({ co: !!ac, trangThai: ac ? ac.state : null, bat: tiengBat,
                    muc: ac ? +chung.gain.value.toFixed(3) : null, vang: dangVang,
-                   soMau: mau ? Object.keys(mau).length : 0,
+                   soMau: mau ? Object.values(mau).reduce((n, v) => n + (Array.isArray(v) ? v.filter(Boolean).length : v ? 1 : 0), 0) : 0,
+                   daNuong,
                    tum: demTum, dap: demDap, keu: demKeu }),
   _batTat: () => batTat(),
   _luong: () => ({ goc: +luong.goc.toFixed(2), toc: +luong.toc.toFixed(2), quay: +luong.quay.toFixed(3), xoay: +luong.xoay.toFixed(2) }),
