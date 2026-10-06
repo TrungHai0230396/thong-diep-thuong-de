@@ -1,0 +1,120 @@
+{
+ "_": "Những chữ máy nhận giọng có thể viết ra mà vẫn là ĐÚNG từ đó: từ đồng âm thật, chữ số, tên chữ cái. TUYỆT ĐỐI không đưa cặp tối thiểu vào đây (ship/sheep, ice/eyes, live/leave...): làm vậy là cho bản thu đọc sai từ lọt qua đúng bài luyện tai cần phân biệt chúng. Riêng \"thank\": máy nghe (Whisper) hay tự thêm \"you\" sau một chữ \"thank\" đứng một mình — đã đo đường năng lượng, file chỉ có đúng một âm tiết. Riêng \"air\", \"hair\": máy nghe học trên giọng Mỹ, gặp /eə/ giọng Anh không đọc r (nghe như [ɛː]) thì ghi thành \"eh\", \"heh\" — đó vẫn là đúng từ, đúng âm.",
+ "five": [
+  "5"
+ ],
+ "ten": [
+  "10"
+ ],
+ "three": [
+  "3"
+ ],
+ "zero": [
+  "0"
+ ],
+ "bee": [
+  "b",
+  "be"
+ ],
+ "see": [
+  "c",
+  "sea"
+ ],
+ "sea": [
+  "c",
+  "see"
+ ],
+ "pea": [
+  "p",
+  "pee"
+ ],
+ "tea": [
+  "t",
+  "tee"
+ ],
+ "buy": [
+  "by",
+  "bye"
+ ],
+ "write": [
+  "right",
+  "rite"
+ ],
+ "right": [
+  "write",
+  "rite"
+ ],
+ "week": [
+  "weak"
+ ],
+ "sun": [
+  "son"
+ ],
+ "shoe": [
+  "shoo"
+ ],
+ "pack": [
+  "pac",
+  "pak"
+ ],
+ "way": [
+  "weigh"
+ ],
+ "made": [
+  "maid"
+ ],
+ "red": [
+  "read"
+ ],
+ "feet": [
+  "feat"
+ ],
+ "tell": [
+  "tel"
+ ],
+ "eye": [
+  "i",
+  "aye"
+ ],
+ "know": [
+  "no"
+ ],
+ "no": [
+  "know"
+ ],
+ "hear": [
+  "here"
+ ],
+ "here": [
+  "hear"
+ ],
+ "too": [
+  "two",
+  "to",
+  "2"
+ ],
+ "wine": [
+  "whine"
+ ],
+ "whale": [
+  "wail"
+ ],
+ "night": [
+  "knight"
+ ],
+ "thank": [
+  "thank you"
+ ],
+ "park": [
+  "parc"
+ ],
+ "air": [
+  "eh"
+ ],
+ "hair": [
+  "heh"
+ ],
+ "he": [
+  "hee"
+ ]
+}

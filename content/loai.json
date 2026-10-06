@@ -1,0 +1,10 @@
+{
+ "_": "Bản thu bị loại sau khi máy nghe lại file ĐÃ cắt gọt (scripts/kiem-tieng-nguoi.py --nghe, temperature 0) mà ra chữ khác. Lúc chọn thì bản gốc qua được, nên không rõ lỗi ở bản thu hay ở máy nghe — loại cho chắc, từ nào cũng còn bản khác.",
+ "LL-Q1860 (eng)-Vealhurl-apple.wav": "\"apple\" nghe ra \"uh oh\"",
+ "LL-Q1860 (eng)-Grendelkhan-bat.wav": "\"bat\" nghe ra \"that\"",
+ "LL-Q1860 (eng)-Naomi Persephone Amethyst (NaomiAmethyst)-box.wav": "\"box\" nghe ra \"bux\"",
+ "EN-AU ck1 full.ogg": "\"full\" nghe ra \"fool\"",
+ "LL-Q1860 (eng)-Grendelkhan-sing.wav": "\"sing\" nghe ra \"seng\"",
+ "LL-Q1860 (eng)-Naomi Persephone Amethyst (NaomiAmethyst)-top.wav": "\"top\" nghe ra \"tap\"",
+ "LL-Q1860 (eng)-Naomi Persephone Amethyst (NaomiAmethyst)-way.wav": "\"way\" nghe ra \"we\""
+}

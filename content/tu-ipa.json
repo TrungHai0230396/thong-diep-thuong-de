@@ -1,0 +1,762 @@
+{
+ "about": {
+  "anh": "/əˈbaʊt/",
+  "my": "/əˈbaʊt/"
+ },
+ "air": {
+  "anh": "/eə/",
+  "my": "/er/"
+ },
+ "apple": {
+  "anh": "/ˈæpəl/",
+  "my": "/ˈæpəl/"
+ },
+ "back": {
+  "anh": "/bæk/",
+  "my": "/bæk/"
+ },
+ "bad": {
+  "anh": "/bæd/",
+  "my": "/bæd/"
+ },
+ "bag": {
+  "anh": "/bæg/",
+  "my": "/bæg/"
+ },
+ "ball": {
+  "anh": "/bɔːl/",
+  "my": "/bɔːl/"
+ },
+ "banana": {
+  "anh": "/bəˈnɑːnə/",
+  "my": "/bəˈnænə/"
+ },
+ "bat": {
+  "anh": "/bæt/",
+  "my": "/bæt/"
+ },
+ "bed": {
+  "anh": "/bed/",
+  "my": "/bed/"
+ },
+ "bee": {
+  "anh": "/biː/",
+  "my": "/biː/"
+ },
+ "big": {
+  "anh": "/bɪg/",
+  "my": "/bɪg/"
+ },
+ "bird": {
+  "anh": "/bɜːd/",
+  "my": "/bɝːd/"
+ },
+ "blue": {
+  "anh": "/bluː/",
+  "my": "/bluː/"
+ },
+ "book": {
+  "anh": "/bʊk/",
+  "my": "/bʊk/"
+ },
+ "books": {
+  "anh": "/bʊks/",
+  "my": "/bʊks/"
+ },
+ "box": {
+  "anh": "/bɒks/",
+  "my": "/bɑːks/"
+ },
+ "boy": {
+  "anh": "/bɔɪ/",
+  "my": "/bɔɪ/"
+ },
+ "bus": {
+  "anh": "/bʌs/",
+  "my": "/bʌs/"
+ },
+ "buy": {
+  "anh": "/baɪ/",
+  "my": "/baɪ/"
+ },
+ "call": {
+  "anh": "/kɔːl/",
+  "my": "/kɔːl/"
+ },
+ "car": {
+  "anh": "/kɑː/",
+  "my": "/kɑːr/"
+ },
+ "care": {
+  "anh": "/keə/",
+  "my": "/ker/"
+ },
+ "cat": {
+  "anh": "/kæt/",
+  "my": "/kæt/"
+ },
+ "cats": {
+  "anh": "/kæts/",
+  "my": "/kæts/"
+ },
+ "chair": {
+  "anh": "/tʃeə/",
+  "my": "/tʃer/"
+ },
+ "cheap": {
+  "anh": "/tʃiːp/",
+  "my": "/tʃiːp/"
+ },
+ "chip": {
+  "anh": "/tʃɪp/",
+  "my": "/tʃɪp/"
+ },
+ "coal": {
+  "anh": "/kəʊl/",
+  "my": "/koʊl/"
+ },
+ "coin": {
+  "anh": "/kɔɪn/",
+  "my": "/kɔɪn/"
+ },
+ "cold": {
+  "anh": "/kəʊld/",
+  "my": "/koʊld/"
+ },
+ "cool": {
+  "anh": "/kuːl/",
+  "my": "/kuːl/"
+ },
+ "cup": {
+  "anh": "/kʌp/",
+  "my": "/kʌp/"
+ },
+ "day": {
+  "anh": "/deɪ/",
+  "my": "/deɪ/"
+ },
+ "dog": {
+  "anh": "/dɒg/",
+  "my": "/dɔːg/"
+ },
+ "dogs": {
+  "anh": "/dɒgz/",
+  "my": "/dɔːgz/"
+ },
+ "ear": {
+  "anh": "/ɪə/",
+  "my": "/ɪr/"
+ },
+ "eat": {
+  "anh": "/iːt/",
+  "my": "/iːt/"
+ },
+ "eyes": {
+  "anh": "/aɪz/",
+  "my": "/aɪz/"
+ },
+ "famous": {
+  "anh": "/ˈfeɪməs/",
+  "my": "/ˈfeɪməs/"
+ },
+ "fat": {
+  "anh": "/fæt/",
+  "my": "/fæt/"
+ },
+ "father": {
+  "anh": "/ˈfɑːðə/",
+  "my": "/ˈfɑːðɚ/"
+ },
+ "fee": {
+  "anh": "/fiː/",
+  "my": "/fiː/"
+ },
+ "feel": {
+  "anh": "/fiːl/",
+  "my": "/fiːl/"
+ },
+ "feet": {
+  "anh": "/fiːt/",
+  "my": "/fiːt/"
+ },
+ "find": {
+  "anh": "/faɪnd/",
+  "my": "/faɪnd/"
+ },
+ "fine": {
+  "anh": "/faɪn/",
+  "my": "/faɪn/"
+ },
+ "fish": {
+  "anh": "/fɪʃ/",
+  "my": "/fɪʃ/"
+ },
+ "fit": {
+  "anh": "/fɪt/",
+  "my": "/fɪt/"
+ },
+ "five": {
+  "anh": "/faɪv/",
+  "my": "/faɪv/"
+ },
+ "food": {
+  "anh": "/fuːd/",
+  "my": "/fuːd/"
+ },
+ "full": {
+  "anh": "/fʊl/",
+  "my": "/fʊl/"
+ },
+ "funny": {
+  "anh": "/ˈfʌni/",
+  "my": "/ˈfʌni/"
+ },
+ "glass": {
+  "anh": "/glɑːs/",
+  "my": "/glæs/"
+ },
+ "go": {
+  "anh": "/gəʊ/",
+  "my": "/goʊ/"
+ },
+ "good": {
+  "anh": "/gʊd/",
+  "my": "/gʊd/"
+ },
+ "grass": {
+  "anh": "/grɑːs/",
+  "my": "/græs/"
+ },
+ "had": {
+  "anh": "/hæd/",
+  "my": "/hæd/"
+ },
+ "hand": {
+  "anh": "/hænd/",
+  "my": "/hænd/"
+ },
+ "hat": {
+  "anh": "/hæt/",
+  "my": "/hæt/"
+ },
+ "he": {
+  "anh": "/hiː/",
+  "my": "/hiː/"
+ },
+ "her": {
+  "anh": "/hɜː/",
+  "my": "/hɝː/"
+ },
+ "here": {
+  "anh": "/hɪə/",
+  "my": "/hɪr/"
+ },
+ "home": {
+  "anh": "/həʊm/",
+  "my": "/hoʊm/"
+ },
+ "hot": {
+  "anh": "/hɒt/",
+  "my": "/hɑːt/"
+ },
+ "house": {
+  "anh": "/haʊs/",
+  "my": "/haʊs/"
+ },
+ "ice": {
+  "anh": "/aɪs/",
+  "my": "/aɪs/"
+ },
+ "it": {
+  "anh": "/ɪt/",
+  "my": "/ɪt/"
+ },
+ "jam": {
+  "anh": "/dʒæm/",
+  "my": "/dʒæm/"
+ },
+ "job": {
+  "anh": "/dʒɒb/",
+  "my": "/dʒɑːb/"
+ },
+ "jump": {
+  "anh": "/dʒʌmp/",
+  "my": "/dʒʌmp/"
+ },
+ "key": {
+  "anh": "/kiː/",
+  "my": "/kiː/"
+ },
+ "king": {
+  "anh": "/kɪŋ/",
+  "my": "/kɪŋ/"
+ },
+ "last": {
+  "anh": "/lɑːst/",
+  "my": "/læst/"
+ },
+ "leaf": {
+  "anh": "/liːf/",
+  "my": "/liːf/"
+ },
+ "leave": {
+  "anh": "/liːv/",
+  "my": "/liːv/"
+ },
+ "leg": {
+  "anh": "/leg/",
+  "my": "/leg/"
+ },
+ "life": {
+  "anh": "/laɪf/",
+  "my": "/laɪf/"
+ },
+ "light": {
+  "anh": "/laɪt/",
+  "my": "/laɪt/"
+ },
+ "like": {
+  "anh": "/laɪk/",
+  "my": "/laɪk/"
+ },
+ "live": {
+  "anh": "/lɪv/",
+  "my": "/lɪv/"
+ },
+ "long": {
+  "anh": "/lɒŋ/",
+  "my": "/lɔːŋ/"
+ },
+ "look": {
+  "anh": "/lʊk/",
+  "my": "/lʊk/"
+ },
+ "love": {
+  "anh": "/lʌv/",
+  "my": "/lʌv/"
+ },
+ "low": {
+  "anh": "/ləʊ/",
+  "my": "/loʊ/"
+ },
+ "made": {
+  "anh": "/meɪd/",
+  "my": "/meɪd/"
+ },
+ "make": {
+  "anh": "/meɪk/",
+  "my": "/meɪk/"
+ },
+ "man": {
+  "anh": "/mæn/",
+  "my": "/mæn/"
+ },
+ "me": {
+  "anh": "/miː/",
+  "my": "/miː/"
+ },
+ "measure": {
+  "anh": "/ˈmeʒə/",
+  "my": "/ˈmeʒɚ/"
+ },
+ "men": {
+  "anh": "/men/",
+  "my": "/men/"
+ },
+ "moon": {
+  "anh": "/muːn/",
+  "my": "/muːn/"
+ },
+ "more": {
+  "anh": "/mɔː/",
+  "my": "/mɔːr/"
+ },
+ "mother": {
+  "anh": "/ˈmʌðə/",
+  "my": "/ˈmʌðɚ/"
+ },
+ "mouth": {
+  "anh": "/maʊθ/",
+  "my": "/maʊθ/"
+ },
+ "my": {
+  "anh": "/maɪ/",
+  "my": "/maɪ/"
+ },
+ "name": {
+  "anh": "/neɪm/",
+  "my": "/neɪm/"
+ },
+ "near": {
+  "anh": "/nɪə/",
+  "my": "/nɪr/"
+ },
+ "night": {
+  "anh": "/naɪt/",
+  "my": "/naɪt/"
+ },
+ "no": {
+  "anh": "/nəʊ/",
+  "my": "/noʊ/"
+ },
+ "now": {
+  "anh": "/naʊ/",
+  "my": "/naʊ/"
+ },
+ "out": {
+  "anh": "/aʊt/",
+  "my": "/aʊt/"
+ },
+ "pack": {
+  "anh": "/pæk/",
+  "my": "/pæk/"
+ },
+ "park": {
+  "anh": "/pɑːk/",
+  "my": "/pɑːrk/"
+ },
+ "pat": {
+  "anh": "/pæt/",
+  "my": "/pæt/"
+ },
+ "pea": {
+  "anh": "/piː/",
+  "my": "/piː/"
+ },
+ "pen": {
+  "anh": "/pen/",
+  "my": "/pen/"
+ },
+ "people": {
+  "anh": "/ˈpiːpəl/",
+  "my": "/ˈpiːpəl/"
+ },
+ "pick": {
+  "anh": "/pɪk/",
+  "my": "/pɪk/"
+ },
+ "pie": {
+  "anh": "/paɪ/",
+  "my": "/paɪ/"
+ },
+ "pig": {
+  "anh": "/pɪg/",
+  "my": "/pɪg/"
+ },
+ "pin": {
+  "anh": "/pɪn/",
+  "my": "/pɪn/"
+ },
+ "played": {
+  "anh": "/pleɪd/",
+  "my": "/pleɪd/"
+ },
+ "price": {
+  "anh": "/praɪs/",
+  "my": "/praɪs/"
+ },
+ "prize": {
+  "anh": "/praɪz/",
+  "my": "/praɪz/"
+ },
+ "problem": {
+  "anh": "/ˈprɒbləm/",
+  "my": "/ˈprɑːbləm/"
+ },
+ "pull": {
+  "anh": "/pʊl/",
+  "my": "/pʊl/"
+ },
+ "red": {
+  "anh": "/red/",
+  "my": "/red/"
+ },
+ "rice": {
+  "anh": "/raɪs/",
+  "my": "/raɪs/"
+ },
+ "ride": {
+  "anh": "/raɪd/",
+  "my": "/raɪd/"
+ },
+ "right": {
+  "anh": "/raɪt/",
+  "my": "/raɪt/"
+ },
+ "room": {
+  "anh": "/ruːm/",
+  "my": "/ruːm/"
+ },
+ "run": {
+  "anh": "/rʌn/",
+  "my": "/rʌn/"
+ },
+ "safe": {
+  "anh": "/seɪf/",
+  "my": "/seɪf/"
+ },
+ "save": {
+  "anh": "/seɪv/",
+  "my": "/seɪv/"
+ },
+ "saw": {
+  "anh": "/sɔː/",
+  "my": "/sɔː/"
+ },
+ "school": {
+  "anh": "/skuːl/",
+  "my": "/skuːl/"
+ },
+ "sea": {
+  "anh": "/siː/",
+  "my": "/siː/"
+ },
+ "seat": {
+  "anh": "/siːt/",
+  "my": "/siːt/"
+ },
+ "see": {
+  "anh": "/siː/",
+  "my": "/siː/"
+ },
+ "she": {
+  "anh": "/ʃiː/",
+  "my": "/ʃiː/"
+ },
+ "sheep": {
+  "anh": "/ʃiːp/",
+  "my": "/ʃiːp/"
+ },
+ "sheet": {
+  "anh": "/ʃiːt/",
+  "my": "/ʃiːt/"
+ },
+ "ship": {
+  "anh": "/ʃɪp/",
+  "my": "/ʃɪp/"
+ },
+ "shoe": {
+  "anh": "/ʃuː/",
+  "my": "/ʃuː/"
+ },
+ "sin": {
+  "anh": "/sɪn/",
+  "my": "/sɪn/"
+ },
+ "sing": {
+  "anh": "/sɪŋ/",
+  "my": "/sɪŋ/"
+ },
+ "sink": {
+  "anh": "/sɪŋk/",
+  "my": "/sɪŋk/"
+ },
+ "sip": {
+  "anh": "/sɪp/",
+  "my": "/sɪp/"
+ },
+ "sit": {
+  "anh": "/sɪt/",
+  "my": "/sɪt/"
+ },
+ "size": {
+  "anh": "/saɪz/",
+  "my": "/saɪz/"
+ },
+ "sky": {
+  "anh": "/skaɪ/",
+  "my": "/skaɪ/"
+ },
+ "sofa": {
+  "anh": "/ˈsəʊfə/",
+  "my": "/ˈsoʊfə/"
+ },
+ "spin": {
+  "anh": "/spɪn/",
+  "my": "/spɪn/"
+ },
+ "star": {
+  "anh": "/stɑː/",
+  "my": "/stɑːr/"
+ },
+ "stop": {
+  "anh": "/stɒp/",
+  "my": "/stɑːp/"
+ },
+ "street": {
+  "anh": "/striːt/",
+  "my": "/striːt/"
+ },
+ "sue": {
+  "anh": "/suː/",
+  "my": "/suː/"
+ },
+ "sun": {
+  "anh": "/sʌn/",
+  "my": "/sʌn/"
+ },
+ "sure": {
+  "anh": "/ʃʊə/",
+  "my": "/ʃʊr/"
+ },
+ "tea": {
+  "anh": "/tiː/",
+  "my": "/tiː/"
+ },
+ "teacher": {
+  "anh": "/ˈtiːtʃə/",
+  "my": "/ˈtiːtʃɚ/"
+ },
+ "television": {
+  "anh": "/ˈtelɪvɪʒən/",
+  "my": "/ˈteləvɪʒən/"
+ },
+ "tell": {
+  "anh": "/tel/",
+  "my": "/tel/"
+ },
+ "ten": {
+  "anh": "/ten/",
+  "my": "/ten/"
+ },
+ "thank": {
+  "anh": "/θæŋk/",
+  "my": "/θæŋk/"
+ },
+ "they": {
+  "anh": "/ðeɪ/",
+  "my": "/ðeɪ/"
+ },
+ "think": {
+  "anh": "/θɪŋk/",
+  "my": "/θɪŋk/"
+ },
+ "this": {
+  "anh": "/ðɪs/",
+  "my": "/ðɪs/"
+ },
+ "three": {
+  "anh": "/θriː/",
+  "my": "/θriː/"
+ },
+ "time": {
+  "anh": "/taɪm/",
+  "my": "/taɪm/"
+ },
+ "top": {
+  "anh": "/tɒp/",
+  "my": "/tɑːp/"
+ },
+ "tour": {
+  "anh": "/tʊə/",
+  "my": "/tʊr/"
+ },
+ "tourist": {
+  "anh": "/ˈtʊərɪst/",
+  "my": "/ˈtʊrəst/"
+ },
+ "toy": {
+  "anh": "/tɔɪ/",
+  "my": "/tɔɪ/"
+ },
+ "tree": {
+  "anh": "/triː/",
+  "my": "/triː/"
+ },
+ "turn": {
+  "anh": "/tɜːn/",
+  "my": "/tɝːn/"
+ },
+ "usually": {
+  "anh": "/ˈjuːʒʊəli/",
+  "my": "/ˈjuːʒuəli/"
+ },
+ "van": {
+  "anh": "/væn/",
+  "my": "/væn/"
+ },
+ "very": {
+  "anh": "/ˈveri/",
+  "my": "/ˈveri/"
+ },
+ "vest": {
+  "anh": "/vest/",
+  "my": "/vest/"
+ },
+ "vine": {
+  "anh": "/vaɪn/",
+  "my": "/vaɪn/"
+ },
+ "vote": {
+  "anh": "/vəʊt/",
+  "my": "/voʊt/"
+ },
+ "wash": {
+  "anh": "/wɒʃ/",
+  "my": "/wɑːʃ/"
+ },
+ "watch": {
+  "anh": "/wɒtʃ/",
+  "my": "/wɑːtʃ/"
+ },
+ "way": {
+  "anh": "/weɪ/",
+  "my": "/weɪ/"
+ },
+ "we": {
+  "anh": "/wiː/",
+  "my": "/wiː/"
+ },
+ "week": {
+  "anh": "/wiːk/",
+  "my": "/wiːk/"
+ },
+ "well": {
+  "anh": "/wel/",
+  "my": "/wel/"
+ },
+ "west": {
+  "anh": "/west/",
+  "my": "/west/"
+ },
+ "wet": {
+  "anh": "/wet/",
+  "my": "/wet/"
+ },
+ "when": {
+  "anh": "/wen/",
+  "my": "/wen/"
+ },
+ "wine": {
+  "anh": "/waɪn/",
+  "my": "/waɪn/"
+ },
+ "work": {
+  "anh": "/wɜːk/",
+  "my": "/wɝːk/"
+ },
+ "write": {
+  "anh": "/raɪt/",
+  "my": "/raɪt/"
+ },
+ "yellow": {
+  "anh": "/ˈjeləʊ/",
+  "my": "/ˈjeloʊ/"
+ },
+ "yes": {
+  "anh": "/jes/",
+  "my": "/jes/"
+ },
+ "you": {
+  "anh": "/juː/",
+  "my": "/juː/"
+ },
+ "zebra": {
+  "anh": "/ˈzebrə/",
+  "my": "/ˈziːbrə/"
+ },
+ "zero": {
+  "anh": "/ˈzɪərəʊ/",
+  "my": "/ˈzɪroʊ/"
+ }
+}

@@ -1221,6 +1221,83 @@ Ba chuyện đáng ghi lại từ lúc làm:
 Một chỗ chưa thử trên máy thật: trên iPhone, tiếng phát bằng Web Audio thường bị tắt khi gạt công
 tắc im lặng (âm máy dựng trước đây cũng đi đường này). Không nghe thấy gì thì gạt công tắc lên trước.
 
+## "Mất phần hướng dẫn bằng hình ảnh, phát âm từng âm như máy đọc, thiếu nhiều âm"
+
+Ba lời chê, cả ba đều đúng:
+
+- **Mất hình.** Màn "Từng âm một" mà tôi đưa lên đầu ở lần trước không có hình nào; hình miệng chỉ
+  còn ở bước 3 trong các bài sửa lỗi. Đường vào chính lại là đường không có hình.
+- **Như máy đọc.** Bộ bản thu cũ là mẫu ngữ âm của người KHÔNG bản xứ (Peter Isotalo lớn lên ở
+  Stockholm và Moskva) đọc [sa] … [asa], nguyên âm chuẩn IPA thu năm 2005, và bản "chỉ âm" là một
+  khúc 0,2 giây cắt ra — nghe đúng là không giống người nói. Còn bước 2, 3, 4 của mỗi bài vẫn dùng
+  máy đọc của hệ điều hành.
+- **Thiếu âm.** Chỉ có 22 âm, trong khi bảng người Việt quen học có 44.
+
+Giờ:
+
+- **Bảng 44 âm** chia ba nhóm như sách: 12 nguyên âm đơn, 8 nguyên âm đôi, 24 phụ âm (ký hiệu
+  Anh-Anh). Mỗi ô ghi kèm một từ ví dụ.
+- **Mỗi âm một màn có hình**: miệng nhìn thẳng và mặt cắt bên trong, CHẠY ĐỘNG theo tiếng; nguyên
+  âm có sơ đồ vị trí lưỡi, nguyên âm đôi có mũi tên đường lướt (/aʊ/ lướt từ [a] sang /ʊ/). Kèm
+  cách đặt miệng, lỗi người Việt hay mắc, ghi chú Anh–Mỹ, nghe so với âm hay lẫn, nói theo.
+- **Mọi tiếng là người bản xứ.** Không ai, ở đâu, với giấy phép mở, thu riêng đủ 44 âm (đã lùng
+  Commons, Lingua Libre, Freesound, Openverse, GitHub, Hugging Face). Nên mỗi âm lấy cái gần nhất:
+  nhiều từ tiếng Anh vốn chỉ là một nguyên âm ("ah", "or", "oh", "eye", "ear", "air" — giọng Anh
+  không đọc r cuối), thán từ ("shh", "mmm", "uh", "oy"), nhà ngữ âm người Anh Peter Roach đọc [e] [ʌ]
+  [ɒ] và [fa] … [afa]. 27 âm có bản như thế; 17 âm còn lại (ʊ p b t d k θ ð z ʒ tʃ dʒ n ŋ l w j)
+  nghe qua từ ví dụ — âm tắc tách riêng ra chỉ còn một tiếng tách, còn lại đơn giản là không ai thu.
+  Từ ví dụ và mọi từ trong các bài (190 từ, 662 file, phần lớn 3–4 người đọc Mỹ/Anh) lấy từ bản
+  thu trên Wiktionary và Lingua Libre. Máy đọc chỉ còn là đường lùi khi mất mạng.
+- **Phiên âm quốc tế dưới mỗi từ**, Anh-Anh trước, Anh-Mỹ ghi thêm khi khác (hot /hɒt/ · Mỹ
+  /hɑːt/). Anh-Anh theo Britfone, Anh-Mỹ theo CMUdict, đối chiếu Wiktionary, rồi hai người soát
+  độc lập cả 190 từ theo đúng nghĩa đang dùng.
+
+Những chuyện đáng ghi lại:
+
+1. **Hình cắt dọc đặt lưỡi ở RĂNG cho /t d n l s z/.** Người soát ngữ âm chỉ ra: bộ vẽ chỉ chặn
+   không cho lưỡi vượt quá vòm, chứ không kéo lưỡi lên, nên đầu lưỡi dừng ở mép răng cửa (y≈122),
+   cách gờ lợi (y≈100) hai mươi điểm ảnh — đúng thói quen tiếng Việt mà bài muốn sửa. /k g ŋ/ thì
+   lưng lưỡi hở vòm mềm gần hai chục điểm ảnh. Giờ lưỡi rướn tới chỗ chạm, âm xát chừa khe hẹp, và
+   lưỡi rướn lên dần dần chứ không giật bật giữa chừng hình động. Bài kiểm mới đã thử gỡ bản sửa ra:
+   7 bài hỏng ngay.
+2. **Máy nghe lại từng file.** Mỗi bản thu từ được faster-whisper nghe lại, phải ra đúng từ mới được
+   chọn. Lần đầu tôi gài sai: danh sách "từ đồng âm" có cả cặp tối thiểu (ship/sheep, ice/eyes,
+   live/leave), nên một bản "ship" mà máy nghe thành "sheep" lọt qua — đúng vào bài luyện tai phân
+   biệt hai từ đó. Giờ danh sách đồng âm nằm riêng ở `content/dong-am.json`, ghi rõ cấm cặp tối thiểu.
+3. **Cắt lặng xén mất chữ.** Lần đầu chừa 40 ms trước, 90 ms sau: /p/ cuối "cheap" đến sau một quãng
+   ngậm hơi gần như im lặng nên bị xén, máy nghe lại thành "cheers"; /s/ đầu "sing" nhỏ quá cũng bị
+   cắt. Giờ chừa 150 ms trước, 300 ms sau, và bộ kiểm nghe lại cả 482 file SAU khi cắt.
+4. **/z/ cuối từ gần như không rung.** Đo trên bản thu người bản xứ: đoạn xát của /z/ trong "size",
+   "eyes", "dogs" gần như không có năng lượng dưới 500 Hz (0,00–0,05), còn /z/ đầu "zebra" có (0,24).
+   Cái làm "eyes" khác "ice" lúc đó là nguyên âm trước nó dài hơn. Bài giờ nói rõ điều này thay vì
+   chỉ bảo "rung cổ"; bản "buzz" (z cuối không rung) bị bỏ khỏi phần tiếng mẫu của /z/.
+5. **Máy đo cũng phải được kiểm.** Phép đo "rung dây thanh" bằng độ tuần hoàn trên cả file báo /ʃ/
+   rung 0,61 — vì đoạn lặng hai đầu có tiếng ù điện 120 Hz, tuần hoàn rất đều. Đổi sang đo tỉ lệ năng
+   lượng dưới 500 Hz trong chính đoạn xát. Còn faster-whisper thì không tất định: cùng file "box" có
+   lần ra "bux"; giờ chạy với temperature 0.
+
+6. **Bài luyện tai lộ đáp án qua giọng đọc** (người soát tìm ra, đã kiểm chứng): bản thu lấy theo TỪ,
+   mà mỗi từ có tập người đọc riêng — "ship" lúc nào cũng giọng Mỹ, "sip" lúc nào cũng giọng Anh, nên
+   nghe giọng là chọn đúng mà không cần tai. Giờ hai từ của một cặp luôn do CÙNG một người đọc: đã
+   tra thẳng bản thu của từng người đọc lớn (Back ache, Vealhurl, Wodencafe...) cho cả hai từ của
+   mọi cặp, và bài kiểm canh rằng cặp nào trong bài luyện tai cũng có người đọc chung.
+7. **Giọng Mỹ làm hỏng phép so nguyên âm.** "car rồi hot" giọng Mỹ là /kɑːr/ rồi /hɑːt/: cùng một
+   nguyên âm. Từ nào Anh-Mỹ đọc khác thì giờ giọng Anh lên trước; so hai âm thì chọn người giọng Anh
+   đọc cả hai từ, không có thì so bằng hai bản thu chính cái âm. Máy nghe (học trên giọng Mỹ) lại hay
+   từ chối bản giọng Anh không đọc r — "car" thành "call", "her" thành "huh" — nên mấy bản đó được
+   kiểm bằng đo formant thay vì máy nghe, số đo ghi trong `content/chap-nhan.json`.
+8. **Tên file trùng khi bỏ qua hoa/thường.** Ổ đĩa macOS coi "When.wav" và "when.wav" là một, nên
+   when-3 thành bản sao từng byte của when-2 mà ghi công một người khác. Giờ tên file tạm kèm băm
+   của đường dẫn, và bộ kiểm báo nếu hai bản gốc khác nhau ra cùng một file.
+9. **Tiếng đã nghe mất sau mỗi lần deploy.** sw.js xoá mọi kho khác phiên bản hiện tại, kể cả mp3.
+   Giờ tiếng nằm trong kho riêng `tdtd-tieng`, đường dẫn mang dấu nội dung (`?v=`) để file đổi thì
+   địa chỉ đổi.
+
+Làm lại toàn bộ tiếng: `python3 scripts/lam-tieng-nguoi.py`. Kiểm: `python3 scripts/kiem-tieng-nguoi.py
+--nghe`. Danh sách nguồn: `content/am44.json`, `content/am-nguoi.json`, `content/tu-nguoi.json`,
+`content/tu-ipa.json`. Ghi công từng file: `assets/am/NGUON.md`, `assets/tu/NGUON.md`, và màn
+"Nguồn tiếng đọc" trong app.
+
 ## Cấu trúc
 
 ```
@@ -1279,10 +1356,10 @@ node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 43 kiểm thử thần số học
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 125 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 158 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
-python3 scripts/kiem-am-nguoi.py  # đo lại 32 file tiếng người trong assets/am (cần ffmpeg, numpy)
+python3 scripts/kiem-tieng-nguoi.py  # đo lại ~700 file tiếng người (cần ffmpeg, numpy); thêm --nghe để máy nghe lại từng từ
 ```
 
 ## Sửa chính tả trong nguồn

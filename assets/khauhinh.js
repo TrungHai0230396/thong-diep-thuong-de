@@ -90,7 +90,14 @@ function tron(a, b, t) {
   }
   r.rung = m < .5 ? !!a.rung : !!b.rung;
   r.mui = m < .5 ? !!a.mui : !!b.mui;
-  r.chamO = m < .5 ? (a.chamO || 'khong') : (b.chamO || 'khong');
+  /* Chỗ chạm không trộn được (lợi với vòm mềm không có "nửa đường"), nhưng ĐỘ CHẠM thì trộn được:
+     lưỡi rướn dần lên chỗ chạm rồi hạ dần xuống, thay vì giật bật lên giữa chừng. */
+  const coA = a.chamO && a.chamO !== 'khong', coB = b.chamO && b.chamO !== 'khong';
+  const da = a.camDo !== undefined ? a.camDo : coA ? 1 : 0, db = b.camDo !== undefined ? b.camDo : coB ? 1 : 0;
+  r.camDo = da + (db - da) * m;
+  r.chamO = coA && coB ? (m < .5 ? a.chamO : b.chamO) : coB ? b.chamO : coA ? a.chamO : 'khong';
+  const ka = a.khe === undefined ? 1.5 : a.khe, kb = b.khe === undefined ? 1.5 : b.khe;
+  r.khe = ka + (kb - ka) * m;
   return r;
 }
 
@@ -103,13 +110,31 @@ function tinh(p) {
   const gocX = 176 + sa * 16;
 
   const dinhX = 104 + sa * 66, beRong = 38 + sa * 14, hGo = 12 + cao * 40;
+  /* LƯỠI PHẢI RƯỚN TỚI CHỖ CHẠM. Bản trước chỉ chặn trần (lưỡi không được vượt quá vòm) mà không
+     kéo lưỡi lên, nên với /t d n l s z/ đầu lưỡi dừng ở mép răng cửa (y≈122) cách gờ lợi (y≈100)
+     tới hai mươi điểm ảnh: nhìn vào là thấy đặt lưỡi ở RĂNG — đúng thói quen tiếng Việt mà bài
+     đang muốn sửa. Với /k g ŋ/ thì lưng lưỡi hở vòm mềm gần hai chục điểm ảnh, không ra chặn.
+     Giờ: chạm bằng ĐẦU lưỡi (lợi, sau lợi) thì cả phần lưỡi phía trước chỗ chạm nâng lên sát vòm;
+     chạm bằng LƯNG lưỡi (vòm cứng, vòm mềm) thì một quãng lưng lưỡi quanh chỗ chạm nâng lên.
+     khe: khoảng hở còn lại — âm tắc chạm kín (1,5), âm xát chừa khe hẹp, âm lướt chừa rộng hơn. */
+  const keo = p.camDo !== undefined ? p.camDo : (chamX !== null ? 1 : 0);
+  const chamDau = chamX !== null && (p.chamO === 'loi' || p.chamO === 'sau-loi');
+  const chamLung = chamX !== null && (p.chamO === 'vom-cung' || p.chamO === 'vom-mem');
+  const khe = p.khe === undefined ? 1.5 : p.khe;
   const mat = [];
   for (let x = LOI - 6; x <= gocX; x += 3) {
     const go = hGo * Math.exp(-Math.pow((x - dinhX) / beRong, 2));
     let y = sanY(x) - 22 - go;
     const vom = vomY(Math.min(x, 190));
+    if (keo > 0 && (chamDau || chamLung)) {
+      const d = x - chamX;
+      const w = chamDau ? (d <= 0 ? 1 : Math.exp(-Math.pow(d / 13, 2))) : Math.exp(-Math.pow(d / 22, 2));
+      const dich = vom + khe;
+      if (y > dich) y += (dich - y) * w * keo;
+    }
     let ke = 14;
-    if (chamX !== null) ke = 14 - 12.5 * Math.exp(-Math.pow((x - chamX) / 15, 2));
+    if (chamX !== null) ke = Math.min(14, khe) + (14 - Math.min(14, khe)) * (1 - Math.exp(-Math.pow((x - chamX) / 15, 2)));
+    if (chamX !== null && keo > 0 && (chamDau || chamLung)) ke = Math.min(ke, khe);
     if (y < vom + ke) y = vom + ke;
     mat.push([x, y]);
   }
@@ -199,7 +224,7 @@ function tinh(p) {
   }
 
   let vong = null;
-  if (chamX !== null) {
+  if (chamX !== null && keo > .5) {
     const cy = chamX <= 82 ? (moiTren + moiDuoi) / 2 : vomY(chamX) + 10;
     vong = { x: chamX, y: so(cy), ten: TEN_CHAM[p.chamO] };
   }
@@ -430,7 +455,45 @@ const viTri = (v) => {
   const y = 50 + 600 * v.Y, xL = 100 + 400 * v.Y;
   return [xL + v.X * (900 - xL) + (v.lech || 0), y];
 };
-function veNguyenAm(dang) {
+/* Điểm xuất phát của nguyên âm đôi không nằm trong 12 nguyên âm đơn: /aɪ/ và /aʊ/ bắt đầu từ [a],
+   mở và ở trước, thấp hơn cả /æ/ (Roach, English Phonetics and Phonology, sơ đồ nguyên âm đôi).
+   Không vẽ thành vòng tròn riêng; chỉ dùng làm gốc mũi tên. */
+const DIEM_PHU = { a: { ipa: 'a', X: .2, Y: 1 } };
+const timNguyenAm = (ipa) => NGUYEN_AM.find(v => v.ipa === ipa) || DIEM_PHU[ipa] || null;
+
+/* dang: nguyên âm đơn đang học — tô sáng. Thêm `den` thì thành nguyên âm đôi: mũi tên đi từ
+   dang tới den, vì nguyên âm đôi là một cú LƯỚT của lưỡi chứ không phải hai âm đặt cạnh nhau. */
+function veNguyenAm(dang, den, ten) {
+  const dau = den ? timNguyenAm(dang) : null, cuoi = den ? timNguyenAm(den) : null;
+  /* ten: ký hiệu thật của nguyên âm đôi. Ghép dang + den thì /ɔɪ/ thành "/ɔːɪ/" vì điểm đầu là ɔː. */
+  if (den && dau && cuoi) return veLuot(dau, cuoi, ten || dang + den);
+  return veDon(dang);
+}
+function veLuot(dau, cuoi, ten) {
+  const [x1, y1] = viTri(dau), [x2, y2] = viTri(cuoi);
+  const g = [`<path d="M100,50H900V650H500zM500,50 700,650M233.333,250H900M366.667,450H900"
+    fill="none" stroke="rgba(244,239,230,.35)" stroke-width="4"/>`];
+  g.push(`<text x="104" y="34" font-size="30" fill="rgba(244,239,230,.45)">trước</text>`);
+  g.push(`<text x="838" y="34" font-size="30" fill="rgba(244,239,230,.45)" text-anchor="end">sau</text>`);
+  g.push(`<text x="70" y="60" font-size="30" fill="rgba(244,239,230,.45)" text-anchor="end" transform="rotate(-90 70 60)">lưỡi cao</text>`);
+  for (const v of NGUYEN_AM) {
+    const [x, y] = viTri(v);
+    g.push(`<circle cx="${so(x)}" cy="${so(y)}" r="20" fill="rgba(255,255,255,.06)" stroke="rgba(244,239,230,.22)" stroke-width="2"/>`);
+    g.push(`<text x="${so(x)}" y="${so(y + 10)}" text-anchor="middle" font-size="24" fill="rgba(244,239,230,.4)">${v.ipa}</text>`);
+  }
+  /* mũi tên dừng trước vòng tròn đích một khoảng, đầu mũi tên vẽ bằng đa giác — không dùng
+     <marker> vì id của marker đụng nhau khi trang có hai hình cùng lúc */
+  const dx = x2 - x1, dy = y2 - y1, dai = Math.hypot(dx, dy) || 1, ux = dx / dai, uy = dy / dai;
+  const ax = x1 + ux * 40, ay = y1 + uy * 40, bx = x2 - ux * 44, by = y2 - uy * 44;
+  g.push(`<path class="k-luot" d="M${so(ax)},${so(ay)} L${so(bx)},${so(by)}" stroke="#e8c37a" stroke-width="10" stroke-linecap="round"/>`);
+  g.push(`<polygon points="${so(bx + ux * 26)},${so(by + uy * 26)} ${so(bx - uy * 20)},${so(by + ux * 20)} ${so(bx + uy * 20)},${so(by - ux * 20)}" fill="#e8c37a"/>`);
+  g.push(`<circle cx="${so(x1)}" cy="${so(y1)}" r="34" fill="#e8c37a" stroke="#e8c37a" stroke-width="3"/>`);
+  g.push(`<text x="${so(x1)}" y="${so(y1 + 12)}" text-anchor="middle" font-size="34" font-weight="600" fill="#121a2c">${dau.ipa}</text>`);
+  g.push(`<circle cx="${so(x2)}" cy="${so(y2)}" r="34" fill="rgba(18,26,44,.9)" stroke="#e8c37a" stroke-width="5"/>`);
+  g.push(`<text x="${so(x2)}" y="${so(y2 + 12)}" text-anchor="middle" font-size="34" font-weight="600" fill="#e8c37a">${cuoi.ipa}</text>`);
+  return `<svg viewBox="40 0 900 700" role="img" aria-label="Sơ đồ nguyên âm: /${ten}/ lướt từ ${dau.ipa} sang ${cuoi.ipa}">${g.join('')}</svg>`;
+}
+function veDon(dang) {
   const g = [`<path d="M100,50H900V650H500zM500,50 700,650M233.333,250H900M366.667,450H900"
     fill="none" stroke="rgba(244,239,230,.35)" stroke-width="4"/>`];
   g.push(`<text x="104" y="34" font-size="30" fill="rgba(244,239,230,.45)">trước</text>`);
@@ -447,6 +510,6 @@ function veNguyenAm(dang) {
   return `<svg viewBox="40 0 900 700" role="img" aria-label="Sơ đồ nguyên âm tiếng Anh">${g.join('')}</svg>`;
 }
 
-const API = { ve, capNhat, tinh, tron, NGHI, veMatTruoc, capNhatTruoc, veMoi, veNguyenAm, vomY, NGUYEN_AM, viTri, CHO_CHAM, TEN_CHAM };
+const API = { ve, capNhat, tinh, tron, NGHI, veMatTruoc, capNhatTruoc, veMoi, veNguyenAm, vomY, NGUYEN_AM, DIEM_PHU, timNguyenAm, viTri, CHO_CHAM, TEN_CHAM };
 if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.TDTD_KHAUHINH = API;
 })(typeof self !== 'undefined' ? self : this);

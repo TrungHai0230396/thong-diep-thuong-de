@@ -1,0 +1,9 @@
+{
+ "_": "Bản thu giọng Anh mà máy nghe (faster-whisper, học chủ yếu trên giọng Mỹ) nghe sai vì giọng Anh không đọc r cuối — đã kiểm bằng cách khác: đo formant nguyên âm, so với chính người đọc đó đọc âm chuẩn (Back ache: 'ah' /ɑː/ F1≈640 F2≈1060, 'or' /ɔː/ F1≈410 F2≈660, 'earth' /ɜː/ F1≈510 F2≈1310). Chỉ nhận khi số đo khớp đúng âm của từ.",
+ "LL-Q1860 (eng)-Back ache-car.wav": "máy nghe 'call'; đo F1 580–640, F2 1010–1150: là /ɑː/, không phải /ɔː/",
+ "LL-Q1860 (eng)-Back ache-star.wav": "máy nghe 'stahl'; đo F1 540–620, F2 960–1190: là /ɑː/",
+ "LL-Q1860 (eng)-Back ache-grass.wav": "máy nghe 'gross'; đo F1 490–590, F2 970–1060, không lướt như /əʊ/: là /ɑː/",
+ "LL-Q1860 (eng)-Back ache-her.wav": "máy nghe 'huh'; đo F1 550–590, F2 1250–1310: là /ɜː/ (trùng 'earth' của chính người này)",
+ "LL-Q1860 (eng)-Back ache-hot.wav": "máy nghe 'halt'; đo F1 540–570, F2 850–930: trùng 'on' /ɒ/ của chính người này (F1≈530, F2≈860), khác 'or' /ɔː/",
+ "LL-Q1860 (eng)-Wodencafe-thank.wav": "máy nghe 'thank you for watching' — câu Whisper hay tự bịa khi gặp khoảng lặng; đo đường năng lượng: file chỉ có đúng một âm tiết, và bản gốc máy nghe ra đúng 'thank'"
+}

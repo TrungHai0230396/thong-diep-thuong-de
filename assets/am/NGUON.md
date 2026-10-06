@@ -1,33 +1,41 @@
-# Nguồn tiếng người đọc
+# Nguồn tiếng đọc từng âm
 
-Mọi file trong thư mục này là bản đã sửa của các bản thu trên Wikimedia Commons, dùng trong các bài
-về bảng phiên âm quốc tế (IPA) trên Wikipedia. Giấy phép gốc:
-[CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/). Bản sửa ở đây cũng mang đúng giấy phép đó.
+Bản thu người thật trên Wikimedia Commons: người đóng góp Lingua Libre (Back ache, Vealhurl, Wodencafe,
+Grendelkhan, Pvanp7), Association Shtooka (Judith Franck), GS ngữ âm Peter Roach, Mova2016, Erutuon.
 
-Đã sửa gì: đã cắt khoảng lặng, chỉnh âm lượng, đổi sang MP3; bản "chỉ âm" cắt từ đầu âm tiết. Cách làm lại từ bản gốc: `python3 scripts/lam-am-nguoi.py <thư mục .ogg gốc>`.
-Kiểm lại: `python3 scripts/kiem-am-nguoi.py`.
+Đã sửa gì: cắt khoảng lặng hai đầu, cân độ to, trộn về một kênh, đổi sang MP3. Mỗi file giữ đúng giấy
+phép của bản gốc ghi trong bảng (bản gốc CC BY-SA thì bản sửa cũng CC BY-SA).
+Làm lại: `python3 scripts/lam-tieng-nguoi.py`. Kiểm: `python3 scripts/kiem-tieng-nguoi.py`.
 
-| Âm | File | Bản thu đọc | Người thu | Bản gốc |
-|---|---|---|---|---|
-| /s/ | `s.mp3`, `s-rieng.mp3` | [sa] … [asa] | Peter Isotalo | [Voiceless alveolar sibilant.ogg](https://commons.wikimedia.org/wiki/File:Voiceless_alveolar_sibilant.ogg) |
-| /z/ | `z.mp3`, `z-rieng.mp3` | [za] … [aza] | Peter Isotalo | [Voiced alveolar sibilant.ogg](https://commons.wikimedia.org/wiki/File:Voiced_alveolar_sibilant.ogg) |
-| /ʃ/ | `sh.mp3`, `sh-rieng.mp3` | [ʃa] … [aʃa] | Peter Isotalo | [Voiceless palato-alveolar sibilant.ogg](https://commons.wikimedia.org/wiki/File:Voiceless_palato-alveolar_sibilant.ogg) |
-| /f/ | `f.mp3`, `f-rieng.mp3` | [afa] | Peter Isotalo | [Voiceless labiodental fricative.ogg](https://commons.wikimedia.org/wiki/File:Voiceless_labiodental_fricative.ogg) |
-| /v/ | `v.mp3`, `v-rieng.mp3` | [ava] | Peter Isotalo | [Voiced labiodental fricative.ogg](https://commons.wikimedia.org/wiki/File:Voiced_labiodental_fricative.ogg) |
-| /θ/ | `th.mp3`, `th-rieng.mp3` | [θa] … [aθa] | Peter Isotalo | [Voiceless dental fricative.ogg](https://commons.wikimedia.org/wiki/File:Voiceless_dental_fricative.ogg) |
-| /ð/ | `dh.mp3`, `dh-rieng.mp3` | [ða] … [aða] | Peter Isotalo | [Voiced dental fricative.ogg](https://commons.wikimedia.org/wiki/File:Voiced_dental_fricative.ogg) |
-| /p/ | `p.mp3` | [pa] … [apa] | Peter Isotalo | [Voiceless bilabial plosive.ogg](https://commons.wikimedia.org/wiki/File:Voiceless_bilabial_plosive.ogg) |
-| /b/ | `b.mp3` | [ba] … [aba] | Peter Isotalo | [Voiced bilabial plosive.ogg](https://commons.wikimedia.org/wiki/File:Voiced_bilabial_plosive.ogg) |
-| /t/ | `t.mp3` | [ta] … [ata] | Peter Isotalo | [Voiceless alveolar plosive.ogg](https://commons.wikimedia.org/wiki/File:Voiceless_alveolar_plosive.ogg) |
-| /d/ | `d.mp3` | [da] … [ada] | Peter Isotalo | [Voiced alveolar plosive.ogg](https://commons.wikimedia.org/wiki/File:Voiced_alveolar_plosive.ogg) |
-| /k/ | `k.mp3` | [ka] … [aka] | Peter Isotalo | [Voiceless velar plosive.ogg](https://commons.wikimedia.org/wiki/File:Voiceless_velar_plosive.ogg) |
-| /g/ | `g.mp3` | [aga] | Peter Isotalo | [Voiced velar plosive.ogg](https://commons.wikimedia.org/wiki/File:Voiced_velar_plosive.ogg) |
-| /m/ | `m.mp3`, `m-rieng.mp3` | [ma] … [ama] | Peter Isotalo | [Bilabial nasal.ogg](https://commons.wikimedia.org/wiki/File:Bilabial_nasal.ogg) |
-| /n/ | `n.mp3`, `n-rieng.mp3` | [na] … [ana] | Peter Isotalo | [Alveolar nasal.ogg](https://commons.wikimedia.org/wiki/File:Alveolar_nasal.ogg) |
-| /l/ | `l.mp3`, `l-rieng.mp3` | [la] … [ala] | Peter Isotalo | [Alveolar lateral approximant.ogg](https://commons.wikimedia.org/wiki/File:Alveolar_lateral_approximant.ogg) |
-| /r/ | `r.mp3` | [ɹa] … [aɹa] | Erutuon | [Alveolar approximant.ogg](https://commons.wikimedia.org/wiki/File:Alveolar_approximant.ogg) |
-| /w/ | `w.mp3` | [wa] … [awa] | Peter Isotalo | [Voiced labio-velar approximant.ogg](https://commons.wikimedia.org/wiki/File:Voiced_labio-velar_approximant.ogg) |
-| /iː/ | `ii.mp3` | [i] | Denelson83 | [Close front unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Close_front_unrounded_vowel.ogg) |
-| /ɪ/ | `i.mp3` | [ɪ] | Denelson83 | [Near-close near-front unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Near-close_near-front_unrounded_vowel.ogg) |
-| /æ/ | `ae.mp3` | [æ] | Denelson83 | [Near-open front unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:Near-open_front_unrounded_vowel.ogg) |
-| /ə/ | `uh.mp3` | [ə] | Denelson83 | [Mid-central vowel.ogg](https://commons.wikimedia.org/wiki/File:Mid-central_vowel.ogg) |
+| Mục | File | Nhãn | Giọng | Người đọc | Giấy phép | Bản gốc |
+|---|---|---|---|---|---|---|
+| aa | `aa-1.mp3` | ah | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-ah.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-ah.wav) |
+| aa | `aa-2.mp3` | are | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-are.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-are.wav) |
+| ae | `ae-1.mp3` | at | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-at.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-at.wav) |
+| ah | `ah-1.mp3` | âm /ʌ/ | Anh | Peter Roach | CC BY-SA 4.0 | [PR-open-mid back unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:PR-open-mid_back_unrounded_vowel.ogg) |
+| ai | `ai-1.mp3` | eye | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-eye.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-eye.wav) |
+| au | `au-1.mp3` | how | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-how.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-how.wav) |
+| e | `e-1.mp3` | egg | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-egg.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-egg.wav) |
+| e | `e-2.mp3` | âm /e/ | Anh | Peter Roach | CC BY-SA 4.0 | [PR-open-mid front unrounded vowel.ogg](https://commons.wikimedia.org/wiki/File:PR-open-mid_front_unrounded_vowel.ogg) |
+| ea | `ea-1.mp3` | air | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-air.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-air.wav) |
+| ei | `ei-1.mp3` | A | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-A.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-A.wav) |
+| er | `er-1.mp3` | earth | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-earth.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-earth.wav) |
+| f | `f-1.mp3` | [fa] … [afa] | Anh | Peter Roach | CC BY-SA 4.0 | [PR-voiceless labiodental fricative.ogg](https://commons.wikimedia.org/wiki/File:PR-voiceless_labiodental_fricative.ogg) |
+| g | `g-1.mp3` | [ga] … [aga] | Anh | Peter Roach | CC BY-SA 4.0 | [PR-voiced velar stop.ogg](https://commons.wikimedia.org/wiki/File:PR-voiced_velar_stop.ogg) |
+| h | `h-1.mp3` | âm /h/ | Mỹ | Mova2016 | CC BY-SA 4.0 | [American English sound "h" (female).wav](https://commons.wikimedia.org/wiki/File:American_English_sound_"h"_(female).wav) |
+| i | `i-1.mp3` | it | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-it.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-it.wav) |
+| ia | `ia-1.mp3` | ear | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-ear.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-ear.wav) |
+| ii | `ii-1.mp3` | he | Anh | Association Shtooka, Judith Franck | CC BY 3.0 us | [En-uk-he.ogg](https://commons.wikimedia.org/wiki/File:En-uk-he.ogg) |
+| m | `m-1.mp3` | mmm | Mỹ | Grendelkhan | CC0 | [LL-Q1860 (eng)-Grendelkhan-mmm.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Grendelkhan-mmm.wav) |
+| o | `o-1.mp3` | âm /ɒ/ | Anh | Peter Roach | CC BY-SA 4.0 | [PR-open back rounded vowel.ogg](https://commons.wikimedia.org/wiki/File:PR-open_back_rounded_vowel.ogg) |
+| o | `o-2.mp3` | on | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-on.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-on.wav) |
+| oi | `oi-1.mp3` | oy | Anh | Vealhurl | CC BY-SA 4.0 | [LL-Q1860 (eng)-Vealhurl-oy.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Vealhurl-oy.wav) |
+| oo | `oo-1.mp3` | or | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-or.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-or.wav) |
+| ou | `ou-1.mp3` | oh | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-oh.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-oh.wav) |
+| r | `r-1.mp3` | [ra] … [ara] | Mỹ | Erutuon | CC BY-SA 3.0 | [Alveolar approximant.ogg](https://commons.wikimedia.org/wiki/File:Alveolar_approximant.ogg) |
+| s | `s-1.mp3` | hiss | Mỹ | Wodencafe | CC0 | [LL-Q1860 (eng)-Wodencafe-hiss.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Wodencafe-hiss.wav) |
+| sh | `sh-1.mp3` | shh | Mỹ | Wodencafe | CC0 | [LL-Q1860 (eng)-Wodencafe-shh.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Wodencafe-shh.wav) |
+| ua | `ua-1.mp3` | âm /ʊə/ | Úc | Pvanp7 | CC0 | [LL-Q1860 (eng)-Pvanp7-ʊə (diphthong).wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Pvanp7-ʊə_(diphthong).wav) |
+| uh | `uh-1.mp3` | uh | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-uh.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-uh.wav) |
+| uu | `uu-1.mp3` | who | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-who.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-who.wav) |
+| v | `v-1.mp3` | [va] … [ava] | Anh | Peter Roach | CC BY-SA 4.0 | [PR-voiced labiodental fricative.ogg](https://commons.wikimedia.org/wiki/File:PR-voiced_labiodental_fricative.ogg) |

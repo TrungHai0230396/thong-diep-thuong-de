@@ -262,20 +262,22 @@ ok('mỗi khung là một tư thế khác nhau, không đứng yên',
    new Set(self.TDTD_PHATAM._khung(AM[2].kh, true).map(k => JSON.stringify(k.p))).size >= 3);
 
 console.log('\n— Bước đầu: NGƯỜI THẬT đọc chính cái âm, không phải từ, không phải máy dựng —');
-/* Hai bài học chồng lên nhau. Một: đo đúng phổ KHÔNG có nghĩa là tai người nghe ra — âm máy dựng
-   khớp 47 phép đo mà người dùng nghe không hiểu gì. Hai: thay nó bằng TỪ do máy đọc thì nghe được,
-   nhưng cả bài thành luyện từ, trong khi người học cần luyện chính cái âm /s/, /z/. Bản thu người
-   thật là cách duy nhất có cả giọng người lẫn âm đứng riêng. */
+/* Ba lần người dùng chê: âm máy dựng "khó hiểu" (dù khớp 47 phép đo phổ), máy đọc "đâu phải người
+   đọc", rồi bản thu mẫu ngữ âm của người không bản xứ "khó nghe, như máy đọc". Giờ mọi tiếng trong
+   trò này là bản thu người bản xứ, và mấy bài dưới canh để không tụt lại chỗ cũ. */
 const AN = require('../assets/amnguoi.js');
-self.TDTD_AMNGUOI = AN;
+const TN = require('../assets/tunguoi.js');
+self.TDTD_AMNGUOI = AN; self.TDTD_TUNGUOI = TN;
 const P = self.TDTD_PHATAM;
 ok('bước đầu dẫn bằng bản thu người thật',
    /Bước 1 — nghe người thật đọc âm này[\s\S]{0,300}pa-nguoi/.test(nguon));
 ok('bước đầu không còn nút âm máy dựng', !/data-am="1"/.test(nguon) && !/tách riêng \(tiếng máy dựng\)/.test(nguon));
-ok('từ do máy đọc vẫn còn, nhưng lùi xuống sau bản thu',
+ok('từ ví dụ vẫn còn, nhưng lùi xuống sau bản thu',
    /Bước 1 — nghe người thật[\s\S]{0,1500}<p class="pa-nhan">Trong từ<\/p>/.test(nguon));
-ok('vẫn nói rõ vì sao máy đọc không đọc được âm rời', /tên chữ cái Hy Lạp/.test(doc('amnguoi.js')));
-ok('bài nào cũng có ít nhất một âm do người thật đọc', AM.every(a => P._dsNguoi(a).length >= 1),
+ok('đọc từ thì lấy bản thu người thật trước, máy đọc chỉ là đường lùi',
+   /function doc\(chu, cham, iGiong, nut\) \{[\s\S]{0,120}banThu\(chu\)[\s\S]{0,300}docMay\(chu, cham, iGiong\)/.test(nguon)
+   && /function banThu\(chu\) \{[\s\S]{0,80}TDTD_TUNGUOI/.test(nguon));
+ok('bài nào cũng có ít nhất một âm trong bảng 44 âm', AM.every(a => P._dsNguoi(a).length >= 1),
    AM.filter(a => !P._dsNguoi(a).length).map(a => a.ipa).join(', '));
 ok('âm chính của bài đứng đầu và không bị tô là cái sai', AM.every(a => !P._dsNguoi(a)[0].startsWith('!')));
 const lCuoi = AM.find(a => a.ipa === '/l/ cuối');
@@ -284,37 +286,121 @@ ok('vế sai được tô riêng: /l/ cuối nói thành /n/', lCuoi && P._dsNgu
 ok('âm trùng nhau chỉ hiện một lần (cụm -ld: l-toi ở cả hai vế)',
    AM.every(a => new Set(P._dsNguoi(a).map(x => x.replace('!', ''))).size === P._dsNguoi(a).length));
 
-console.log('\n— Bản thu người thật: đủ file, đúng chỗ, có ghi công —');
-ok('đủ 22 âm', AN.DS.length === 22, `${AN.DS.length}`);
-ok('mã âm không trùng', new Set(AN.DS.map(x => x.ma)).size === AN.DS.length);
-ok('âm nào cũng có người thu, file gốc, lời gợi ý, và nói rõ bản thu đọc gì',
-   AN.DS.every(x => x.tacGia && /\.ogg$/.test(x.tep) && x.goiY.length > 10 && /^\[/.test(x.noi)));
-ok('âm hay lẫn khai báo đều có thật', AN.DS.every(x => x.doi.every(m => AN.tim(m))),
+console.log('\n— Bảng đủ 44 âm, chia nhóm như người Việt hay học —');
+const BON_TU = ['iː', 'ɪ', 'e', 'æ', 'ʌ', 'ɑː', 'ɒ', 'ɔː', 'ʊ', 'uː', 'ɜː', 'ə', 'eɪ', 'aɪ', 'ɔɪ', 'aʊ', 'əʊ', 'ɪə', 'eə', 'ʊə',
+  'p', 'b', 't', 'd', 'k', 'g', 'f', 'v', 'θ', 'ð', 's', 'z', 'ʃ', 'ʒ', 'h', 'tʃ', 'dʒ', 'm', 'n', 'ŋ', 'l', 'r', 'w', 'j'];
+ok('đủ 44 âm, đúng bộ ký hiệu', AN.DS.length === 44 && BON_TU.every(i => AN.DS.some(x => x.ipa === i)),
+   BON_TU.filter(i => !AN.DS.some(x => x.ipa === i)).join(' '));
+const dem = (n) => AN.DS.filter(x => x.nhom === n).length;
+ok('12 nguyên âm đơn, 8 nguyên âm đôi, 24 phụ âm', dem('don') === 12 && dem('doi') === 8 && dem('phu') === 24,
+   `${dem('don')} / ${dem('doi')} / ${dem('phu')}`);
+ok('mã âm không trùng', new Set(AN.DS.map(x => x.ma)).size === 44);
+ok('âm nào cũng có tên, cách đặt miệng, ba từ ví dụ có nghĩa',
+   AN.DS.every(x => x.ten && x.goiY.length > 15 && x.vd.length === 3 && x.vd.every(v => v.tu && v.nghia)));
+ok('âm hay lẫn khai báo đều có trong bảng', AN.DS.every(x => x.doi.every(m => AN.tim(m))),
    AN.DS.flatMap(x => x.doi.filter(m => !AN.tim(m))).join(', '));
-ok('mọi mã âm dùng trong các bài đều tìm được bản thu',
+ok('mọi mã âm dùng trong các bài sửa lỗi đều có trong bảng',
    AM.every(a => [].concat(a.am, a.am2 || []).every(m => AN.tim(m))),
    AM.flatMap(a => [].concat(a.am, a.am2 || []).filter(m => !AN.tim(m))).join(', '));
-/* Âm tắc (p, t, k...) cắt riêng ra chỉ còn một tiếng tách — không được có bản "chỉ âm". */
-const TAC = ['p', 'b', 't', 'd', 'k', 'g'];
-ok('âm tắc không có bản "chỉ âm"', AN.DS.filter(x => TAC.includes(x.ma)).every(x => !x.cat));
-ok('nguyên âm không có bản "chỉ âm" (cả file đã là âm đứng riêng)', AN.DS.filter(x => x.nhom === 'nguyen').every(x => !x.cat));
-ok('mốc cắt hợp lý: 0,1–0,4 giây, nằm trong nửa giây đầu',
-   AN.DS.filter(x => x.cat).every(x => x.cat[0] >= 0 && x.cat[1] <= .6 && x.cat[1] - x.cat[0] >= .1 && x.cat[1] - x.cat[0] <= .4));
-const thieu = AN.DS.flatMap(x => [AN.duongDan(x.ma), x.cat && AN.duongDan(x.ma, true)].filter(Boolean))
-  .filter(f => !fs.existsSync(path.join(__dirname, '..', f)));
-ok('file nào khai báo cũng có trên đĩa', thieu.length === 0, thieu.join(', '));
-ok('âm không có bản "chỉ âm" thì không trả về đường dẫn ma', AN.duongDan('p', true) === null);
-ok('/l/ cuối dùng bản thu /l/', AN.duongDan('l-toi') === 'assets/am/l.mp3');
-const ghiCong = fs.readFileSync(path.join(__dirname, '..', 'assets', 'am', 'NGUON.md'), 'utf8');
-ok('file ghi nguồn có đủ người thu, giấy phép, và từng file',
-   AN.tacGia().every(t => ghiCong.includes(t)) && ghiCong.includes('CC BY-SA 3.0')
-   && AN.DS.every(x => ghiCong.includes('`' + x.ma + '.mp3`')));
-ok('trên màn hình có ghi công người thu và giấy phép', /Tiếng người thật:/.test(nguon) && /GIAY_PHEP\.url/.test(nguon));
-ok('sw.js cất sẵn danh sách âm', /'assets\/amnguoi\.js'/.test(fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8')));
+const HUU = ['b', 'd', 'g', 'v', 'dh', 'z', 'zh', 'jh', 'm', 'n', 'ng', 'l', 'r', 'w', 'y'];
+ok('âm hữu thanh thì cổ rung, âm vô thanh thì không',
+   AN.DS.filter(x => x.nhom === 'phu').every(x => !!x.kh.rung === HUU.includes(x.ma)),
+   AN.DS.filter(x => x.nhom === 'phu' && !!x.kh.rung !== HUU.includes(x.ma)).map(x => x.ipa).join(' '));
+ok('chỉ ba âm mũi m n ŋ cho hơi lên mũi', AN.DS.filter(x => x.kh.mui).map(x => x.ma).sort().join() === 'm,n,ng');
+ok('âm tắc và tắc xát chạy hình kiểu chặn-rồi-nhả', AN.DS.filter(x => x.tac).map(x => x.ma).sort().join() === 'b,ch,d,g,jh,k,p,t');
+ok('nguyên âm đôi nào cũng có tư thế cuối và đường lướt trên sơ đồ',
+   AN.DS.filter(x => x.nhom === 'doi').every(x => x.kh2 && x.luot && x.luot.every(i => K.timNguyenAm(i))));
+ok('tắc xát có pha xát thứ hai', ['ch', 'jh'].every(m => AN.tim(m).kh2));
+const hinhAm = AN.DS.flatMap(x => [x.kh, x.kh2].filter(Boolean).map(kh => K.ve(kh, {}) + K.veMatTruoc(kh, {})));
+ok('cả 44 âm vẽ được hình nhìn thẳng và hình bên trong, không NaN', hinhAm.every(h => !/NaN|undefined/.test(h)));
+ok('sơ đồ nguyên âm: âm đơn tô đúng chỗ, âm đôi có mũi tên',
+   AN.DS.filter(x => x.nhom === 'don').every(x => K.veNguyenAm(x.ipa).includes(`>${x.ipa}</text>`))
+   && AN.DS.filter(x => x.nhom === 'doi').every(x => K.veNguyenAm(x.luot[0], x.luot[1]).includes('k-luot')));
+/* Lỗi người soát chỉ ra: đầu lưỡi các âm lợi chỉ lên tới mép răng (y≈122), cách gờ lợi 20 điểm ảnh
+   — nhìn như đặt lưỡi ở răng, đúng thói quen tiếng Việt mà bài muốn sửa. */
+const hoVom = (x) => { const N = K.tinh(x.kh), ch = K.CHO_CHAM[x.kh.chamO];
+  const q = N.mat.reduce((b, p) => Math.abs(p[0] - ch) < Math.abs(b[0] - ch) ? p : b); return q[1] - K.vomY(Math.min(ch, 190)); };
+ok('âm chạm lợi: đầu lưỡi lên sát gờ lợi', ['t', 'd', 'n', 'l'].every(m => hoVom(AN.tim(m)) < 4),
+   ['t', 'd', 'n', 'l'].map(m => m + ' ' + hoVom(AN.tim(m)).toFixed(1)).join(', '));
+ok('âm chạm vòm mềm: sau lưỡi lên sát vòm mềm', ['k', 'g', 'ng'].every(m => hoVom(AN.tim(m)) < 4),
+   ['k', 'g', 'ng'].map(m => m + ' ' + hoVom(AN.tim(m)).toFixed(1)).join(', '));
+ok('âm xát chừa khe hẹp, không chạm kín như âm tắc', hoVom(AN.tim('s')) > hoVom(AN.tim('t')) + 1.5,
+   `s hở ${hoVom(AN.tim('s')).toFixed(1)}, t hở ${hoVom(AN.tim('t')).toFixed(1)}`);
+const giua = K.tinh(K.tron(K.NGHI, AN.tim('t').kh, .5));
+ok('lưỡi rướn lên chỗ chạm DẦN DẦN, không giật bật giữa chừng',
+   giua.mat[4][1] > K.tinh(AN.tim('t').kh).mat[4][1] + 5 && giua.mat[4][1] < K.tinh(K.NGHI).mat[4][1] - 5);
+
+console.log('\n— Tiếng người bản xứ: đủ file, có ghi công, không còn bộ mẫu cũ —');
+const coTep = (f) => fs.existsSync(path.join(__dirname, '..', f.split('?')[0]));
+const banAm = AN.DS.flatMap(x => x.am);
+ok('bản thu chính cái âm: file nào khai báo cũng có', banAm.every(b => coTep(b.f)), banAm.filter(b => !coTep(b.f)).map(b => b.f).join(', '));
+ok('hầu hết các âm có bản thu chính cái âm', AN.DS.filter(x => x.am.length).length >= 25, `${AN.DS.filter(x => x.am.length).length}/44`);
+ok('bản thu nào cũng ghi nhãn, người đọc, giấy phép, link bản gốc',
+   banAm.every(b => b.nhan && b.phu && b.tacGia && b.giayPhep && /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/.test(b.nguon)));
+ok('không còn bộ mẫu cũ (người không bản xứ, đọc kiểu phòng thí nghiệm)',
+   !banAm.some(b => /Isotalo|Denelson/i.test(b.tacGia)) && !banAm.some(b => b.tacGia === 'Back ache' && /Uh - Vowel/.test(b.nguon)));
+const moiTu = new Set();
+AM.forEach(a => { a.tu.forEach(t => moiTu.add(t)); a.cap.forEach(c => { moiTu.add(c[0]); moiTu.add(c[1]); });
+  [a.tuA, a.tuB].filter(Boolean).forEach(t => moiTu.add(t));
+  if (a.do) { (a.do.tu || []).forEach(t => moiTu.add(t)); (a.do.cap || []).forEach(c => c.forEach(t => moiTu.add(t))); } });
+AN.DS.forEach(x => x.vd.forEach(v => moiTu.add(v.tu)));
+const tuThieu = [...moiTu].filter(t => !(TN.tim(t) || []).length);
+ok(`mọi từ trong trò (${moiTu.size} từ) đều có bản thu người thật`, !tuThieu.length, tuThieu.join(', '));
+const tepThieu = Object.values(TN.TU).flat().filter(b => !coTep(b.f));
+ok('file từ nào khai báo cũng có trên đĩa', !tepThieu.length, tepThieu.slice(0, 5).map(b => b.f).join(', '));
+ok('nhiều từ có từ hai giọng trở lên, cho bài luyện tai đổi giọng',
+   Object.values(TN.TU).filter(v => v.length >= 2).length >= 120, `${Object.values(TN.TU).filter(v => v.length >= 2).length} từ`);
+ok('giọng ghi rõ Mỹ / Anh / Úc / Canada', Object.values(TN.TU).flat().every(b => ['Mỹ', 'Anh', 'Úc', 'Canada'].includes(b.giong)));
+ok('cả hai thư mục có file ghi nguồn', coTep('assets/am/NGUON.md') && coTep('assets/tu/NGUON.md'));
+ok('trong app có màn ghi công người đọc và giấy phép', /function veNguon\(\)/.test(nguon) && /GIAY_PHEP_URL/.test(nguon));
+const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+ok('sw.js cất sẵn hai danh sách tiếng', /'assets\/amnguoi\.js'/.test(sw) && /'assets\/tunguoi\.js'/.test(sw));
 const trang = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-ok('trang nạp danh sách âm trước ipa.js', trang.indexOf('amnguoi.js') > 0 && trang.indexOf('amnguoi.js') < trang.indexOf('ipa.js'));
+ok('trang nạp hai danh sách tiếng trước ipa.js',
+   ['amnguoi.js', 'tunguoi.js'].every(f => trang.indexOf(f) > 0 && trang.indexOf(f) < trang.indexOf('ipa.js')));
 ok('mất mạng thì không đem trang HTML đi giải mã thành tiếng', /\/html\/i\.test\(r\.headers\.get\('content-type'\)/.test(nguon));
+ok('tải tiếng từ không được thì lùi về máy đọc chứ không im', /phatChuoi\(\[b\.f\], nut, \(\) => docMay\(/.test(nguon));
 ok('đóng sao giữa lúc đang thu thì tắt micro ngay', /function dong\(\) \{[\s\S]{0,160}if \(huyThu\) huyThu\(\)/.test(nguon));
+
+console.log('\n— Cặp từ đọc bằng CÙNG một người: giọng không được lộ đáp án —');
+/* Lỗi người soát tìm ra: bài luyện tai lấy bản thu theo TỪ, mà mỗi từ có tập người đọc riêng — "ship"
+   lúc nào cũng giọng Mỹ, "sip" lúc nào cũng giọng Anh. Nghe giọng là chọn đúng 8/8, không cần tai. */
+const ngNguoi = (t) => new Set((TN.tim(t) || []).map(b => b.nguoi));
+const capLuyen = AM.flatMap(a => a.cap.map(c => [c[0], c[1]]));
+const capKhong = capLuyen.filter(([x, y]) => ![...ngNguoi(x)].some(n => ngNguoi(y).has(n)));
+ok(`mọi cặp trong bài luyện tai (${capLuyen.length} cặp) có ít nhất một người đọc cả hai từ`, !capKhong.length,
+   capKhong.map(c => c.join('/')).join(', '));
+ok('mọi bản thu từ đều ghi mã người đọc', Object.values(TN.TU).flat().every(b => b.nguoi));
+ok('luyện tai đọc cặp bằng cùng một người', /function docLuot\(l\) \{ docCap\(am\.cap\[l\.c\]/.test(nguon));
+ok('không có người đọc chung thì dùng CÙNG một giọng máy cho cả hai từ', /function docCap[\s\S]{0,400}docMay\(cap\[ben\]/.test(nguon));
+ok('nút so hai âm cũng đọc bằng cùng một người', /chungNguoi\(c\[0\], c\[1\]\)/.test(nguon));
+const soCapThieu = AN.DS.flatMap(x => Object.entries(x.soCap || {}).filter(([m, c]) => !AN.tim(m) || !x.doi.includes(m)
+  || !c.every(t => (TN.tim(t) || []).length)).map(([m]) => x.ipa + '→' + m));
+ok('cặp so âm khai báo sẵn đều có bản thu và nằm trong danh sách âm hay lẫn', !soCapThieu.length, soCapThieu.join(', '));
+/* Bảng âm dùng ký hiệu Anh-Anh: từ nào Anh-Mỹ đọc khác thì giọng Anh phải lên trước, không thì
+   "car rồi hot" giọng Mỹ ra cùng một nguyên âm. */
+ok('từ Anh-Mỹ đọc khác nhau thì giọng Anh lên trước', /function banThu[\s\S]{0,400}'Anh': 0/.test(nguon));
+const khacGiong = Object.keys(TN.IPA).filter(t => TN.IPA[t][0] !== TN.IPA[t][1] && (TN.tim(t) || []).length);
+const coAnh = khacGiong.filter(t => TN.tim(t).some(b => b.giong === 'Anh'));
+ok('phần lớn từ có Anh-Mỹ khác nhau có ít nhất một bản giọng Anh', coAnh.length >= khacGiong.length * .7,
+   `${coAnh.length}/${khacGiong.length}; thiếu: ${khacGiong.filter(t => !coAnh.includes(t)).join(' ')}`);
+ok('đường dẫn tiếng mang dấu nội dung (?v=) để bộ nhớ đệm không phát bản cũ',
+   Object.values(TN.TU).flat().concat(banAm).every(b => /\?v=[0-9a-f]{8}$/.test(b.f)));
+ok('sw.js giữ tiếng đã nghe trong kho riêng, không xoá khi deploy', /const TIENG = /.test(sw) && /x !== V && x !== TIENG/.test(sw));
+ok('tải tiếng lỗi thì sw.js không trả index.html thay mp3', /laTieng\(new URL\(e\.request\.url\)\)\) \{[\s\S]{0,500}return;\s*\}/.test(sw));
+
+console.log('\n— Phiên âm quốc tế dưới mỗi từ —');
+const thieuPA = [...moiTu].filter(t => !TN.ipa(t));
+ok('từ nào cũng có phiên âm Anh-Anh và Anh-Mỹ', !thieuPA.length && [...moiTu].every(t => TN.ipa(t).every(Boolean)), thieuPA.join(', '));
+ok('ghi theo lối từ điển người học: e chứ không ɛ, r chứ không ɹ, không dấu chấm, không dấu nối',
+   Object.values(TN.IPA).flat().every(x => !/[ɛɹɡ.ˌ͡]/.test(x) && /^\/.+\/$/.test(x)));
+ok('từ một âm tiết không ghi trọng âm', Object.values(TN.IPA).flat().every(x => !x.includes('ˈ') || (x.match(/[iɪeæɑɒɔəɜɝɚʌʊuoa]+ː?/g) || []).length > 1));
+ok('đúng nghĩa đang dùng: "live" trong leave/live là /lɪv/ cả hai giọng', TN.ipa('live').every(x => x === '/lɪv/'));
+ok('ví dụ của /ʊə/ có /ʊə/ thật trong phiên âm Anh-Anh',
+   AN.tim('ua').vd.every(v => TN.ipa(v.tu)[0].includes('ʊə')), AN.tim('ua').vd.map(v => v.tu + ' ' + TN.ipa(v.tu)[0]).join(', '));
+ok('khác giọng thì ghi cả hai: hot /hɒt/ · Mỹ /hɑːt/', TN.ipa('hot')[0] === '/hɒt/' && TN.ipa('hot')[1] === '/hɑːt/');
+const choPA = (nguon.match(/phienAm\(/g) || []).length;
+ok('phiên âm hiện ở mọi chỗ có từ: bước 1, hình, bước 4, cặp từ, luyện tai, máy đo, màn từng âm', choPA >= 9, `${choPA} chỗ`);
 
 console.log('\n— Nói theo: gọt tiếng bạn vừa thu —');
 const SRT = 16000;
@@ -379,7 +465,7 @@ ok('không loại nhầm giọng tử tế',
    reDua ? ['Samantha', 'Alex', 'Ava', 'Allison'].filter(n => reDua.test(n)).join(', ') : '');
 ok('gom nhiều giọng chứ không lấy mỗi một, để bài nghe đổi giọng được',
    /dsGiong = xep[\s\S]{0,80}slice\(0, 5\)/.test(nguon));
-ok('mỗi lượt nghe gắn một giọng', /doc\(am\.cap\[l\.c\]\[l\.b \? 0 : 1\], true, l\.g\)/.test(nguon));
+ok('mỗi lượt nghe gắn một người đọc, chung cho cả hai từ của cặp', /docCap\(am\.cap\[l\.c\], l\.b \? 0 : 1, l\.g/.test(nguon));
 
 console.log('\n— Chấm lượt nói: chỉ xét phương án máy xếp đầu —');
 /* Lỗi người dùng gặp: nói "books" đúng, màn hình hiện máy nghe ra "books", mà vẫn đếm 0/5.
