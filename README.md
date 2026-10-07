@@ -1298,6 +1298,43 @@ Làm lại toàn bộ tiếng: `python3 scripts/lam-tieng-nguoi.py`. Kiểm: `py
 `content/tu-ipa.json`. Ghi công từng file: `assets/am/NGUON.md`, `assets/tu/NGUON.md`, và màn
 "Nguồn tiếng đọc" trong app.
 
+## "Phần phát âm cuối từ review lại UI/UX chưa? Chưa có chỗ nói thử xem máy có nghe được mình nói gì không"
+
+**Nói thử.** Phần nhận giọng có từ trước, nhưng giấu ở bước 5, dưới dòng "Hoặc thử cách khác", trông như
+thẻ chữ, bấm vào lại sang một màn khác — và màn đó chỉ cho nói từ ĐẦU của cặp. Giờ là một khối "Nói thử —
+máy nghe ra chữ gì?" dùng chung, đặt ở ba chỗ: đầu bước 5 của mỗi bài, màn của từng âm trong bảng 44 âm, và
+một mục riêng ở đầu danh sách (nói từ hay câu bất kỳ). Chọn từ, bấm micro, máy ghi ra chữ nó nghe được và nói
+rõ: đúng từ / nghe thành từ kia trong cặp / không khớp, kèm mấy chữ nó còn phân vân và các lượt đã nói. So
+khớp NGUYÊN từ, không so "gần giống" ("bucks" gần "books" lắm nhưng là từ khác), có tính từ đồng âm thật và
+chữ số ("write" mà máy ghi "right", "five" mà máy ghi "5" vẫn là đúng).
+
+**Soát giao diện năm bài âm cuối** — ba người soát độc lập (người mới học, sư phạm, tương tác), mỗi phát
+hiện có người kiểm chứng lại; 36 trên 40 phát hiện là thật. Đã sửa:
+
+1. **Luyện tai lộ đáp án qua thứ tự.** Lịch cũ tính vế bằng `i < 4` và cặp bằng `floor(i/2)`, nên bài có 3
+   cặp thì cặp thứ hai LUÔN ra từ đầu, cặp thứ ba LUÔN ra từ sau, có từ không bao giờ được phát — nhớ cặp là
+   đúng, khỏi cần tai. Hỏng ở cả 8 bài có 3 cặp, không riêng bài âm cuối. Giờ cặp nào cũng ra đủ hai từ, đúng
+   4/4; bài kiểm đã thử đưa lịch cũ trở lại và bắt được ngay. Chọn sai thì dừng lại cho nghe hai từ cạnh nhau
+   rồi mới sang lượt; hết 8 lượt thì liệt kê các lượt nghe nhầm để nghe lại.
+2. **Dạy âm cuối bằng âm đầu.** Bước 1 bài /k/ /g/ cuối phát "[ga] … [aga]", bài /f/ /v/ cuối phát "[fa] …
+   [afa]" và minh hoạ cái sai bằng "pen" (p đầu từ) cùng tiếng máy "pơ". Giờ bước 1 dùng từ có âm đó ở CUỐI
+   (back/bag, wife/wipe, hat/had); bài /f/ /v/ có thêm hai cặp thật wife/wipe và safe/save (tải thêm bản thu,
+   cùng người đọc cả hai từ) nên có luyện tai và nói thử, thôi là ngõ cụt.
+3. **Năm bài nói khác nhau về âm hữu thanh cuối từ.** Người bản xứ đọc /d g z v/ cuối từ rung rất ít; cái tai
+   nghe ra là nguyên âm TRƯỚC dài hơn ("had" dài hơn "hat"). Cả năm bài giờ nói đúng điều đó.
+4. **Hình động âm tắc cuối từ** nhả bằng cách há hàm như thêm "ơ" — đúng lỗi "hat-ơ" bài dặn tránh. Giờ đi
+   từ nguyên âm đứng trước, chặn, rồi nhả nhẹ.
+5. **Máy đo đuôi s chấm "Đạt" khi nói "ice" thay "eyes"** — nó không tách được /s/ với /z/. Giờ chỉ đo các
+   từ đuôi /s/, và nói thẳng giới hạn đó. Đo xong có thêm "▶ Nghe lại tiếng bạn" và "Mẫu rồi tới bạn".
+6. Tương tác: mở bài trên điện thoại thì bước 1 hiện ở tận đáy (không cuộn về đầu); nút micro báo "Đang
+   nghe…" khi hộp xin quyền còn hiện; micro đang thu mà vẫn phát mẫu được (máy đo chấm luôn tiếng mẫu); hai
+   phần dùng micro chạy chồng nhau; iPhone gạt im lặng thì mọi nút ▶ câm (giờ xin phiên âm thanh "playback"
+   như Nhạc ngủ); xong bài thì về đầu danh sách (giờ có "bài tiếp"); bước 4 lặp y hệt bước 1 (giờ là nghe
+   so từng cặp); bài đuôi s thiếu quy tắc /s/ /z/ /ɪz/; bài /l/ cuối không dạy "l tối".
+
+Công cụ chọn bản thu trước đây nằm ở thư mục tạm và mất khi máy khởi động lại; phần thêm từ mới giờ nằm
+trong repo: `python3 scripts/them-tu-nguoi.py <từ...> --cap a/b ...`.
+
 ## Cấu trúc
 
 ```
@@ -1356,7 +1393,7 @@ node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 43 kiểm thử thần số học
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 158 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 182 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 python3 scripts/kiem-tieng-nguoi.py  # đo lại ~700 file tiếng người (cần ffmpeg, numpy); thêm --nghe để máy nghe lại từng từ

@@ -1859,7 +1859,7 @@ const TU = {
 "tacGia": "Dvortygirl"
 },
 {
-"f": "assets/tu/her-3.mp3?v=cbd5b26f",
+"f": "assets/tu/her-3.mp3?v=9b4609cc",
 "giayPhep": "CC BY-SA 4.0",
 "giong": "Anh",
 "nguoi": "Back ache",
@@ -5443,6 +5443,40 @@ const TU = {
 "tacGia": "Association Shtooka, Judith Franck"
 }
 ],
+"wife": [
+{
+"f": "assets/tu/wife-1.mp3?v=11ea4a58",
+"giayPhep": "CC0",
+"giong": "Mỹ",
+"nguoi": "Grendelkhan",
+"nguon": "https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Grendelkhan-wife.wav",
+"tacGia": "Grendelkhan"
+},
+{
+"f": "assets/tu/wife-2.mp3?v=a48f7da4",
+"giayPhep": "CC BY-SA 3.0",
+"giong": "Mỹ",
+"nguoi": "Dvortygirl",
+"nguon": "https://commons.wikimedia.org/wiki/File:En-us-wife.ogg",
+"tacGia": "Dvortygirl"
+},
+{
+"f": "assets/tu/wife-3.mp3?v=fc7f812e",
+"giayPhep": "CC0",
+"giong": "Mỹ",
+"nguoi": "Wodencafe",
+"nguon": "https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Wodencafe-wife.wav",
+"tacGia": "Wodencafe"
+},
+{
+"f": "assets/tu/wife-4.mp3?v=879e28e1",
+"giayPhep": "CC BY-SA 4.0",
+"giong": "Anh",
+"nguoi": "Back ache",
+"nguon": "https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-wife.wav",
+"tacGia": "Back ache"
+}
+],
 "wine": [
 {
 "f": "assets/tu/wine-1.mp3?v=2318866e",
@@ -5475,6 +5509,24 @@ const TU = {
 "nguoi": "Wodencafe",
 "nguon": "https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Wodencafe-wine.wav",
 "tacGia": "Wodencafe"
+}
+],
+"wipe": [
+{
+"f": "assets/tu/wipe-1.mp3?v=b9adb81f",
+"giayPhep": "CC0",
+"giong": "Mỹ",
+"nguoi": "Grendelkhan",
+"nguon": "https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Grendelkhan-wipe.wav",
+"tacGia": "Grendelkhan"
+},
+{
+"f": "assets/tu/wipe-2.mp3?v=b92c632f",
+"giayPhep": "CC BY-SA 3.0",
+"giong": "Mỹ",
+"nguoi": "Dvortygirl",
+"nguon": "https://commons.wikimedia.org/wiki/File:En-us-wipe.ogg",
+"tacGia": "Dvortygirl"
 }
 ],
 "work": [
@@ -5684,12 +5736,14 @@ const TU = {
 }
 ]
 };
-const IPA = {"about": ["/əˈbaʊt/", "/əˈbaʊt/"], "air": ["/eə/", "/er/"], "apple": ["/ˈæpəl/", "/ˈæpəl/"], "back": ["/bæk/", "/bæk/"], "bad": ["/bæd/", "/bæd/"], "bag": ["/bæg/", "/bæg/"], "ball": ["/bɔːl/", "/bɔːl/"], "banana": ["/bəˈnɑːnə/", "/bəˈnænə/"], "bat": ["/bæt/", "/bæt/"], "bed": ["/bed/", "/bed/"], "bee": ["/biː/", "/biː/"], "big": ["/bɪg/", "/bɪg/"], "bird": ["/bɜːd/", "/bɝːd/"], "blue": ["/bluː/", "/bluː/"], "book": ["/bʊk/", "/bʊk/"], "books": ["/bʊks/", "/bʊks/"], "box": ["/bɒks/", "/bɑːks/"], "boy": ["/bɔɪ/", "/bɔɪ/"], "bus": ["/bʌs/", "/bʌs/"], "buy": ["/baɪ/", "/baɪ/"], "call": ["/kɔːl/", "/kɔːl/"], "car": ["/kɑː/", "/kɑːr/"], "care": ["/keə/", "/ker/"], "cat": ["/kæt/", "/kæt/"], "cats": ["/kæts/", "/kæts/"], "chair": ["/tʃeə/", "/tʃer/"], "cheap": ["/tʃiːp/", "/tʃiːp/"], "chip": ["/tʃɪp/", "/tʃɪp/"], "coal": ["/kəʊl/", "/koʊl/"], "coin": ["/kɔɪn/", "/kɔɪn/"], "cold": ["/kəʊld/", "/koʊld/"], "cool": ["/kuːl/", "/kuːl/"], "cup": ["/kʌp/", "/kʌp/"], "day": ["/deɪ/", "/deɪ/"], "dog": ["/dɒg/", "/dɔːg/"], "dogs": ["/dɒgz/", "/dɔːgz/"], "ear": ["/ɪə/", "/ɪr/"], "eat": ["/iːt/", "/iːt/"], "eyes": ["/aɪz/", "/aɪz/"], "famous": ["/ˈfeɪməs/", "/ˈfeɪməs/"], "fat": ["/fæt/", "/fæt/"], "father": ["/ˈfɑːðə/", "/ˈfɑːðɚ/"], "fee": ["/fiː/", "/fiː/"], "feel": ["/fiːl/", "/fiːl/"], "feet": ["/fiːt/", "/fiːt/"], "find": ["/faɪnd/", "/faɪnd/"], "fine": ["/faɪn/", "/faɪn/"], "fish": ["/fɪʃ/", "/fɪʃ/"], "fit": ["/fɪt/", "/fɪt/"], "five": ["/faɪv/", "/faɪv/"], "food": ["/fuːd/", "/fuːd/"], "full": ["/fʊl/", "/fʊl/"], "funny": ["/ˈfʌni/", "/ˈfʌni/"], "glass": ["/glɑːs/", "/glæs/"], "go": ["/gəʊ/", "/goʊ/"], "good": ["/gʊd/", "/gʊd/"], "grass": ["/grɑːs/", "/græs/"], "had": ["/hæd/", "/hæd/"], "hand": ["/hænd/", "/hænd/"], "hat": ["/hæt/", "/hæt/"], "he": ["/hiː/", "/hiː/"], "her": ["/hɜː/", "/hɝː/"], "here": ["/hɪə/", "/hɪr/"], "home": ["/həʊm/", "/hoʊm/"], "hot": ["/hɒt/", "/hɑːt/"], "house": ["/haʊs/", "/haʊs/"], "ice": ["/aɪs/", "/aɪs/"], "it": ["/ɪt/", "/ɪt/"], "jam": ["/dʒæm/", "/dʒæm/"], "job": ["/dʒɒb/", "/dʒɑːb/"], "jump": ["/dʒʌmp/", "/dʒʌmp/"], "key": ["/kiː/", "/kiː/"], "king": ["/kɪŋ/", "/kɪŋ/"], "last": ["/lɑːst/", "/læst/"], "leaf": ["/liːf/", "/liːf/"], "leave": ["/liːv/", "/liːv/"], "leg": ["/leg/", "/leg/"], "life": ["/laɪf/", "/laɪf/"], "light": ["/laɪt/", "/laɪt/"], "like": ["/laɪk/", "/laɪk/"], "live": ["/lɪv/", "/lɪv/"], "long": ["/lɒŋ/", "/lɔːŋ/"], "look": ["/lʊk/", "/lʊk/"], "love": ["/lʌv/", "/lʌv/"], "low": ["/ləʊ/", "/loʊ/"], "made": ["/meɪd/", "/meɪd/"], "make": ["/meɪk/", "/meɪk/"], "man": ["/mæn/", "/mæn/"], "me": ["/miː/", "/miː/"], "measure": ["/ˈmeʒə/", "/ˈmeʒɚ/"], "men": ["/men/", "/men/"], "moon": ["/muːn/", "/muːn/"], "more": ["/mɔː/", "/mɔːr/"], "mother": ["/ˈmʌðə/", "/ˈmʌðɚ/"], "mouth": ["/maʊθ/", "/maʊθ/"], "my": ["/maɪ/", "/maɪ/"], "name": ["/neɪm/", "/neɪm/"], "near": ["/nɪə/", "/nɪr/"], "night": ["/naɪt/", "/naɪt/"], "no": ["/nəʊ/", "/noʊ/"], "now": ["/naʊ/", "/naʊ/"], "out": ["/aʊt/", "/aʊt/"], "pack": ["/pæk/", "/pæk/"], "park": ["/pɑːk/", "/pɑːrk/"], "pat": ["/pæt/", "/pæt/"], "pea": ["/piː/", "/piː/"], "pen": ["/pen/", "/pen/"], "people": ["/ˈpiːpəl/", "/ˈpiːpəl/"], "pick": ["/pɪk/", "/pɪk/"], "pie": ["/paɪ/", "/paɪ/"], "pig": ["/pɪg/", "/pɪg/"], "pin": ["/pɪn/", "/pɪn/"], "played": ["/pleɪd/", "/pleɪd/"], "price": ["/praɪs/", "/praɪs/"], "prize": ["/praɪz/", "/praɪz/"], "problem": ["/ˈprɒbləm/", "/ˈprɑːbləm/"], "pull": ["/pʊl/", "/pʊl/"], "red": ["/red/", "/red/"], "rice": ["/raɪs/", "/raɪs/"], "ride": ["/raɪd/", "/raɪd/"], "right": ["/raɪt/", "/raɪt/"], "room": ["/ruːm/", "/ruːm/"], "run": ["/rʌn/", "/rʌn/"], "safe": ["/seɪf/", "/seɪf/"], "save": ["/seɪv/", "/seɪv/"], "saw": ["/sɔː/", "/sɔː/"], "school": ["/skuːl/", "/skuːl/"], "sea": ["/siː/", "/siː/"], "seat": ["/siːt/", "/siːt/"], "see": ["/siː/", "/siː/"], "she": ["/ʃiː/", "/ʃiː/"], "sheep": ["/ʃiːp/", "/ʃiːp/"], "sheet": ["/ʃiːt/", "/ʃiːt/"], "ship": ["/ʃɪp/", "/ʃɪp/"], "shoe": ["/ʃuː/", "/ʃuː/"], "sin": ["/sɪn/", "/sɪn/"], "sing": ["/sɪŋ/", "/sɪŋ/"], "sink": ["/sɪŋk/", "/sɪŋk/"], "sip": ["/sɪp/", "/sɪp/"], "sit": ["/sɪt/", "/sɪt/"], "size": ["/saɪz/", "/saɪz/"], "sky": ["/skaɪ/", "/skaɪ/"], "sofa": ["/ˈsəʊfə/", "/ˈsoʊfə/"], "spin": ["/spɪn/", "/spɪn/"], "star": ["/stɑː/", "/stɑːr/"], "stop": ["/stɒp/", "/stɑːp/"], "street": ["/striːt/", "/striːt/"], "sue": ["/suː/", "/suː/"], "sun": ["/sʌn/", "/sʌn/"], "sure": ["/ʃʊə/", "/ʃʊr/"], "tea": ["/tiː/", "/tiː/"], "teacher": ["/ˈtiːtʃə/", "/ˈtiːtʃɚ/"], "television": ["/ˈtelɪvɪʒən/", "/ˈteləvɪʒən/"], "tell": ["/tel/", "/tel/"], "ten": ["/ten/", "/ten/"], "thank": ["/θæŋk/", "/θæŋk/"], "they": ["/ðeɪ/", "/ðeɪ/"], "think": ["/θɪŋk/", "/θɪŋk/"], "this": ["/ðɪs/", "/ðɪs/"], "three": ["/θriː/", "/θriː/"], "time": ["/taɪm/", "/taɪm/"], "top": ["/tɒp/", "/tɑːp/"], "tour": ["/tʊə/", "/tʊr/"], "tourist": ["/ˈtʊərɪst/", "/ˈtʊrəst/"], "toy": ["/tɔɪ/", "/tɔɪ/"], "tree": ["/triː/", "/triː/"], "turn": ["/tɜːn/", "/tɝːn/"], "usually": ["/ˈjuːʒʊəli/", "/ˈjuːʒuəli/"], "van": ["/væn/", "/væn/"], "very": ["/ˈveri/", "/ˈveri/"], "vest": ["/vest/", "/vest/"], "vine": ["/vaɪn/", "/vaɪn/"], "vote": ["/vəʊt/", "/voʊt/"], "wash": ["/wɒʃ/", "/wɑːʃ/"], "watch": ["/wɒtʃ/", "/wɑːtʃ/"], "way": ["/weɪ/", "/weɪ/"], "we": ["/wiː/", "/wiː/"], "week": ["/wiːk/", "/wiːk/"], "well": ["/wel/", "/wel/"], "west": ["/west/", "/west/"], "wet": ["/wet/", "/wet/"], "when": ["/wen/", "/wen/"], "wine": ["/waɪn/", "/waɪn/"], "work": ["/wɜːk/", "/wɝːk/"], "write": ["/raɪt/", "/raɪt/"], "yellow": ["/ˈjeləʊ/", "/ˈjeloʊ/"], "yes": ["/jes/", "/jes/"], "you": ["/juː/", "/juː/"], "zebra": ["/ˈzebrə/", "/ˈziːbrə/"], "zero": ["/ˈzɪərəʊ/", "/ˈzɪroʊ/"]};
+const IPA = {"about": ["/əˈbaʊt/", "/əˈbaʊt/"], "air": ["/eə/", "/er/"], "apple": ["/ˈæpəl/", "/ˈæpəl/"], "back": ["/bæk/", "/bæk/"], "bad": ["/bæd/", "/bæd/"], "bag": ["/bæg/", "/bæg/"], "ball": ["/bɔːl/", "/bɔːl/"], "banana": ["/bəˈnɑːnə/", "/bəˈnænə/"], "bat": ["/bæt/", "/bæt/"], "bed": ["/bed/", "/bed/"], "bee": ["/biː/", "/biː/"], "big": ["/bɪg/", "/bɪg/"], "bird": ["/bɜːd/", "/bɝːd/"], "blue": ["/bluː/", "/bluː/"], "book": ["/bʊk/", "/bʊk/"], "books": ["/bʊks/", "/bʊks/"], "box": ["/bɒks/", "/bɑːks/"], "boy": ["/bɔɪ/", "/bɔɪ/"], "bus": ["/bʌs/", "/bʌs/"], "buy": ["/baɪ/", "/baɪ/"], "call": ["/kɔːl/", "/kɔːl/"], "car": ["/kɑː/", "/kɑːr/"], "care": ["/keə/", "/ker/"], "cat": ["/kæt/", "/kæt/"], "cats": ["/kæts/", "/kæts/"], "chair": ["/tʃeə/", "/tʃer/"], "cheap": ["/tʃiːp/", "/tʃiːp/"], "chip": ["/tʃɪp/", "/tʃɪp/"], "coal": ["/kəʊl/", "/koʊl/"], "coin": ["/kɔɪn/", "/kɔɪn/"], "cold": ["/kəʊld/", "/koʊld/"], "cool": ["/kuːl/", "/kuːl/"], "cup": ["/kʌp/", "/kʌp/"], "day": ["/deɪ/", "/deɪ/"], "dog": ["/dɒg/", "/dɔːg/"], "dogs": ["/dɒgz/", "/dɔːgz/"], "ear": ["/ɪə/", "/ɪr/"], "eat": ["/iːt/", "/iːt/"], "eyes": ["/aɪz/", "/aɪz/"], "famous": ["/ˈfeɪməs/", "/ˈfeɪməs/"], "fat": ["/fæt/", "/fæt/"], "father": ["/ˈfɑːðə/", "/ˈfɑːðɚ/"], "fee": ["/fiː/", "/fiː/"], "feel": ["/fiːl/", "/fiːl/"], "feet": ["/fiːt/", "/fiːt/"], "find": ["/faɪnd/", "/faɪnd/"], "fine": ["/faɪn/", "/faɪn/"], "fish": ["/fɪʃ/", "/fɪʃ/"], "fit": ["/fɪt/", "/fɪt/"], "five": ["/faɪv/", "/faɪv/"], "food": ["/fuːd/", "/fuːd/"], "full": ["/fʊl/", "/fʊl/"], "funny": ["/ˈfʌni/", "/ˈfʌni/"], "glass": ["/glɑːs/", "/glæs/"], "go": ["/gəʊ/", "/goʊ/"], "good": ["/gʊd/", "/gʊd/"], "grass": ["/grɑːs/", "/græs/"], "had": ["/hæd/", "/hæd/"], "hand": ["/hænd/", "/hænd/"], "hat": ["/hæt/", "/hæt/"], "he": ["/hiː/", "/hiː/"], "her": ["/hɜː/", "/hɝː/"], "here": ["/hɪə/", "/hɪr/"], "home": ["/həʊm/", "/hoʊm/"], "hot": ["/hɒt/", "/hɑːt/"], "house": ["/haʊs/", "/haʊs/"], "ice": ["/aɪs/", "/aɪs/"], "it": ["/ɪt/", "/ɪt/"], "jam": ["/dʒæm/", "/dʒæm/"], "job": ["/dʒɒb/", "/dʒɑːb/"], "jump": ["/dʒʌmp/", "/dʒʌmp/"], "key": ["/kiː/", "/kiː/"], "king": ["/kɪŋ/", "/kɪŋ/"], "last": ["/lɑːst/", "/læst/"], "leaf": ["/liːf/", "/liːf/"], "leave": ["/liːv/", "/liːv/"], "leg": ["/leg/", "/leg/"], "life": ["/laɪf/", "/laɪf/"], "light": ["/laɪt/", "/laɪt/"], "like": ["/laɪk/", "/laɪk/"], "live": ["/lɪv/", "/lɪv/"], "long": ["/lɒŋ/", "/lɔːŋ/"], "look": ["/lʊk/", "/lʊk/"], "love": ["/lʌv/", "/lʌv/"], "low": ["/ləʊ/", "/loʊ/"], "made": ["/meɪd/", "/meɪd/"], "make": ["/meɪk/", "/meɪk/"], "man": ["/mæn/", "/mæn/"], "me": ["/miː/", "/miː/"], "measure": ["/ˈmeʒə/", "/ˈmeʒɚ/"], "men": ["/men/", "/men/"], "moon": ["/muːn/", "/muːn/"], "more": ["/mɔː/", "/mɔːr/"], "mother": ["/ˈmʌðə/", "/ˈmʌðɚ/"], "mouth": ["/maʊθ/", "/maʊθ/"], "my": ["/maɪ/", "/maɪ/"], "name": ["/neɪm/", "/neɪm/"], "near": ["/nɪə/", "/nɪr/"], "night": ["/naɪt/", "/naɪt/"], "no": ["/nəʊ/", "/noʊ/"], "now": ["/naʊ/", "/naʊ/"], "out": ["/aʊt/", "/aʊt/"], "pack": ["/pæk/", "/pæk/"], "park": ["/pɑːk/", "/pɑːrk/"], "pat": ["/pæt/", "/pæt/"], "pea": ["/piː/", "/piː/"], "pen": ["/pen/", "/pen/"], "people": ["/ˈpiːpəl/", "/ˈpiːpəl/"], "pick": ["/pɪk/", "/pɪk/"], "pie": ["/paɪ/", "/paɪ/"], "pig": ["/pɪg/", "/pɪg/"], "pin": ["/pɪn/", "/pɪn/"], "played": ["/pleɪd/", "/pleɪd/"], "price": ["/praɪs/", "/praɪs/"], "prize": ["/praɪz/", "/praɪz/"], "problem": ["/ˈprɒbləm/", "/ˈprɑːbləm/"], "pull": ["/pʊl/", "/pʊl/"], "red": ["/red/", "/red/"], "rice": ["/raɪs/", "/raɪs/"], "ride": ["/raɪd/", "/raɪd/"], "right": ["/raɪt/", "/raɪt/"], "room": ["/ruːm/", "/ruːm/"], "run": ["/rʌn/", "/rʌn/"], "safe": ["/seɪf/", "/seɪf/"], "save": ["/seɪv/", "/seɪv/"], "saw": ["/sɔː/", "/sɔː/"], "school": ["/skuːl/", "/skuːl/"], "sea": ["/siː/", "/siː/"], "seat": ["/siːt/", "/siːt/"], "see": ["/siː/", "/siː/"], "she": ["/ʃiː/", "/ʃiː/"], "sheep": ["/ʃiːp/", "/ʃiːp/"], "sheet": ["/ʃiːt/", "/ʃiːt/"], "ship": ["/ʃɪp/", "/ʃɪp/"], "shoe": ["/ʃuː/", "/ʃuː/"], "sin": ["/sɪn/", "/sɪn/"], "sing": ["/sɪŋ/", "/sɪŋ/"], "sink": ["/sɪŋk/", "/sɪŋk/"], "sip": ["/sɪp/", "/sɪp/"], "sit": ["/sɪt/", "/sɪt/"], "size": ["/saɪz/", "/saɪz/"], "sky": ["/skaɪ/", "/skaɪ/"], "sofa": ["/ˈsəʊfə/", "/ˈsoʊfə/"], "spin": ["/spɪn/", "/spɪn/"], "star": ["/stɑː/", "/stɑːr/"], "stop": ["/stɒp/", "/stɑːp/"], "street": ["/striːt/", "/striːt/"], "sue": ["/suː/", "/suː/"], "sun": ["/sʌn/", "/sʌn/"], "sure": ["/ʃʊə/", "/ʃʊr/"], "tea": ["/tiː/", "/tiː/"], "teacher": ["/ˈtiːtʃə/", "/ˈtiːtʃɚ/"], "television": ["/ˈtelɪvɪʒən/", "/ˈteləvɪʒən/"], "tell": ["/tel/", "/tel/"], "ten": ["/ten/", "/ten/"], "thank": ["/θæŋk/", "/θæŋk/"], "they": ["/ðeɪ/", "/ðeɪ/"], "think": ["/θɪŋk/", "/θɪŋk/"], "this": ["/ðɪs/", "/ðɪs/"], "three": ["/θriː/", "/θriː/"], "time": ["/taɪm/", "/taɪm/"], "top": ["/tɒp/", "/tɑːp/"], "tour": ["/tʊə/", "/tʊr/"], "tourist": ["/ˈtʊərɪst/", "/ˈtʊrəst/"], "toy": ["/tɔɪ/", "/tɔɪ/"], "tree": ["/triː/", "/triː/"], "turn": ["/tɜːn/", "/tɝːn/"], "usually": ["/ˈjuːʒʊəli/", "/ˈjuːʒuəli/"], "van": ["/væn/", "/væn/"], "very": ["/ˈveri/", "/ˈveri/"], "vest": ["/vest/", "/vest/"], "vine": ["/vaɪn/", "/vaɪn/"], "vote": ["/vəʊt/", "/voʊt/"], "wash": ["/wɒʃ/", "/wɑːʃ/"], "watch": ["/wɒtʃ/", "/wɑːtʃ/"], "way": ["/weɪ/", "/weɪ/"], "we": ["/wiː/", "/wiː/"], "week": ["/wiːk/", "/wiːk/"], "well": ["/wel/", "/wel/"], "west": ["/west/", "/west/"], "wet": ["/wet/", "/wet/"], "when": ["/wen/", "/wen/"], "wife": ["/waɪf/", "/waɪf/"], "wine": ["/waɪn/", "/waɪn/"], "wipe": ["/waɪp/", "/waɪp/"], "work": ["/wɜːk/", "/wɝːk/"], "write": ["/raɪt/", "/raɪt/"], "yellow": ["/ˈjeləʊ/", "/ˈjeloʊ/"], "yes": ["/jes/", "/jes/"], "you": ["/juː/", "/juː/"], "zebra": ["/ˈzebrə/", "/ˈziːbrə/"], "zero": ["/ˈzɪərəʊ/", "/ˈzɪroʊ/"]};
 const GIAY_PHEP_URL = {"CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0/", "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/", "CC BY 3.0": "https://creativecommons.org/licenses/by/3.0/", "CC BY 3.0 us": "https://creativecommons.org/licenses/by/3.0/us/", "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/", "CC BY 2.5": "https://creativecommons.org/licenses/by/2.5/", "CC BY-SA 2.5": "https://creativecommons.org/licenses/by-sa/2.5/", "CC0": "https://creativecommons.org/publicdomain/zero/1.0/", "Public domain": ""};
+/* Từ đồng âm thật và chữ số: phần nói thử chấm khớp nguyên từ, mà máy nhận giọng hay ghi "five" thành "5", "see" thành "sea". */
+const DONG = {"bee": ["b", "be"], "buy": ["by", "bye"], "eye": ["i", "aye"], "feet": ["feat"], "five": ["5"], "hear": ["here"], "here": ["hear"], "know": ["no"], "made": ["maid"], "night": ["knight"], "no": ["know"], "pea": ["p", "pee"], "red": ["read"], "right": ["write", "rite"], "sea": ["c", "see"], "see": ["c", "sea"], "shoe": ["shoo"], "sun": ["son"], "tea": ["t", "tee"], "ten": ["10"], "three": ["3"], "too": ["two", "to", "2"], "way": ["weigh"], "week": ["weak"], "whale": ["wail"], "wine": ["whine"], "write": ["right", "rite"], "zero": ["0"]};
 const chuan = (chu) => String(chu || '').toLowerCase().trim();
 function tim(chu) { return TU[chuan(chu)] || null; }
 function ipa(chu) { return IPA[chuan(chu)] || null; }
-const api = { TU, IPA, GIAY_PHEP_URL, tim, ipa };
+const api = { TU, IPA, GIAY_PHEP_URL, DONG, tim, ipa };
 if (typeof module !== 'undefined' && module.exports) module.exports = api;
 else root.TDTD_TUNGUOI = api;
 })(typeof self !== 'undefined' ? self : this);

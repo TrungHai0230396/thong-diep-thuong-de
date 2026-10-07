@@ -6703,6 +6703,48 @@
    "nguoi": "Judith Franck"
   }
  ],
+ "wife": [
+  {
+   "tep": "LL-Q1860 (eng)-Grendelkhan-wife.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/LL-Q1860_%28eng%29-Grendelkhan-wife.wav?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "giayPhep": "CC0",
+   "tacGia": "Grendelkhan",
+   "giong": "Mỹ",
+   "nghe": "Wife.",
+   "snr": 56.5,
+   "nguoi": "Grendelkhan"
+  },
+  {
+   "tep": "En-us-wife.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/7a/En-us-wife.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "giayPhep": "CC BY-SA 3.0",
+   "tacGia": "Dvortygirl",
+   "giong": "Mỹ",
+   "nghe": "Wife.",
+   "snr": 33.6,
+   "nguoi": "Dvortygirl"
+  },
+  {
+   "tep": "LL-Q1860 (eng)-Wodencafe-wife.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/LL-Q1860_%28eng%29-Wodencafe-wife.wav?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "giayPhep": "CC0",
+   "tacGia": "Wodencafe",
+   "giong": "Mỹ",
+   "nghe": "Wife.",
+   "snr": 40.1,
+   "nguoi": "Wodencafe"
+  },
+  {
+   "tep": "LL-Q1860 (eng)-Back ache-wife.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/LL-Q1860_%28eng%29-Back_ache-wife.wav?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "giayPhep": "CC BY-SA 4.0",
+   "tacGia": "Back ache",
+   "giong": "Anh",
+   "nghe": "WIFE",
+   "snr": 65.3,
+   "nguoi": "Back ache"
+  }
+ ],
  "wine": [
   {
    "tep": "en-us-wine.ogg",
@@ -6743,6 +6785,28 @@
    "nghe": "Wine.",
    "snr": 44.6,
    "nguoi": "Wodencafe"
+  }
+ ],
+ "wipe": [
+  {
+   "tep": "LL-Q1860 (eng)-Grendelkhan-wipe.wav",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/LL-Q1860_%28eng%29-Grendelkhan-wipe.wav?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "giayPhep": "CC0",
+   "tacGia": "Grendelkhan",
+   "giong": "Mỹ",
+   "nghe": "Wipe.",
+   "snr": 62.5,
+   "nguoi": "Grendelkhan"
+  },
+  {
+   "tep": "En-us-wipe.ogg",
+   "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/En-us-wipe.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+   "giayPhep": "CC BY-SA 3.0",
+   "tacGia": "Dvortygirl",
+   "giong": "Mỹ",
+   "nghe": "Wipe",
+   "snr": 35.9,
+   "nguoi": "Dvortygirl"
   }
  ],
  "work": [

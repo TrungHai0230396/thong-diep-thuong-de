@@ -163,6 +163,10 @@ def main():
     os.makedirs(goc, exist_ok=True)
     am44, am_nguoi = doc_json('am44.json'), doc_json('am-nguoi.json')
     tu_nguoi, tu_ipa = doc_json('tu-nguoi.json'), doc_json('tu-ipa.json')
+    # content/dong-am.json có cả mấy chữ chỉ máy nghe Whisper hay viết ("thank you", "eh" cho air giọng Anh) —
+    # không đưa mấy chữ đó vào app, app chỉ cần từ đồng âm thật và chữ số
+    CHI_WHISPER = {'thank', 'air', 'hair', 'park', 'he', 'tell', 'pack'}
+    dong_that = {k: v for k, v in doc_json('dong-am.json').items() if k != '_' and k not in CHI_WHISPER}
 
     bang_am, dong_am = dung(am_nguoi, 'am', goc, lambda k, i: f'{k}-{i}.mp3')
     bang_tu, dong_tu = dung(tu_nguoi, 'tu', goc, lambda k, i: f'{k}-{i}.mp3')
@@ -191,10 +195,12 @@ def main():
           f"const TU = {json.dumps(bang_tu, ensure_ascii=False, indent=0, sort_keys=True)};\n"
           f"const IPA = {json.dumps({k: [v['anh'], v['my']] for k, v in sorted(tu_ipa.items())}, ensure_ascii=False)};\n"
           f"const GIAY_PHEP_URL = {json.dumps(GIAY_PHEP_URL, ensure_ascii=False)};\n"
+          "/* Từ đồng âm thật và chữ số: phần nói thử chấm khớp nguyên từ, mà máy nhận giọng hay ghi \"five\" thành \"5\", \"see\" thành \"sea\". */\n"
+          f"const DONG = {json.dumps(dong_that, ensure_ascii=False, sort_keys=True)};\n"
           "const chuan = (chu) => String(chu || '').toLowerCase().trim();\n"
           "function tim(chu) { return TU[chuan(chu)] || null; }\n"
           "function ipa(chu) { return IPA[chuan(chu)] || null; }\n"
-          "const api = { TU, IPA, GIAY_PHEP_URL, tim, ipa };\n"
+          "const api = { TU, IPA, GIAY_PHEP_URL, DONG, tim, ipa };\n"
           "if (typeof module !== 'undefined' && module.exports) module.exports = api;\n"
           "else root.TDTD_TUNGUOI = api;\n"
           "})(typeof self !== 'undefined' ? self : this);\n")

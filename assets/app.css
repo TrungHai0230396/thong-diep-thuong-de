@@ -378,7 +378,14 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-the-chu b{font-weight:500;font-size:14.5px}
 .pa-the-chu i{font-style:normal;font-size:12px;line-height:1.5;color:var(--ink-dim)}
 .pa-sao{flex:0 0 auto;font-size:8px;letter-spacing:2px;color:rgba(232,195,122,.55)}
-.pa-do-nhan{position:absolute;top:7px;right:10px;font-size:9.5px;letter-spacing:.06em;color:rgba(150,205,160,.8)}
+.pa-do-nhan{display:inline-block;margin-top:3px;padding:1px 7px;border-radius:999px;font-size:10px;letter-spacing:.04em;border:1px solid rgba(150,205,160,.35);color:rgba(150,205,160,.9)}
+.pa-tai-sai{margin:10px 0 0}
+.pa-tai-sai[hidden]{display:none}
+.pa-tai-cap{display:flex;gap:8px;margin:0 0 8px}
+.pa-tai-cap .pa-le-phat{padding:10px}
+.pa-le-phat.that{border-color:rgba(150,205,160,.6)}
+.pa-tai-tiep{width:100%}
+.pa-ve-ds{margin-top:10px;font-size:12.5px;color:var(--ink-dim)}
 .pa-the{position:relative}
 .pa-noithu{margin-left:auto;flex:0 0 auto;padding:6px 12px;border-radius:999px;cursor:pointer;font-size:12.5px;
   border:1px solid rgba(232,195,122,.45);background:rgba(232,195,122,.1);color:#f0c48a}
@@ -583,6 +590,30 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-chon-nut .pa-pa{font-size:14px;margin-top:4px}
 .pa-nut-am .pa-pa,.pa-doi-nut .pa-pa{font-size:12.5px}
 .pa-do-nghe .pa-pa{display:inline;margin-left:5px}
+/* nói thử: máy nghe ra chữ gì */
+.pa-nt{border-color:rgba(232,195,122,.38)}
+.pa-nt-chon{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0}
+.pa-nt-tu{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:64px;cursor:pointer;padding:7px 11px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);background:transparent;color:var(--ink-dim)}
+.pa-nt-tu b{font-weight:500;font-size:14.5px;color:var(--ink)}
+.pa-nt-tu .pa-pa{font-size:11px}
+.pa-nt-tu.dang{border-color:rgba(232,195,122,.7);background:rgba(232,195,122,.16)}
+.pa-nt-mau{display:block;margin:0 auto 10px}
+.pa-nt-mic{margin-bottom:6px}
+.pa-nt-canh{margin:6px 0 2px;color:#f0c48a}
+.pa-nt-kqs:empty{display:none}
+.pa-nt-kq{margin:4px 0 10px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.pa-nt-kq b{display:block;font-size:16px;font-weight:500;color:var(--ink)}
+.pa-nt-kq .pa-pa{margin:1px 0 4px}
+.pa-nt-kq span{display:block;margin-top:3px;font-size:13px;line-height:1.6;color:var(--ink)}
+.pa-nt-kq i{display:block;margin-top:5px;font-style:normal;font-size:12px;color:var(--ink-dim)}
+.pa-nt-kq.dung{border-color:rgba(150,205,160,.5);background:rgba(150,205,160,.1)}
+.pa-nt-kq.dung span{color:#bfe2c6}
+.pa-nt-kq.sai{border-color:rgba(226,140,134,.45);background:rgba(226,140,134,.08)}
+.pa-nt-kq.sai span{color:#f0bcb8}
+.pa-nt-kq.loi{border-style:dashed}
+.pa-nt-kq.loi b{font-size:13.5px;color:var(--ink-dim)}
+.pa-nt-vao{border-color:rgba(232,195,122,.45);background:rgba(232,195,122,.1);margin-bottom:6px}
 /* thẻ thông tin thiên thể trong bầu trời đêm */
 .td-the{position:absolute;z-index:6;left:50%;transform:translateX(-50%);
   bottom:calc(96px + var(--safe-b));width:min(92vw,340px);

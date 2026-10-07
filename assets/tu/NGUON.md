@@ -643,10 +643,16 @@ Làm lại: `python3 scripts/lam-tieng-nguoi.py`. Kiểm: `python3 scripts/kiem-
 | when | `when-2.mp3` |  | Mỹ | Dvortygirl | CC BY-SA 3.0 | [en-us-when.ogg](https://commons.wikimedia.org/wiki/File:en-us-when.ogg) |
 | when | `when-3.mp3` |  | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-When.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-When.wav) |
 | when | `when-4.mp3` |  | Anh | Association Shtooka, Judith Franck | CC BY 3.0 us | [En-uk-when.ogg](https://commons.wikimedia.org/wiki/File:En-uk-when.ogg) |
+| wife | `wife-1.mp3` |  | Mỹ | Grendelkhan | CC0 | [LL-Q1860 (eng)-Grendelkhan-wife.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Grendelkhan-wife.wav) |
+| wife | `wife-2.mp3` |  | Mỹ | Dvortygirl | CC BY-SA 3.0 | [En-us-wife.ogg](https://commons.wikimedia.org/wiki/File:En-us-wife.ogg) |
+| wife | `wife-3.mp3` |  | Mỹ | Wodencafe | CC0 | [LL-Q1860 (eng)-Wodencafe-wife.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Wodencafe-wife.wav) |
+| wife | `wife-4.mp3` |  | Anh | Back ache | CC BY-SA 4.0 | [LL-Q1860 (eng)-Back ache-wife.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Back_ache-wife.wav) |
 | wine | `wine-1.mp3` |  | Mỹ | Dvortygirl | CC BY-SA 3.0 | [en-us-wine.ogg](https://commons.wikimedia.org/wiki/File:en-us-wine.ogg) |
 | wine | `wine-2.mp3` |  | Mỹ | Naomi Persephone Amethyst | CC BY-SA 4.0 | [LL-Q1860 (eng)-Naomi Persephone Amethyst (NaomiAmethyst)-wine.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Naomi_Persephone_Amethyst_(NaomiAmethyst)-wine.wav) |
 | wine | `wine-3.mp3` |  | Mỹ | Grendelkhan | CC0 | [LL-Q1860 (eng)-Grendelkhan-wine.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Grendelkhan-wine.wav) |
 | wine | `wine-4.mp3` |  | Mỹ | Wodencafe | CC0 | [LL-Q1860 (eng)-Wodencafe-wine.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Wodencafe-wine.wav) |
+| wipe | `wipe-1.mp3` |  | Mỹ | Grendelkhan | CC0 | [LL-Q1860 (eng)-Grendelkhan-wipe.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Grendelkhan-wipe.wav) |
+| wipe | `wipe-2.mp3` |  | Mỹ | Dvortygirl | CC BY-SA 3.0 | [En-us-wipe.ogg](https://commons.wikimedia.org/wiki/File:En-us-wipe.ogg) |
 | work | `work-1.mp3` |  | Mỹ | Naomi Persephone Amethyst | CC BY-SA 4.0 | [LL-Q1860 (eng)-Naomi Persephone Amethyst (NaomiAmethyst)-work.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Naomi_Persephone_Amethyst_(NaomiAmethyst)-work.wav) |
 | work | `work-2.mp3` |  | Mỹ | Grendelkhan | CC0 | [LL-Q1860 (eng)-Grendelkhan-work.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Grendelkhan-work.wav) |
 | work | `work-3.mp3` |  | Mỹ | Wodencafe | CC0 | [LL-Q1860 (eng)-Wodencafe-work.wav](https://commons.wikimedia.org/wiki/File:LL-Q1860_(eng)-Wodencafe-work.wav) |

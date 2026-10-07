@@ -389,6 +389,56 @@ ok('đường dẫn tiếng mang dấu nội dung (?v=) để bộ nhớ đệm 
 ok('sw.js giữ tiếng đã nghe trong kho riêng, không xoá khi deploy', /const TIENG = /.test(sw) && /x !== V && x !== TIENG/.test(sw));
 ok('tải tiếng lỗi thì sw.js không trả index.html thay mp3', /laTieng\(new URL\(e\.request\.url\)\)\) \{[\s\S]{0,500}return;\s*\}/.test(sw));
 
+console.log('\n— Nói thử: máy nghe ra chữ gì —');
+/* Người dùng: "chưa có chỗ nói thử để xem máy có nghe được mình nói gì không". Phần nhận giọng có, nhưng
+   giấu ở bước 5 dưới "Hoặc thử cách khác", sang màn khác, và chỉ cho nói từ đầu của cặp. */
+const SC = P._soChu;
+ok('nói đúng từ thì là đúng', SC('books', 'books', 'book') === 'dung' && SC(' Books. ', 'books', 'book') === 'dung');
+ok('máy nghe thành từ kia của cặp thì báo đúng như vậy', SC('book', 'books', 'book') === 'ban');
+ok('so khớp NGUYÊN từ, không so gần giống: "bucks" không phải "books"', SC('bucks', 'books', 'book') === 'khac');
+ok('từ đồng âm thật vẫn tính đúng: máy ghi "right" cho "write"', SC('right', 'write', 'ride') === 'dung');
+ok('máy ghi chữ số vẫn tính đúng: "5" cho "five"', SC('5', 'five') === 'dung');
+ok('máy không nghe ra gì thì không tính đúng', SC('', 'books', 'book') === 'rong');
+ok('nói tự do (không có từ định nói) thì chỉ ghi ra chữ', SC('hello there', null) === 'tudo');
+ok('bước 5 đặt phần nói thử LÊN ĐẦU, không còn "Hoặc thử cách khác"',
+   /tới lượt bạn: nói thử<\/p>\s*\$\{veNoiThu\(\)\}/.test(nguon) && !/pa-hoac">Hoặc thử cách khác/.test(nguon));
+ok('không còn màn cặp từ riêng chỉ cho nói từ đầu', !/function veCap\(/.test(nguon) && !/function moCap\(/.test(nguon));
+ok('màn từng âm và đầu danh sách đều có chỗ nói thử', /taoNoiThu\('le:'/.test(nguon) && /pa-nt-vao/.test(nguon) && /function veNoiTuDo/.test(nguon));
+ok('báo lỗi micro rõ từng loại', ['not-allowed', 'service-not-allowed', 'no-speech', 'network'].every(e => nguon.includes("'" + e + "'")));
+ok('nói thử và máy đo không mở micro chồng nhau', /if \(dangThu \|\| dangThuLe\)/.test(nguon) && /if \(dangNghe\) \{ baoDo/.test(nguon));
+ok('nút micro chỉ bảo "nói đi" khi micro đã thật sự mở', /onaudiostart/.test(nguon) && /Đang mở micro…/.test(nguon));
+
+console.log('\n— Luyện tai: lịch chia đều, không lộ đáp án qua thứ tự —');
+/* Lỗi cả ba người soát cùng thấy: lịch cũ tính vế bằng i < 4 và cặp bằng floor(i/2), nên bài có 3 cặp
+   thì cặp thứ hai luôn ra từ đầu, cặp thứ ba luôn ra từ sau — nhớ cặp là đoán đúng, có từ không bao giờ được phát. */
+let lichHong = [];
+for (const a of AM.filter(x => x.cap.length)) {
+  for (let lan = 0; lan < 20; lan++) {
+    const l = P._xepLich(a);
+    const A = l.filter(x => x.b).length;
+    const moiCap = a.cap.map((_, c) => [l.some(x => x.c === c && x.b), l.some(x => x.c === c && !x.b)]);
+    if (A !== 4 || (a.cap.length <= 4 && moiCap.some(([x, y]) => !x || !y))) { lichHong.push(a.ipa); break; }
+  }
+}
+ok('cặp nào cũng phát cả hai từ, đúng 4 lượt từ này 4 lượt từ kia', !lichHong.length, lichHong.join(', '));
+ok('chọn sai thì dừng lại cho nghe lại hai từ, không tự nhảy', /Chọn sai thì DỪNG lại/.test(nguon) && /pa-tai-tiep/.test(nguon));
+
+console.log('\n— Năm bài âm cuối: dạy đúng chỗ CUỐI từ —');
+const cuoi = AM.filter(a => a.nhom === 'Cuối từ');
+ok('bài nào cũng có cặp tối thiểu thật để luyện tai và nói thử', cuoi.every(a => a.cap.length >= 2 && a.kiemDuoc),
+   cuoi.filter(a => a.cap.length < 2).map(a => a.ipa).join(', '));
+ok('từ dưới hình có âm đó ở CUỐI từ (vd hat/had, back/bag, wife/wipe)', cuoi.every(a => a.tuA && a.tuB),
+   cuoi.filter(a => !a.tuB).map(a => a.ipa).join(', '));
+ok('bài hai âm có đủ hai hình (âm này, âm kia)', cuoi.every(a => a.kh2 && a.nhan1 && a.nhan2));
+ok('nói đúng điều người bản xứ làm: ở cuối từ, khác nhau ở độ dài nguyên âm trước',
+   ['/s/ /z/ cuối', '/t/ /d/ cuối', '/k/ /g/ cuối', '/f/ /v/ cuối'].every(n => /dài hơn/.test(AM.find(a => a.ipa === n).cach)));
+ok('bài đuôi s nói đủ ba cách đọc /s/ /z/ /ɪz/', /\/ɪz\//.test(AM.find(a => a.ipa === '/s/ /z/ cuối').viSao));
+ok('máy đo đuôi s chỉ dùng từ đuôi /s/ (nó không tách được /s/ với /z/)', AM.find(a => a.ipa === '/s/ /z/ cuối').do.tu.every(t => /s$/.test(t) && !/(es|gs|ys)$/.test(t)));
+ok('hình động âm tắc cuối từ không há hàm như thêm "ơ"', /kieu === 'cuoi'/.test(nguon) && /khungHinh\(a\.kh, a\.tac, a\.kieu\)/.test(nguon));
+ok('bước 1 bài âm cuối không minh hoạ bằng bản thu âm ở đầu từ ([ga] … [aga])', /cuoiTu = a\.nhom === 'Cuối từ'/.test(nguon));
+
+ok('bước 4 không lặp lại khối "Trong từ" của bước 1: bài có cặp thì nghe so từng cặp', /nghe so từng cặp/.test(nguon) && /data-socap/.test(nguon));
+
 console.log('\n— Phiên âm quốc tế dưới mỗi từ —');
 const thieuPA = [...moiTu].filter(t => !TN.ipa(t));
 ok('từ nào cũng có phiên âm Anh-Anh và Anh-Mỹ', !thieuPA.length && [...moiTu].every(t => TN.ipa(t).every(Boolean)), thieuPA.join(', '));
@@ -441,7 +491,7 @@ ok('hình thứ hai cũng có từ, trừ chỗ lỗi không đẻ ra từ nào'
 ok('nút dưới hình đọc từ bằng giọng người', /data-hinh="\$\{thu\}" data-t=/.test(nguon)
    && /if \(n\.dataset\.t\) doc\(n\.dataset\.t, true/.test(nguon));
 ok('chỗ không có từ thì ghi rõ là tiếng máy dựng', /▶ nghe \(tiếng máy dựng\)/.test(nguon));
-ok('có nói cho người dùng biết đó là giọng người', /Hai nút dưới hình đọc từ thật bằng giọng người/.test(nguon));
+ok('có nói cho người dùng biết đó là giọng người', /dưới hình đọc từ thật bằng giọng người/.test(nguon));
 /* Từ minh hoạ phải đúng cái âm hình đang vẽ, nên không lấy bừa cặp đầu tiên: cặp đầu của
    /s/ /z/ cuối là books/book (rụng đuôi), còn hai hình thì vẽ /s/ với /z/. */
 const tuKhac = AM.filter(a => a.tuB && a.tuA !== a.tuB);
