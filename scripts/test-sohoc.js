@@ -118,6 +118,19 @@ console.log('\n— Theo họ tên —');
   ok('mọi số tên có thể ra đều có lời giảng', [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22].every(k => S.NET[k]));
 }
 
+console.log('\n— Ý nghĩa từng ô, và tên bù cho ngày sinh —');
+{
+  ok('đủ ý nghĩa cho chín ô của lưới', [1, 2, 3, 4, 5, 6, 7, 8, 9].every(k => typeof S.Y_O[k] === 'string' && S.Y_O[k].length > 10));
+  /* Người dùng hỏi "1 8 9 là gì, ở đâu ra": tên "Hải" đổi từng chữ ra số H 8, A 1, I 9 — không cộng */
+  ok('biểu đồ tên "Hải": đúng ba ô 8 (H), 1 (A), 9 (I)', S.bieuDoTen('Hải').join('') === '0100000011');
+  const ngay = S.bieuDo(19, 8, 1991);                    // 1, 9, 8, 1, 9, 9, 1
+  ok('ngày sinh 19/8/1991 đã có sẵn 1, 8, 9 nên tên "Hải" không bù thêm ô nào', S.tenBu(ngay, S.bieuDoTen('Hải')).length === 0);
+  ok('tên "Phong" (P 7, H 8, O 6, N 5, G 7) bù cho ngày sinh đó ba ô 5, 6, 7', S.tenBu(ngay, S.bieuDoTen('Phong')).join() === '5,6,7');
+  const r = S.chiSoTen('Hồ Trung Hải');
+  ok('còn ba chỉ số Linh hồn, Nhân cách, Sứ mệnh tính trên CẢ họ tên: 1, 3, 4', r.linhHon.so === 1 && r.nhanCach.so === 3 && r.suMenh.so === 4,
+     `${r.linhHon.buoc} | ${r.nhanCach.buoc} | ${r.suMenh.buoc}`);
+}
+
 console.log('\n— Lời giảng có đủ —');
 ok('mỗi số chủ đạo có tên, thế mạnh và điều nên để ý', [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 22].every(n => S.Y_CHU_DAO[n] && S.Y_CHU_DAO[n].manh && S.Y_CHU_DAO[n].yeu));
 ok('mỗi năm cá nhân 1–9 có lời giảng', [1, 2, 3, 4, 5, 6, 7, 8, 9].every(n => S.Y_NAM[n]));

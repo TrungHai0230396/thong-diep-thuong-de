@@ -69,6 +69,13 @@ function dsMuiTen(mt) {
       ${!mt.day.length && !mt.trong.length ? '<p class="xn-rong">Không có hàng nào đầy hay trống cả ba ô, nên không có mũi tên nào.</p>' : ''}`;
 }
 
+/* Danh sách các ô có số và nghĩa của nó. chu: chữ cái làm ra số đó (biểu đồ tên), để thấy số từ đâu ra. */
+function yNghiaCacO(dem, X, chu) {
+  const co = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(k => dem[k]);
+  if (!co.length) return '';
+  return `<ul class="ts-y-o">${co.map(k => `<li><b>${String(k).repeat(dem[k])}</b>${chu && chu[k] ? `<i>${chu[k].join(', ')}</i>` : ''} ${esc(X.Y_O[k])}</li>`).join('')}</ul>`;
+}
+
 /* ---------- theo họ tên ---------- */
 
 function veTen() {
@@ -78,6 +85,9 @@ function veTen() {
   if (!r.tu.length) { o.innerHTML = hoTen ? '<p class="xn-rong">Chưa đọc được chữ cái nào trong tên này.</p>' : ''; return; }
   const goi = (tenGoi || '').trim() || hoTen.trim().split(/\s+/).pop();
   const demTen = X.bieuDoTen(goi), demNgay = X.bieuDo(sinh.dd, sinh.mm, sinh.yy), demTong = X.tongHop(demNgay, demTen);
+  const chuTen = X.tachTu(goi).flatMap(w => X.tachChu(w)), chuTheoSo = {};
+  for (const x of chuTen) (chuTheoSo[x.so] = chuTheoSo[x.so] || []).push(x.c);
+  const bu = X.tenBu(demNgay, demTen), conTrong = [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(k => !demTong[k]);
   o.innerHTML = `
     <div class="ts-chu-so">${r.tu.map(w => `
       <p><b>${esc(w.tu)}</b> ${w.chu.map(x => `<span class="${x.nguyenAm ? 'na' : ''}">${x.c}<sub>${x.so}</sub></span>`).join('')}</p>`).join('')}
@@ -96,11 +106,19 @@ function veTen() {
     }).join('')}
     <p class="ts-nhom">Biểu đồ tên "${esc(goi)}"</p>
     ${luoi(demTen, X)}
+    <p class="ts-giai">Mỗi chữ cái của tên thường gọi "${esc(goi)}" đổi ra một số rồi đặt vào đúng ô của số đó — <b>không cộng lại</b>:
+      ${chuTen.map(x => `${x.c} → ${x.so}`).join(', ')}.</p>
+    <p class="ts-giai">Khác ba số tròn ở trên: Linh hồn, Nhân cách, Sứ mệnh là <b>tổng</b> các chữ của cả họ tên khai sinh, cộng tới khi còn một chữ số.
+      Biểu đồ tên thì giữ riêng từng chữ của tên bạn được gọi hằng ngày. Theo các trang thần số học, biểu đồ ngày sinh là tố chất
+      bẩm sinh, còn biểu đồ tên là cách bạn thể hiện mình ra ngoài, hình thành qua trải nghiệm.</p>
+    ${yNghiaCacO(demTen, X, chuTheoSo)}
     <p class="ts-nhom">Biểu đồ tổng hợp (ngày sinh + tên "${esc(goi)}")</p>
     ${luoi(demTong, X)}
-    ${dsMuiTen(X.muiTen(demTong))}
-    <p class="xn-ghi">Biểu đồ tên lấy theo tên bạn được gọi hằng ngày; biểu đồ tổng hợp cộng nó với biểu đồ ngày sinh.
-      Ba chỉ số ở trên tính trên họ tên khai sinh đầy đủ.</p>`;
+    <p class="ts-giai">${bu.length
+      ? `Tên lấp vào ô ngày sinh còn trống: <b>${bu.join(', ')}</b> (${bu.map(k => esc(X.Y_O[k])).join('; ')}). Các trang thần số học gọi là tên "bù" cho ngày sinh.`
+      : 'Tên không lấp thêm ô trống nào của ngày sinh — các số trong tên đều đã có sẵn trong ngày sinh.'}
+      ${conTrong.length ? `Vẫn còn trống: ${conTrong.join(', ')}.` : 'Đủ cả chín ô.'}</p>
+    ${dsMuiTen(X.muiTen(demTong))}`;
 }
 
 /* ---------- kết quả ---------- */
@@ -134,6 +152,7 @@ function veKetQua() {
       <p class="xn-tieu">Biểu đồ ngày sinh</p>
       ${luoi(dem, X)}
       <p class="xn-ghi ts-giua">Mỗi chữ số trong ngày sinh vào đúng ô của nó; số 0 không vào lưới. Ô mờ là số không có.</p>
+      ${yNghiaCacO(dem, X)}
       ${dsMuiTen(mt)}
     </section>
 

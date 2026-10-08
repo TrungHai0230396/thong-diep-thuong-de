@@ -744,7 +744,7 @@ Lời giảng các con số viết lại bằng lời của app, ngắn, nói c�
 - Biểu đồ tên lấy theo **tên thường gọi** (tracuuthansohoc.com); để trống thì lấy chữ cuối của họ tên.
 - Có trang đưa ví dụ tính sai chính luật của nó (cộng Y như nguyên âm dù đứng cạnh U) — không dùng ví dụ đó. Chỉ số phụ âm có nơi gọi "Nhân cách", có nơi gọi "Biểu đạt"; app dùng "Nhân cách".
 
-`scripts/test-sohoc.js`, 43 bài: các ví dụ có lời giải trong nguồn (19/8/1991 ra 11; 29/11/1994 và 11/2/1985 ra 9; năm cá nhân của người sinh 31/1 các năm 2022–2026 và 27/2 các năm 2018–2020; chân kim tự tháp của 1/5/1974 và 10/5/2001; số 11 đỉnh đầu 25 tuổi), và các tính chất trên cả 40.542 ngày từ 1920 tới 2030: không có số chủ đạo 1, 22/4 khi và chỉ khi tổng bằng 22, năm cá nhân luôn 1–9, đỉnh 1 và 2 luôn một chữ số. Phần họ tên: hai ví dụ có lời giải ở trên, luật chữ Y trên 10 tên, Đ ra D, giữ 11 (Tuấn, Hương 29 → 11) và 22/4 (Hạnh), tên không có nguyên âm hay không có chữ cái nào.
+`scripts/test-sohoc.js`, 48 bài: các ví dụ có lời giải trong nguồn (19/8/1991 ra 11; 29/11/1994 và 11/2/1985 ra 9; năm cá nhân của người sinh 31/1 các năm 2022–2026 và 27/2 các năm 2018–2020; chân kim tự tháp của 1/5/1974 và 10/5/2001; số 11 đỉnh đầu 25 tuổi), và các tính chất trên cả 40.542 ngày từ 1920 tới 2030: không có số chủ đạo 1, 22/4 khi và chỉ khi tổng bằng 22, năm cá nhân luôn 1–9, đỉnh 1 và 2 luôn một chữ số. Phần họ tên: hai ví dụ có lời giải ở trên, luật chữ Y trên 10 tên, Đ ra D, giữ 11 (Tuấn, Hương 29 → 11) và 22/4 (Hạnh), tên không có nguyên âm hay không có chữ cái nào.
 
 ## Nhạc ngủ
 
@@ -778,6 +778,14 @@ Ngôi sao hình trăng lưỡi liềm, `#nhac-ngu`. Chọn một âm, hẹn gi�
 - Đóng trang là tắt nhạc, để không có âm chạy ngầm mà không ai thấy.
 
 `scripts/test-ngu.js`, 53 bài: phổ ồn hồng bằng nhau ở mọi quãng tám 63 Hz–4 kHz (lệch 0,2 dB), ồn nâu dốc −3,3 dB năng lượng mỗi quãng tám; nhịp hai tai đúng 250/253 Hz, không lẫn kênh (59–61 dB); hợp âm có đủ sáu nốt theo 432 Hz và không có 440; nhịp sóng tự tương quan 0,97 ở 10 giây, đúng 8 đỉnh, không bao giờ im hẳn; nhạc 60 phách, mọi nốt trên phách, chỉ năm nốt ngũ cung; mọi âm nối đuôi vào đầu không có tiếng "tách" (xét cả từng mẫu lẫn độ to từng khung 20 ms); lịch nhỏ dần chạy qua một bộ mô phỏng AudioParam theo luật Web Audio ra đúng đường âm lượng, cả khi kéo dài giữa chừng; đường worker. Đã thử phá cố ý (bỏ phần "làm ấm" bộ lọc; bỏ một bước trong lịch): bài kiểm bắt được cả hai. `scripts/test-sao.js` thêm ba tình huống tự cập nhật lúc đang phát nhạc ngủ.
+
+### "1 8 9 là gì, ở đâu ra — sao ở trên là 3, 4"
+
+Người dùng nhìn biểu đồ tên "Hải" mà không hiểu các số từ đâu ra, cũng không hiểu sao ba số tròn ở trên lại là 1, 3, 4. Hai thứ tính khác nhau mà app không nói: ba chỉ số Linh hồn, Nhân cách, Sứ mệnh là **tổng** các chữ của cả họ tên khai sinh, rút về một chữ số (Hồ Trung Hải: nguyên âm 19 → 10 → 1, phụ âm 39 → 12 → 3, cả tên 58 → 13 → 4); còn biểu đồ tên giữ **riêng từng chữ** của tên thường gọi, mỗi số vào ô của nó (Hải: H → 8, A → 1, I → 9). Giờ ngay dưới biểu đồ tên có dòng đổi chữ ra số, câu nói rõ khác ba chỉ số ở chỗ nào, và **nghĩa của từng ô có số** kèm chữ cái làm ra nó; dưới biểu đồ ngày sinh cũng có nghĩa các ô; dưới biểu đồ tổng hợp nói tên **lấp vào ô nào** ngày sinh còn trống ("tên bù cho ngày sinh") và ô nào vẫn trống.
+
+Nghĩa chín ô (`Y_O` trong `sohoc.js`) chỉ lấy chỗ hai nguồn nhất trí — tracuuthansohoc.com (bài biểu đồ ngày sinh, bài biểu đồ tên) và thansohoconline.com (bài biểu đồ ngày sinh) — viết lại ngắn bằng lời của app: 1 cái tôi, cách thể hiện mình; 2 nhạy cảm, trực giác; 3 tâm trí, trí nhớ; 4 thực tế, trật tự; 5 cảm xúc và sự tự do bộc lộ; 6 sáng tạo, trí tuệ, hay lo nghĩ; 7 học qua trải nghiệm; 8 năng động, độc lập, hiểu cảm xúc người khác; 9 lý tưởng, trách nhiệm, uy tín. Cũng theo hai trang đó: biểu đồ ngày sinh là tố chất bẩm sinh, biểu đồ tên là cách thể hiện ra ngoài hình thành qua trải nghiệm. "Số nội cảm" thì các trang nói không thống nhất (có trang không định nghĩa), nên không đưa vào.
+
+`scripts/test-sohoc.js` thêm 5 bài: đủ nghĩa chín ô; biểu đồ tên "Hải" đúng ba ô 8, 1, 9; tên "Hải" không bù ô nào cho ngày sinh 19/8/1991 (đã có sẵn 1, 8, 9), tên "Phong" bù 5, 6, 7; Hồ Trung Hải ra 1, 3, 4.
 
 ## Bầu trời đêm nay
 
@@ -1404,7 +1412,7 @@ scripts/mau-am.js          tạo giọng mẫu bằng lệnh `say` của macOS, 
 scripts/test-lich.js       97 kiểm thử lịch vạn niên, đối chiếu lịch đã công bố
 assets/sohoc.js            thần số học: hàm thuần, ngày sinh vào, các con số ra
 assets/thanso.js           giao diện ngôi sao thần số học
-scripts/test-sohoc.js      43 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
+scripts/test-sohoc.js      48 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
 assets/caiapp.js           gợi ý cài app: nhận dạng máy, khi nào tự gợi ý, bắt hộp cài của trình duyệt
 scripts/test-caiapp.js     24 kiểm thử gợi ý cài app
 assets/rungu.js            nhạc ngủ: tạo âm thành đoạn lặp liền mạch, tính hẹn giờ; chạy được làm Web Worker
@@ -1430,7 +1438,7 @@ node scripts/test-troidem.js     # chạy 92 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
-node scripts/test-sohoc.js       # chạy 43 kiểm thử thần số học
+node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
 node scripts/test-caiapp.js      # chạy 24 kiểm thử gợi ý cài app
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói

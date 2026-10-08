@@ -211,6 +211,23 @@ const Y_DINH = {
 
 const TANG = { 3: 'trí não', 2: 'tinh thần', 1: 'thể chất' };
 
+/* Ý nghĩa từng ô của lưới 3×3 (dùng chung cho biểu đồ ngày sinh, biểu đồ tên, biểu đồ tổng hợp). Chỉ lấy
+   chỗ hai nguồn nhất trí — tracuuthansohoc.com (bài biểu đồ ngày sinh và bài biểu đồ tên) và
+   thansohoconline.com (bài biểu đồ ngày sinh) — viết lại ngắn bằng lời của app. */
+const Y_O = {
+  1: 'cái tôi, cách bạn thể hiện mình ra ngoài, tính tự chủ',
+  2: 'nhạy cảm, trực giác, cảm nhận cảm xúc',
+  3: 'tâm trí: trí nhớ, suy nghĩ, tưởng tượng',
+  4: 'tính thực tế, trật tự, tổ chức',
+  5: 'cảm xúc và sự tự do bộc lộ cảm xúc',
+  6: 'sáng tạo, trí tuệ — đôi khi hay lo nghĩ',
+  7: 'học qua trải nghiệm, kể cả vấp ngã',
+  8: 'năng động, độc lập, hiểu cảm xúc người khác',
+  9: 'lý tưởng, tinh thần trách nhiệm, coi trọng uy tín',
+};
+/* Biểu đồ tổng hợp: những ô ngày sinh để trống mà tên lấp vào ("tên bù cho ngày sinh"). */
+const tenBu = (demNgay, demTen) => [1, 2, 3, 4, 5, 6, 7, 8, 9].filter(k => !demNgay[k] && demTen[k]);
+
 /* Nét chung của từng con số, dùng cho ba chỉ số theo tên. */
 const NET = {
   1: 'độc lập, chủ động, dám đi đầu', 2: 'tinh tế, hoà hợp, biết lắng nghe', 3: 'sáng tạo, vui vẻ, giỏi diễn đạt',
@@ -226,7 +243,7 @@ const Y_TEN = {
 
 const API = { soChuDao, bieuDo, muiTen, namCaNhan, dinhCao, congSo, veMot, veMuoiMot,
               tachTu, tachChu, chiSoTen, bieuDoTen, tongHop, BANG_CHU,
-              MUI_TEN, Y_CHU_DAO, Y_NAM, Y_DINH, TANG, NET, Y_TEN };
+              MUI_TEN, Y_CHU_DAO, Y_NAM, Y_DINH, TANG, NET, Y_TEN, Y_O, tenBu };
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 else root.TDTD_SOHOC = API;
 })(typeof self !== 'undefined' ? self : this);
