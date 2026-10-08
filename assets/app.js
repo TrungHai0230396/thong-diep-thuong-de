@@ -240,7 +240,7 @@ function moCaiApp() {
       `Kéo xuống, chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
       `Bấm <b>Thêm</b> ở góc trên bên phải. Biểu tượng app hiện ngay trên màn hình chính.`]),
     iosKhac: buoc([
-      `Bấm nút <b>Chia sẻ</b> ${ICO_CHIA_SE} ở góc phải thanh địa chỉ.`,
+      `Bấm biểu tượng <b>Chia sẻ</b> ${ICO_CHIA_SE} nằm ngay trên thanh địa chỉ, ở góc phải.<small>Đừng dùng mục Chia sẻ trong nút ⋯ ở dưới — ở đó không có mục Thêm vào MH chính.</small>`,
       `Kéo xuống, chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
       `Bấm <b>Thêm</b>.`]) +
       `<p class="cai-luu">Không thấy mục <b>Thêm vào MH chính</b>? Mở trang này bằng <b>Safari</b> rồi bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.</p>

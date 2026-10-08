@@ -1,4 +1,4 @@
-const V = 'tdtd-v132';
+const V = 'tdtd-v133';
 /* Tiếng người đọc (assets/am, assets/tu: hơn 600 file mp3) nằm trong kho RIÊNG, không xoá khi deploy:
    gần như lần deploy nào V cũng tăng, mà xoá theo V thì mất hết tiếng đã nghe, lúc mất mạng lại phải
    lùi về máy đọc. Đường dẫn mang dấu nội dung (?v=...), nên file nào đổi thì đổi địa chỉ, không phát bản cũ. */
