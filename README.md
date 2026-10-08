@@ -16,6 +16,8 @@ Mở http://127.0.0.1:5179 — không cần cài gì, không cần build.
 
 App không giữ lại thông điệp nào. Không lịch sử, không bộ sưu tập, không nhật ký, không tài khoản, không cookie. Đóng tab là thông điệp đi qua, mở lại thì lá úp lại từ đầu.
 
+Để biết có bao nhiêu người dùng, trang đếm lượt mở bằng Vercel Web Analytics — không cookie, không gắn mã nào vào máy, không gửi nội dung gì (xem mục *Đếm lượt truy cập*).
+
 Máy chỉ ghi đúng **ba giá trị**, không có giá trị nào là nội dung và không có gì tích lũy theo thời gian:
 
 | Khoá | Nội dung | Vì sao cần |
@@ -656,6 +658,28 @@ Người dùng muốn "một cái popup cài app, để mọi người dễ dùn
 **Khi nào hiện:** không chặn ngay lúc vào. Tự gợi ý **3,2 giây sau khi lật lá hôm nay** — đọc xong thông điệp rồi — chỉ trên điện thoại, chỉ ở trang chính (không đang mở ngôi sao hay bảng khác), **tối đa 3 lần, cách nhau ít nhất 7 ngày**; đã cài (hoặc đang mở từ biểu tượng ngoài màn hình chính) thì thôi. Lúc nào cũng mở lại được từ nút **?** → *Cài app vào điện thoại*. Chỉ ghi một mẩu nhỏ `tdtd.caiApp`: số lần đã gợi ý, lần cuối, đã cài chưa.
 
 `scripts/test-caiapp.js`, 24 bài: nhận dạng 15 trường hợp theo chuỗi nhận dạng thật (iPhone Safari cả iOS 26, iPad tự xưng Mac mà không nhầm máy Mac thật, Chrome iPhone, Zalo, Facebook, Messenger trên cả hai hệ, Android có và chưa có hộp cài, máy tính, đã cài); quy tắc tự gợi ý; link mở bằng Chrome. Đã thử trên trình duyệt: nút Cài app gọi hộp cài đúng một lần, đóng bảng, ghi đã cài; lật lá xong 3 giây thì bảng tự hiện.
+
+## Đếm lượt truy cập
+
+Người dùng hỏi "có biết được bao nhiêu lượt cài app không, tôi không biết số người truy cập có nhiều không". Trước đó app không đếm gì nên không có số nào cả. Giờ `assets/thongke.js` gắn [Vercel Web Analytics](https://vercel.com/docs/analytics/quickstart) bản HTML thuần (không cần gói npm): không cookie; Vercel nhận ra người xem bằng một mã băm tạo từ chính lượt truy cập, phiên xem tự bỏ sau 24 giờ, số liệu chỉ để thống kê gộp, không gắn với ai hay địa chỉ IP nào ([Vercel](https://vercel.com/docs/analytics/privacy-policy)). Mỗi lượt kèm thời điểm, địa chỉ trang, trang dẫn tới, vị trí cỡ thành phố, hệ điều hành, trình duyệt, loại máy.
+
+**Phải bật một lần trong Vercel:** vào dự án → thẻ **Analytics** → **Enable**. Lần deploy sau đó Vercel mới mở đường `/_vercel/insights/`; trước khi bật, tệp đếm báo 404 và trang vẫn chạy bình thường. Chỉ đếm từ lúc bật, không có số của trước đó.
+
+**Gói Hobby:** 50.000 lượt một tháng, xem lại được 1 tháng; vượt thì Vercel ngừng đếm tới kỳ sau chứ không tính tiền; không có sự kiện tuỳ chọn ([bảng giá](https://vercel.com/docs/analytics/limits-and-pricing)). Vì vậy mỗi lần mở trang chỉ gửi **một** lượt — đổi qua lại giữa các sao (đổi dấu `#`) bị bộ lọc `beforeSend` bỏ.
+
+**Đọc số ở thẻ Analytics, mục Pages.** Địa chỉ gửi đi được thay bằng một trong ba nhãn:
+
+| Nhãn | Nghĩa |
+|---|---|
+| `/` | mở bằng trình duyệt |
+| `/app` | mở từ biểu tượng app ngoài màn hình chính |
+| `/app/moi` | lần đầu mở app trên máy đó — một lượt **cài mới** |
+
+Cột *Visitors* là số người, *Page Views* là số lần mở. Số người dùng app = `/app` + `/app/moi`. iPhone không báo cho trang lúc cài xong (Android chỉ báo khi cài bằng hộp cài), nên lượt cài đếm bằng **lần mở đầu tiên từ màn hình chính**, mốc `moApp` ghi chung vào mẩu `tdtd.caiApp`. Người đã cài từ trước khi có bộ đếm sẽ bị tính là "cài mới" ở lần mở đầu tiên sau đó; ai xoá app rồi cài lại thì đếm lại. Trình chặn quảng cáo có thể chặn bộ đếm, nên số thật có thể cao hơn một chút.
+
+Service worker để đường `/_vercel/` đi thẳng ra mạng: không cất, và mất mạng thì không trả `index.html` thay cho tệp đếm. Chạy thử ở máy (`http://127.0.0.1`) thì không đếm.
+
+`scripts/test-thongke.js`, 20 bài: nhãn từng trường hợp, mỗi lần mở chỉ một lượt, lượt cài không đếm lại, chạy trong trang có/không có `https`, service worker không chặn.
 
 ## Xem ngày
 ## Xem ngày
@@ -1415,6 +1439,8 @@ assets/thanso.js           giao diện ngôi sao thần số học
 scripts/test-sohoc.js      48 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
 assets/caiapp.js           gợi ý cài app: nhận dạng máy, khi nào tự gợi ý, bắt hộp cài của trình duyệt
 scripts/test-caiapp.js     24 kiểm thử gợi ý cài app
+assets/thongke.js          đếm lượt truy cập bằng Vercel Web Analytics: mỗi lần mở một lượt, tách trình duyệt / app / cài mới
+scripts/test-thongke.js    20 kiểm thử đếm lượt truy cập
 assets/rungu.js            nhạc ngủ: tạo âm thành đoạn lặp liền mạch, tính hẹn giờ; chạy được làm Web Worker
 assets/nhacngu.js          giao diện ngôi sao nhạc ngủ, phát bằng Web Audio
 scripts/test-ngu.js        53 kiểm thử nhạc ngủ: phổ, tần số, mối nối, lịch nhỏ dần
@@ -1440,6 +1466,7 @@ node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi 
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
 node scripts/test-caiapp.js      # chạy 24 kiểm thử gợi ý cài app
+node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 182 kiểm thử trò luyện phát âm
