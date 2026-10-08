@@ -169,13 +169,13 @@ ok('không ra bài nghe cho cặp /f/ với /θ/',
 ok('chỗ nào tai không tách được thì phải nói ra',
    AM.find(a => a.ipa.includes('θ')).luuY && /không thể phân biệt bằng tai|58/.test(AM.find(a => a.ipa.includes('θ')).luuY));
 
-console.log('\n— Hình: miệng nhìn thẳng là hình chính, cắt dọc chỉ là xem thêm —');
-ok('âm nào cũng chọn rõ hình chính', AM.every(a => a.hinh === 'truoc' || a.hinh === 'canh'),
-   AM.filter(a => !a.hinh).map(a => a.ipa).join(', '));
-ok('âm phân biệt bằng môi hàm thì lấy hình nhìn thẳng',
-   ['/p/ và /b/', '/p/ và /f/', '/v/ và /w/', '/æ/'].every(i => AM.find(a => a.ipa === i).hinh === 'truoc'));
-ok('âm phân biệt bằng lưỡi bên trong thì lấy hình cắt dọc',
-   ['/l/ cuối', '/t/ /d/ cuối', '/k/ /g/ cuối', '/r/'].every(i => AM.find(a => a.ipa === i).hinh === 'canh'));
+console.log('\n— Hình: miệng nhìn thẳng và bên trong miệng đặt cạnh nhau —');
+/* Người dùng chọn giữ kiểu hình của màn 44 âm ("giữ lại kiểu này — khẩu hình miệng"): hai hình
+   cạnh nhau, chạy cùng nhịp. Bản trước của bài sửa lỗi chọn MỘT hình chính, giấu hình kia sau nút. */
+ok('bước xem miệng bày hình nhìn thẳng cạnh hình bên trong, không giấu hình nào sau nút',
+   /class="pa-hinh-tu"[\s\S]{0,200}class="pa-le-hinh"[\s\S]{0,120}veMatTruoc\(kh[\s\S]{0,250}K\.ve\(kh/.test(nguon)
+   && !/Nhìn bên trong miệng<\/button>/.test(nguon));
+ok('không còn trường "hình chính" bỏ không trong dữ liệu', AM.every(a => a.hinh === undefined));
 ok('âm nào cũng vẽ được hình nhìn thẳng', AM.every(a => K.veMatTruoc(a.kh, {}).startsWith('<svg')));
 const vt = AM.map(a => K.veMatTruoc(a.kh, {}).replace(/aria-label="[^"]*"/, ''));
 ok('hình nhìn thẳng phân biệt được các nhóm âm, không phải một hình dùng chung',
@@ -273,7 +273,7 @@ ok('bước đầu dẫn bằng bản thu người thật',
    /Bước 1 — nghe người thật đọc âm này[\s\S]{0,300}pa-nguoi/.test(nguon));
 ok('bước đầu không còn nút âm máy dựng', !/data-am="1"/.test(nguon) && !/tách riêng \(tiếng máy dựng\)/.test(nguon));
 ok('từ ví dụ vẫn còn, nhưng lùi xuống sau bản thu',
-   /Bước 1 — nghe người thật[\s\S]{0,1500}<p class="pa-nhan">Trong từ<\/p>/.test(nguon));
+   /Bước 1 — nghe người thật[\s\S]{0,2500}<p class="pa-nhan">Trong từ — người bản xứ đọc<\/p>/.test(nguon));
 ok('đọc từ thì lấy bản thu người thật trước, máy đọc chỉ là đường lùi',
    /function doc\(chu, cham, iGiong, nut\) \{[\s\S]{0,120}banThu\(chu\)[\s\S]{0,300}docMay\(chu, cham, iGiong\)/.test(nguon)
    && /function banThu\(chu\) \{[\s\S]{0,80}TDTD_TUNGUOI/.test(nguon));
@@ -434,7 +434,7 @@ ok('nói đúng điều người bản xứ làm: ở cuối từ, khác nhau �
    ['/s/ /z/ cuối', '/t/ /d/ cuối', '/k/ /g/ cuối', '/f/ /v/ cuối'].every(n => /dài hơn/.test(AM.find(a => a.ipa === n).cach)));
 ok('bài đuôi s nói đủ ba cách đọc /s/ /z/ /ɪz/', /\/ɪz\//.test(AM.find(a => a.ipa === '/s/ /z/ cuối').viSao));
 ok('máy đo đuôi s chỉ dùng từ đuôi /s/ (nó không tách được /s/ với /z/)', AM.find(a => a.ipa === '/s/ /z/ cuối').do.tu.every(t => /s$/.test(t) && !/(es|gs|ys)$/.test(t)));
-ok('hình động âm tắc cuối từ không há hàm như thêm "ơ"', /kieu === 'cuoi'/.test(nguon) && /khungHinh\(a\.kh, a\.tac, a\.kieu\)/.test(nguon));
+ok('hình động âm tắc cuối từ không há hàm như thêm "ơ"', /kieu === 'cuoi'/.test(nguon) && /khungHinh\(hai \? a\.kh2 : a\.kh, a\.tac, a\.kieu\)/.test(nguon));
 ok('bước 1 bài âm cuối không minh hoạ bằng bản thu âm ở đầu từ ([ga] … [aga])', /cuoiTu = a\.nhom === 'Cuối từ'/.test(nguon));
 
 ok('bước 4 không lặp lại khối "Trong từ" của bước 1: bài có cặp thì nghe so từng cặp', /nghe so từng cặp/.test(nguon) && /data-socap/.test(nguon));
@@ -555,6 +555,37 @@ ok('có lối đi cho iPhone đã cài ra màn hình chính', /navigator && self
 ok('vẫn giữ được phần hình khi không có micro', /vẫn dùng bình thường|xem hình và nghe mẫu/.test(nguon));
 ok('báo rõ từng loại lỗi micro',
    ['not-allowed', 'no-speech', 'network'].every(e => nguon.includes(e)));
+
+console.log('\n— Bảng 44 âm và bài sửa lỗi: một lối học, không phải hai —');
+/* Người dùng: "sao Bảng 44 âm lại khác so với Cuối từ, khi bấm vô học cách bố trí khác nhau hết".
+   Màn 44 âm từng là một trang dài riêng; giờ nó được gói thành một bài và đi chung veBuoc. */
+const lop = (ds) => ds.join(' → ');
+const buocAm = AN.DS.map(x => ({ x, ds: P._soBuoc(P._baiAm(x.ma)) }));
+ok('mở một âm trong bảng là mở cùng lối từng bước với bài sửa lỗi',
+   /function veLe\(ma, ten\) \{[\s\S]{0,400}moAm\(baiAm\(x\), ten\)/.test(nguon) && !/pa-le-to">\/\$\{esc\(x\.ipa\)\}/.test(nguon));
+ok('cả 44 âm và 17 bài đều đi đúng thứ tự: nghe → (luyện tai) → xem miệng → (nghe so) → nói',
+   buocAm.map(b => b.ds).concat(AM.map(a => P._soBuoc(a))).every(ds => {
+     const thu = ['nghe', 'tai', 'mieng', 'so', 'noi'];
+     return ds[0] === 'nghe' && ds.includes('mieng') && ds[ds.length - 1] === 'noi'
+       && ds.every((b, i) => i === 0 || thu.indexOf(b) > thu.indexOf(ds[i - 1]));
+   }));
+ok('âm có cặp tối thiểu thì có luyện tai, như bài: /iː/ đi đủ năm bước',
+   lop(P._soBuoc(P._baiAm('ii'))) === 'nghe → tai → mieng → so → noi', lop(P._soBuoc(P._baiAm('ii'))));
+ok('âm không có gì để so thì bỏ bước nghe so, không bày bước rỗng: /h/',
+   lop(P._soBuoc(P._baiAm('h'))) === 'nghe → mieng → noi', lop(P._soBuoc(P._baiAm('h'))));
+const capAmHong = buocAm.flatMap(({ x }) => P._baiAm(x.ma).cap.filter(c => ![...ngNguoi(c[0])].some(n => ngNguoi(c[1]).has(n))).map(c => x.ipa + ':' + c[0] + '/' + c[1]));
+ok('luyện tai của âm trong bảng chỉ dùng cặp có một người đọc cả hai từ (giọng không lộ đáp án)', !capAmHong.length, capAmHong.join(', '));
+ok('luyện tai của âm trong bảng chỉ dùng cặp tối thiểu khai báo sẵn, không ghép bừa từ ví dụ',
+   buocAm.every(({ x }) => P._baiAm(x.ma).cap.every(c => Object.values(x.soCap || {}).some(s => s[0] === c[0] && s[1] === c[1]))));
+ok('đầu màn có hàng chip để sang âm / bài cùng nhóm, ở cả hai loại',
+   /function dauMan\(\)[\s\S]{0,700}AN\.DS\.filter\(y => y\.nhom === a\.le\.nhom\)[\s\S]{0,300}AM\.map\(\(b, i\) => b\.nhom !== a\.nhom/.test(nguon));
+ok('bước nói của mọi bài có cả "nói thử" lẫn "nói theo mẫu, nghe lại mình"',
+   /tới lượt bạn: nói thử<\/p>\s*\$\{veNoiThu\(\)\}\s*\$\{veNoiTheo\(a\)\}/.test(nguon));
+ok('bài nào cũng có mẫu để nói theo', AM.every(a => P._dsMau(a).length >= 1) && AN.DS.every(x => P._dsMau(P._baiAm(x.ma)).length >= 1),
+   AM.filter(a => !P._dsMau(a).length).map(a => a.ipa).join(', '));
+const sh = AM.find(a => a.ipa === '/ʃ/'), sAm = AN.tim('s').am.map(b => b.f);
+ok('mẫu nói theo không lấy tiếng của vế SAI (/s/ trong bài /ʃ/)', sAm.length && !P._dsMau(sh).some(f => sAm.includes(f)));
+ok('bài so hai tư thế: bấm qua lại, mỗi lúc một cặp hình', /data-chon-hinh/.test(nguon) && /k\.hidden = \+k\.dataset\.tu !== hinhTu/.test(nguon));
 
 console.log(`\n${fail ? '✗' : '✓'} Tất cả: ${pass} đạt, ${fail} hỏng\n`);
 process.exit(fail ? 1 : 0);

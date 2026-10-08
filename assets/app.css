@@ -421,7 +421,6 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-ten{font-size:16px;font-weight:500;color:var(--ink)}
 .pa-hinh{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:center;gap:10px;margin-bottom:16px}
 .pa-hinh svg{max-width:100%;height:auto}
-.pa-moi{flex:0 0 auto;width:132px}
 .pa-khoi{margin:0 0 14px;padding:13px 14px;border-radius:14px;
   border:1px solid var(--line);background:rgba(255,255,255,.035)}
 .pa-khoi.pa-mo{border-style:dashed;opacity:.85}
@@ -441,11 +440,6 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-cap-nut:hover{background:rgba(232,195,122,.1)}
 .pa-cap-nut i{font-style:normal;font-size:11.5px;color:var(--ink-dim)}
 .pa-doi{margin-bottom:14px}
-.pa-doi-nut{flex:1 1 130px;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;
-  padding:14px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink)}
-.pa-doi-nut:hover{background:rgba(232,195,122,.1)}
-.pa-doi-nut b{font-weight:500;font-size:17px}
-.pa-doi-nut i{font-style:normal;font-size:11px;color:rgba(232,195,122,.7)}
 .pa-gui{margin:0 0 9px;padding:9px 11px;border-radius:10px;font-size:11.5px;line-height:1.6;
   border:1px solid rgba(232,195,122,.2);background:rgba(232,195,122,.06);color:rgba(244,239,230,.86)}
 .pa-mic{width:100%;cursor:pointer;padding:14px;border-radius:14px;font-size:14.5px;
@@ -459,12 +453,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-luot span{padding:5px 10px;border-radius:999px;font-size:12px;border:1px solid var(--line)}
 .pa-luot span.dung{border-color:rgba(150,205,160,.4);background:rgba(150,205,160,.12);color:#bfe2c6}
 .pa-luot span.sai{border-color:rgba(226,140,134,.35);background:rgba(226,140,134,.1);color:#f0bcb8}
-@media (max-width:420px){ .pa-moi{width:112px} .pa-ipa{min-width:50px;font-size:14px} }
-.pa-doi-hinh{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;margin-bottom:16px}
-.pa-doi-hinh .pa-hinh{flex:1 1 240px;max-width:320px;margin:0;display:flex;flex-wrap:wrap;
-  align-items:flex-end;justify-content:center;gap:8px}
-.pa-doi-hinh figcaption{flex:1 0 100%;margin-top:6px;text-align:center;font-size:12px;line-height:1.5;color:var(--ink-dim)}
-.pa-doi-hinh figcaption.pa-sai{color:#f0a9a3}
+@media (max-width:420px){ .pa-ipa{min-width:50px;font-size:14px} }
 /* bước và nút của chế độ hướng dẫn */
 .pa-cham{display:flex;gap:6px;justify-content:center;margin:0 0 16px}
 .pa-cham i{width:26px;height:3px;border-radius:2px;background:rgba(255,255,255,.14)}
@@ -479,10 +468,6 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-to:active{transform:scale(.985)}
 .pa-to.pa-nho-to{padding:14px;font-size:14.5px}
 .pa-giua{text-align:center}
-.pa-nut-am{flex:1 0 100%;margin-top:6px;cursor:pointer;padding:8px;border-radius:999px;font-size:13px;
-  border:1px solid rgba(232,195,122,.34);background:rgba(232,195,122,.1);color:var(--ink)}
-.pa-nut-am:hover{background:rgba(232,195,122,.2)}
-.pa-nut-am.sai{border-color:rgba(226,140,134,.4);background:rgba(226,140,134,.12);color:#f0bcb8}
 .pa-lai{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:20px}
 .pa-lui,.pa-toi{cursor:pointer;padding:13px 18px;border-radius:13px;font-size:14px;
   border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink)}
@@ -506,18 +491,12 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-bao.sai{color:#f0bcb8}
 .pa-mo-nut{background:rgba(255,255,255,.05)!important;border-color:var(--line)!important;
   flex:0 0 auto!important;font-size:13px}
-.pa-to-hinh .pa-hinh{max-width:240px}
-.pa-nho-hinh{margin-top:-4px}
-.pa-nho-hinh .pa-hinh{max-width:130px}
 .pa-truoc svg{max-width:100%;height:auto}
 .pa-nut-hang{display:flex;gap:8px;justify-content:center;margin:0 0 14px}
 .pa-phu-nut{cursor:pointer;padding:9px 14px;border-radius:999px;font-size:12.5px;
   border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink-dim)}
 .pa-phu-nut:hover{background:rgba(255,255,255,.11);color:var(--ink)}
 .pa-phu-nut.bat{border-color:rgba(232,195,122,.45);background:rgba(232,195,122,.14);color:var(--ink)}
-.pa-tu-to{gap:10px;margin-bottom:12px}
-.pa-tu-to .pa-tu-nut{flex:1 1 130px;padding:16px 12px;font-size:16px;text-align:center}
-.pa-rong{display:block;width:100%;margin:6px 0 8px}
 /* luyện từng âm: bảng âm, màn một âm, tiếng người thật ở bước đầu mỗi bài */
 .pa-muc{margin:26px 0 4px;font-family:"Cormorant Garamond",Georgia,serif;font-size:21px;font-weight:600;color:var(--ink)}
 .pa-phu.pa-trai{margin:0 0 4px;text-align:left}
@@ -531,8 +510,6 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   font-family:"Be Vietnam Pro",system-ui,sans-serif}
 .pa-am-o:hover{background:rgba(232,195,122,.16);border-color:rgba(232,195,122,.4)}
 .pa-le-to{margin:0 0 4px;text-align:center;font-size:58px;line-height:1.1;color:var(--gold)}
-.pa-le-goi{max-width:430px;margin:0 auto 16px}
-.pa-le-nghe{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 6px}
 .pa-le-phat{flex:1 1 150px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
   padding:14px 12px;border-radius:14px;font-size:15px;
   border:1px solid rgba(232,195,122,.4);background:rgba(232,195,122,.12);color:var(--ink)}
@@ -557,7 +534,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-nguoi-nut .pa-le-phat{flex:1 1 120px;padding:11px}
 .pa-nguoi-nut .pa-phu-nut{flex:1 0 100%}
 /* màn một âm: thanh chọn âm cùng nhóm, hình, từ ví dụ, ghi công */
-.pa-le-cham{display:flex;gap:5px;overflow-x:auto;margin:-4px -16px 10px;padding:2px 16px 6px;scrollbar-width:none}
+.pa-le-cham{position:relative;display:flex;gap:5px;overflow-x:auto;margin:-4px -16px 10px;padding:2px 16px 6px;scrollbar-width:none}
 .pa-le-cham::-webkit-scrollbar{display:none}
 .pa-le-o{flex:0 0 auto;min-width:38px;height:34px;padding:0 7px;border-radius:10px;cursor:pointer;font-size:16px;
   font-family:"Charis SIL","Doulos SIL","Gentium Plus","Noto Serif","Times New Roman",serif;
@@ -566,6 +543,18 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-le-hinh{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin:4px 0 6px}
 .pa-le-hinh .pa-hinh{flex:1 1 210px;max-width:290px;margin:0;display:flex;flex-direction:column;align-items:center;gap:4px}
 .pa-le-hinh figcaption{font-size:11.5px;color:var(--ink-dim)}
+/* bước xem miệng: hai tư thế thì bấm qua lại, mỗi lúc một cặp hình (nhìn thẳng + bên trong) */
+.pa-hinh-tu[hidden]{display:none}
+.pa-hinh-tu .pa-nut-hang{margin-top:4px}
+.pa-hinh-tu .pa-le-phat{flex:0 1 300px}
+.pa-hinh-chon{display:flex;gap:8px;margin:0 0 10px}
+.pa-hinh-nut{flex:1 1 0;min-width:0;cursor:pointer;padding:10px 10px;border-radius:12px;font:inherit;font-size:13px;line-height:1.45;
+  border:1px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink-dim)}
+.pa-hinh-nut:hover{background:rgba(255,255,255,.1);color:var(--ink)}
+.pa-hinh-nut.dang{border-color:var(--gold);background:rgba(232,195,122,.18);color:var(--ink)}
+.pa-hinh-nut.sai.dang{border-color:rgba(226,140,134,.75);background:rgba(226,140,134,.16);color:#f6cbc7}
+.pa-le-phat.sai{border-color:rgba(226,140,134,.4);background:rgba(226,140,134,.12);color:#f0bcb8}
+.pa-le-to.dai{font-size:34px;line-height:1.2}
 .pa-le-bieu{max-width:320px;margin:6px auto 4px}
 .pa-vd{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
 .pa-vd-nut{flex:1 1 120px;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
@@ -575,20 +564,18 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .pa-vd-nut b{font-weight:500;font-size:16px}
 .pa-vd-nut i{font-style:normal;font-size:11.5px;color:var(--ink-dim)}
 .pa-vd-giong{min-height:14px;font-size:10.5px;color:rgba(232,195,122,.8)}
-.pa-tu-nut.keu,.pa-nut-am.keu,.pa-doi-nut.keu{border-color:var(--gold);background:rgba(232,195,122,.3)}
+.pa-tu-nut.keu{border-color:var(--gold);background:rgba(232,195,122,.3)}
 .pa-lien{padding:0;border:0;background:none;cursor:pointer;font:inherit;color:inherit;text-decoration:underline}
 .pa-nguon-nut{display:block;margin:18px auto 0}
 .pa-nguon-ds{margin:0 0 8px;padding-left:18px;font-size:11.5px;line-height:1.7;color:var(--ink-dim)}
 .pa-nguon-ds span{color:var(--ink)}
 .pa-nguon-ds a{color:inherit}
-.pa-le-mau b{color:var(--ink);font-weight:500}
 /* phiên âm quốc tế dưới mỗi từ — phông có đủ ký hiệu IPA, không để mỗi ký tự rơi về một phông khác */
 .pa-pa{display:block;margin-top:2px;font-style:normal;font-size:12px;letter-spacing:.01em;line-height:1.35;
   color:rgba(232,195,122,.88)!important;font-family:"Charis SIL","Doulos SIL","Gentium Plus","Noto Serif","Times New Roman",serif}
 .pa-pa span{color:var(--ink-dim)}
 .pa-tu-nut{text-align:center}
 .pa-chon-nut .pa-pa{font-size:14px;margin-top:4px}
-.pa-nut-am .pa-pa,.pa-doi-nut .pa-pa{font-size:12.5px}
 .pa-do-nghe .pa-pa{display:inline;margin-left:5px}
 /* nói thử: máy nghe ra chữ gì */
 .pa-nt{border-color:rgba(232,195,122,.38)}

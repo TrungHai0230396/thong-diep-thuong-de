@@ -1335,6 +1335,26 @@ hiện có người kiểm chứng lại; 36 trên 40 phát hiện là thật. �
 Công cụ chọn bản thu trước đây nằm ở thư mục tạm và mất khi máy khởi động lại; phần thêm từ mới giờ nằm
 trong repo: `python3 scripts/them-tu-nguoi.py <từ...> --cap a/b ...`.
 
+## "Sao Bảng 44 âm lại khác so với Cuối từ, khi bấm vô học cách bố trí khác nhau hết"
+
+Đúng là khác: bài sửa lỗi làm trước, dắt từng bước; màn 44 âm làm sau, thành một trang dài như tờ tra cứu.
+Cùng là "học một âm" mà hai lối, khối giống nhau nằm chỗ khác nhau, có thứ chỉ một bên có (luyện tai chỉ ở
+bài, "nói theo rồi nghe lại mình" chỉ ở màn 44 âm). Người dùng chọn gộp về lối từng bước, và dặn giữ kiểu
+hình khẩu hình của màn 44 âm.
+
+Giờ một âm trong bảng được gói thành cùng dạng một bài (`baiAm`) rồi đi chung `veBuoc`:
+
+- **Cùng đầu màn**: tên, nút "Nói thử", hàng chip sang âm (hay bài) cùng nhóm, thanh chấm báo bước.
+- **Cùng thứ tự bước**: nghe người thật đọc → luyện tai (khi có cặp tối thiểu có một người đọc cả hai từ)
+  → xem miệng → nghe so từng cặp (khi có cái để so) → nói. /iː/ đi đủ năm bước; /h/ chỉ ba.
+- **Xem miệng theo kiểu màn 44 âm**: hình nhìn thẳng và hình bên trong miệng đặt cạnh nhau, chạy cùng nhịp,
+  có sơ đồ lưỡi cho nguyên âm. Bài so hai tư thế (/l/ với /n/...) bấm qua lại giữa hai cặp hình, không bày
+  bốn hình chồng nhau dài cả màn trên điện thoại.
+- **Bước nói có đủ cả hai**: "nói thử — máy nghe ra chữ gì" và "nói theo mẫu, nghe lại mình" (mẫu chọn ngay
+  tại chỗ; không lấy tiếng của vế sai làm mẫu), cộng máy đo ở bài nào có.
+- Bấm chip sang âm khác lúc đang xem miệng thì vẫn ở bước xem miệng, để so hai hình; "Sang /y/ →" ở bước
+  nghe so mở âm kia đúng ở bước nghe so. Vào âm từ một bài thì nút quay lại về đúng bài, đúng bước.
+
 ## Cấu trúc
 
 ```

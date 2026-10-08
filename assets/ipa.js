@@ -37,7 +37,6 @@ const AM = [
      không làm. */
   { ipa: '/l/ cuối', ten: 'l cuối bị nuốt hoặc thành n', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
     tuA: 'tell', tuB: 'ten',
-    hinh: 'canh',
     am: 'l-toi', am2: 'n', sai2: true,
     viSao: 'Âm hỏng nhiều nhất khi đo trên người Việt: chỉ 25% đúng, 50% mất hẳn. Tiếng Việt có "l" ở đầu từ nhưng tuyệt đối không có ở cuối, nên "call" thành "co", "tell" thành "ten". Người miền Bắc còn sẵn thói lẫn l/n ngay trong tiếng Việt, mang luôn sang.',
     cach: 'Đầu lưỡi chạm CHẮC vào lợi sau răng trên rồi GIỮ nguyên ở đó, cho hơi thoát ra hai bên cạnh lưỡi. Ở cuối từ là "l tối": phần sau lưỡi nâng lên một chút nên nghe như có "ô" mờ chen vào ("tell" gần như "teo-l"), nhưng đầu lưỡi VẪN phải chạm lợi. Tự kiểm: nói "tell" rồi đứng yên miệng — đầu lưỡi phải đang chạm lợi; lưỡi nằm dưới là đã nuốt mất /l/. Bịt mũi mà tắc tiếng là đang nói thành "n".',
@@ -48,7 +47,6 @@ const AM = [
 
   { ipa: '/s/ /z/ cuối', ten: 'đuôi s của số nhiều', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
     tuA: 'price', tuB: 'prize',
-    hinh: 'canh',
     am: 's', am2: 'z',
     viSao: 'Người Việt bỏ /s/ cuối gần như mọi lúc. Mất đuôi s là mất dấu số nhiều và mất chia động từ: "two books" thành "two book". Đuôi -s có ba cách đọc: /s/ sau âm không rung (books, cats), /z/ sau âm rung (dogs, eyes), /ɪz/ sau s, z, sh, ch, j (buses, watches). Tiếng Việt cũng không có /z/ ở cuối, nên "eyes" dễ thành "ice" — khác nghĩa hẳn.',
     cach: 'Đầu lưỡi nâng sát lợi (không chạm hẳn), hai hàm răng gần khít, hơi rít qua một rãnh nhỏ giữa lưỡi. /s/ là tiếng rắn kêu, /z/ là tiếng ong bay — đặt tay lên cổ, nói "s" rồi "z" thật dài, phải thấy khác. Riêng ở cuối từ, người bản xứ rung rất nhẹ — cái nghe ra rõ hơn là nguyên âm đứng trước /z/ được kéo dài: "eyes" dài hơn "ice". Tuyệt đối đừng bỏ tiếng rít cuối.',
@@ -59,7 +57,6 @@ const AM = [
 
   { ipa: '/t/ /d/ cuối', ten: 'chặn rồi nhả, đừng nuốt', nhom: 'Cuối từ', uuTien: 10, kiemDuoc: true,
     tuA: 'hat', tuB: 'had',
-    hinh: 'canh',
     am: 't', am2: 'd', tac: true, kieu: 'cuoi',
     viSao: 'Tiếng Việt CÓ /t/ cuối nhưng ngậm luôn, nuốt hơi, nên người nghe tiếng Anh dễ không nhận ra có /t/. Nặng hơn: đuôi quá khứ -ed cũng chính là âm này (worked, played), nuốt mất là người nghe không biết chuyện xảy ra lúc nào.',
     cach: 'Chặn đầu lưỡi lên lợi sau răng trên (không phải lên răng), giữ một nhịp, rồi nhả nhẹ — một tiếng bật nhỏ, KHÔNG thêm "ơ" phía sau. Người bản xứ nói nhanh có khi không nhả, nhưng vẫn chặn gọn chứ không bao giờ bỏ hẳn. Ở cuối từ, /t/ với /d/ khác nhau chủ yếu ở nguyên âm đứng trước: "had" kéo dài hơn "hat".',
@@ -70,7 +67,6 @@ const AM = [
 
   { ipa: '/k/ /g/ cuối', ten: 'back hay thành bag, hay mất hẳn', nhom: 'Cuối từ', uuTien: 7, kiemDuoc: true,
     tuA: 'back', tuB: 'bag',
-    hinh: 'canh',
     am: 'k', am2: 'g', tac: true, kieu: 'cuoi',
     viSao: 'Cuối từ, /k/ và /g/ hay bị nuốt mất hoặc lẫn vào nhau: "back" (lưng) nghe thành "bag" (cái túi), "pick" (chọn) thành "pig" (con heo). Tiếng Việt có "c" cuối (các, bác) nhưng ngậm luôn không nhả, nên tai người nghe tiếng Anh dễ không nhận ra.',
     cach: 'Nâng phần SAU của lưỡi lên chạm vòm mềm, chặn hơi lại rồi nhả nhẹ, không thêm "ơ". Đầu lưỡi không làm gì cả. Ở cuối từ, /k/ với /g/ khác nhau chủ yếu ở nguyên âm đứng trước: "bag" kéo dài hơn "back".',
@@ -83,7 +79,6 @@ const AM = [
      dùng hai cặp TỪ THẬT có cùng lỗi: wife/wipe (f thành p) và safe/save (quên rung /v/). */
   { ipa: '/f/ /v/ cuối', ten: 'life hay thành laip', nhom: 'Cuối từ', uuTien: 6, kiemDuoc: true,
     tuA: 'wife', tuB: 'wipe',
-    hinh: 'truoc',
     am: 'f', am2: 'p', sai2: true,
     viSao: 'Cuối từ, /f/ và /v/ hay bị đổi thành /p/ hoặc rơi mất: "life" thành "laip", "wife" (vợ) nghe ra "wipe" (lau chùi), "five" thành "fai". Quên rung cổ ở /v/ thì "save" (cứu) thành "safe" (an toàn).',
     cach: 'Cắn nhẹ môi DƯỚI vào hàm răng TRÊN rồi đẩy hơi qua khe đó. Môi tuyệt đối không khép kín lại như /p/. Lưỡi nằm yên, không tham gia. /v/ cuối thì cùng chỗ đó, và nguyên âm trước kéo dài hơn: "save" dài hơn "safe".',
@@ -95,7 +90,6 @@ const AM = [
   /* ---- cụm phụ âm ---- */
   { ipa: 'cụm st- sp- sk-', ten: 'đừng bỏ chữ đầu', nhom: 'Cụm phụ âm', uuTien: 8, kiemDuoc: true,
     tuA: 'stop', tuB: 'top',
-    hinh: 'canh',
     am: ['s', 't'], am2: 't', sai2: true, tac: true,
     viSao: 'Gặp hai phụ âm dính nhau, người Việt gần như luôn bỏ phụ âm THỨ NHẤT — đo được 55 trên 56 trường hợp. "Stop" thành "top", "spin" thành "pin", và cả hai đều là từ có thật nên người nghe hiểu sang nghĩa khác.',
     cach: 'Giữ âm /s/ cho kêu rõ trước đã, rồi mới sang phụ âm sau. Đừng chèn nguyên âm vào giữa — "sờ-top" cũng sai, vì nó đẻ ra hai âm tiết.',
@@ -105,7 +99,6 @@ const AM = [
 
   { ipa: 'cụm -st -nd -ld', ten: 'hai phụ âm cuối', nhom: 'Cụm phụ âm', uuTien: 7, kiemDuoc: true,
     tuA: 'cold', tuB: 'coal',
-    hinh: 'canh',
     am: ['l-toi', 'd'], am2: 'l-toi', sai2: true, tac: true,
     viSao: 'Nhóm lì nhất, vẫn hỏng sau nhiều tuần luyện. Tiếng Việt không bao giờ có hai phụ âm cuối liền nhau nên miệng chưa từng phải làm việc đó.',
     cach: 'Làm chậm lại: phát đủ âm thứ nhất rồi mới sang âm thứ hai. Thà chậm mà đủ còn hơn nhanh mà mất. Nói chậm lại là cách rẻ nhất để người nghe hiểu bạn.',
@@ -116,7 +109,6 @@ const AM = [
   /* ---- phụ âm đầu hay lẫn ---- */
   { ipa: '/p/ và /b/', ten: 'pat hay thành bat', nhom: 'Phụ âm đầu', uuTien: 9, kiemDuoc: true,
     tuA: 'pat', tuB: 'bat',
-    hinh: 'truoc',
     am: 'p', am2: 'b', tac: true,
     viSao: 'Tiếng Việt không có /p/ ở ĐẦU từ, nên nó hay trượt thành /b/ — có ghi nhận "people" đọc thành "bi-bồ". Đây là cặp đứng đầu bảng những lẫn lộn làm hỏng nghĩa nhiều nhất.',
     cach: 'Hai môi khép kín, dồn hơi, rồi bật ra. /p/ phải có một luồng hơi PHỤT mạnh và cổ họng không rung. Tự kiểm: để tờ giấy trước miệng, nói "pat" thì giấy bay, nói "bat" thì giấy đứng yên.',
@@ -127,7 +119,6 @@ const AM = [
 
   { ipa: '/p/ và /f/', ten: 'funny hay thành punny', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
     tuA: 'pat', tuB: 'fat',
-    hinh: 'truoc',
     am: 'p', am2: 'f', tac: true,
     viSao: 'Người Việt hay đọc "funny", "famous" bằng âm /p/. Cặp này đứng thứ hai trong bảng những lẫn lộn làm hỏng nghĩa.',
     cach: '/f/ thì răng trên chạm môi dưới và hơi xì ra LIÊN TỤC kéo dài được; /p/ thì hai môi khép kín rồi bật ra một cái, không kéo dài được. Thử ngân dài: ngân được là /f/.',
@@ -138,7 +129,6 @@ const AM = [
 
   { ipa: '/n/ và /l/', ten: 'night hay thành light', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
     tuA: 'night', tuB: 'light',
-    hinh: 'canh',
     am: 'n', am2: 'l',
     viSao: 'Cặp lẫn lộn quen thuộc, nhất là với người miền Bắc vốn đã lẫn l/n trong tiếng Việt. Cả hai lỗi đều đẻ ra từ CÓ THẬT nên người nghe hiểu sang nghĩa khác chứ không đoán lại được.',
     cach: 'Lưỡi đặt cùng một chỗ cho cả hai — khác nhau ở chỗ hơi thoát ra: /n/ cho hơi ra đằng MŨI, /l/ cho hơi ra hai bên lưỡi. Tự kiểm: bịt mũi lại, kêu được là /l/, tắc tiếng là /n/.',
@@ -149,7 +139,6 @@ const AM = [
 
   { ipa: '/r/', ten: 'r kiểu Anh Mỹ', nhom: 'Phụ âm đầu', uuTien: 8, kiemDuoc: true,
     tuA: 'right', tuB: 'light',
-    hinh: 'canh',
     am: 'r', am2: 'l',
     viSao: 'Chữ "r" tiếng Việt khác hẳn: miền Bắc đọc thành "z" (rice thành "zai"), miền Nam rung đầu lưỡi. /r/ tiếng Anh thì đầu lưỡi KHÔNG chạm vào đâu cả. Đọc sai thì "right" nghe ra "light".',
     cach: 'Chu môi ra một chút như sắp huýt sáo. Đầu lưỡi KHÔNG chạm vào đâu cả, thân lưỡi gồng nhẹ và kéo lùi về phía cổ. Tuyệt đối không rung đầu lưỡi như "r" tiếng Việt.',
@@ -161,7 +150,6 @@ const AM = [
 
   { ipa: '/v/ và /w/', ten: 'vine hay thành wine', nhom: 'Phụ âm đầu', uuTien: 7, kiemDuoc: true,
     tuA: 'vine', tuB: 'wine',
-    hinh: 'truoc',
     am: 'v', am2: 'w',
     viSao: 'Chữ "v" giọng Bắc khá gần /v/ tiếng Anh, nhưng giọng Nam hay đọc thành "d/gi" (very thành "gia-ry"). Quên bật giọng thì /v/ thành /f/: "save" nghe ra "safe", nghĩa ngược nhau.',
     cach: '/v/ thì răng trên cắn nhẹ môi dưới, rung cổ họng, hơi rít qua kẽ răng. /w/ thì răng KHÔNG chạm gì cả, hai môi chu tròn lại rồi mở ra.',
@@ -172,7 +160,6 @@ const AM = [
 
   { ipa: '/ʃ/', ten: 'sh trong she', nhom: 'Phụ âm đầu', uuTien: 6, kiemDuoc: true,
     tuA: 'she', tuB: 'see',
-    hinh: 'truoc',
     am: 'sh', am2: 's', sai2: true,
     viSao: 'Nhiều vùng tiếng Việt không phân biệt s/x nên "she" thành "see", "ship" thành "sip" — đều ra từ có thật, nghĩa đổi hẳn. Máy nhận giọng nói cũng nhầm y như người nghe.',
     cach: 'Kéo lưỡi lùi lại một chút so với /s/, nâng phần giữa lưỡi lên gần vòm. Chu môi ra. Tiếng nghe trầm và dày như khi bảo ai đó im lặng: "suỵt".',
@@ -183,7 +170,6 @@ const AM = [
 
   { ipa: '/θ/ /ð/', ten: 'hai âm "th"', nhom: 'Phụ âm đầu', uuTien: 4, kiemDuoc: true,
     tuA: 'think', tuB: 'this',
-    hinh: 'truoc',
     am: 'th', am2: 'dh',
     viSao: 'Người học sợ âm này nhất, nhưng nó lại ÍT làm hỏng nghĩa nhất — "think" đọc thành "tink" thì người nghe vẫn hiểu. Sửa phụ âm cuối có lợi hơn nhiều. Để đây vì bạn sẽ đi tìm, không phải vì nó gấp.',
     cach: 'Thè nhẹ đầu lưỡi ra, kẹp hờ giữa hai hàm răng, thổi hơi qua khe đó. Soi gương phải THẤY đầu lưỡi. /θ/ (think) không rung cổ họng; /ð/ (this) thì rung, hơi ra ít hơn, tiếng trầm và mượt hơn.',
@@ -196,7 +182,6 @@ const AM = [
   /* ---- nguyên âm: có ích, nhưng ít cấp hơn phụ âm ---- */
   { ipa: '/ə/', ten: 'âm ơ nhẹ, schwa', nhom: 'Nguyên âm', uuTien: 6, kiemDuoc: false, bieu: 'ə',
     tuA: 'about',
-    hinh: 'truoc',
     am: 'uh',
     viSao: 'Âm hay gặp nhất trong tiếng Anh, nằm ở mọi âm tiết KHÔNG có trọng âm. Người Việt đọc rõ đều từng chữ nên câu nghe cứng và sai nhịp. Máy không kiểm được vì nó nằm chìm trong từ, không đứng riêng để đo.',
     cach: 'Thả lỏng hoàn toàn: không kéo môi, không chu môi, lưỡi nằm giữa, hàm hé nhẹ. Âm rất ngắn và mờ, nghe như đang lười nói.',
@@ -206,7 +191,6 @@ const AM = [
 
   { ipa: '/iː/ và /ɪ/', ten: 'sheep hay ship', nhom: 'Nguyên âm', uuTien: 5, kiemDuoc: true, bieu: 'iː',
     tuA: 'sheep', tuB: 'ship',
-    hinh: 'truoc',
     am: 'ii', am2: 'i',
     viSao: 'Cặp nguyên âm người Việt lẫn nhiều nhất. Chúng khác nhau ở VỊ TRÍ LƯỠI chứ không chỉ ở chỗ dài hay ngắn — nên kéo dài âm i tiếng Việt ra vẫn không thành /iː/.',
     cach: '/iː/: cười nhẹ, kéo hai khoé môi sang ngang, lưỡi đẩy lên cao và ra trước gần chạm vòm. /ɪ/: bắt đầu như /iː/ rồi thả lỏng hết — hạ lưỡi xuống, lùi vào, môi buông ra không cười, âm rất ngắn.',
@@ -217,7 +201,6 @@ const AM = [
 
   { ipa: '/æ/', ten: 'a bẹt, cat', nhom: 'Nguyên âm', uuTien: 4, kiemDuoc: true, bieu: 'æ',
     tuA: 'cat',
-    hinh: 'truoc',
     am: 'ae',
     viSao: 'Hay bị đọc thành "e". "Bad" thành "bed", "man" thành "men" — đổi nghĩa hẳn.',
     cach: 'Mở hàm to hẳn ra, lưỡi ở phía trước nhưng hạ thấp xuống. Miệng bẹt sang hai bên, nghe như đang giữa "a" và "e".',
@@ -389,8 +372,8 @@ function veDanhSach() {
       </button>
       ${AN ? `
       <p class="pa-muc">Bảng ${AN.DS.length} âm tiếng Anh</p>
-      <p class="pa-phu pa-trai">Bấm một âm: xem miệng đặt thế nào, nghe người thật đọc nó và đọc từ ví dụ, rồi nói theo
-        và nghe lại mình ngay cạnh mẫu.</p>
+      <p class="pa-phu pa-trai">Bấm một âm để học theo từng bước, y như các bài sửa lỗi bên dưới: nghe người thật đọc,
+        luyện tai, xem miệng đặt thế nào, nghe so với âm hay lẫn, rồi nói thử.</p>
       ${AN.NHOM.map(([k, ten]) => { const ds = AN.DS.filter(x => x.nhom === k); return ds.length ? `
         <p class="pa-nhom">${esc(ten)} · ${ds.length}</p>
         <div class="pa-bang">${ds.map(x =>
@@ -444,7 +427,7 @@ function veNoiTuDo() {
 function veNguon() {
   const AN = self.TDTD_AMNGUOI, TN = self.TDTD_TUNGUOI;
   /* nhớ chỗ đang học để nút quay lại về đúng chỗ đó, không đá người ta về danh sách */
-  const noiVe = amLe ? { ma: amLe.ma, quay: quayVe } : am ? { a: am, b: buoc } : null;
+  const noiVe = am ? { a: am, b: buoc, qua: daQua, quay: quayVe } : null;
   am = null; amLe = null; thoiNghe(); thoiHinh(); roiMan();
   const dongAm = AN ? AN.DS.flatMap(x => (x.am || []).map(b => ({ chu: '/' + x.ipa + '/ — ' + b.nhan, b }))) : [];
   const dongTu = TN ? Object.keys(TN.TU).sort().flatMap(t => TN.TU[t].map(b => ({ chu: t + ' (' + b.giong + ')', b }))) : [];
@@ -463,187 +446,61 @@ function veNguon() {
   </div>`;
   oTrong.scrollTop = 0;
   const ve = () => {
-    if (noiVe && noiVe.ma) { quayVe = noiVe.quay; veLe(noiVe.ma); }
-    else if (noiVe && noiVe.a) { am = noiVe.a; buoc = noiVe.b; veBuoc(); }
-    else veDanhSach();
+    if (!noiVe) { veDanhSach(); return; }
+    am = noiVe.a; amLe = am.le || null; buoc = noiVe.b; daQua = noiVe.qua; quayVe = noiVe.quay;
+    veBuoc();
   };
   oTrong.querySelector('.pa-quay').onclick = ve;
   oTrong.querySelector('.pa-lui').onclick = ve;
 }
 
-/* ---- màn luyện một âm ----
-   Nghe → nói theo → nghe lại mình ngay cạnh mẫu. Không chấm điểm: máy nhận giọng chỉ biết chữ,
-   mà một âm tiết như [sa] thì không phải chữ nào cả. Cái máy làm được thật là đặt tiếng bạn sát
-   cạnh tiếng mẫu để TAI bạn so. */
-let amLe = null, tiengMinh = null, dangThuLe = false, quayVe = null;
-
-function veLe(ma) {
-  const AN = self.TDTD_AMNGUOI, K = self.TDTD_KHAUHINH, x = AN && AN.tim(ma);
-  if (!x) { veDanhSach(); return; }
-  if (am) quayVe = { a: am, b: buoc };          // vào từ một bài sửa lỗi thì nút quay lại về đúng bài đó
-  am = null; capDang = null; amLe = x; tiengMinh = null; mauLe = x.am && x.am[0] ? x.am[0].f : null;
-  thoiNghe(); thoiHinh(); roiMan();
-  const baiHoc = AM.map((a, i) => ({ a, i })).filter(({ a }) => dsNguoi(a).some(d => d.x.ma === x.ma));
-  const cung = AN.DS.filter(y => y.nhom === x.nhom);
-  const ke = AN.DS[(AN.DS.indexOf(x) + 1) % AN.DS.length];
-  const coMic = !IOS_CAI && !!(self.navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
-  const nguyen = x.nhom !== 'phu';
-  taoNoiThu('le:' + x.ma, x.vd.map(v => v.tu), Object.values(x.soCap || {}), '/' + x.ipa + '/');
-  /* Câu dưới hình nhìn thẳng tả tư thế ĐÍCH. Nguyên âm đôi là một cú lướt nên nói cả hai đầu. */
-  const chuTruoc = x.luot ? `bắt đầu như /${x.luot[0]}/, lướt sang /${x.luot[1]}/` : undefined;
-  const hinh = K ? `
-    <div class="pa-le-hinh">
-      <figure class="pa-hinh pa-truoc">${K.veMatTruoc(x.kh, { nhan: 'Miệng nhìn thẳng khi đọc /' + x.ipa + '/', chu: chuTruoc })}
-        <figcaption>nhìn thẳng, như soi gương</figcaption></figure>
-      <figure class="pa-hinh pa-canh">${K.ve(x.kh, { nhan: 'Bên trong miệng khi đọc /' + x.ipa + '/' })}
-        <figcaption>bên trong miệng, nhìn từ bên hông</figcaption></figure>
-    </div>
-    ${nguyen ? `<div class="pa-bieu pa-le-bieu">${x.luot ? K.veNguyenAm(x.luot[0], x.luot[1], x.ipa) : K.veNguyenAm(x.ipa)}</div>
-      <p class="pa-chu pa-nho pa-giua">${x.luot ? 'Mũi tên là đường lưỡi lướt đi trong lúc đọc.' : 'Chấm vàng là chỗ của lưỡi.'}
-        Trái là lưỡi đưa ra trước, phải là lùi về sau; trên là lưỡi nâng cao, dưới là hạ thấp.</p>` : ''}
-    <div class="pa-nut-hang"><button class="pa-phu-nut pa-cham-nut${chamLai ? ' bat' : ''}">${chamLai ? 'Hình chạy tốc độ thường' : 'Cho hình chạy chậm'}</button></div>` : '';
-  oTrong.innerHTML = `<div class="pa-man">
-    <div class="pa-dau"><button class="pa-quay" aria-label="Quay lại">‹</button>
-      <span class="pa-ten">/${esc(x.ipa)}/ · ${esc(x.ten)}</span></div>
-    <div class="pa-le-cham">${cung.map(y => `<button class="pa-le-o${y === x ? ' nay' : ''}" data-sang="${esc(y.ma)}"
-      aria-label="Âm /${esc(y.ipa)}/">${esc(y.ipa)}</button>`).join('')}</div>
-    <p class="pa-le-to">/${esc(x.ipa)}/</p>
-    ${hinh}
-    <div class="pa-khoi">
-      <p class="pa-nhan">Cách đặt miệng</p>
-      <p class="pa-chu">${esc(x.goiY)}</p>
-    </div>
-    ${x.am && x.am.length ? `<div class="pa-le-nghe">${x.am.map((b, i) => `
-      <button class="pa-le-phat" data-am="${i}">▶ ${esc(b.nhan)}<i>${esc(b.phu || '')}</i></button>`).join('')}</div>` : ''}
-    <div class="pa-khoi">
-      <p class="pa-nhan">Trong từ — người bản xứ đọc</p>
-      <div class="pa-vd">${x.vd.map(v => `
-        <button class="pa-vd-nut" data-vd="${esc(v.tu)}"><b>▶ ${esc(v.tu)}</b>
-          ${phienAm(v.tu)}
-          <i>${esc(v.nghia)}</i><span class="pa-vd-giong"></span></button>`).join('')}</div>
-      <p class="pa-chu pa-nho">Bấm lại cùng một từ để nghe người khác đọc (từ nào có nhiều bản thu) — nghe nhiều giọng thì mới nhận ra cái âm chung.</p>
-    </div>
-    <p class="pa-le-bao" role="status"></p>
-    ${x.loi ? `<div class="pa-khoi pa-mo"><p class="pa-nhan">Người Việt hay sai</p><p class="pa-chu">${esc(x.loi)}</p></div>` : ''}
-    ${x.ghiChu ? `<div class="pa-khoi pa-mo"><p class="pa-nhan">Lưu ý</p><p class="pa-chu pa-nho">${esc(x.ghiChu)}</p></div>` : ''}
-    <div class="pa-khoi">
-      <p class="pa-nhan">Tới lượt bạn — nói theo, nghe lại mình</p>
-      ${coMic ? `<p class="pa-chu pa-nho pa-le-mau">Mẫu: <b>${esc(tenMau(x))}</b> — bấm một tiếng mẫu khác ở trên là đổi mẫu.</p>
-      <button class="pa-mic pa-le-thu">● Bấm rồi nói theo mẫu</button>
-      <div class="pa-do-muc"><i></i></div>
-      <div class="pa-le-so" hidden>
-        <button class="pa-le-phat" data-phat="so">▶ Mẫu rồi tới bạn</button>
-        <button class="pa-le-phat" data-phat="minh">▶ Chỉ tiếng bạn</button>
-      </div>
-      <p class="pa-chu pa-nho">Không có máy chấm ở đây. Máy phát mẫu rồi phát tiếng bạn ngay sau, để chính tai bạn so —
-        nghe mình sát cạnh mẫu thì mới nghe ra mình lệch chỗ nào. Tiếng bạn chỉ nằm trong máy lúc này,
-        không lưu, không gửi đi đâu.</p>` : `<p class="pa-chu pa-nho">${IOS_CAI
-        ? 'iPhone khi mở từ biểu tượng ngoài màn hình chính thì không cho trang web dùng micro. Mở trang này trong Safari là thu được.'
-        : 'Trình duyệt này không cho thu âm.'} Vẫn tập được: nghe mẫu, nói to theo, rồi nghe lại mẫu.</p>`}
-    </div>
-    ${veNoiThu()}
-    ${x.doi.length ? `<div class="pa-khoi">
-      <p class="pa-nhan">Nghe so với âm hay lẫn</p>
-      <div class="pa-le-cap">${x.doi.map(m => AN.tim(m)).filter(Boolean).map(y => { const c = capSo(x, y); return `
-        <div class="pa-le-cap-hang">
-          <button class="pa-le-phat" data-cap="${esc(y.ma)}">▶ ${esc(c[0])} rồi ${esc(c[1])}${phienAmCap(c)}<i>/${esc(x.ipa)}/ rồi /${esc(y.ipa)}/</i></button>
-          <button class="pa-phu-nut" data-sang="${esc(y.ma)}">Sang /${esc(y.ipa)}/ →</button>
-        </div>`; }).join('')}</div></div>` : ''}
-    ${baiHoc.length ? `<div class="pa-khoi">
-      <p class="pa-nhan">Bài sửa lỗi có âm này</p>
-      <div class="pa-tu">${baiHoc.map(({ a, i }) =>
-        `<button class="pa-tu-nut" data-bai="${i}">${esc(a.ipa)} · ${esc(a.ten)}</button>`).join('')}</div></div>` : ''}
-    <p class="pa-nguon">Mọi tiếng đọc ở đây là bản thu người thật trên Wikimedia Commons.
-      <button class="pa-lien" type="button" data-nguon="1">Ai đọc, giấy phép gì</button></p>
-    <div class="pa-lai">
-      <button class="pa-lui">${quayVe ? '← Về bài ' + esc(quayVe.a.ipa) : '← Danh sách'}</button>
-      <button class="pa-toi">Âm tiếp: /${esc(ke.ipa)}/ →</button>
-    </div>
-  </div>`;
-  oTrong.scrollTop = 0;
-
-  const ve = () => {
-    if (quayVe) { am = quayVe.a; buoc = quayVe.b; quayVe = null; amLe = null; veBuoc(); }
-    else veDanhSach();
-  };
-  oTrong.querySelector('.pa-quay').onclick = ve;
-  oTrong.querySelector('.pa-lui').onclick = ve;
-  oTrong.querySelector('.pa-toi').onclick = () => veLe(ke.ma);
-  oTrong.querySelector('[data-nguon]').onclick = () => veNguon();
-  const nutCham = oTrong.querySelector('.pa-cham-nut');
-  if (nutCham) nutCham.onclick = () => {
-    chamLai = !chamLai;
-    nutCham.textContent = chamLai ? 'Hình chạy tốc độ thường' : 'Cho hình chạy chậm';
-    nutCham.classList.toggle('bat', chamLai);
-    chayLe(x);
-  };
-  oTrong.querySelectorAll('[data-am]').forEach(n => {
-    n.onclick = () => { const b = x.am[+n.dataset.am]; datMau(x, b.f); phatChuoi([b.f], n); chayLe(x); };
-  });
-  oTrong.querySelectorAll('[data-vd]').forEach(n => {
-    n.onclick = () => {
-      const tu = n.dataset.vd, i = luotVd[tu] = (luotVd[tu] === undefined ? 0 : luotVd[tu] + 1);
-      const ds = banThu(tu);
-      const b = ds && ds.length ? ds[i % ds.length] : null;
-      const g = n.querySelector('.pa-vd-giong');
-      if (g) g.textContent = b ? 'giọng ' + b.giong + (ds.length > 1 ? ` · người ${i % ds.length + 1}/${ds.length}` : ' · chỉ có một bản thu') : '';
-      if (b) datMau(x, b.f);
-      doc(tu, false, i, n); chayLe(x);
-    };
-  });
-  oTrong.querySelectorAll('[data-phat]').forEach(n => {
-    n.onclick = () => {
-      const k = n.dataset.phat;
-      if (k === 'so' && tiengMinh && mauLe) phatChuoi([mauLe, tiengMinh], n);
-      else if (k === 'minh' && tiengMinh) phatChuoi([tiengMinh], n);
-    };
-  });
-  oTrong.querySelectorAll('[data-cap]').forEach(n => {
-    const c = capSo(x, AN.tim(n.dataset.cap)), kh = c.join('|');
-    n.onclick = () => {
-      /* hai từ do CÙNG MỘT NGƯỜI đọc, giọng Anh trước nếu Anh-Mỹ khác nhau; bấm lại thì sang người khác */
-      const ds = chungNguoi(c[0], c[1]), i = luotVd[kh] = luotVd[kh] === undefined ? 0 : luotVd[kh] + 1;
-      /* Anh-Mỹ đọc khác mà không có người giọng Anh nào đọc cả hai từ: giọng Mỹ thì "car rồi hot" ra
-         cùng một nguyên âm. Lúc đó so bằng hai bản thu chính cái âm (đều giọng Anh) cho đúng. */
-      const TN = self.TDTD_TUNGUOI, khac = c.some(t => { const p = TN && TN.ipa(t); return p && p[0] !== p[1]; });
-      const anh = ds.filter(p => p[0].giong === 'Anh');
-      if (khac && !anh.length && x.am.length && y.am.length) { phatChuoi([x.am[0].f, y.am[0].f], n); return; }
-      const dung = khac ? anh : ds;
-      if (dung.length) { const p = dung[i % dung.length]; phatChuoi([p[0].f, p[1].f], n); return; }
-      const A = banThu(c[0]), B = banThu(c[1]);
-      if (A && B) phatChuoi([A[0].f, B[0].f], n);
-    };
-  });
-  oTrong.querySelectorAll('[data-sang]').forEach(n => { n.onclick = () => veLe(n.dataset.sang); });
-  oTrong.querySelectorAll('[data-bai]').forEach(n => { n.onclick = () => { quayVe = null; moAm(AM[+n.dataset.bai]); }; });
-  const thu = oTrong.querySelector('.pa-le-thu');
-  if (thu) thu.onclick = () => thuLe();
-  ganNoiThu();
-  chayLe(x);
-  /* mở màn là nghe ngay: tiếng của chính âm đó nếu có, không thì từ ví dụ đầu tiên */
-  const dau = oTrong.querySelector('[data-am="0"]') || oTrong.querySelector('[data-vd]');
-  if (dau) dau.click();
-}
-
-let mauLe = null;
+/* ---- một âm trong bảng 44 âm ----
+   Người dùng hỏi: "sao Bảng 44 âm lại khác so với Cuối từ, khi bấm vô học cách bố trí khác nhau hết".
+   Đúng là vậy: bài sửa lỗi làm trước, dắt từng bước; màn 44 âm làm sau, thành một trang dài như tờ
+   tra cứu — cùng là "học một âm" mà hai chỗ hai lối, khối giống nhau nằm chỗ khác nhau, có thứ chỉ
+   một bên có. Giờ một âm của bảng được gói thành cùng dạng một bài sửa lỗi rồi đi CHUNG một lối từng
+   bước (veBuoc): nghe → luyện tai → xem miệng → nghe so → nói. Chỉ nội dung khác (một âm thay vì một
+   cặp lỗi); khung, thứ tự bước, hình khẩu hình và nút bấm thì như nhau. */
+let amLe = null, tiengMinh = null, dangThuLe = false, quayVe = null, mauLe = null;
 const luotVd = {};
+
+function baiAm(x) {
+  const AN = self.TDTD_AMNGUOI;
+  /* Luyện tai chỉ lấy cặp tối thiểu khai báo sẵn (sheep/ship), và chỉ cặp có MỘT người đọc cả hai từ.
+     Ghép bừa từ ví dụ của hai âm (cup/car) thì hai từ khác nhau đủ đường, chẳng cần tai nghe âm;
+     hai người đọc thì giọng lộ đáp án. */
+  const cap = Object.entries(x.soCap || {}).map(([m, c]) => {
+    const y = AN.tim(m);
+    return y && chungNguoi(c[0], c[1]).length ? [c[0], c[1], '/' + x.ipa + '/ · /' + y.ipa + '/'] : null;
+  }).filter(Boolean);
+  return { le: x, ipa: '/' + x.ipa + '/', ten: x.ten, nhom: x.nhom, cap, kiemDuoc: true,
+           tu: x.vd.map(v => v.tu), kh: x.kh, kh2: x.kh2, tac: x.tac, cach: x.goiY };
+}
+
+/* ten: bước muốn mở. Bấm sang âm bên cạnh lúc đang xem miệng thì vẫn ở bước xem miệng — để so hai hình. */
+function veLe(ma, ten) {
+  const AN = self.TDTD_AMNGUOI, x = AN && AN.tim(ma);
+  if (!x) { veDanhSach(); return; }
+  if (am && !am.le) quayVe = { a: am, b: buoc, qua: daQua };   // vào từ một bài sửa lỗi thì nút quay lại về đúng bài đó
+  moAm(baiAm(x), ten);
+}
+
 /* Cặp từ để so âm x với âm y: dùng cặp tối thiểu khai báo sẵn (sing/sin — cùng chỗ đứng trong từ) nếu
    có, không thì lấy từ ví dụ đầu của mỗi âm. Lấy bừa vd[0] thì "sing rồi no": ng ở cuối, n ở đầu,
    không luyện được đúng cái lỗi đang nói. */
 function capSo(x, y) {
   return (x.soCap && x.soCap[y.ma]) || [x.vd[0].tu, y.vd[0].tu];
 }
-function tenMau(x) {
-  const b = x.am && x.am.find(b => b.f === mauLe);
-  if (b) return b.nhan;
-  const TN = self.TDTD_TUNGUOI;
-  for (const v of x.vd) { const ds = TN && TN.tim(v.tu); const c = ds && ds.find(c => c.f === mauLe); if (c) return v.tu + ' (giọng ' + c.giong + ')'; }
-  return x.vd[0].tu;
-}
-function datMau(x, f) {
-  mauLe = f;
-  const n = oTrong && oTrong.querySelector('.pa-le-mau b');
-  if (n) n.textContent = tenMau(x);
+
+/* Mẫu để nói theo: tiếng chính cái âm (nếu có người thu), rồi các từ ví dụ, mỗi thứ một bản thu.
+   Không lấy tiếng của vế SAI (/n/ trong bài /l/ cuối) — đó là cái cần tránh, không phải cái để bắt chước. */
+function dsMau(a) {
+  const ra = [], them = (f, nhan) => { if (f && !ra.some(m => m.f === f)) ra.push({ f, nhan }); };
+  if (a.le) (a.le.am || []).forEach(b => them(b.f, b.nhan));
+  else dsNguoi(a).filter(d => !d.laSai).forEach(({ x }) =>
+    (x.am || []).filter(b => a.nhom !== 'Cuối từ' || /cuối/.test(b.phu || '')).forEach(b => them(b.f, b.nhan)));
+  for (const t of [a.tuA].concat(a.tu)) { const ds = t && banThu(t); if (ds && ds.length) them(ds[0].f, t); }
+  return ra.slice(0, 5);
 }
 
 /* Khung hình động cho một âm. Nguyên âm đôi: đi tới tư thế đầu, giữ một nhịp, LƯỚT sang tư thế
@@ -657,16 +514,35 @@ function khungLe(x) {
     { p: vs(x.kh2, .5), g: .35 }, { p: vs(x.kh2, .5), g: .4 }, { p: N, g: .3 }];
   return khungHinh(x.kh, x.tac);
 }
-function chayLe(x) {
-  const svgs = [...oTrong.querySelectorAll('.pa-le-hinh svg')];
-  svgs.forEach(sv => { sv.dataset.truoc = sv.parentNode.classList.contains('pa-truoc') ? '1' : ''; });
-  if (svgs.length) chayHinh(svgs, khungLe(x));
+
+/* Khối "nói theo mẫu, nghe lại mình" — trước chỉ màn 44 âm có, giờ bước nói của mọi bài đều có. */
+function veNoiTheo(a) {
+  const coMic = !IOS_CAI && !!(self.navigator && navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+  const mau = dsMau(a);
+  if (!mau.some(m => m.f === mauLe)) mauLe = mau.length ? mau[0].f : null;
+  return `<div class="pa-khoi pa-noi-theo">
+    <p class="pa-nhan">Nói theo mẫu, nghe lại mình</p>
+    ${mau.length ? `<div class="pa-nt-chon">${mau.map(m =>
+      `<button class="pa-nt-tu${m.f === mauLe ? ' dang' : ''}" data-mau="${esc(m.f)}" type="button"><b>▶ ${esc(m.nhan)}</b></button>`).join('')}</div>` : ''}
+    ${coMic ? `<p class="pa-chu pa-nho">Chọn một mẫu ở trên, bấm micro rồi nói theo. Máy phát mẫu rồi phát tiếng bạn ngay sau,
+      để chính tai bạn so — nghe mình sát cạnh mẫu thì mới nghe ra mình lệch chỗ nào. Không có máy chấm ở đây.</p>
+    <button class="pa-mic pa-le-thu">● Bấm rồi nói theo mẫu</button>
+    <div class="pa-do-muc"><i></i></div>
+    <div class="pa-le-so" hidden>
+      <button class="pa-le-phat" data-phat="so">▶ Mẫu rồi tới bạn</button>
+      <button class="pa-le-phat" data-phat="minh">▶ Chỉ tiếng bạn</button>
+    </div>
+    <p class="pa-chu pa-nho">Tiếng bạn chỉ nằm trong máy lúc này, không lưu, không gửi đi đâu.</p>` : `<p class="pa-chu pa-nho">${IOS_CAI
+      ? 'iPhone khi mở từ biểu tượng ngoài màn hình chính thì không cho trang web dùng micro. Mở trang này trong Safari là thu được.'
+      : 'Trình duyệt này không cho thu âm.'} Vẫn tập được: nghe mẫu, nói to theo, rồi nghe lại mẫu.</p>`}
+    <p class="pa-le-bao" role="status"></p>
+  </div>`;
 }
 
 async function thuLe() {
   if (dangThuLe) return;
-  const x = amLe, the = phienMan;
-  const nut = oTrong.querySelector('.pa-le-thu'), muc = oTrong.querySelector('.pa-do-muc i');
+  const a = am, the = phienMan;
+  const nut = oTrong.querySelector('.pa-le-thu'), muc = oTrong.querySelector('.pa-noi-theo .pa-do-muc i');
   imLang();
   moLoa();                           // mở loa ngay trong cú chạm, lát nữa mới phát lại được trên iPhone
   dangThuLe = true;
@@ -676,7 +552,7 @@ async function thuLe() {
   try { kq = await thuAm(v => { if (!moRoi) { moRoi = true; nut.textContent = 'Đang nghe… nói đi'; } if (muc) muc.style.width = Math.round(v * 100) + '%'; }, .9, 4); }
   catch (e) { loi = e; }
   dangThuLe = false;
-  if (the !== phienMan || amLe !== x) return;     // đã rời màn này trong lúc thu
+  if (the !== phienMan || am !== a) return;       // đã rời màn này trong lúc thu
   nut.classList.remove('dang'); nut.textContent = '● Nói lại';
   if (muc) muc.style.width = '0';
   if (loi) {
@@ -921,14 +797,11 @@ function chayHinh(svgs, khung) {
 }
 function dungHinh() { if (quay) { cancelAnimationFrame(quay); quay = null; } }
 
-/* Dừng CẢ HAI vòng chạy hình. Hàm này từng bị xoá nhầm lúc tôi tách hàm quyet() ra khỏi xet():
+/* Dừng vòng chạy hình. Hàm này từng bị xoá nhầm lúc tôi tách hàm quyet() ra khỏi xet():
    phép thay thế lấy trọn đoạn từ "function xet" tới "function thoiNghe", mà thoiHinh lại nằm
    lọt giữa hai mốc đó. Hậu quả: dong() ném lỗi ngay trước dòng gỡ lớp "hien", nên màn phát âm
    mở ra là không bao giờ đóng được, phủ kín màn hình và làm mọi ngôi sao khác bấm như không. */
-function thoiHinh() {
-  dungHinh();
-  if (quay2) { cancelAnimationFrame(quay2); quay2 = null; }
-}
+function thoiHinh() { dungHinh(); }
 
 /* ---- màn một âm: dắt tay từng bước, không phải một trang dài cuộn xuống ---- */
 let buoc = 0;
@@ -941,7 +814,11 @@ let buoc = 0;
 function cacBuoc(a) {
   const ds = ['nghe'];
   if (a.cap.length) ds.push('tai');
-  ds.push('mieng', 'tu', 'noi');
+  ds.push('mieng');
+  /* nghe so từng cặp: chỉ khi có cặp để so — bản trước bài không có cặp thì bước này lặp lại y hệt
+     khối "Trong từ" của bước 1 */
+  if (a.le ? a.le.doi.length : a.cap.length) ds.push('so');
+  ds.push('noi');
   return ds;
 }
 
@@ -1041,23 +918,17 @@ function veTai() {
     }, 260);
   }
 }
-/* Nối mọi hình đang hiện trên màn với vòng chạy. Gọi lại được sau khi mở lớp "xem thêm"
-   hoặc đổi tốc độ, nên không cần vẽ lại cả màn. */
-function noiHinh(lai) {
+/* Nối hình đang hiện trên màn với vòng chạy: cả hình nhìn thẳng lẫn hình bên trong của tư thế đang
+   xem chạy cùng một nhịp. Gọi lại được sau khi đổi tư thế hay đổi tốc độ, không cần vẽ lại cả màn. */
+function noiHinh() {
   const a = am;
   if (!a) return;
-  oTrong.querySelectorAll('.pa-hinh svg').forEach(sv => {
-    sv.dataset.truoc = sv.parentNode.classList.contains('pa-truoc') ? '1' : '';
-  });
-  const ds = [...oTrong.querySelectorAll('.pa-hinh svg')].filter(s => !s.closest('[hidden]'));
-  ds.forEach((s, i) => { s.dataset.hai = a.kh2 && i % 2 === 1 ? '1' : ''; });
-  const A = ds.filter(s => !s.dataset.hai), B = ds.filter(s => s.dataset.hai);
-  /* Chạy TẤT CẢ hình của mỗi vế, không chỉ hình đầu — một màn có thể có hình nhìn thẳng,
-     hình nhỏ bên dưới, và hình cắt dọc vừa mở ra, cả ba đều phải động. */
-  if (A.length) chayHinh(A, khungHinh(a.kh, a.tac, a.kieu));
-  if (B.length && a.kh2) setTimeout(() => {
-    if (B[0].isConnected) chayPhu(B, khungHinh(a.kh2, a.tac, a.kieu));
-  }, 380);
+  const k = [...oTrong.querySelectorAll('.pa-hinh-tu')].find(k => !k.hidden);
+  if (!k) return;
+  const svgs = [...k.querySelectorAll('.pa-hinh svg')];
+  svgs.forEach(sv => { sv.dataset.truoc = sv.parentNode.classList.contains('pa-truoc') ? '1' : ''; });
+  const hai = k.dataset.tu === '2';
+  chayHinh(svgs, a.le ? khungLe(a.le) : khungHinh(hai ? a.kh2 : a.kh, a.tac, a.kieu));
 }
 
 /* Đọc từ của lượt này, bằng giọng người, chậm lại một chút cho nghe rõ chỗ khác nhau. */
@@ -1107,174 +978,228 @@ function batTai(a) {
   veTai();
 }
 
-let daQua = new Set();
-function moAm(a) {
-  am = a; amLe = null; capDang = null; luot = []; buoc = 0; daQua = new Set(); doTieng = null;
-  doTu = 0; doLuot = []; doBuoc = 0; doMau1 = null; doKq = null;
+let daQua = new Set(), hinhTu = 1;     // hinhTu: bài so hai tư thế thì đang xem hình nào (1 hay 2)
+function moAm(a, ten) {
+  am = a; amLe = a.le || null; capDang = null; luot = []; daQua = new Set(); doTieng = null; hinhTu = 1;
+  doTu = 0; doLuot = []; doBuoc = 0; doMau1 = null; doKq = null; tiengMinh = null; mauLe = null;
+  /* mở thẳng tới bước `ten` nếu bài này có bước đó — trừ luyện tai: đang luyện dở mà bấm sang âm
+     khác thì không nên quăng người ta vào một lượt nghe mới ngay */
+  const i = ten && ten !== 'tai' ? cacBuoc(a).indexOf(ten) : -1;
+  buoc = i > 0 ? i : 0;
   veBuoc();
 }
 
-const coNoiThu = (a) => !!a.do || (a.cap.length > 0 && a.kiemDuoc && coNghe());
+const coNoiThu = (a) => a.le ? coNghe() : (!!a.do || (a.cap.length > 0 && a.kiemDuoc && coNghe()));
 
+/* Tên ngắn của một bài trên hàng chip: "/s/ /z/ cuối" → "s z", "cụm st- sp- sk-" → "st- sp- sk-". */
+const tenNgan = (b) => b.ipa.replace(/ cuối$/, '').replace(/^cụm /, '').replace(/ và /, ' ').replace(/\//g, '');
+
+/* Đầu màn — giống hệt nhau cho bài sửa lỗi và âm trong bảng 44 âm: tên, nút nói thử, hàng chip để
+   sang âm (hay bài) cùng nhóm, và thanh chấm báo đang ở bước nào. */
 function dauMan() {
-  const ds = cacBuoc(am);
-  const noiThu = coNoiThu(am) && ds[buoc] !== 'noi';
+  const a = am, ds = cacBuoc(a), AN = self.TDTD_AMNGUOI;
+  const noiThu = coNoiThu(a) && ds[buoc] !== 'noi';
+  const chip = a.le
+    ? AN.DS.filter(y => y.nhom === a.le.nhom).map(y =>
+        `<button class="pa-le-o${y === a.le ? ' nay' : ''}" data-chip="${esc(y.ma)}" aria-label="Âm /${esc(y.ipa)}/">${esc(y.ipa)}</button>`)
+    : AM.map((b, i) => b.nhom !== a.nhom ? '' :
+        `<button class="pa-le-o${b === a ? ' nay' : ''}" data-chip="${i}" aria-label="Bài ${esc(b.ipa)}">${esc(tenNgan(b))}</button>`);
   return `
     <div class="pa-dau">
       <button class="pa-quay" aria-label="Quay lại">‹</button>
-      <span class="pa-ten">${esc(am.ipa)} · ${esc(am.ten)}</span>
+      <span class="pa-ten">${esc(a.ipa)} · ${esc(a.ten)}</span>
       ${noiThu ? '<button class="pa-noithu" type="button">Nói thử</button>' : ''}
     </div>
+    <div class="pa-le-cham">${chip.join('')}</div>
     <div class="pa-cham">${ds.map((_, i) =>
       `<i class="${i === buoc ? 'nay' : daQua.has(i) ? 'roi' : ''}"></i>`).join('')}</div>`;
 }
+/* Nút quay lại ở đầu màn: âm mở ra từ một bài sửa lỗi thì về đúng bài, đúng bước đó; không thì về danh sách. */
+function veVe() {
+  phienTai++;
+  if (!quayVe) { veDanhSach(); return; }
+  const q = quayVe; quayVe = null;
+  am = q.a; amLe = null; buoc = q.b; daQua = q.qua || new Set(); hinhTu = 1;
+  veBuoc();
+}
 function gocMan() {
-  oTrong.querySelector('.pa-quay').onclick = () => { phienTai++; veDanhSach(); };
+  const a = am, AN = self.TDTD_AMNGUOI;
+  oTrong.querySelector('.pa-quay').onclick = veVe;
   const noiThu = oTrong.querySelector('.pa-noithu');
-  if (noiThu) noiThu.onclick = () => { phienTai++; buoc = cacBuoc(am).indexOf('noi'); veBuoc(); };
+  if (noiThu) noiThu.onclick = () => { phienTai++; buoc = cacBuoc(a).indexOf('noi'); veBuoc(); };
   const lui = oTrong.querySelector('.pa-lui');
-  if (lui) lui.onclick = () => { phienTai++; if (buoc > 0) { buoc--; veBuoc(); } else veDanhSach(); };
+  if (lui) lui.onclick = () => { phienTai++; if (buoc > 0) { buoc--; veBuoc(); } else veVe(); };
   const toi = oTrong.querySelector('.pa-toi');
   if (toi) toi.onclick = () => {
     phienTai++;
-    if (buoc >= cacBuoc(am).length - 1) { moAm(AM[(AM.indexOf(am) + 1) % AM.length]); return; }
-    buoc++; veBuoc();
+    if (buoc < cacBuoc(a).length - 1) { buoc++; veBuoc(); return; }
+    if (a.le) veLe(AN.DS[(AN.DS.indexOf(a.le) + 1) % AN.DS.length].ma);
+    else moAm(AM[(AM.indexOf(a) + 1) % AM.length]);
   };
   const veDs = oTrong.querySelector('.pa-ve-ds');
   if (veDs) veDs.onclick = () => { phienTai++; veDanhSach(); };
+  oTrong.querySelectorAll('[data-chip]').forEach(n => {
+    n.onclick = () => {
+      phienTai++;
+      const ten = cacBuoc(a)[buoc];
+      if (a.le) veLe(n.dataset.chip, ten);
+      else { quayVe = null; moAm(AM[+n.dataset.chip], ten); }
+    };
+  });
+  /* hàng chip dài hơn màn điện thoại: cuộn sao cho chip đang chọn nằm giữa */
+  const hang = oTrong.querySelector('.pa-le-cham'), nay = hang && hang.querySelector('.nay');
+  if (nay && hang.clientWidth) hang.scrollLeft = Math.max(0, nay.offsetLeft - (hang.clientWidth - nay.offsetWidth) / 2);
 }
 
 function veBuoc() {
-  const a = am, K = self.TDTD_KHAUHINH, ds = cacBuoc(a), ten = ds[buoc];
-  const cuoi = buoc >= ds.length - 1;
+  const a = am, x = a.le, K = self.TDTD_KHAUHINH, AN = self.TDTD_AMNGUOI, ds = cacBuoc(a), ten = ds[buoc];
+  const cuoi = buoc >= ds.length - 1, so = (t) => ds.indexOf(t) + 1;
   roiMan();
   if (ten === 'tai') { dungHinh(); batTai(a); return; }
   const dau = dauMan();
+  const khoi = (nhan, chu, phu) => `<div class="pa-khoi${phu ? ' pa-mo' : ''}"><p class="pa-nhan">${esc(nhan)}</p>
+    <p class="pa-chu${phu ? ' pa-nho' : ''}">${esc(chu)}</p></div>`;
 
   let than = '';
   if (ten === 'noi') {
     /* Bài có cặp tối thiểu: cho nói cả HAI từ của cặp (bản trước chỉ cho nói từ đầu). Bài lỗi đẻ ra
        chuỗi không phải từ (life → "laip") thì máy hay tự sửa giùm — vẫn cho nói thử, nhưng nói thẳng ra. */
-    taoNoiThu('bai:' + a.ipa, a.cap.length ? [] : a.tu, a.cap.map(c => [c[0], c[1]]), a.ipa,
+    if (x) taoNoiThu('le:' + x.ma, x.vd.map(v => v.tu), Object.values(x.soCap || {}), a.ipa);
+    else taoNoiThu('bai:' + a.ipa, a.cap.length ? [] : a.tu, a.cap.map(c => [c[0], c[1]]), a.ipa,
       a.kiemDuoc ? '' : 'Với bài này máy hay "sửa giùm": bạn nói "laip" nó vẫn có thể ghi "life", vì "laip" không phải từ. '
-        + 'Máy ghi đúng chưa chắc bạn đã nói đúng — nghe kỹ mẫu và soi gương ở bước trước.');
+        + 'Máy ghi đúng chưa chắc bạn đã nói đúng — nghe kỹ mẫu và soi gương ở bước xem miệng.');
   }
   if (ten === 'nghe') {
     /* Dẫn bằng chính cái ÂM, do NGƯỜI THẬT đọc — đứng riêng và trong âm tiết. Hai bản trước đều
        trượt: bản đầu dẫn bằng âm máy dựng (đúng phổ mà tai không nghe ra chữ gì), bản sau dẫn bằng
        từ do máy đọc (nghe được, nhưng cả bài thành luyện từ chứ không còn luyện âm). Bản thu người
        thật là cách duy nhất có được cả hai: giọng người, và âm đứng một mình. */
-    const nguoi = dsNguoi(a);
+    const hang = x ? [{ x, laSai: false, tu: x.vd[0].tu }] : dsNguoi(a);
     than = `
       <p class="pa-buoc">Bước 1 — nghe người thật đọc âm này</p>
-      ${nguoi.length ? `<div class="pa-nguoi">${nguoi.map(({ x, laSai, tu }) => `
+      <p class="pa-le-to${a.ipa.length > 6 ? ' dai' : ''}">${esc(a.ipa)}</p>
+      <div class="pa-nguoi">${hang.map(({ x: y, laSai, tu }) => `
         <div class="pa-nguoi-hang${laSai ? ' sai' : ''}">
-          <span class="pa-nguoi-ipa">/${esc(x.ipa)}/${laSai ? '<i>cái sai hay gặp</i>' : ''}</span>
+          ${x ? '' : `<span class="pa-nguoi-ipa">/${esc(y.ipa)}/${laSai ? '<i>cái sai hay gặp</i>' : ''}</span>`}
           <span class="pa-nguoi-nut">
             ${(() => {
               /* Bài âm CUỐI từ thì minh hoạ bằng từ có âm đó ở cuối (hat, bag, wipe) — bản thu "[ga] … [aga]"
                  hay "[fa] … [afa]" là âm ở đầu và giữa, dạy sai chỗ. Chỉ giữ bản thu nào chính là âm cuối từ ("hiss"). */
-              const cuoiTu = a.nhom === 'Cuối từ', ban = (x.am || []).filter(b => !cuoiTu || /cuối/.test(b.phu || ''));
-              const nutTu = `<button class="pa-le-phat" data-vd="${esc(tu)}">▶ ${esc(tu)}${phienAm(tu)}<i>người bản xứ đọc</i></button>`;
-              const nutAm = ban.map(b => `<button class="pa-le-phat" data-nguoi="${esc(b.f)}">▶ ${esc(b.nhan)}<i>${esc(b.phu || '')}</i></button>`).join('');
-              return cuoiTu ? (ban.length ? nutAm : nutTu) : (ban.length ? nutAm : nutTu);
+              const cuoiTu = a.nhom === 'Cuối từ', ban = (y.am || []).filter(b => !cuoiTu || /cuối/.test(b.phu || ''));
+              return ban.length
+                ? ban.map(b => `<button class="pa-le-phat" data-nguoi="${esc(b.f)}">▶ ${esc(b.nhan)}<i>${esc(b.phu || '')}</i></button>`).join('')
+                : `<button class="pa-le-phat" data-vd="${esc(tu)}">▶ ${esc(tu)}${phienAm(tu)}<i>${x
+                    ? 'âm này chưa ai thu đứng riêng — nghe nó trong từ' : 'người bản xứ đọc'}</i></button>`;
             })()}
-            <button class="pa-phu-nut" data-sang="${esc(x.ma)}">Xem âm /${esc(x.ipa)}/ trong bảng 44 âm →</button>
+            ${x ? '' : `<button class="pa-phu-nut" data-sang="${esc(y.ma)}">Xem âm /${esc(y.ipa)}/ trong bảng 44 âm →</button>`}
           </span></div>`).join('')}</div>
-      <p class="pa-le-bao" role="status"></p>` : ''}
+      <p class="pa-le-bao" role="status"></p>
       <div class="pa-khoi">
-        <p class="pa-nhan">Trong từ</p>
-        <div class="pa-tu">${a.tu.map((t, i) =>
-          `<button class="pa-tu-nut" data-t="${esc(t)}" data-g="${i}">▶ ${esc(t)}${phienAm(t)}</button>`).join('')}</div>
-        <p class="pa-chu pa-nho">Người bản xứ đọc, mỗi nút một giọng — nghe âm ${esc(a.ipa)}
-          nằm trong từ, vì đó là cách bạn gặp nó khi nói thật.</p>
+        <p class="pa-nhan">Trong từ — người bản xứ đọc</p>
+        <div class="pa-vd">${(x ? x.vd : a.tu.map(t => ({ tu: t }))).map(v => `
+          <button class="pa-vd-nut" data-vd="${esc(v.tu)}"><b>▶ ${esc(v.tu)}</b>${phienAm(v.tu)}
+            ${v.nghia ? `<i>${esc(v.nghia)}</i>` : ''}<span class="pa-vd-giong"></span></button>`).join('')}</div>
+        <p class="pa-chu pa-nho">Bấm lại cùng một từ để nghe người khác đọc (từ nào có nhiều bản thu) — nghe nhiều giọng
+          thì mới nhận ra cái âm chung.</p>
       </div>
-      <div class="pa-khoi">
-        <p class="pa-nhan">Vì sao phải học âm này</p>
-        <p class="pa-chu">${esc(a.viSao)}</p>
-      </div>
+      ${x ? (x.loi ? khoi('Người Việt hay sai', x.loi) : '') + (x.ghiChu ? khoi('Lưu ý', x.ghiChu, true) : '')
+          : khoi('Vì sao phải học âm này', a.viSao)}
       <p class="pa-nguon">Mọi tiếng đọc ở đây là bản thu người thật trên Wikimedia Commons.
         <button class="pa-lien" type="button" data-nguon="1">Ai đọc, giấy phép gì</button></p>`;
   } else if (ten === 'mieng') {
-    /* Thứ tự hiển thị theo bằng chứng: hình MIỆNG NHÌN THẲNG là hình chính, vì soi gương là
-       tự kiểm được ngay. Hình cắt dọc hạ xuống thành lớp "xem thêm" — nó chỉ có ích sau khi
-       người ta được dạy cách đọc nó, nên không được đặt nó ở chỗ đầu tiên người mới nhìn vào.
-       Riêng âm nào phân biệt bằng lưỡi BÊN TRONG thì cắt dọc mới lên làm chính. */
-    const canh = a.hinh === 'canh';
-    const hinhCanh = (kh, nhan2, sai) => `<figure class="pa-hinh">${K ? K.ve(kh, { nhan: 'Khẩu hình ' + (nhan2 || a.ipa) }) : ''}
-      ${nhan2 ? `<figcaption${sai ? ' class="pa-sai"' : ''}>${esc(nhan2)}</figcaption>` : ''}</figure>`;
-    /* Nút dưới mỗi hình đọc một TỪ THẬT bằng giọng người, chọn sao cho từ đó minh hoạ đúng cái
-       âm mà hình đang vẽ. Chỗ duy nhất còn dùng âm máy dựng là vế sai của /f/ /v/ cuối, vì lỗi
-       ở đó đẻ ra "laip" — không phải từ nên máy đọc chịu, mà lại đúng là cái cần cho nghe. */
+    /* Hình theo đúng kiểu của màn 44 âm (người dùng chọn giữ kiểu này): miệng nhìn thẳng và bên trong
+       miệng đặt CẠNH NHAU, chạy cùng một nhịp — soi gương được bằng hình trái, hiểu lưỡi làm gì bằng
+       hình phải. Bài so hai tư thế (/l/ với /n/, /s/ với /z/...) thì có hai nút bấm qua lại giữa hai
+       hình, chứ không bày bốn hình chồng nhau dài cả màn trên điện thoại. */
+    const hai = !x && !!a.kh2;
+    const nguyen = x ? x.nhom !== 'phu' : !!a.bieu;
+    const chuTruoc = x && x.luot ? `bắt đầu như /${x.luot[0]}/, lướt sang /${x.luot[1]}/` : undefined;
+    /* Nút dưới hình đọc một TỪ THẬT bằng giọng người (hay chính cái âm, ở màn 44 âm), chọn sao cho
+       đúng cái âm hình đang vẽ. Chỗ duy nhất còn dùng âm máy dựng là vế sai không đẻ ra từ nào. */
     const nutNghe = (thu, sai) => {
+      const lop = 'pa-le-phat' + (sai ? ' sai' : '');
+      if (x) {
+        const b = (x.am || [])[0];
+        return b ? `<button class="${lop}" data-hinh="1" data-f="${esc(b.f)}">▶ ${esc(b.nhan)}<i>${esc(b.phu || '')}</i></button>`
+          : `<button class="${lop}" data-hinh="1" data-t="${esc(x.vd[0].tu)}" data-g="0">▶ ${esc(x.vd[0].tu)}${phienAm(x.vd[0].tu)}</button>`;
+      }
       const t = thu === 2 ? a.tuB : a.tuA;
-      const lop = 'pa-nut-am' + (sai ? ' sai' : '');
       return t
         ? `<button class="${lop}" data-hinh="${thu}" data-t="${esc(t)}" data-g="${thu === 2 ? 1 : 0}">▶ ${esc(t)}${phienAm(t)}</button>`
         : `<button class="${lop}" data-hinh="${thu}">▶ nghe (tiếng máy dựng)</button>`;
     };
-    const hinhTruoc = (kh, ten2, sai, thu) => `<figure class="pa-hinh pa-truoc">${K ? K.veMatTruoc(kh, { nhan: 'Miệng nhìn thẳng, ' + (ten2 || a.ipa) }) : ''}
-      ${ten2 ? `<figcaption${sai ? ' class="pa-sai"' : ''}>${esc(ten2)}</figcaption>` : ''}
-      ${nutNghe(thu, sai)}</figure>`;
+    const tuThe = (kh, thu, nhan, sai) => `
+      <div class="pa-hinh-tu" data-tu="${thu}"${thu === hinhTu ? '' : ' hidden'}>
+        <div class="pa-le-hinh">
+          <figure class="pa-hinh pa-truoc">${K ? K.veMatTruoc(kh, { nhan: 'Miệng nhìn thẳng khi đọc ' + nhan, chu: chuTruoc }) : ''}
+            <figcaption>nhìn thẳng, như soi gương</figcaption></figure>
+          <figure class="pa-hinh pa-canh">${K ? K.ve(kh, { nhan: 'Bên trong miệng khi đọc ' + nhan }) : ''}
+            <figcaption>bên trong miệng, nhìn từ bên hông</figcaption></figure>
+        </div>
+        <div class="pa-nut-hang">${nutNghe(thu, sai)}</div>
+      </div>`;
     than = `
-      <p class="pa-buoc">Bước ${ds.indexOf('mieng') + 1} — giờ mới xem miệng làm gì</p>
-      <div class="pa-doi-hinh${canh ? '' : ' pa-to-hinh'}">
-        ${canh ? hinhCanh(a.kh, a.nhan1) + (a.kh2 ? hinhCanh(a.kh2, a.nhan2, a.sai2) : '')
-               : hinhTruoc(a.kh, a.nhan1, false, 1) + (a.kh2 ? hinhTruoc(a.kh2, a.nhan2, a.sai2, 2) : '')}
-      </div>
-      ${canh ? `<div class="pa-doi-hinh pa-nho-hinh">
-        ${hinhTruoc(a.kh, null, false, 1)}${a.kh2 ? hinhTruoc(a.kh2, null, a.sai2, 2) : ''}</div>` : ''}
-      <div class="pa-nut-hang">
-        <button class="pa-phu-nut pa-cham-nut${chamLai ? ' bat' : ''}">${chamLai ? 'Hình chạy tốc độ thường' : 'Cho hình chạy chậm'}</button>
-        ${canh ? '' : '<button class="pa-phu-nut pa-trong-nut">Nhìn bên trong miệng</button>'}
-      </div>
-      <div class="pa-trong-hinh" hidden><div class="pa-doi-hinh">
-        ${hinhCanh(a.kh, a.nhan1)}${a.kh2 ? hinhCanh(a.kh2, a.nhan2, a.sai2) : ''}</div>
-        <p class="pa-chu pa-nho pa-giua">Đây là mặt cắt dọc, nhìn từ bên hông vào. Chỗ sáng là đường hơi đi,
-          chỗ nó hẹp lại chính là chỗ đang cấu âm.</p></div>
+      <p class="pa-buoc">Bước ${so('mieng')} — xem miệng làm gì</p>
+      ${hai ? `<div class="pa-hinh-chon">${[1, 2].map(t => `
+        <button class="pa-hinh-nut${t === hinhTu ? ' dang' : ''}${t === 2 && a.sai2 ? ' sai' : ''}" data-chon-hinh="${t}"
+          type="button" aria-pressed="${t === hinhTu}">${esc(t === 1 ? a.nhan1 : a.nhan2)}</button>`).join('')}</div>`
+        : !x && a.nhan1 ? `<p class="pa-chu pa-nho pa-giua">${esc(a.nhan1)}</p>` : ''}
+      ${tuThe(a.kh, 1, x ? a.ipa : (a.nhan1 || a.ipa), false)}
+      ${hai ? tuThe(a.kh2, 2, a.nhan2, a.sai2) : ''}
+      ${nguyen && K ? `<div class="pa-bieu pa-le-bieu">${x ? (x.luot ? K.veNguyenAm(x.luot[0], x.luot[1], x.ipa) : K.veNguyenAm(x.ipa)) : K.veNguyenAm(a.bieu)}</div>
+        <p class="pa-chu pa-nho pa-giua">${x && x.luot ? 'Mũi tên là đường lưỡi lướt đi trong lúc đọc.' : 'Chấm vàng là chỗ của lưỡi.'}
+          Trái là lưỡi đưa ra trước, phải là lùi về sau; trên là lưỡi nâng cao, dưới là hạ thấp.</p>` : ''}
+      <div class="pa-nut-hang"><button class="pa-phu-nut pa-cham-nut${chamLai ? ' bat' : ''}">${chamLai ? 'Hình chạy tốc độ thường' : 'Cho hình chạy chậm'}</button></div>
+      <p class="pa-le-bao" role="status"></p>
       <div class="pa-khoi">
         <p class="pa-nhan">Cách đặt miệng</p>
         <p class="pa-chu">${esc(a.cach)}</p>
       </div>
-      ${a.luuY ? `<div class="pa-khoi pa-mo"><p class="pa-nhan">Một điều cần nói thật</p>
-        <p class="pa-chu pa-nho">${esc(a.luuY)}</p></div>` : ''}
-      <p class="pa-chu pa-nho pa-giua">${a.kh2 && a.tuB ? 'Hai nút' : 'Nút'} dưới hình đọc từ thật bằng giọng người.${a.sai2
-        ? ' Hình bên phải là lỗi hay gặp — bấm nút của nó để nghe cái sai, nghe được nó thì mới tránh được nó.'
-        : ''}</p>`;
-  } else if (ten === 'tu') {
-    /* Bước này từng lặp y hệt khối "Trong từ" của bước 1. Giờ, bài nào có cặp tối thiểu thì nghe SO
-       từng cặp: hai từ liền nhau, cùng một người đọc — đúng cái tai cần để chuẩn bị nói ở bước sau. */
-    than = a.cap.length ? `
-      <p class="pa-buoc">Bước ${ds.indexOf('tu') + 1} — nghe so từng cặp</p>
+      ${a.luuY ? khoi('Một điều cần nói thật', a.luuY, true) : ''}
+      ${x ? '' : `<p class="pa-chu pa-nho pa-giua">${hai ? 'Bấm hai nút trên hình để xem qua lại hai tư thế. ' : ''}Nút dưới hình đọc từ thật bằng giọng người.${a.sai2
+        ? ' Hình thứ hai là lỗi hay gặp — bấm nghe cái sai, nghe được nó thì mới tránh được nó.' : ''}</p>`}`;
+  } else if (ten === 'so') {
+    /* Nghe SO từng cặp: hai từ liền nhau, cùng một người đọc — đúng cái tai cần để chuẩn bị nói ở
+       bước sau. Bài sửa lỗi so các cặp của bài; âm trong bảng thì so với từng âm hay bị lẫn với nó. */
+    const hang = x
+      ? x.doi.map(m => AN.tim(m)).filter(Boolean).map(y => { const c = capSo(x, y); return `
+        <div class="pa-le-cap-hang">
+          <button class="pa-le-phat" data-cap="${esc(y.ma)}">▶ ${esc(c[0])} rồi ${esc(c[1])}${phienAmCap(c)}<i>/${esc(x.ipa)}/ rồi /${esc(y.ipa)}/</i></button>
+          <button class="pa-phu-nut" data-sang="${esc(y.ma)}">Sang /${esc(y.ipa)}/ →</button>
+        </div>`; })
+      : a.cap.map((c, i) => `
+        <div class="pa-le-cap-hang pa-so-cap">
+          <button class="pa-le-phat" data-socap="${i}">▶ ${esc(c[0])} rồi ${esc(c[1])}${phienAmCap(c)}<i>${esc(c[2])}</i></button>
+        </div>`);
+    than = `
+      <p class="pa-buoc">Bước ${so('so')} — nghe so từng cặp</p>
       <div class="pa-khoi">
         <p class="pa-chu pa-nho">Mỗi nút đọc hai từ liền nhau, cùng một người đọc. Bấm lại thì sang người khác.
-          Nghe xem chỗ khác nhau nằm ở đâu — ${esc(a.ipa)}.</p>
-        ${a.cap.map((c, i) => `<div class="pa-le-cap-hang pa-so-cap">
-          <button class="pa-le-phat" data-socap="${i}">▶ ${esc(c[0])} rồi ${esc(c[1])}${phienAmCap(c)}<i>${esc(c[2])}</i></button>
-        </div>`).join('')}
-      </div>` : `
-      <p class="pa-buoc">Bước ${ds.indexOf('tu') + 1} — nghe âm đó nằm trong từ</p>
-      <div class="pa-khoi">
-        <div class="pa-tu">${a.tu.map(t => `<button class="pa-tu-nut" data-t="${esc(t)}">▶ ${esc(t)}${phienAm(t)}</button>`).join('')}</div>
-        <p class="pa-chu pa-nho">Người bản xứ đọc. Bấm lại cùng một từ để nghe giọng khác.</p>
+          Nghe xem chỗ khác nhau nằm ở đâu — ${x ? esc(a.ipa) + ' với âm hay bị lẫn với nó' : esc(a.ipa)}.</p>
+        <div class="pa-le-cap">${hang.join('')}</div>
       </div>
-      ${a.bieu && K ? `<div class="pa-khoi"><p class="pa-nhan">Chỗ của âm này trong miệng</p>
-        <div class="pa-bieu">${K.veNguyenAm(a.bieu)}</div>
-        <p class="pa-chu pa-nho">Trái là lưỡi đưa ra trước, phải là lưỡi lùi về sau; trên là lưỡi nâng cao, dưới là hạ thấp.</p></div>` : ''}`;
+      <p class="pa-le-bao" role="status"></p>`;
   } else {
+    const baiHoc = x ? AM.map((b, i) => ({ b, i })).filter(({ b }) => dsNguoi(b).some(d => d.x.ma === x.ma)) : [];
     than = `
       <p class="pa-buoc">Bước ${ds.length} — tới lượt bạn: nói thử</p>
       ${veNoiThu()}
-      ${a.do ? `<p class="pa-nhan pa-giua pa-hoac">Đo kỹ hơn: máy đo âm cuối ngay trên máy</p>${veDo(a)}` : ''}`;
+      ${veNoiTheo(a)}
+      ${a.do ? `<p class="pa-nhan pa-giua pa-hoac">Đo kỹ hơn: máy đo âm cuối ngay trên máy</p>${veDo(a)}` : ''}
+      ${baiHoc.length ? `<div class="pa-khoi">
+        <p class="pa-nhan">Bài sửa lỗi có âm này</p>
+        <div class="pa-tu">${baiHoc.map(({ b, i }) =>
+          `<button class="pa-tu-nut" data-bai="${i}">${esc(b.ipa)} · ${esc(b.ten)}</button>`).join('')}</div></div>` : ''}`;
   }
 
-  const ke = AM[(AM.indexOf(a) + 1) % AM.length];
+  const ke = x ? AN.DS[(AN.DS.indexOf(x) + 1) % AN.DS.length] : AM[(AM.indexOf(a) + 1) % AM.length];
   oTrong.innerHTML = `<div class="pa-man">${dau}${than}
     <div class="pa-lai">
-      <button class="pa-lui">${buoc > 0 ? '← Bước trước' : '← Danh sách'}</button>
-      ${cuoi ? `<button class="pa-toi pa-xong">Xong · bài tiếp: ${esc(ke.ipa)} →</button>` : '<button class="pa-toi">Bước tiếp →</button>'}
+      <button class="pa-lui">${buoc > 0 ? '← Bước trước' : quayVe ? '← Về bài ' + esc(quayVe.a.ipa) : '← Danh sách'}</button>
+      ${cuoi ? `<button class="pa-toi pa-xong">Xong · ${x ? 'âm tiếp: /' + esc(ke.ipa) + '/' : 'bài tiếp: ' + esc(ke.ipa)} →</button>`
+             : '<button class="pa-toi">Bước tiếp →</button>'}
     </div>
-    ${cuoi ? '<p class="pa-giua"><button class="pa-lien pa-ve-ds" type="button">hoặc về danh sách bài</button></p>' : ''}</div>`;
+    ${cuoi ? `<p class="pa-giua"><button class="pa-lien pa-ve-ds" type="button">hoặc về danh sách</button></p>` : ''}</div>`;
   /* Đổi bước thì cuộn về đầu màn. Không có dòng này thì trên điện thoại, bấm một bài ở cuối danh
      sách là bước 1 hiện ra ở đúng chỗ cuộn cũ — tận đáy, mất đầu màn, mất nút "Nói thử". */
   oTrong.scrollTop = 0;
@@ -1282,14 +1207,6 @@ function veBuoc() {
 
   dungHinh();
   gocMan();
-  const nutTrong = oTrong.querySelector('.pa-trong-nut');
-  if (nutTrong) nutTrong.onclick = () => {
-    const h = oTrong.querySelector('.pa-trong-hinh');
-    h.hidden = !h.hidden;
-    nutTrong.textContent = h.hidden ? 'Nhìn bên trong miệng' : 'Ẩn hình bên trong';
-    nutTrong.classList.toggle('bat', !h.hidden);
-    if (!h.hidden) noiHinh();
-  };
   const nutCham = oTrong.querySelector('.pa-cham-nut');
   if (nutCham) nutCham.onclick = () => {
     chamLai = !chamLai;
@@ -1297,15 +1214,44 @@ function veBuoc() {
     nutCham.classList.toggle('bat', chamLai);
     noiHinh();
   };
-  /* bấm lại cùng một từ thì sang giọng khác */
-  oTrong.querySelectorAll('.pa-tu-nut[data-t]').forEach(n => {
+  /* bản thu chính cái âm */
+  oTrong.querySelectorAll('[data-nguoi]').forEach(n => { n.onclick = () => phatChuoi([n.dataset.nguoi], n); });
+  /* từ do người bản xứ đọc: bấm lại cùng một từ thì sang người khác, và ghi rõ đang nghe giọng nào */
+  oTrong.querySelectorAll('[data-vd]').forEach(n => {
     n.onclick = () => {
-      const t = n.dataset.t;
-      luotVd[t] = luotVd[t] === undefined ? +(n.dataset.g || 0) : luotVd[t] + 1;
-      doc(t, true, luotVd[t], n);
+      const tu = n.dataset.vd, i = luotVd[tu] = (luotVd[tu] === undefined ? 0 : luotVd[tu] + 1);
+      const ds2 = banThu(tu), b = ds2 && ds2.length ? ds2[i % ds2.length] : null;
+      const g = n.querySelector('.pa-vd-giong');
+      if (g) g.textContent = b ? 'giọng ' + b.giong + (ds2.length > 1 ? ` · người ${i % ds2.length + 1}/${ds2.length}` : ' · chỉ có một bản thu') : '';
+      doc(tu, false, i, n);
     };
   });
-  if (ten === 'noi') { ganNoiThu(); if (a.do) ganDo(a); }
+  /* bước xem miệng: bấm qua lại hai tư thế */
+  oTrong.querySelectorAll('[data-chon-hinh]').forEach(n => {
+    n.onclick = () => {
+      hinhTu = +n.dataset.chonHinh;
+      oTrong.querySelectorAll('[data-chon-hinh]').forEach(m => {
+        const bat = +m.dataset.chonHinh === hinhTu;
+        m.classList.toggle('dang', bat); m.setAttribute('aria-pressed', bat ? 'true' : 'false');
+      });
+      oTrong.querySelectorAll('.pa-hinh-tu').forEach(k => { k.hidden = +k.dataset.tu !== hinhTu; });
+      const nut = oTrong.querySelector(`.pa-hinh-tu[data-tu="${hinhTu}"] [data-hinh]`);
+      if (nut) nut.click(); else noiHinh();
+    };
+  });
+  /* nút dưới hình: đọc bằng giọng người (hoặc phát âm máy dựng nếu không có từ),
+     đồng thời cho hình chạy lại từ đầu để tai và mắt khớp nhau */
+  oTrong.querySelectorAll('[data-hinh]').forEach(n => {
+    n.onclick = () => {
+      const hai = n.dataset.hinh === '2';
+      if (n.dataset.f) phatChuoi([n.dataset.f], n);
+      else if (n.dataset.t && !x && a.tuA && a.tuB) docCap([a.tuA, a.tuB], hai ? 1 : 0, 0, n, true);
+      else if (n.dataset.t) doc(n.dataset.t, true, +(n.dataset.g || 0), n);
+      else phatAm(hai ? a.am2 : a.am, a.kieu);
+      noiHinh();
+    };
+  });
+  /* bước nghe so: bài sửa lỗi */
   oTrong.querySelectorAll('[data-socap]').forEach(n => {
     const c = a.cap[+n.dataset.socap], kh = 'so:' + c[0] + '|' + c[1];
     n.onclick = () => {
@@ -1315,31 +1261,51 @@ function veBuoc() {
       if (A && B) phatChuoi([A[0].f, B[0].f], n);
     };
   });
-
-  /* nút dưới hình: đọc từ bằng giọng người (hoặc phát âm máy dựng nếu không có từ),
-     đồng thời cho hình chạy lại từ đầu để tai và mắt khớp nhau */
-  oTrong.querySelectorAll('[data-hinh]').forEach(n => {
+  /* bước nghe so: âm trong bảng, so với âm hay lẫn */
+  oTrong.querySelectorAll('[data-cap]').forEach(n => {
+    const y = AN.tim(n.dataset.cap), c = capSo(x, y), kh = c.join('|');
     n.onclick = () => {
-      const hai = n.dataset.hinh === '2';
-      if (n.dataset.t && a.tuA && a.tuB) docCap([a.tuA, a.tuB], hai ? 1 : 0, 0, n, true);
-      else if (n.dataset.t) doc(n.dataset.t, true, +(n.dataset.g || 0), n);
-      else phatAm(hai ? a.am2 : a.am, a.kieu);
-      noiHinh(hai ? 2 : 1);
+      /* hai từ do CÙNG MỘT NGƯỜI đọc, giọng Anh trước nếu Anh-Mỹ khác nhau; bấm lại thì sang người khác */
+      const ds2 = chungNguoi(c[0], c[1]), i = luotVd[kh] = luotVd[kh] === undefined ? 0 : luotVd[kh] + 1;
+      /* Anh-Mỹ đọc khác mà không có người giọng Anh nào đọc cả hai từ: giọng Mỹ thì "car rồi hot" ra
+         cùng một nguyên âm. Lúc đó so bằng hai bản thu chính cái âm (đều giọng Anh) cho đúng. */
+      const TN = self.TDTD_TUNGUOI, khac = c.some(t => { const p = TN && TN.ipa(t); return p && p[0] !== p[1]; });
+      const anh = ds2.filter(p => p[0].giong === 'Anh');
+      if (khac && !anh.length && x.am.length && y.am.length) { phatChuoi([x.am[0].f, y.am[0].f], n); return; }
+      const dung = khac ? anh : ds2;
+      if (dung.length) { const p = dung[i % dung.length]; phatChuoi([p[0].f, p[1].f], n); return; }
+      const A = banThu(c[0]), B = banThu(c[1]);
+      if (A && B) phatChuoi([A[0].f, B[0].f], n);
     };
   });
-  /* bước đầu: tiếng người thật đọc từng âm của bài */
-  const AN = self.TDTD_AMNGUOI;
-  oTrong.querySelectorAll('[data-nguoi]').forEach(n => { n.onclick = () => phatChuoi([n.dataset.nguoi], n); });
-  oTrong.querySelectorAll('.pa-nguoi [data-vd]').forEach(n => { n.onclick = () => doc(n.dataset.vd, false, 0, n); });
+  /* sang một âm trong bảng: từ bài sửa lỗi thì mở từ đầu; từ bước nghe so thì mở đúng bước nghe so của âm kia */
+  oTrong.querySelectorAll('[data-sang]').forEach(n => { n.onclick = () => { phienTai++; veLe(n.dataset.sang, x ? 'so' : undefined); }; });
+  oTrong.querySelectorAll('[data-bai]').forEach(n => { n.onclick = () => { phienTai++; quayVe = null; moAm(AM[+n.dataset.bai]); }; });
   const nguonNut = oTrong.querySelector('[data-nguon]');
   if (nguonNut) nguonNut.onclick = () => veNguon();
-  oTrong.querySelectorAll('[data-sang]').forEach(n => { n.onclick = () => veLe(n.dataset.sang); });
+  /* bước nói: chọn mẫu, thu, nghe lại */
+  oTrong.querySelectorAll('[data-mau]').forEach(n => {
+    n.onclick = () => {
+      mauLe = n.dataset.mau;
+      oTrong.querySelectorAll('[data-mau]').forEach(m => m.classList.toggle('dang', m === n));
+      phatChuoi([mauLe], n);
+    };
+  });
+  const thu = oTrong.querySelector('.pa-le-thu');
+  if (thu) thu.onclick = () => thuLe();
+  oTrong.querySelectorAll('[data-phat]').forEach(n => {
+    n.onclick = () => {
+      const k = n.dataset.phat;
+      if (k === 'so' && tiengMinh && mauLe) phatChuoi([mauLe, tiengMinh], n);
+      else if (k === 'minh' && tiengMinh) phatChuoi([tiengMinh], n);
+    };
+  });
+  if (ten === 'noi') { ganNoiThu(); if (a.do) ganDo(a); }
   noiHinh();
   if (ten === 'nghe') {
-    /* mở bước 1 là nghe ngay nút đầu tiên của hàng đầu — đúng cái người học đang nhìn */
+    /* mở bước 1 là nghe ngay nút đầu tiên — đúng cái người học đang nhìn */
     const d = oTrong.querySelector('.pa-nguoi .pa-le-phat');
     if (d) d.click();
-    else { const the = phienMan; setTimeout(() => { if (the === phienMan) doc(a.tu[0], true, 0); }, 260); }
   }
 }
 
@@ -1532,32 +1498,6 @@ async function thuAm(baoMuc, nghi = .6, toiDa = 3) {
   });
 }
 
-/* Vòng chạy thứ hai, cho hình bên phải ở bước so sánh. */
-let quay2 = null;
-function chayPhu(svgs, khung) {
-  const K = self.TDTD_KHAUHINH;
-  const ds = [].concat(svgs).filter(Boolean);
-  if (!ds.length) return;
-  const svg = ds[0];
-  const tong = khung.reduce((s, k) => s + k.g, 0);
-  let t0 = null, pha = 0, truoc = 0;
-  const b = (nay) => {
-    if (!svg.isConnected) { quay2 = null; return; }
-    if (t0 === null) t0 = nay;
-    const dt = Math.min(.05, (nay - truoc) / 1000 || 0); truoc = nay;
-    pha += dt * .8 * TOC();
-    let t = ((nay - t0) / 1000 * TOC()) % tong, i = 0;
-    while (i < khung.length - 1 && t > khung[i].g) { t -= khung[i].g; i++; }
-    const p = K.tron(khung[i].p, khung[Math.min(i + 1, khung.length - 1)].p, t / khung[i].g);
-    p.pha = pha;
-    for (const e of ds) { if (e.dataset.truoc) K.capNhatTruoc(e, p); else K.capNhat(e, p); }
-    quay2 = requestAnimationFrame(b);
-  };
-  if (quay2) cancelAnimationFrame(quay2);
-  quay2 = requestAnimationFrame(b);
-}
-
-/* ---- tập cặp tối thiểu ---- */
 /* ---- Nói thử: máy nghe ra chữ gì ----
    Người dùng hỏi: "chưa có chỗ nói thử để xem máy có nghe được mình nói gì không". Bản trước CÓ phần
    nhận giọng, nhưng giấu ở bước 5, dưới dòng "Hoặc thử cách khác", trông như thẻ chữ, bấm vào lại sang
@@ -1760,6 +1700,8 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classLis
 
 self.TDTD_PHATAM = { mo, dong, _am: AM,
   _le: (ma) => veLe(ma),
+  _baiAm: (ma) => baiAm(self.TDTD_AMNGUOI.tim(ma)),
+  _dsMau: (a) => dsMau(a).map(m => m.f),
   _amLe: () => amLe && amLe.ma,
   _daPhat: () => daPhat.slice(),
   _gonTieng: (x, sr) => gonTieng(x, sr),
