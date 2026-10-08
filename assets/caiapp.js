@@ -17,14 +17,20 @@ const KEY = 'tdtd.caiApp';
 const NGAY = 864e5;
 const TRONG_APP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Zalo|Line\/|TikTok|musical_ly|BytedanceWebview|Messenger|MicroMessenger/i;
 
-/* Loại máy: 'daCai' | 'nhacCai' | 'iosSafari' | 'iosKhac' | 'trongAppIos' | 'trongAppAndroid' | 'trongApp'
+/* Loại máy: 'daCai' | 'nhacCai' | 'iosSafari' | 'iosKhac' | 'iosKhacCu' | 'trongAppIos' | 'trongAppAndroid' | 'trongApp'
    | 'androidTay' | 'mayTinh'. chamDuoc: màn cảm ứng nhiều điểm — iPad đời mới tự xưng là Mac. */
 function loaiMay(ua = '', { standalone = false, coNhacCai = false, chamDuoc = false } = {}) {
   if (standalone) return 'daCai';
   const ios = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && chamDuoc);
   const android = /Android/.test(ua);
   if (TRONG_APP.test(ua)) return ios ? 'trongAppIos' : android ? 'trongAppAndroid' : 'trongApp';
-  if (ios) return /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua) ? 'iosKhac' : 'iosSafari';
+  if (ios) {
+    if (!/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua)) return 'iosSafari';
+    /* Chrome, Firefox, Edge trên iPhone chỉ cài được từ iOS 16.4 (WebKit cho trình duyệt khác thêm web app
+       ra màn hình chính từ bản đó). Máy cũ hơn thì phải mở bằng Safari. */
+    const m = /OS (\d+)_(\d+)/.exec(ua);
+    return m && (+m[1] < 16 || (+m[1] === 16 && +m[2] < 4)) ? 'iosKhacCu' : 'iosKhac';
+  }
   /* Chỉ cho điện thoại, máy tính bảng. Chrome trên máy tính cũng có hộp cài — bản đầu thấy hộp cài là
      gợi ý luôn, nên bảng hiện cả trên máy tính; người dùng chỉ muốn nó ở bản điện thoại. */
   if (!android && !/Mobi|Tablet/i.test(ua)) return 'mayTinh';

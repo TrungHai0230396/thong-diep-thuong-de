@@ -240,9 +240,15 @@ function moCaiApp() {
       `Kéo xuống, chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
       `Bấm <b>Thêm</b> ở góc trên bên phải. Biểu tượng app hiện ngay trên màn hình chính.`]),
     iosKhac: buoc([
-      `Bấm nút <b>Chia sẻ</b> ${ICO_CHIA_SE} trên thanh địa chỉ.`,
-      `Chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
-      `Bấm <b>Thêm</b>.`]),
+      `Bấm nút <b>Chia sẻ</b> ${ICO_CHIA_SE} ở góc phải thanh địa chỉ.`,
+      `Kéo xuống, chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
+      `Bấm <b>Thêm</b>.`]) +
+      `<p class="cai-luu">Không thấy mục <b>Thêm vào MH chính</b>? Mở trang này bằng <b>Safari</b> rồi bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.</p>
+      <button class="ghost wide-ghost" id="btn-chep-cai">Chép link để dán vào Safari</button>`,
+    iosKhacCu: `<p class="cai-luu">iPhone này chạy iOS cũ hơn 16.4 nên chỉ <b>Safari</b> mới cài được app — Chrome, Firefox thì chưa.</p>` + buoc([
+      `Chép link bên dưới, mở <b>Safari</b> rồi dán vào thanh địa chỉ.`,
+      `Trong Safari, bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.`]) +
+      `<button class="ghost wide-ghost" id="btn-chep-cai">Chép link để dán vào Safari</button>`,
     trongAppIos: `<p class="cai-luu">Bạn đang mở trong một ứng dụng khác (Zalo, Facebook, Messenger…) — ở đây không cài được.</p>` + buoc([
       `Bấm nút ${ICO_BA_CHAM} ở góc màn hình, chọn <b>Mở bằng trình duyệt</b> hoặc <b>Mở trong Safari</b>.`,
       `Trong Safari, bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.`]) +
