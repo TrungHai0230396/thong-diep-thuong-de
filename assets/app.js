@@ -131,6 +131,7 @@ function reveal() {
     $('#after').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     datCacSao();                          // bố cục vừa đổi, tìm chỗ trống mới
   }, 950);
+  setTimeout(goiYCaiApp, 3200);           // đọc xong thông điệp rồi mới gợi ý cài, không chặn ngay cửa
 }
 
 function tick() {
@@ -206,13 +207,82 @@ function about() {
     <p>Ứng dụng không giữ lịch sử: không bộ sưu tập, không nhật ký, không tài khoản. Thông điệp cũ không xem lại được. Mỗi ngày chỉ nhận một lần, ngày mai sẽ có lá khác.</p>
     <p>Bộ bài gồm ${CARDS.length} thông điệp và được xáo riêng cho từng người, nên hai người mở cùng một ngày vẫn nhận hai thông điệp khác nhau. Một thông điệp đã nhận thì phải ít nhất 105 ngày sau mới gặp lại.</p>
     <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>
+    ${loaiCai() === 'daCai' ? '' : '<button class="ghost" id="btn-cai-app" style="margin:4px 8px 0 0">Cài app vào điện thoại</button>'}
     <button class="ghost" id="btn-reshuffle" style="margin-top:4px">Xáo lại bộ bài của tôi</button>`);
+  const nc = $('#btn-cai-app');
+  if (nc) nc.onclick = () => moCaiApp();
   $('#btn-reshuffle').onclick = () => {
     if (!confirm('Xáo lại bộ bài? Thông điệp hôm nay sẽ đổi sang lá khác.')) return;
     seed = newSeed();
     try { localStorage.setItem(SEED_KEY, String(seed)); localStorage.removeItem(DAY_KEY); } catch (e) {}
     revealed = false; closeSheet(); render(); toast('Đã xáo lại bộ bài');
   };
+}
+
+/* ---------- cài app lên điện thoại ----------
+   Nhận dạng máy và quy tắc gợi ý ở assets/caiapp.js; đây chỉ là bảng hướng dẫn. Tự gợi ý một lần sau khi
+   lật lá (tối đa ba lần, cách nhau một tuần), và lúc nào cũng mở được từ nút "?". */
+const CA = self.TDTD_CAIAPP;
+const loaiCai = () => (CA ? CA.loaiMay(navigator.userAgent, {
+  standalone: !!navigator.standalone || matchMedia('(display-mode: standalone)').matches,
+  coNhacCai: !!CA.nhacCai(), chamDuoc: navigator.maxTouchPoints > 1 }) : 'mayTinh');
+const ICO_CHIA_SE = '<svg class="cai-ico" viewBox="0 0 24 24" aria-label="nút Chia sẻ"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10.5H6v10h12v-10h-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+const ICO_THEM = '<svg class="cai-ico" viewBox="0 0 24 24" aria-label="biểu tượng Thêm"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const ICO_BA_CHAM = '<b class="cai-cham">⋯</b>';
+
+function moCaiApp() {
+  const loai = loaiCai(), link = location.origin + location.pathname;
+  if (loai === 'daCai') { toast('Bạn đang dùng app rồi'); return; }
+  const buoc = (ds) => `<ol class="cai-buoc">${ds.map((d, i) => `<li><span>${i + 1}</span><p>${d}</p></li>`).join('')}</ol>`;
+  const than = {
+    nhacCai: `<button class="primary wide" id="btn-cai">Cài app</button>`,
+    iosSafari: buoc([
+      `Bấm nút ${ICO_BA_CHAM} cạnh thanh địa chỉ, rồi chọn <b>Chia sẻ</b> ${ICO_CHIA_SE}<small>Máy đời cũ: bấm luôn nút Chia sẻ ${ICO_CHIA_SE} ở thanh dưới.</small>`,
+      `Kéo xuống, chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
+      `Bấm <b>Thêm</b> ở góc trên bên phải. Biểu tượng app hiện ngay trên màn hình chính.`]),
+    iosKhac: buoc([
+      `Bấm nút <b>Chia sẻ</b> ${ICO_CHIA_SE} trên thanh địa chỉ.`,
+      `Chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
+      `Bấm <b>Thêm</b>.`]),
+    trongAppIos: `<p class="cai-luu">Bạn đang mở trong một ứng dụng khác (Zalo, Facebook, Messenger…) — ở đây không cài được.</p>` + buoc([
+      `Bấm nút ${ICO_BA_CHAM} ở góc màn hình, chọn <b>Mở bằng trình duyệt</b> hoặc <b>Mở trong Safari</b>.`,
+      `Trong Safari, bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.`]) +
+      `<button class="ghost wide-ghost" id="btn-chep-cai">Hoặc chép link để dán vào Safari</button>`,
+    trongAppAndroid: `<p class="cai-luu">Bạn đang mở trong một ứng dụng khác (Zalo, Facebook, Messenger…) — ở đây không cài được. Mở bằng Chrome rồi bấm <b>?</b> → <b>Cài app vào điện thoại</b>.</p>
+      <a class="primary wide cai-nut" href="${CA.linkChrome(link)}">Mở bằng Chrome</a>
+      <button class="ghost wide-ghost" id="btn-chep-cai">Hoặc chép link để dán vào trình duyệt</button>`,
+    androidTay: buoc([`Bấm nút menu <b class="cai-cham">⋮</b> của trình duyệt (thường ở góc trên bên phải).`, `Chọn <b>Cài đặt ứng dụng</b> hoặc <b>Thêm vào màn hình chính</b>.`]),
+    mayTinh: `<p>Trên điện thoại, mở <b>${location.host}</b> rồi bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>. Trên máy tính, Chrome và Edge có biểu tượng cài ở cuối thanh địa chỉ.</p>`,
+  };
+  than.trongApp = than.trongAppAndroid;
+  openSheet('Cài app vào điện thoại', `
+    <div class="cai-dau"><img src="icons/icon-192.png" alt="" width="52" height="52">
+      <p>Mở bằng một chạm từ màn hình chính, chạy toàn màn hình, mất mạng vẫn mở được. Không cần vào kho ứng dụng, không tốn dung lượng.</p></div>
+    ${than[loai] || than.mayTinh}`);
+  const nut = $('#btn-cai');
+  if (nut) nut.onclick = async () => {
+    const e = CA.nhacCai();
+    if (!e) { closeSheet(); return; }
+    e.prompt();
+    const { outcome } = await e.userChoice.catch(() => ({ outcome: 'dismissed' }));
+    CA.xoaNhacCai();
+    closeSheet();
+    if (outcome === 'accepted') { CA.ghiTT({ ...(CA.docTT() || {}), daCai: true }); toast('Đang cài app…'); }
+  };
+  const chep = $('#btn-chep-cai');
+  if (chep) chep.onclick = () => {
+    const xong = () => toast('Đã chép link, dán vào trình duyệt nhé');
+    if (navigator.clipboard) navigator.clipboard.writeText(link).then(xong, () => chepTay(link, xong)); else chepTay(link, xong);
+  };
+}
+
+/* Tự gợi ý: chỉ khi đang ở trang chính (không mở ngôi sao, không mở bảng nào) và quy tắc cho phép. */
+function goiYCaiApp() {
+  if (!CA || saoDangMo || !$('#sheet-wrap').hidden) return;
+  const loai = loaiCai(), tt = CA.docTT();
+  if (!CA.nenTuHien(loai, tt, Date.now())) return;
+  CA.ghiTT({ ...(tt || {}), lan: ((tt && tt.lan) || 0) + 1, luc: Date.now() });
+  moCaiApp();
 }
 
 /* Đặt ngôi sao vào một chỗ trống ngẫu nhiên trong màn hình.

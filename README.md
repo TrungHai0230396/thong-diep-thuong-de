@@ -640,6 +640,24 @@ Mười phép thử giữ chỗ này: đủ 209 lá, thông điệp không có d
 
 Lúc kiểm thì phát hiện bảng Giới thiệu **không mở được từ 9/9**: khung bảng trượt bị xoá nhầm khỏi `index.html` cùng nút "số may mắn" cũ, `app.js` gọi `$('#sheet-title')` ra `null` rồi ném lỗi — kéo theo nút *Xáo lại bộ bài* cũng không ai bấm được. Đã khôi phục; `scripts/test-sao.js` giờ kiểm mọi `#id` mà `app.js` dùng đều có trong `index.html`. Câu "trong vòng 209 ngày không lá nào lặp lại" ở bảng Giới thiệu cũng nói quá — đúng với ai bắt đầu từ đầu vòng; ai bắt đầu giữa vòng thì một lá có thể quay lại sau ít nhất 105 ngày — đã sửa.
 
+## Gợi ý cài app lên điện thoại
+
+Người dùng muốn "một cái popup cài app, để mọi người dễ dùng trên điện thoại". Mỗi loại máy một cách cài, nên `assets/caiapp.js` nhận dạng trước rồi bảng hướng dẫn (dùng chung bảng trượt) nói đúng cách cho máy đó:
+
+| Máy | Bảng hiện gì |
+|---|---|
+| Android Chrome, Edge… có hộp cài (`beforeinstallprompt`) | nút **Cài app** — gọi đúng hộp cài của trình duyệt |
+| Android, trình duyệt chưa đưa hộp cài | bấm menu ⋮ → *Cài đặt ứng dụng* / *Thêm vào màn hình chính* |
+| iPhone, iPad, Safari | ba bước có hình nút: ⋯ cạnh thanh địa chỉ → **Chia sẻ** (máy đời cũ: nút Chia sẻ ở thanh dưới) → **Thêm vào MH chính** → **Thêm**. Từ iOS 26 nút Chia sẻ nằm trong nút ⋯ ([MacRumors](https://www.macrumors.com/how-to/save-safari-bookmark-web-app-iphone-home-screen/)); iPad đời mới tự xưng là Mac nên nhận ra bằng màn cảm ứng nhiều điểm |
+| iPhone, Chrome hay Firefox | nút Chia sẻ trên thanh địa chỉ → Thêm vào MH chính |
+| Mở link trong **Zalo, Facebook, Messenger**, Instagram, TikTok | ở đó không cài được: hướng dẫn mở bằng trình duyệt; Android có nút **Mở bằng Chrome** (link `intent://`, máy không có Chrome thì mở link thường); kèm nút chép link |
+| Máy tính | không tự gợi ý; mở từ nút ? thì chỉ cách mở trên điện thoại |
+
+**Khi nào hiện:** không chặn ngay lúc vào. Tự gợi ý **3,2 giây sau khi lật lá hôm nay** — đọc xong thông điệp rồi — chỉ trên điện thoại, chỉ ở trang chính (không đang mở ngôi sao hay bảng khác), **tối đa 3 lần, cách nhau ít nhất 7 ngày**; đã cài (hoặc đang mở từ biểu tượng ngoài màn hình chính) thì thôi. Lúc nào cũng mở lại được từ nút **?** → *Cài app vào điện thoại*. Chỉ ghi một mẩu nhỏ `tdtd.caiApp`: số lần đã gợi ý, lần cuối, đã cài chưa.
+
+`scripts/test-caiapp.js`, 24 bài: nhận dạng 15 trường hợp theo chuỗi nhận dạng thật (iPhone Safari cả iOS 26, iPad tự xưng Mac mà không nhầm máy Mac thật, Chrome iPhone, Zalo, Facebook, Messenger trên cả hai hệ, Android có và chưa có hộp cài, máy tính, đã cài); quy tắc tự gợi ý; link mở bằng Chrome. Đã thử trên trình duyệt: nút Cài app gọi hộp cài đúng một lần, đóng bảng, ghi đã cài; lật lá xong 3 giây thì bảng tự hiện.
+
+## Xem ngày
 ## Xem ngày
 
 Một ngôi sao màu son đỏ, `#xem-ngay`. Ba phần trên một màn hình:
@@ -1387,6 +1405,8 @@ scripts/test-lich.js       97 kiểm thử lịch vạn niên, đối chiếu l�
 assets/sohoc.js            thần số học: hàm thuần, ngày sinh vào, các con số ra
 assets/thanso.js           giao diện ngôi sao thần số học
 scripts/test-sohoc.js      43 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
+assets/caiapp.js           gợi ý cài app: nhận dạng máy, khi nào tự gợi ý, bắt hộp cài của trình duyệt
+scripts/test-caiapp.js     24 kiểm thử gợi ý cài app
 assets/rungu.js            nhạc ngủ: tạo âm thành đoạn lặp liền mạch, tính hẹn giờ; chạy được làm Web Worker
 assets/nhacngu.js          giao diện ngôi sao nhạc ngủ, phát bằng Web Audio
 scripts/test-ngu.js        53 kiểm thử nhạc ngủ: phổ, tần số, mối nối, lịch nhỏ dần
@@ -1411,6 +1431,7 @@ node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự bá
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 43 kiểm thử thần số học
+node scripts/test-caiapp.js      # chạy 24 kiểm thử gợi ý cài app
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 182 kiểm thử trò luyện phát âm
