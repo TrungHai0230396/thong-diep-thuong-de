@@ -651,7 +651,7 @@ Người dùng muốn "một cái popup cài app, để mọi người dễ dùn
 | iPhone, iPad, Safari | ba bước có hình nút: ⋯ cạnh thanh địa chỉ → **Chia sẻ** (máy đời cũ: nút Chia sẻ ở thanh dưới) → **Thêm vào MH chính** → **Thêm**. Từ iOS 26 nút Chia sẻ nằm trong nút ⋯ ([MacRumors](https://www.macrumors.com/how-to/save-safari-bookmark-web-app-iphone-home-screen/)); iPad đời mới tự xưng là Mac nên nhận ra bằng màn cảm ứng nhiều điểm |
 | iPhone, Chrome hay Firefox | nút Chia sẻ trên thanh địa chỉ → Thêm vào MH chính |
 | Mở link trong **Zalo, Facebook, Messenger**, Instagram, TikTok | ở đó không cài được: hướng dẫn mở bằng trình duyệt; Android có nút **Mở bằng Chrome** (link `intent://`, máy không có Chrome thì mở link thường); kèm nút chép link |
-| Máy tính | không tự gợi ý; mở từ nút ? thì chỉ cách mở trên điện thoại |
+| Máy tính | **không hiện gì** — không tự gợi ý, không có nút trong bảng Giới thiệu, kể cả khi Chrome hay Edge trên máy tính có hộp cài (bản đầu thấy hộp cài là gợi ý luôn, nên bảng hiện cả trên máy tính; người dùng chỉ muốn nó ở bản điện thoại) |
 
 **Khi nào hiện:** không chặn ngay lúc vào. Tự gợi ý **3,2 giây sau khi lật lá hôm nay** — đọc xong thông điệp rồi — chỉ trên điện thoại, chỉ ở trang chính (không đang mở ngôi sao hay bảng khác), **tối đa 3 lần, cách nhau ít nhất 7 ngày**; đã cài (hoặc đang mở từ biểu tượng ngoài màn hình chính) thì thôi. Lúc nào cũng mở lại được từ nút **?** → *Cài app vào điện thoại*. Chỉ ghi một mẩu nhỏ `tdtd.caiApp`: số lần đã gợi ý, lần cuối, đã cài chưa.
 

@@ -207,7 +207,7 @@ function about() {
     <p>Ứng dụng không giữ lịch sử: không bộ sưu tập, không nhật ký, không tài khoản. Thông điệp cũ không xem lại được. Mỗi ngày chỉ nhận một lần, ngày mai sẽ có lá khác.</p>
     <p>Bộ bài gồm ${CARDS.length} thông điệp và được xáo riêng cho từng người, nên hai người mở cùng một ngày vẫn nhận hai thông điệp khác nhau. Một thông điệp đã nhận thì phải ít nhất 105 ngày sau mới gặp lại.</p>
     <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>
-    ${loaiCai() === 'daCai' ? '' : '<button class="ghost" id="btn-cai-app" style="margin:4px 8px 0 0">Cài app vào điện thoại</button>'}
+    ${['daCai', 'mayTinh', 'trongApp'].includes(loaiCai()) ? '' : '<button class="ghost" id="btn-cai-app" style="margin:4px 8px 0 0">Cài app vào điện thoại</button>'}
     <button class="ghost" id="btn-reshuffle" style="margin-top:4px">Xáo lại bộ bài của tôi</button>`);
   const nc = $('#btn-cai-app');
   if (nc) nc.onclick = () => moCaiApp();

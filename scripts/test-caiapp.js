@@ -33,7 +33,8 @@ const CA = [
   ['Android, mở link trong Facebook (dù trình duyệt nhúng có hộp cài cũng không tính)', UA.androidFacebook, { coNhacCai: true }, 'trongAppAndroid'],
   ['Android, mở link trong Zalo', UA.androidZalo, {}, 'trongAppAndroid'],
   ['máy tính', UA.macChrome, {}, 'mayTinh'],
-  ['máy tính Chrome có hộp cài', UA.macChrome, { coNhacCai: true }, 'nhacCai'],
+  ['máy tính Chrome có hộp cài: vẫn là máy tính, không gợi ý (chỉ cho điện thoại)', UA.macChrome, { coNhacCai: true }, 'mayTinh'],
+  ['máy tính Windows Edge có hộp cài: không gợi ý', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36 Edg/129.0.0.0', { coNhacCai: true }, 'mayTinh'],
   ['đã mở từ biểu tượng ngoài màn hình chính', UA.iphoneSafari, { standalone: true }, 'daCai'],
 ];
 for (const [ten, ua, o, mong] of CA) ok(ten, C.loaiMay(ua, o) === mong, C.loaiMay(ua, o));
@@ -46,6 +47,7 @@ ok('gợi ý lần trước đã hơn 7 ngày: gợi ý lại', C.nenTuHien('nha
 ok('đã gợi ý 3 lần: thôi hẳn', !C.nenTuHien('nhacCai', { lan: 3, luc: nay - 60 * NGAY }, nay));
 ok('đã cài: không gợi ý nữa', !C.nenTuHien('iosSafari', { daCai: true }, nay));
 ok('đang mở từ màn hình chính, hay đang ở máy tính: không tự gợi ý', !C.nenTuHien('daCai', null, nay) && !C.nenTuHien('mayTinh', null, nay));
+ok('máy tính có hộp cài cũng không tự gợi ý', !C.nenTuHien(C.loaiMay(UA.macChrome, { coNhacCai: true }), null, nay));
 ok('mở trong Zalo: vẫn gợi ý (để hướng dẫn mở bằng trình duyệt)', C.nenTuHien('trongAppIos', null, nay) && C.nenTuHien('trongAppAndroid', null, nay));
 
 console.log('\n— Mở bằng Chrome từ Zalo, Facebook trên Android —');

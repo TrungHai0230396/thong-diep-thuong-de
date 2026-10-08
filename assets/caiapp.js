@@ -25,9 +25,11 @@ function loaiMay(ua = '', { standalone = false, coNhacCai = false, chamDuoc = fa
   const android = /Android/.test(ua);
   if (TRONG_APP.test(ua)) return ios ? 'trongAppIos' : android ? 'trongAppAndroid' : 'trongApp';
   if (ios) return /CriOS|FxiOS|EdgiOS|OPiOS/.test(ua) ? 'iosKhac' : 'iosSafari';
+  /* Chỉ cho điện thoại, máy tính bảng. Chrome trên máy tính cũng có hộp cài — bản đầu thấy hộp cài là
+     gợi ý luôn, nên bảng hiện cả trên máy tính; người dùng chỉ muốn nó ở bản điện thoại. */
+  if (!android && !/Mobi|Tablet/i.test(ua)) return 'mayTinh';
   if (coNhacCai) return 'nhacCai';
-  if (android) return 'androidTay';
-  return 'mayTinh';
+  return 'androidTay';
 }
 
 /* Có tự gợi ý không (người dùng tự mở từ nút "?" thì luôn được). Chỉ trên điện thoại; tối đa 3 lần,
