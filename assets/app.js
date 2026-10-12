@@ -44,7 +44,7 @@ const SAO = [
   { id: 'sao-troi', mau: '#aebff0', hinh: 'sao5',      nhan: 'Bầu trời thật đêm nay, ngay trên đầu bạn',
     duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM' },
   { id: 'sao-phatam', mau: '#e8c37a', hinh: 'tia',     nhan: 'Luyện phát âm, xem miệng đặt lưỡi ở đâu',
-    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'phat-am/' },
+    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'luyen-phat-am/' },
   { id: 'sao-lich', mau: '#e58a7a', hinh: 'sao8',      nhan: 'Xem ngày tốt xấu, nên và không nên làm gì',
     duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY' },
   { id: 'sao-so',   mau: '#b99ae8', hinh: 'sao6',      nhan: 'Thần số học: con số chủ đạo, biểu đồ ngày sinh',
@@ -379,7 +379,9 @@ function themNutChepLink(s) {
 
 /* Link của một trò. Zalo, Facebook, Tin nhắn hiện tiêu đề của TRANG mà link trỏ tới, còn phần sau dấu #
    không bao giờ được gửi lên máy chủ — nên link …/#phat-am lúc nào cũng hiện "Thông Điệp Của Thượng Đế".
-   Trò nào có trang riêng (trang: 'phat-am/') thì chia sẻ trang đó: nó mang tiêu đề riêng rồi tự chuyển vào trò. */
+   Trò nào có trang riêng (trang: 'luyen-phat-am/') thì chia sẻ trang đó: nó mang tiêu đề riêng rồi tự chuyển vào
+   trò. Bản đầu chia sẻ /phat-am/ — Telegram đã lưu bản xem trước sai của địa chỉ đó (xem phat-am/index.html), nên
+   đổi sang địa chỉ mới chưa bị lưu; /phat-am/ vẫn giữ, đã sửa, cho những link đã gửi đi. */
 function linkTro(s) {
   return s.trang ? location.origin + location.pathname.replace(/[^/]*$/, '') + s.trang
                  : location.origin + location.pathname + '#' + s.duong;

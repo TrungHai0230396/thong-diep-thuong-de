@@ -239,16 +239,20 @@ console.log('\n— Chia sẻ link một trò —');
   ok('mọi trò: chia sẻ chỉ có MỘT link — chữ đi kèm không chứa link', goi.length === dsSao.length && goi.every(o => !/https?:/.test(o.text || '') && /^https:/.test(o.url)),
      goi.filter(o => /https?:/.test(o.text || '')).map(o => o.url).join(', '));
   const pa = dsSao.find(x => x.id === 'sao-phatam'), oPa = goi[dsSao.indexOf(pa)];
-  ok('phát âm: chia sẻ trang riêng /phat-am/, tiêu đề "Luyện phát âm tiếng Anh"', oPa.url === 'https://x.vercel.app/phat-am/' && oPa.title === 'Luyện phát âm tiếng Anh', oPa.url);
+  ok('phát âm: chia sẻ trang riêng /luyen-phat-am/, tiêu đề "Luyện phát âm tiếng Anh"', oPa.url === 'https://x.vercel.app/luyen-phat-am/' && oPa.title === 'Luyện phát âm tiếng Anh', oPa.url);
   ok('trò khác vẫn chia sẻ link #trò như cũ', goi[dsSao.findIndex(x => x.id === 'sao-hoadang')].url === 'https://x.vercel.app/#tha-den');
-  for (const sao of dsSao.filter(x => x.trang)) {
+  /* Trang chia sẻ đang dùng, và trang cũ /phat-am/ (link đã gửi đi vẫn phải mở được; đã sửa) */
+  for (const sao of dsSao.filter(x => x.trang).concat([{ ...pa, trang: 'phat-am/' }])) {
     const f = path.join(__dirname, '..', sao.trang, 'index.html');
     const html = fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : '';
     const tieuDe = (html.match(/<title>([^<]*)<\/title>/) || [])[1], og = (html.match(/property="og:title" content="([^"]*)"/) || [])[1];
     ok(`${sao.trang}: có trang riêng, tiêu đề và og:title trùng tieuDe trong app.js, không nhắc tên app`,
        tieuDe === sao.tieuDe && og === sao.tieuDe && !/Thông Điệp/.test(html), `${tieuDe} / ${og}`);
-    ok(`${sao.trang}: mở ra là chuyển ngay vào #${sao.duong} (cả khi tắt JavaScript)`,
-       html.includes(`location.replace('../#${sao.duong}')`) && html.includes(`content="0; url=../#${sao.duong}"`));
+    /* Không thẻ meta làm mới trang: Telegram đi theo nó về trang chủ và hiện tên app (người dùng gửi ảnh).
+       Tắt JavaScript thì còn link bấm tay. */
+    ok(`${sao.trang}: người mở được chuyển vào #${sao.duong} bằng JavaScript; không có thẻ refresh cho trình đọc link đi theo`,
+       html.includes(`location.replace('../#${sao.duong}')`) && !/http-equiv/i.test(html) && html.includes(`href="../#${sao.duong}"`));
+    ok(`${sao.trang}: og:url trỏ đúng chính trang này`, html.includes(`property="og:url" content="https://thong-diep-thuong-de.vercel.app/${sao.trang}"`));
   }
 }
 

@@ -3,9 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<!-- Trang riêng để chia sẻ link phần Luyện phát âm. Zalo, Facebook, Tin nhắn đọc tiêu đề từ trang mà link
+<!-- Trang riêng để chia sẻ link phần Luyện phát âm. Zalo, Facebook, Telegram đọc tiêu đề từ trang mà link
      trỏ tới, mà phần sau dấu # không được gửi lên máy chủ, nên link …/#phat-am luôn hiện tên app. Trang này
-     mang tên riêng, rồi chuyển ngay vào phần phát âm trong app. Tên ở đây phải trùng tieuDe trong assets/app.js. -->
+     mang tên riêng, rồi chuyển vào phần phát âm trong app. Tên ở đây phải trùng tieuDe trong assets/app.js.
+     CHỈ chuyển bằng JavaScript, không dùng thẻ meta làm mới trang (refresh): bản đầu có thẻ đó, và Telegram đi
+     theo nó về trang chủ rồi lấy tiêu đề của trang chủ (người dùng gửi ảnh: bản xem trước mang đúng
+     dòng mô tả của trang chủ). Trình đọc link không chạy JavaScript nên dừng ở đây; người thật thì được chuyển. -->
 <title>Luyện phát âm tiếng Anh</title>
 <meta name="description" content="Bảng 44 âm tiếng Anh: nghe giọng người bản xứ, xem miệng và lưỡi đặt ở đâu qua hình chạy theo tiếng, rồi nói thử cho máy nghe. Miễn phí, không cần tài khoản.">
 <meta property="og:type" content="website">
@@ -14,7 +17,6 @@
 <meta property="og:url" content="https://thong-diep-thuong-de.vercel.app/phat-am/">
 <meta name="twitter:card" content="summary">
 <meta name="theme-color" content="#0d0b1a">
-<meta http-equiv="refresh" content="0; url=../#phat-am">
 <script>location.replace('../#phat-am');</script>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0d0b1a;color:#f4efe6;font:16px system-ui,sans-serif}a{color:#e8c37a}</style>
 </head>

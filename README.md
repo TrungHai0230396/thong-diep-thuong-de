@@ -70,9 +70,11 @@ Toàn bộ phần này nằm gọn trong `assets/app.js`, không phải sửa fi
 Nút 🔗 trong mỗi trò mở bảng chia sẻ của máy (không có thì chép link).
 
 - **Bấm chia sẻ ra hai link.** Người dùng báo. Bản đầu gửi `text: "<mô tả> — <link>"` cùng `url: <link>`, nên Zalo, Tin nhắn dán ra hai link liền nhau. Giờ link chỉ nằm ở `url`, chữ đi kèm là mô tả trò.
-- **Link phát âm đừng hiện "Thông Điệp Của Thượng Đế".** Zalo, Facebook, Tin nhắn hiện tiêu đề của trang mà link trỏ tới, còn phần sau dấu `#` không bao giờ được gửi lên máy chủ — nên mọi link `…/#trò` đều hiện tên app. Trò nào khai `tieuDe` và `trang` trong `SAO` (hiện có phát âm: `tieuDe: 'Luyện phát âm tiếng Anh', trang: 'phat-am/'`) thì nút chia sẻ gửi link trang riêng `/phat-am/`: trang tĩnh mang tiêu đề và mô tả riêng (cả thẻ `og:`), mở ra là chuyển ngay vào `/#phat-am` (bằng JS, và bằng `meta refresh` khi tắt JS). Đang ở trong trò thì tên thẻ trình duyệt cũng là tên riêng, đóng trò thì trả về tên app.
+- **Link phát âm đừng hiện "Thông Điệp Của Thượng Đế".** Zalo, Facebook, Tin nhắn hiện tiêu đề của trang mà link trỏ tới, còn phần sau dấu `#` không bao giờ được gửi lên máy chủ — nên mọi link `…/#trò` đều hiện tên app. Trò nào khai `tieuDe` và `trang` trong `SAO` (hiện có phát âm: `tieuDe: 'Luyện phát âm tiếng Anh', trang: 'luyen-phat-am/'`) thì nút chia sẻ gửi link trang riêng: trang tĩnh mang tiêu đề và mô tả riêng (cả thẻ `og:`), mở ra là chuyển ngay vào `/#phat-am`. Đang ở trong trò thì tên thẻ trình duyệt cũng là tên riêng, đóng trò thì trả về tên app.
 
-`scripts/test-sao.js` chạy thẳng `linkTro`, `chepLink` cắt ra từ `app.js` cho mọi trò: chữ đi kèm không chứa link, phát âm gửi `/phat-am/`, trò khác vẫn `#trò`; trang riêng có tiêu đề trùng `tieuDe`, không nhắc tên app, chuyển đúng chỗ.
+- **Vẫn hiện "Thông Điệp Của Thượng Đế".** Người dùng gửi ảnh Telegram: bản xem trước của `/phat-am/` mang đúng dòng mô tả của trang chủ — tức trình đọc link đã đi theo thẻ `<meta http-equiv="refresh">` của trang riêng về trang chủ. Giờ trang riêng chỉ chuyển bằng JavaScript (trình đọc link không chạy JS nên dừng ở trang có tên riêng; người thật vẫn được chuyển), tắt JS thì còn link bấm tay. Telegram đã lưu bản xem trước sai của `/phat-am/`, nên nút chia sẻ đổi sang địa chỉ mới `/luyen-phat-am/`; `/phat-am/` vẫn giữ (đã sửa) cho link đã gửi — muốn Telegram cập nhật link cũ thì gửi link đó cho @WebpageBot.
+
+`scripts/test-sao.js` chạy thẳng `linkTro`, `chepLink` cắt ra từ `app.js` cho mọi trò: chữ đi kèm không chứa link, phát âm gửi `/luyen-phat-am/`, trò khác vẫn `#trò`; cả hai trang riêng có tiêu đề trùng `tieuDe`, không nhắc tên app, chuyển đúng chỗ bằng JS và không có thẻ refresh, `og:url` trỏ đúng chính nó.
 
 ## Bầu trời sao
 
@@ -1500,7 +1502,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        86 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        90 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
