@@ -14,6 +14,7 @@ const { ymd, cardFor, newSeed } = self.TDTD;
      hinh : 'sao5' | 'lap-lanh' | 'sao4' | 'hoa' | chuỗi path SVG riêng
      mo   : hàm chạy khi bấm vào
      tieuDe, trang (không bắt buộc): tên riêng của trò, và trang riêng mang tên đó để chia sẻ link — xem linkTro()
+     goiYCai (không bắt buộc): mở trò này 3 giây thì gợi ý cài app — xem moSao()
    Bỏ một ngôi sao thì xoá dòng của nó, hoặc thêm bat: false.
    Các sao tự rải ngẫu nhiên, không bao giờ đè lên nhau, cũng không đè chữ.
    ───────────────────────────────────────────────────────────── */
@@ -44,7 +45,7 @@ const SAO = [
   { id: 'sao-troi', mau: '#aebff0', hinh: 'sao5',      nhan: 'Bầu trời thật đêm nay, ngay trên đầu bạn',
     duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM' },
   { id: 'sao-phatam', mau: '#e8c37a', hinh: 'tia',     nhan: 'Luyện phát âm, xem miệng đặt lưỡi ở đâu',
-    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'luyen-phat-am/' },
+    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'luyen-phat-am/', goiYCai: true },
   { id: 'sao-lich', mau: '#e58a7a', hinh: 'sao8',      nhan: 'Xem ngày tốt xấu, nên và không nên làm gì',
     duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY' },
   { id: 'sao-so',   mau: '#b99ae8', hinh: 'sao6',      nhan: 'Thần số học: con số chủ đạo, biểu đồ ngày sinh',
@@ -286,8 +287,9 @@ function moCaiApp() {
 }
 
 /* Tự gợi ý: chỉ khi đang ở trang chính (không mở ngôi sao, không mở bảng nào) và quy tắc cho phép. */
-function goiYCaiApp() {
-  if (!CA || saoDangMo || !$('#sheet-wrap').hidden) return;
+/* choSao: gợi ý ngay trong trò đó (trò khai goiYCai) — còn lại thì chỉ ở trang chính, không đè lên trò đang mở. */
+function goiYCaiApp(choSao) {
+  if (!CA || (saoDangMo && saoDangMo !== choSao) || !$('#sheet-wrap').hidden) return;
   const loai = loaiCai(), tt = CA.docTT();
   if (!CA.nenTuHien(loai, tt, Date.now())) return;
   CA.ghiTT({ ...(tt || {}), lan: ((tt && tt.lan) || 0) + 1, luc: Date.now() });
@@ -335,6 +337,9 @@ function moSao(s) {
   saoDangMo = s;
   m.mo();
   if (s.tieuDe) document.title = s.tieuDe;          // tên thẻ trình duyệt, và tên khi chia sẻ bằng nút của trình duyệt
+  /* Người đến từ link phát âm đi thẳng vào trò, không bao giờ thấy trang chính nên không bao giờ được gợi ý cài.
+     Người dùng chọn: vào trò 3 giây thì gợi ý (cùng luật: chỉ điện thoại, tối đa 3 lần, cách nhau 7 ngày). */
+  if (s.goiYCai) setTimeout(() => { if (saoDangMo === s) goiYCaiApp(s); }, 3000);
   if (location.hash.slice(1) !== s.duong) location.hash = s.duong;
   themNutChepLink(s);
   theoDoiDong(s);

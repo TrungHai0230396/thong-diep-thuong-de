@@ -270,6 +270,21 @@ console.log('\n— Chia sẻ link một trò —');
   }
 }
 
+console.log('\n— Gợi ý cài app trong trò phát âm —');
+{
+  /* Người đến từ link phát âm đi thẳng vào trò, không thấy trang chính nên không được gợi ý cài. Người dùng chọn:
+     vào trò 3 giây thì gợi ý. */
+  ok('trò phát âm khai goiYCai', /id: 'sao-phatam'[\s\S]*?goiYCai: true/.test(khoiSao));
+  ok('mở trò có goiYCai: 3 giây sau gợi ý, và chỉ khi vẫn đang ở đúng trò đó',
+     /if \(s\.goiYCai\) setTimeout\(\(\) => \{ if \(saoDangMo === s\) goiYCaiApp\(s\); \}, 3000\)/.test(nguon));
+  ok('gợi ý vẫn theo luật cũ (nenTuHien: điện thoại, tối đa 3 lần, cách 7 ngày), và không đè lên trò KHÁC',
+     /function goiYCaiApp\(choSao\) \{\s*if \(!CA \|\| \(saoDangMo && saoDangMo !== choSao\)[\s\S]{0,200}nenTuHien/.test(nguon));
+  const css = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.css'), 'utf8');
+  const z = (lop) => +((css.match(new RegExp(`\\.${lop}\\{[^}]*z-index:(\\d+)`)) || [])[1] || 0);
+  ok('bảng gợi ý nổi trên màn trò (nếu không sẽ hiện mà bị che mất), dưới dòng thông báo',
+     z('sheet-wrap') > z('phatam') && z('sheet-wrap') < z('toast'), `bảng ${z('sheet-wrap')}, trò ${z('phatam')}, thông báo ${z('toast')}`);
+}
+
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
 {
   /* Ngày 9/9 khung bảng trượt bị xoá nhầm khỏi index.html; app.js vẫn gọi $('#sheet-title') nên nút "?"
