@@ -26,6 +26,7 @@ const HINH_SAO = {
   sao6:      'M12 1.6l2.2 5.4 5.8-1.2-3.6 4.6 3.6 4.6-5.8-1.2-2.2 5.4-2.2-5.4-5.8 1.2 3.6-4.6-3.6-4.6 5.8 1.2z',
   trang:     'M15.2 2.6A9.6 9.6 0 1 0 21.4 15.4 7.8 7.8 0 0 1 15.2 2.6z',
   sao8:      'M12 1.4L13.76 7.75L19.5 4.5L16.25 10.24L22.6 12L16.25 13.76L19.5 19.5L13.76 16.25L12 22.6L10.24 16.25L4.5 19.5L7.75 13.76L1.4 12L7.75 10.24L4.5 4.5L10.24 7.75z',
+  sen:       'M12 3.2c1.9 2.3 2.9 4.7 2.9 7.2 0 2.6-1 4.8-2.9 6.9-1.9-2.1-2.9-4.3-2.9-6.9 0-2.5 1-4.9 2.9-7.2zM2.6 9.6c3 .1 5.4 1.3 7 3.6 1 1.4 1.5 3 1.7 4.6-2.6-.1-4.8-1.1-6.4-2.9-1.3-1.5-2.1-3.3-2.3-5.3zM21.4 9.6c-3 .1-5.4 1.3-7 3.6-1 1.4-1.5 3-1.7 4.6 2.6-.1 4.8-1.1 6.4-2.9 1.3-1.5 2.1-3.3 2.3-5.3zM4.5 18.8c2.3 1.3 4.8 2 7.5 2s5.2-.7 7.5-2c-2.2.6-4.7.9-7.5.9s-5.3-.3-7.5-.9z',
 };
 
 const SAO = [
@@ -49,6 +50,8 @@ const SAO = [
     duong: 'than-so',  khung: '.thanso',  mun: 'TDTD_THANSO' },
   { id: 'sao-ngu',  mau: '#f3dfa0', hinh: 'trang',     nhan: 'Nhạc ngủ: âm thanh và tần số ru ngủ, hẹn giờ tự tắt',
     duong: 'nhac-ngu', khung: '.nhacngu', mun: 'TDTD_NGU' },
+  { id: 'sao-luanxa', mau: '#f2a7c3', hinh: 'sen',     nhan: 'Thiền luân xa: tụng chủng tử theo đàn tanpura và chuông xoay, qua bảy luân xa',
+    duong: 'thien-luan-xa', khung: '.luanxa', mun: 'TDTD_LUANXA' },
 ];
 
 
@@ -568,9 +571,9 @@ function tuCapNhat() {
     if (nenTaiLai(Date.now(), lanTruoc, daTuongTac, MO_LUC) === 'ngay') lamTaiLai();
     else choTaiLai = true;
   });
-  /* Nhạc ngủ đang phát thì khoá màn hình cũng là trang bị ẩn — tải lại lúc đó là tắt nhạc của người
-     đang ngủ. Đợi nhạc tự tắt xong mới tải. */
-  const dangPhatNhac = () => !!(self.TDTD_NGU && self.TDTD_NGU.dangPhat());
+  /* Nhạc ngủ hay buổi thiền luân xa đang phát thì khoá màn hình cũng là trang bị ẩn — tải lại lúc đó là
+     tắt tiếng của người đang ngủ, đang thiền. Đợi tiếng tự tắt xong (cả hai báo 'tdtd-ngu-het') mới tải. */
+  const dangPhatNhac = () => ['TDTD_NGU', 'TDTD_LUANXA'].some(m => self[m] && self[m].dangPhat());
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && choTaiLai && !dangPhatNhac()) lamTaiLai();   // người dùng đã chuyển đi, tải lại không ai thấy
   });

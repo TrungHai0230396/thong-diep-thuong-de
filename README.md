@@ -811,6 +811,38 @@ Nghĩa chín ô (`Y_O` trong `sohoc.js`) chỉ lấy chỗ hai nguồn nhất tr
 
 `scripts/test-sohoc.js` thêm 5 bài: đủ nghĩa chín ô; biểu đồ tên "Hải" đúng ba ô 8, 1, 9; tên "Hải" không bù ô nào cho ngày sinh 19/8/1991 (đã có sẵn 1, 8, 9), tên "Phong" bù 5, 6, 7; Hồ Trung Hải ra 1, 3, 4.
 
+## Thiền luân xa
+
+Người dùng muốn "một ngôi sao nhạc thiền định để kích hoạt các luân xa, tìm hiểu tài liệu xong mới làm, làm cho đúng". Ngôi sao hoa sen hồng (`#thien-luan-xa`): một buổi thiền đi qua bảy luân xa từ gốc lên đỉnh. Mỗi luân xa có hoa sen vẽ theo kinh văn, chữ chủng tử để tụng, nhịp thở 4 – 6, tiếng đàn tanpura cùng nốt và chuông xoay ngân mỗi ba hơi thở. Chọn 1, 2, 3 hay 5 phút mỗi luân xa; cuối buổi có một phút ngồi yên với ba tiếng chuông.
+
+**Nội dung theo kinh văn, không theo bảng trên mạng.** Hệ bảy luân xa dựa trên Ṣaṭ-cakra-nirūpaṇa của Pūrṇānanda (1577), bản dịch Arthur Avalon 1919 ([wisdomlib.org](https://www.wisdomlib.org/hinduism/book/shat-cakra-nirupana-english)), đối chiếu Wikipedia từng luân xa:
+
+| | Tên | Cánh | Chủng tử | Yếu tố | Kinh văn tả |
+|---|---|---|---|---|---|
+| 1 | Mūlādhāra | 4 | LAM | đất | cánh đỏ, giữa hình vuông vàng |
+| 2 | Svādhiṣṭhāna | 6 | VAM | nước | cánh đỏ son, giữa trăng lưỡi liềm trắng |
+| 3 | Maṇipūra | 10 | RAM | lửa | cánh xanh thẫm như mây mưa, giữa tam giác đỏ chĩa xuống |
+| 4 | Anāhata | 12 | YAM | gió | cánh đỏ hoa bandhūka (câu 22), giữa hình sáu góc màu khói |
+| 5 | Viśuddha | 16 | HAM | không gian | cánh tím khói, giữa tam giác xanh có vòng trăng trắng |
+| 6 | Ājñā | 2 | OM | tâm | cánh trắng như trăng, chữ Ha và Kṣa (câu 32) |
+| 7 | Sahasrāra | 1000 | im lặng | — | trắng hơn trăng rằm, nhuỵ màu mặt trời mới mọc (câu 40) |
+
+Hoa sen trong app tô **màu kinh văn**. Màu cầu vồng (đỏ ở gốc → tím ở đỉnh) chỉ dùng cho chấm trên hình người ngồi thiền, và được nói rõ là quy ước thời nay: Leadbeater đưa ra năm 1927, ghép đủ với danh sách phẩm chất từ 1977 (Kurt Leland, dẫn trong [Wikipedia "Chakra"](https://en.wikipedia.org/wiki/Chakra)).
+
+**Nói thẳng ba điều** (mục "Nói cho đúng" trong app):
+- Khoa học chưa tìm thấy luân xa như một bộ phận cơ thể, nên "kích hoạt" ở đây là luyện chú ý, hơi thở, âm thanh — không hứa tác động vật lý.
+- Các tần số 396 – 963 Hz ("solfeggio") do Joseph Puleo tính từ số câu Kinh Thánh khoảng thập niên 1970, Leonard Horowitz phổ biến; không có trong kinh sách cổ, không có bằng chứng chữa bệnh ([Science Feedback](https://science.feedback.org/review/no-evidence-support-claim-solfeggio-frequencies-remove-toxins-from-body/)). App vẫn dùng làm cao độ chuông vì đó là bảng người ta quen gặp (cách gán phổ biến nhất: gốc 396 … đỉnh 963), và đàn lấy cùng nốt hạ vài quãng tám vào 110–220 Hz cho vừa giọng tụng.
+- Điều có bằng chứng: thở chậm dưới 10 hơi mỗi phút tăng hoạt động phó giao cảm (Zaccaro và cs. 2018; Laborde và cs. 2022, 223 nghiên cứu); ngồi nghe chuông xoay một giờ, 62 người bớt căng thẳng (Goldsby và cs. 2017, chưa có nhóm đối chứng — Stanhope & Weinstein 2020 cho rằng còn quá ít nghiên cứu để coi là liệu pháp); tụng OM giảm hoạt động vùng limbic ở 12 người ([Kalyani và cs. 2011](https://pmc.ncbi.nlm.nih.gov/articles/PMC3099099/), nghiên cứu thí điểm).
+
+**Âm thanh tạo trên máy** (`assets/luanxa.js`, chạy làm Web Worker):
+- *Chuông xoay*: năm tần số riêng theo **số đo một chuông thật** — 472, 1329, 2448, 3738, 5165 Hz, tức 1 : 2,82 : 5,19 : 7,92 : 10,94 (Gołaś & Filipek, Archives of Acoustics 2016, bảng 2), nằm trong khoảng Inácio và cs. (2006) đo trên chuông Tây Tạng. Mỗi tần số tách đôi vài Hz vì chuông không tròn tuyệt đối, nên nghe ngân rung ([Terwagne & Bush 2011](https://arxiv.org/abs/1106.6348)). Độ ngân thì **chưa tìm được số đo**: chọn hằng số tắt 4 giây ở chuông 396 Hz (T60 ≈ 28 giây), chuông tiếng cao ngân ngắn hơn, mỗi tần số riêng tắt theo tỉ lệ nghịch tần số (vật có độ tổn hao không đổi).
+- *Tanpura*: bốn dây Pa – Sa – Sa – Sa thấp (lên dây 5-8-8-1), gảy lần lượt, vòng 5 giây, đoạn lặp 20 giây liền mạch (tiếng ngân cuối đoạn cộng vòng về đầu). Jawari mô phỏng **gần đúng**: một đỉnh bồi âm trượt từ bậc 4 lên bậc 22 trong vài giây đầu mỗi lần gảy. Nhịp gảy chọn theo tai.
+- Tạo đủ bảy đoạn đàn và bảy tiếng chuông mất ~0,7 giây trên máy tính (0,9 giây trong trình duyệt). Bản đầu mất 3,4 giây; viết dao động thẳng trong vòng lặp thay vì gọi hàm mỗi mẫu thì nhanh gấp năm.
+
+**Cả buổi hẹn trước trên luồng âm thanh** ngay lúc bấm Bắt đầu (`lichBuoi`): bảy đoạn đàn chỉ chạy trong khoảng của mình, chuyển nhau trong 8 giây (đan tuyến tính, cộng lại vẫn đủ), mọi tiếng chuông đặt sẵn đúng giây — luôn rơi vào đầu một nhịp hít vào — và một mẫu lặng ở giây cuối báo hết buổi. Nhắm mắt, tắt màn hình, JS bị bóp cũng không lệch nhịp. Giữ chạy khi khoá màn hình giống nhạc ngủ; đang thiền thì app không tự tải lại bản mới (cả hai cùng báo `tdtd-ngu-het` khi tắt).
+
+`scripts/test-luanxa.js`, 86 bài: nội dung khớp kinh văn (số cánh, chủng tử, màu cánh Maṇipūra xanh thẫm và Anāhata đỏ chứ không theo cầu vồng); đỉnh phổ của chuông đúng từng tần số riêng (lệch dưới 0,5%), nhịp ngân rung đo ra 1,6 Hz, độ tắt đo ra đúng hằng số đã chọn; mỗi dây đàn có đỉnh nốt rõ, đỉnh bồi âm jawari trượt từ bậc 6 lên bậc 20; lịch buổi đúng từng giây với cả bốn lựa chọn phút; trình phát đặt đúng từng mốc lên luồng âm thanh (Web Audio giả), tạm dừng, tắt, hết buổi tự về; hoa sen vẽ đúng số cánh. Đã thử trong trình duyệt ở cỡ điện thoại: màn chọn, hoa sen từng luân xa, màn đang thiền đổi chữ theo nhịp thở, Worker tạo âm chạy được, bấm Tắt là đóng hẳn luồng âm thanh.
+
 ## Bầu trời đêm nay
 
 Một ngôi sao xanh nhạt, `#troi-dem`. Mở ra là **bầu trời thật, ở chỗ bạn đang đứng, vào đúng lúc này**: Mặt Trời, Mặt Trăng, năm hành tinh mắt thường thấy được, 5.080 sao thật, dải Ngân Hà, và tám chòm sao mượn lại toạ độ thật của trò Nối sao. Kéo để nhìn quanh, chụm hai ngón để phóng to, hoặc bấm *Xoay theo máy* rồi giơ điện thoại lên — hướng máy về phía nào thì thấy bầu trời phía đó.
@@ -1447,7 +1479,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        75 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        81 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -1463,6 +1495,9 @@ scripts/test-thongke.js    20 kiểm thử đếm lượt truy cập
 assets/rungu.js            nhạc ngủ: tạo âm thành đoạn lặp liền mạch, tính hẹn giờ; chạy được làm Web Worker
 assets/nhacngu.js          giao diện ngôi sao nhạc ngủ, phát bằng Web Audio
 scripts/test-ngu.js        53 kiểm thử nhạc ngủ: phổ, tần số, mối nối, lịch nhỏ dần
+assets/luanxa.js           thiền luân xa: bảy luân xa theo kinh văn, tạo âm tanpura và chuông xoay, lịch buổi thiền; chạy được làm Web Worker
+assets/thienluanxa.js      giao diện ngôi sao thiền luân xa: hoa sen, nhịp thở, phát bằng Web Audio
+scripts/test-luanxa.js     86 kiểm thử thiền luân xa: nội dung, phổ chuông, đàn, lịch, trình phát
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1487,6 +1522,7 @@ node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
 node scripts/test-caiapp.js      # chạy 24 kiểm thử gợi ý cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
+node scripts/test-luanxa.js      # chạy 86 kiểm thử thiền luân xa
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 182 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

@@ -896,6 +896,48 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 @keyframes ng-nhay{0%,100%{opacity:.35}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.ng-dp-ten::before{animation:none}}
 
+/* ---------- thiền luân xa: dùng lại khung xn-* và nút ng-* của nhạc ngủ ---------- */
+.luanxa{position:fixed;inset:0;z-index:30;display:none;
+  background:radial-gradient(120% 80% at 50% 0%,#221a33 0%,#141022 55%,#0b0a14 100%)}
+.luanxa.hien{display:block}
+.luanxa.dang-nghe{background:radial-gradient(90% 60% at 50% 28%,#1a1428 0%,#07060d 72%)}
+.luanxa .xn-tieude{color:#e8c6e0}
+.lx-mo{margin:-6px 0 18px;text-align:center;font-size:13px;line-height:1.6;color:rgba(244,239,230,.55)}
+.lx-xong{margin:-4px 0 14px;padding:10px 12px;border-radius:12px;text-align:center;font-size:13.5px;line-height:1.55;
+  color:#e8c6e0;background:rgba(242,167,195,.08);border:1px solid rgba(242,167,195,.28)}
+.lx-mot{border-top:1px solid rgba(255,255,255,.07)}
+.lx-mot:first-of-type{border-top:0}
+.lx-mot summary{display:flex;align-items:center;gap:11px;padding:10px 2px;cursor:pointer;list-style:none}
+.lx-mot summary::-webkit-details-marker{display:none}
+.lx-mot summary i{flex:none;width:12px;height:12px;border-radius:50%}
+.lx-mot-ten{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lx-mot-ten b{font-size:14.5px;font-weight:500;color:rgba(244,239,230,.95)}
+.lx-mot-ten small{font-size:12px;line-height:1.45;color:rgba(244,239,230,.5)}
+.lx-mot-than{padding:2px 2px 12px 23px}
+.lx-mot-than p{margin:0 0 8px;font-size:13px;line-height:1.6;color:rgba(244,239,230,.72)}
+.lx-mot-than b{font-weight:500;color:rgba(244,239,230,.95)}
+.lx-mot-sen{width:120px;margin:4px auto 10px}
+.lx-mot-than .lx-mot-hz{font-size:12px;color:rgba(244,239,230,.45)}
+.lx-sen{display:block;width:100%;height:auto;overflow:visible}
+.lx-sen text{font-family:"Noto Sans Devanagari","Kohinoor Devanagari","Devanagari Sangam MN",sans-serif}
+.lx-nghe{text-align:center;padding-top:2vh}
+.lx-hoa{position:relative;width:min(56vw,230px);aspect-ratio:1;margin:0 auto 14px}
+.lx-hoa::before{content:'';position:absolute;inset:14%;border-radius:50%;background:var(--lx-mau,#a97ddb);opacity:.22;filter:blur(30px)}
+.lx-hoa-trong{position:relative;width:100%;height:100%;transition:transform .2s linear,opacity .5s linear}
+.lx-hang{display:flex;align-items:center;justify-content:center;gap:16px;max-width:360px;margin:0 auto}
+.lx-than-o{flex:none;width:62px}
+.lx-than{display:block;width:100%;height:auto}
+.lx-chu{min-width:0;text-align:left}
+.lx-so{margin:0;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,239,230,.45)}
+.lx-ten{margin:3px 0 0;font-family:"Cormorant Garamond",Georgia,serif;font-size:24px;line-height:1.1;color:rgba(244,239,230,.92)}
+.lx-bija{margin:2px 0 0;font-size:32px;font-weight:300;letter-spacing:.14em;line-height:1.15;color:var(--lx-mau,#e8c6e0)}
+.lx-doc{margin:2px 0 0;font-size:12.5px;line-height:1.45;color:rgba(244,239,230,.5)}
+.lx-chuy{margin:6px 0 0;font-size:13.5px;line-height:1.5;color:rgba(244,239,230,.78)}
+.lx-tho{min-height:24px;margin:18px 0 0;font-size:17px;color:rgba(244,239,230,.88)}
+.lx-dem{margin:6px 0 0;font-size:12.5px;color:rgba(244,239,230,.45);font-variant-numeric:tabular-nums}
+.lx-nut{margin:22px 0 18px}
+@media (prefers-reduced-motion:reduce){.lx-hoa-trong{transition:none}}
+
 /* ---------- cài app ---------- */
 .cai-dau{display:flex;gap:14px;align-items:center;margin:0 0 14px}
 .cai-dau img{flex:0 0 52px;border-radius:13px;box-shadow:0 2px 10px rgba(0,0,0,.35)}
