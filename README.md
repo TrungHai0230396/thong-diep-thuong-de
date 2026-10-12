@@ -74,7 +74,9 @@ Nút 🔗 trong mỗi trò mở bảng chia sẻ của máy (không có thì ch�
 
 - **Vẫn hiện "Thông Điệp Của Thượng Đế".** Người dùng gửi ảnh Telegram: bản xem trước của `/phat-am/` mang đúng dòng mô tả của trang chủ — tức trình đọc link đã đi theo thẻ `<meta http-equiv="refresh">` của trang riêng về trang chủ. Giờ trang riêng chỉ chuyển bằng JavaScript (trình đọc link không chạy JS nên dừng ở trang có tên riêng; người thật vẫn được chuyển), tắt JS thì còn link bấm tay. Telegram đã lưu bản xem trước sai của `/phat-am/`, nên nút chia sẻ đổi sang địa chỉ mới `/luyen-phat-am/`; `/phat-am/` vẫn giữ (đã sửa) cho link đã gửi — muốn Telegram cập nhật link cũ thì gửi link đó cho @WebpageBot.
 
-`scripts/test-sao.js` chạy thẳng `linkTro`, `chepLink` cắt ra từ `app.js` cho mọi trò: chữ đi kèm không chứa link, phát âm gửi `/luyen-phat-am/`, trò khác vẫn `#trò`; cả hai trang riêng có tiêu đề trùng `tieuDe`, không nhắc tên app, chuyển đúng chỗ bằng JS và không có thẻ refresh, `og:url` trỏ đúng chính nó.
+- **Zalo không hiện khung xem trước.** Zalo không công bố cách đọc link; trang chia sẻ có tiêu đề, mô tả mà chưa có ảnh, và nhiều ứng dụng chat không có ảnh thì không hiện khung. Thêm ảnh 1200×630 (`icons/og-phat-am-1.jpg`, 64 KB, vẽ bằng `scripts/lam-anh-chia-se.py`) với `og:image`, kích thước, `twitter:card` cỡ lớn. `icons/` được cache một năm, nên đổi ảnh thì đổi số trong tên.
+
+`scripts/test-sao.js` chạy thẳng `linkTro`, `chepLink` cắt ra từ `app.js` cho mọi trò: chữ đi kèm không chứa link, phát âm gửi `/luyen-phat-am/`, trò khác vẫn `#trò`; cả hai trang riêng có tiêu đề trùng `tieuDe`, không nhắc tên app, chuyển đúng chỗ bằng JS và không có thẻ refresh, `og:url` trỏ đúng chính nó, ảnh xem trước có thật, đúng 1200×630 như khai, dưới 300 KB.
 
 ## Bầu trời sao
 
@@ -1502,7 +1504,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        90 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        92 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ

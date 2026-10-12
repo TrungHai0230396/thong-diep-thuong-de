@@ -253,6 +253,20 @@ console.log('\n— Chia sẻ link một trò —');
     ok(`${sao.trang}: người mở được chuyển vào #${sao.duong} bằng JavaScript; không có thẻ refresh cho trình đọc link đi theo`,
        html.includes(`location.replace('../#${sao.duong}')`) && !/http-equiv/i.test(html) && html.includes(`href="../#${sao.duong}"`));
     ok(`${sao.trang}: og:url trỏ đúng chính trang này`, html.includes(`property="og:url" content="https://thong-diep-thuong-de.vercel.app/${sao.trang}"`));
+    /* Zalo không hiện khung xem trước khi trang chưa có ảnh (người dùng báo). Ảnh phải là địa chỉ đầy đủ, có thật,
+       đúng 1200×630 như thẻ khai, và nhẹ (WhatsApp chỉ nhận ảnh nhỏ, cỡ 300 KB). */
+    const anh = (html.match(/property="og:image" content="https:\/\/thong-diep-thuong-de\.vercel\.app\/([^"]+)"/) || [])[1];
+    const tepAnh = anh && path.join(__dirname, '..', anh), b = tepAnh && fs.existsSync(tepAnh) ? fs.readFileSync(tepAnh) : null;
+    let rong = 0, cao = 0;                                   // đọc kích thước từ khung SOF của JPEG
+    for (let i = 2; b && i < b.length - 9;) {
+      if (b[i] !== 0xFF) { i++; continue; }
+      const m = b[i + 1];
+      if (m >= 0xC0 && m <= 0xC3) { cao = b.readUInt16BE(i + 5); rong = b.readUInt16BE(i + 7); break; }
+      i += 2 + b.readUInt16BE(i + 2);
+    }
+    ok(`${sao.trang}: có ảnh xem trước thật, ${rong}×${cao} khớp thẻ khai, nhẹ dưới 300 KB`, !!b && rong === 1200 && cao === 630 &&
+       html.includes('og:image:width" content="1200"') && html.includes('og:image:height" content="630"') && b.length < 300 * 1024,
+       b ? `${Math.round(b.length / 1024)} KB` : 'không có ảnh');
   }
 }
 
