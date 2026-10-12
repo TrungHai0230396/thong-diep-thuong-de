@@ -1129,6 +1129,25 @@ Bầu trời trước đó chỉ có bài kiểm phần **tính** (`test-astro.j
 **nhìn** và phần **chạm** — đúng chỗ đó đẻ ra cả lỗi này lẫn lỗi "chưa lên khỏi chân trời" ở
 dưới. Giờ có `test-troidem.js`: dựng DOM và canvas giả, chạy thật vòng vẽ, rồi soi vào đó.
 
+## "Sáng rồi Trăng không chịu lặn, có lúc khuya mà Trăng không mọc"
+
+Người dùng hỏi app tính sai hay mình sai. **Không ai sai.** Đối chiếu với [JPL Horizons](https://ssd.jpl.nasa.gov/horizons/) của NASA (TP.HCM, tháng 10/2026, mốc mép trên chạm chân trời thật, có khúc xạ): 38 lần mọc lặn trong 20 ngày lệch nhiều nhất **1,8 phút**, kể cả hai ngày không có mọc (4/10) hay không có lặn (19/10). Hai điều người dùng thấy đều có thật:
+
+| Ngày (TP.HCM) | Trăng mọc | Trăng lặn | Thấy gì |
+|---|---|---|---|
+| 1–3/10 | 21:32 – 23:38 | 9:46 – 11:52 | sáng ra còn trăng ở phía tây |
+| 5–9/10 | 0:40 – 4:18 | 13:44 – 16:38 | trăng cuối tháng: sáng rồi vẫn chưa lặn |
+| 10–11/10 | 5:08 – 5:58 | 17:17 – 17:58 | trăng non: cả đêm không có trăng |
+| 12–18/10 | 6:48 – 11:56 | 18:40 – 23:38 | trăng đầu tháng: khuya là đã lặn |
+
+Trăng không gắn với ban đêm: mỗi ngày mọc trễ chừng 50 phút, nên giờ mọc trôi qua đủ 24 tiếng trong một tháng âm. Cái thiếu là **lời**, sửa ba chỗ:
+
+- **Trăng mọc tối nay, lặn sáng mai thì không ghi giờ lặn.** `trangThaiMocLan` chỉ nhìn giờ lặn của hôm nay — đã qua — nên 22:00 ngày 1/10 dòng chữ chỉ có "đang ở 6° trên đông bắc"; sáng ra thấy trăng còn treo thì tưởng app sai. Giờ lấy giờ lặn ngày mai và nói rõ buổi: *"lặn lúc 10:49 sáng mai"*; đã lặn thì *"mai mọc lúc 07:39 sáng"*.
+- **Ngưỡng chân trời của dòng chữ lệch ngưỡng của giờ mọc lặn.** Giờ mọc Mặt Trời tính ở −0,833° (bán kính đĩa + khúc xạ) nhưng chữ so "trên 0°", nên 2 phút sau giờ mọc (độ cao hình học −0,35°) app vẫn bảo "đang ở dưới chân trời". Giờ dùng chung `NGUONG` với `mocLan`; kiểm từng phút cả ngày: "trên trời" trùng khít khoảng giữa giờ mọc và giờ lặn, cho cả Mặt Trời lẫn Mặt Trăng. Lúc vừa ló hay sắp khuất thì ghi *"đang sát chân trời phía đông"* thay vì "-1°".
+- **Không ai nói vì sao.** Thẻ Mặt Trăng thêm một câu theo pha (`nhipTrang`), chia đúng các mốc của tên pha: trăng non cả đêm không có trăng; đầu tháng chỉ thấy đầu hôm ở phía tây; thượng huyền thấy nửa đầu đêm; tròn thấy suốt đêm; khuyết cuối tháng sáng ra vẫn còn ở phía tây; hạ huyền cả buổi sáng vẫn thấy; cuối tháng thấy ở phía đông trước bình minh, sáng rồi vẫn chưa lặn — kèm "mỗi ngày Trăng mọc trễ hơn chừng 50 phút". **Mỗi câu được kiểm trên bầu trời tính được** suốt năm 2026 ở cả TP.HCM lẫn Hà Nội (507 lần kiểm mỗi nơi, chạy thử 2 năm cũng không sai lần nào): câu nói "khuya là đã lặn" thì 0:30 Trăng phải khuất, "phía tây" thì phương vị phải ở nửa tây, v.v.
+
+Kiểm thử: `test-astro.js` thêm 9 bài (bảng Horizons, giờ lặn ngày mai, ngưỡng từng phút), `test-troidem.js` thêm 9 bài (chữ hiển thị, câu giải thích theo pha, thẻ Mặt Trăng sáng 8/10).
+
 ## "Sao giờ không thấy mặt trăng?"
 
 Người dùng mở bầu trời lúc gần nửa đêm và hỏi vậy. Bầu trời **vẽ đúng** — lúc đó Trăng ở −41°
@@ -1419,10 +1438,10 @@ sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên m�
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       38 kiểm thử lõi
 scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
-scripts/test-astro.js      64 kiểm thử thiên văn, đối chiếu số liệu ngoài
+scripts/test-astro.js      73 kiểm thử thiên văn, đối chiếu số liệu ngoài (có giờ mọc lặn Trăng theo JPL Horizons)
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
-scripts/test-troidem.js    92 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
+scripts/test-troidem.js    101 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
 assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
@@ -1459,8 +1478,8 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
-node scripts/test-astro.js       # chạy 64 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 92 kiểm thử bầu trời đêm
+node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
+node scripts/test-troidem.js     # chạy 101 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên

@@ -204,10 +204,11 @@ function timNguong(hamViTri, nguong, msDauNgay, viDo, kinhDo, len) {
    - Mặt Trời -0,833 độ: gồm bán kính đĩa và khúc xạ khí quyển.
    - Mặt Trăng +0,125 độ: Trăng ở gần nên có thị sai chân trời chừng 0,95 độ, trừ đi khúc xạ
      0,57 và bán kính đĩa 0,26 thì còn dương — nên Trăng mọc muộn hơn là chỉ tính khúc xạ. */
+const NGUONG = { troi: -0.833, trang: 0.125 };
 function mocLan(msDauNgay, viDo, kinhDo, thienThe) {
   const trang = thienThe === 'trang';
   const f = (JD) => (trang ? matTrang(JD) : matTroi(JD));
-  const nguong = trang ? 0.125 : -0.833;
+  const nguong = trang ? NGUONG.trang : NGUONG.troi;
   return {
     moc: timNguong(f, nguong, msDauNgay, viDo, kinhDo, true),
     lan: timNguong(f, nguong, msDauNgay, viDo, kinhDo, false),
@@ -264,10 +265,22 @@ function gocHuong(v) {
    Trả về cái QUYẾT ĐỊNH, còn câu chữ để chỗ hiển thị tự lo — tách ra thì kiểm thử được bằng
    Node, mà chính vì trước đây nó nằm lẫn trong phần vẽ chữ nên không ai canh: dòng chữ gộp cả
    hai thành "chưa lên khỏi chân trời", thành thử mười một giờ đêm mà Trăng lặn từ chín giờ thì
-   app vẫn bảo nó chưa lên. */
-function trangThaiMocLan(cao, ml, mlMai, luc) {
+   app vẫn bảo nó chưa lên.
+
+   nguong: độ cao lúc mọc/lặn, đúng ngưỡng mocLan dùng (NGUONG). Bản trước lấy 0 cho mọi thứ, nên
+   Mặt Trời mọc lúc 5:42 mà tới 5:45 dòng chữ vẫn bảo "đang ở dưới chân trời" — giờ mọc tính cả khúc
+   xạ, còn phép so "trên 0 độ" thì không.
+
+   Trăng mọc muộn hơn mỗi ngày chừng 50 phút, nên nhiều hôm nó mọc tối nay và lặn SÁNG MAI. Bản trước
+   chỉ nhìn giờ lặn của hôm nay — đã qua — nên đêm đó không ghi giờ lặn, sáng ra thấy trăng còn treo
+   trên trời thì tưởng app tính sai. Giờ lặn của hôm nay đã qua thì lấy giờ lặn ngày mai (mai: true). */
+function trangThaiMocLan(cao, ml, mlMai, luc, nguong = 0) {
   ml = ml || { moc: null, lan: null };
-  if (cao > 0) return { tinh: 'tren', lan: ml.lan !== null && ml.lan > luc ? ml.lan : null };
+  if (cao > nguong) {
+    if (ml.lan !== null && ml.lan > luc) return { tinh: 'tren', lan: ml.lan };
+    if (mlMai && mlMai.lan !== null && mlMai.lan > luc) return { tinh: 'tren', lan: mlMai.lan, mai: true };
+    return { tinh: 'tren', lan: null };
+  }
   if (ml.moc !== null && ml.moc > luc) return { tinh: 'chuaMoc', moc: ml.moc };
   if (ml.lan !== null && ml.lan <= luc)
     return { tinh: 'daLan', lan: ml.lan, maiMoc: mlMai && mlMai.moc !== null ? mlMai.moc : null };
@@ -343,7 +356,7 @@ function giaiSao(du, dem) {
 }
 
 const API = { ngayJulius, matTroi, matTrang, hanhTinh, docCao, gioSao, khucXa,
-              mocLan, trangThaiMocLan, huongMay, vecHuong, gocHuong, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG),
+              mocLan, NGUONG, trangThaiMocLan, huongMay, vecHuong, gocHuong, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG),
               tueSai, tuThienHa, CUC_THIEN_HA, khoiKhi, nhietDoSao, mauSao, giaiSao, nhatTamJD, quyDao, nghieng };
 
 if (typeof module !== 'undefined' && module.exports) module.exports = API;

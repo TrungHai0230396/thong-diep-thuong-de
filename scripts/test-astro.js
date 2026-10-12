@@ -362,5 +362,80 @@ console.log('\n— Sao thật: tuế sai, toạ độ thiên hà, khí quyển, 
   }
 }
 
+console.log('\n— Giờ mọc lặn của Trăng khớp JPL Horizons (NASA) —');
+/* Người dùng hỏi: "sáng rồi mặt trăng không chịu lặn, có lúc khuya mà trăng không mọc — tính sai
+   hay tôi sai?". Đối chiếu với JPL Horizons, TP.HCM tháng 10/2026, giờ Việt Nam: chênh nhiều nhất
+   2 phút. Không sai — chỉ là có những tuần như vậy thật: đầu tháng 10 Trăng mọc 21:30 – 4:00, lặn
+   9:46 – 16:37 (sáng ra còn treo trên trời); từ 10/10 Trăng mọc sau bình minh, lặn 17:16 – 23:38
+   (khuya không có Trăng).
+   Nguồn: ssd.jpl.nasa.gov/api/horizons.api, COMMAND='301', CENTER='coord@399',
+   SITE_COORD='106.6297,10.8231,0', R_T_S_ONLY='TVH' (mép trên chạm chân trời thật, có khúc xạ),
+   TIME_ZONE='+07:00'. */
+const HZ = [
+  ['2026-10-01', '21:32', '09:46'], ['2026-10-02', '22:34', '10:50'], ['2026-10-03', '23:38', '11:52'],
+  ['2026-10-04', null, '12:51'], ['2026-10-05', '00:40', '13:44'], ['2026-10-06', '01:39', '14:33'],
+  ['2026-10-07', '02:35', '15:17'], ['2026-10-08', '03:28', '15:58'], ['2026-10-09', '04:18', '16:38'],
+  ['2026-10-10', '05:08', '17:17'], ['2026-10-11', '05:58', '17:58'], ['2026-10-12', '06:48', '18:40'],
+  ['2026-10-13', '07:40', '19:25'], ['2026-10-14', '08:32', '20:13'], ['2026-10-15', '09:25', '21:03'],
+  ['2026-10-16', '10:17', '21:54'], ['2026-10-17', '11:08', '22:46'], ['2026-10-18', '11:56', '23:38'],
+  ['2026-10-19', '12:40', null], ['2026-10-20', '13:22', '00:28'],
+];
+const gioVN = (ngay, hm) => Date.parse(`${ngay}T${hm}:00+07:00`);
+let lechMax = 0, thieu = 0;
+for (const [ngay, moc, lan] of HZ) {
+  const ml = A.mocLan(Date.parse(`${ngay}T00:00:00+07:00`), HCM.vi, HCM.kinh, 'trang');
+  for (const [mau, tinh] of [[moc, ml.moc], [lan, ml.lan]]) {
+    if (mau === null) { if (tinh !== null) thieu++; continue; }
+    if (tinh === null) { thieu++; continue; }
+    lechMax = Math.max(lechMax, Math.abs(tinh - gioVN(ngay, mau)) / 6e4);
+  }
+}
+ok('20 ngày, 38 lần mọc lặn: lệch Horizons không quá 3 phút', lechMax <= 3, `lệch nhiều nhất ${lechMax.toFixed(1)} phút`);
+ok('ngày không có mọc (4/10) hay không có lặn (19/10) thì app cũng ra không có', thieu === 0, `${thieu} chỗ lệch`);
+
+console.log('\n— Trăng mọc tối nay, lặn sáng mai: phải nói được giờ lặn —');
+{
+  /* 1/10/2026 lúc 22:00: Trăng mọc 21:32, lặn 10:50 SÁNG MAI. Bản trước chỉ nhìn giờ lặn hôm nay
+     (9:46, đã qua) nên không ghi giờ lặn; sáng ra thấy Trăng còn trên trời thì tưởng app sai. */
+  const d1 = Date.parse('2026-10-01T00:00:00+07:00'), d2 = Date.parse('2026-10-02T00:00:00+07:00');
+  const luc22 = Date.parse('2026-10-01T22:00:00+07:00');
+  const t = T(caoLuc(luc22, 'trang'), mlT(d1), mlT(d2), luc22, A.NGUONG.trang);
+  ok('22:00 ngày 1/10: Trăng đang trên trời', t.tinh === 'tren', t.tinh);
+  ok('và lặn lúc 10:50 sáng mai, có đánh dấu là ngày mai',
+     t.mai === true && Math.abs(t.lan - Date.parse('2026-10-02T10:50:00+07:00')) < 3 * 6e4,
+     t.lan ? new Date(t.lan + 7 * 36e5).toISOString().slice(5, 16) : 'không có');
+  ok('giờ lặn hôm nay còn ở phía trước thì vẫn dùng giờ hôm nay, không đánh dấu ngày mai',
+     (() => { const l = Date.parse('2026-10-02T08:00:00+07:00'); const r = T(caoLuc(l, 'trang'), mlT(d2), null, l, A.NGUONG.trang);
+              return r.tinh === 'tren' && !r.mai && r.lan === mlT(d2).lan; })());
+}
+
+console.log('\n— Ngưỡng chân trời của dòng chữ phải đúng ngưỡng của giờ mọc lặn —');
+{
+  /* Mặt Trời mọc tính ở -0,833 độ (bán kính đĩa + khúc xạ), còn dòng chữ trước đây so "trên 0 độ":
+     ba bốn phút ngay sau giờ mọc nó vẫn bảo "đang ở dưới chân trời". */
+  const d = Date.parse('2026-10-12T00:00:00+07:00'), dM = d + 864e5;
+  const mlS = A.mocLan(d, HCM.vi, HCM.kinh), mlSM = A.mocLan(dM, HCM.vi, HCM.kinh);
+  const sau = mlS.moc + 2 * 6e4;
+  ok('2 phút sau giờ Mặt Trời mọc: đã ở trên trời', T(caoLuc(sau, 'troi'), mlS, mlSM, sau, A.NGUONG.troi).tinh === 'tren',
+     `độ cao hình học ${caoLuc(sau, 'troi').toFixed(2)}°`);
+  ok('2 phút trước giờ mọc: chưa mọc', T(caoLuc(mlS.moc - 12e4, 'troi'), mlS, mlSM, mlS.moc - 12e4, A.NGUONG.troi).tinh === 'chuaMoc');
+  let mo = 0, sai = 0;
+  for (let p = 0; p < 1440; p += 1) {
+    const ms = d + p * 6e4;
+    const t = T(caoLuc(ms, 'troi'), mlS, mlSM, ms, A.NGUONG.troi);
+    if (t.tinh === 'khongRo') mo++;
+    if ((t.tinh === 'tren') !== (ms >= mlS.moc && ms < mlS.lan)) sai++;
+  }
+  ok('cả ngày, từng phút: "trên trời" đúng bằng khoảng giữa giờ mọc và giờ lặn', sai === 0 && mo === 0, `${sai} phút lệch, ${mo} phút không rõ`);
+  const mlTr = mlT(d), mlTrM = mlT(dM);
+  let saiT = 0;
+  for (let p = 0; p < 1440; p += 1) {
+    const ms = d + p * 6e4;
+    const t = T(caoLuc(ms, 'trang'), mlTr, mlTrM, ms, A.NGUONG.trang);
+    if ((t.tinh === 'tren') !== (ms >= mlTr.moc && ms < mlTr.lan)) saiT++;
+  }
+  ok('Mặt Trăng cũng vậy (12/10: mọc 6:48, lặn 18:40)', saiT === 0, `${saiT} phút lệch`);
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

@@ -48,6 +48,29 @@ function tenTrang(tuoi, sang) {
   return 'trăng lưỡi liềm cuối tháng';
 }
 
+/* Vì sao có hôm sáng bảnh mắt Trăng vẫn chưa lặn, có hôm khuya lại chẳng thấy Trăng đâu.
+   Người dùng hỏi đúng hai câu đó và ngờ app tính sai — đối chiếu JPL Horizons thì giờ mọc lặn của
+   app lệch không quá 2 phút. Chỉ là Trăng không gắn với ban đêm: mỗi ngày nó mọc trễ chừng 50 phút,
+   nên giờ mọc trôi dần qua đủ 24 tiếng trong một tháng âm. Chia theo đúng các mốc của tenTrang;
+   giờ giấc lấy từ bảng mọc lặn tháng 10/2026 ở TP.HCM và Hà Nội (khớp Horizons). */
+function nhipTrang(tuoi) {
+  if (tuoi < 1.5 || tuoi > 28.0)
+    return 'Trăng non đi cùng Mặt Trời: mọc lúc sáng sớm, lặn lúc chiều tối, nên cả đêm không có trăng.';
+  if (tuoi < 6.5)
+    return 'Trăng đầu tháng mọc buổi sáng sau Mặt Trời, lặn buổi tối: chỉ thấy đầu hôm ở phía tây, khuya là đã lặn.';
+  if (tuoi < 8.5)
+    return 'Trăng thượng huyền mọc khoảng trưa, lặn khoảng nửa đêm: thấy nửa đầu đêm, khuya thì không.';
+  if (tuoi < 13.5)
+    return 'Trăng mọc buổi chiều, lặn sau nửa đêm: thấy gần hết đêm.';
+  if (tuoi < 16.5)
+    return 'Trăng tròn nằm đối diện Mặt Trời: mọc lúc hoàng hôn, lặn lúc bình minh, thấy suốt đêm.';
+  if (tuoi < 21.5)
+    return 'Trăng mọc buổi tối, lặn vào buổi sáng: sáng ra vẫn còn trăng ở phía tây.';
+  if (tuoi < 23.5)
+    return 'Trăng hạ huyền mọc khoảng nửa đêm, lặn khoảng trưa: cả buổi sáng vẫn thấy trăng trên trời.';
+  return 'Trăng cuối tháng mọc sau nửa đêm tới rạng sáng, lặn buổi chiều: thấy ở phía đông trước bình minh, sáng rồi vẫn chưa lặn.';
+}
+
 let tam, cv, ctx, W, H, DPR, raf = null;
 let noi = { ten: 'TP.HCM', vi: 10.8231, kinh: 106.6297, tuMay: false };
 /* Người dùng đã tự chọn nơi chưa. Chưa thì TP.HCM ở trên chỉ là chỗ tạm để vẽ bầu trời, và
@@ -771,9 +794,9 @@ function capNhatChu(b, luc) {
   const html = `
     <p class="td-dong1">${daChon ? noi.ten : 'Xem tạm ' + noi.ten} · ${gio} · ${b.toi.ten}</p>
     <p class="td-dong2">
-      <button class="td-ten" data-xem="Mặt Trời">Mặt Trời</button> ${dangODau(b.troi.cao, b.troi.huong, ml, mlMai, luc)}
+      <button class="td-ten" data-xem="Mặt Trời">Mặt Trời</button> ${dangODau(b.troi.cao, b.troi.huong, ml, mlMai, luc, A().NGUONG.troi)}
       · ${tenTrang(b.trang.tuoi, b.trang.sang)}, sáng ${Math.round(b.trang.sang * 100)}%,
-      <button class="td-ten" data-xem="Mặt Trăng">Mặt Trăng</button> ${dangODau(b.trang.cao, b.trang.huong, mt, mtMai, luc)}
+      <button class="td-ten" data-xem="Mặt Trăng">Mặt Trăng</button> ${dangODau(b.trang.cao, b.trang.huong, mt, mtMai, luc, A().NGUONG.trang)}
     </p>
     <p class="td-dong3">${tren.length ? 'Đang trên trời: ' + tren.join(' · ')
                                       : 'Không hành tinh nào trên trời lúc này'}</p>
@@ -935,11 +958,11 @@ function veThe() {
   const dau = new Date(luc); dau.setHours(0, 0, 0, 0);
   const mai = new Date(dau); mai.setDate(mai.getDate() + 1);
 
-  let v = null, phu = '';
+  let v = null, phu = '', nhip = '';
   if (chon === 'Mặt Trời') {
     v = b.troi;
     phu = dangODau(v.cao, v.huong, mocLanNho(dau.getTime()),
-                   mocLanNho(mai.getTime()), luc) + toHonThat(15, v.gocNhin);
+                   mocLanNho(mai.getTime()), luc, A().NGUONG.troi) + toHonThat(15, v.gocNhin);
   } else if (chon === 'Mặt Trăng') {
     v = b.trang;
     /* CẨN THẬN đơn vị: kc của Trăng tính bằng KM (~385000), còn kc của Mặt Trời và hành tinh
@@ -947,9 +970,10 @@ function veThe() {
        viết một dòng hiển thị dùng chung cho cả ba là ra ngay một Mặt Trăng cách 385 nghìn tỉ km. */
     phu = `${tenTrang(v.tuoi, v.sang)}, sáng ${Math.round(v.sang * 100)}% · ` +
       dangODau(v.cao, v.huong, mocLanNho(dau.getTime(), 'trang'),
-               mocLanNho(mai.getTime(), 'trang'), luc) +
+               mocLanNho(mai.getTime(), 'trang'), luc, A().NGUONG.trang) +
       ` · cách Trái Đất ${Math.round(v.kc / 1000)} nghìn km, ánh sáng đi hết ${so1(v.kc / 299792.458)} giây` +
       toHonThat(17 * Math.pow(GOC_THUONG / goc, .75), v.gocNhin);
+    nhip = nhipTrang(v.tuoi) + ' Mỗi ngày Trăng mọc trễ hơn chừng 50 phút.';
   } else {
     v = b.ht.find(p => p.ten === chon);
     if (v) phu = (v.cao > 0 ? `đang ở ${Math.round(v.cao)}° trên ${huongChu(v.huong)}`
@@ -963,7 +987,8 @@ function veThe() {
      mới, và cú bấm rơi mất. */
   const html = `<button class="td-the-thoi" aria-label="Đóng">✕</button>
     <p class="td-the-ten">${chon}</p>
-    <p class="td-the-phu">${phu}</p>
+    <p class="td-the-phu">${phu}</p>${nhip ? `
+    <p class="td-the-phu">${nhip}</p>` : ''}
     <button class="td-the-nhin">Quay nhìn về phía này</button>`;
   if (o._html !== html) { o._html = html; o.innerHTML = html; }
   o.querySelector('.td-the-thoi').onclick = () => { chon = null; o.hidden = true; };
@@ -981,15 +1006,23 @@ function toHonThat(rVe, gocNhin) {
 /* Một thiên thể không ở trên trời thì có HAI lý do khác hẳn nhau: chưa mọc, hoặc đã lặn rồi.
    Bản trước gộp cả hai thành một câu "chưa lên khỏi chân trời", nên lúc mười một giờ đêm mà
    Trăng đã lặn từ chín rưỡi thì app vẫn bảo nó "chưa lên" — người đọc tưởng app hỏng. */
-function dangODau(cao, huong, ml, mlMai, luc) {
+function dangODau(cao, huong, ml, mlMai, luc, nguong = 0) {
   const g = (ms) => ms === null ? '—' :
     new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-  const t = A().trangThaiMocLan(cao, ml, mlMai, luc);
+  const t = A().trangThaiMocLan(cao, ml, mlMai, luc, nguong);
   if (t.tinh === 'tren')
-    return `đang ở ${Math.round(cao)}° trên ${huongChu(huong)}` + (t.lan ? `, lặn lúc ${g(t.lan)}` : '');
+    /* Ngay lúc mọc, lặn thì độ cao hình học còn hơi âm (khúc xạ nâng nó lên), ghi "-1°" thì vô lý. */
+    return (cao < 1 ? `đang sát chân trời phía ${huongChu(huong)}` : `đang ở ${Math.round(cao)}° trên ${huongChu(huong)}`) +
+      (t.lan ? `, lặn lúc ${g(t.lan)}${t.mai ? ` ${buoi(t.lan)} mai` : ''}` : '');
   if (t.tinh === 'chuaMoc') return `chưa mọc, mọc lúc ${g(t.moc)}`;
-  if (t.tinh === 'daLan') return `đã lặn lúc ${g(t.lan)}` + (t.maiMoc ? `, mai mọc ${g(t.maiMoc)}` : '');
+  if (t.tinh === 'daLan') return `đã lặn lúc ${g(t.lan)}` + (t.maiMoc ? `, mai mọc lúc ${g(t.maiMoc)} ${buoi(t.maiMoc)}` : '');
   return 'đang ở dưới chân trời';
+}
+
+/* Buổi trong ngày, để "lặn lúc 10:50 sáng mai" khỏi phải nhẩm. */
+function buoi(ms) {
+  const h = new Date(ms).getHours();
+  return h < 4 ? 'rạng sáng' : h < 11 ? 'sáng' : h < 13 ? 'trưa' : h < 18 ? 'chiều' : h < 22 ? 'tối' : 'khuya';
 }
 
 const so1 = (x) => x.toFixed(1).replace('.', ',');       // dấu thập phân kiểu Việt
@@ -1316,9 +1349,10 @@ self.TDTD_TROIDEM = { mo, dong,
   _quenMua: () => { mua = { luc: 0, tinh: 'chua', gio: null, dangXin: false }; },
   _moc: () => moc.map(m => ({ ten: m.ten, loai: m.loai, x: Math.round(m.x), y: Math.round(m.y), r: m.r })),
   _chonTai: (x, y) => { chonTai(x, y); return chon; },
-  _chon: () => chon,
+  _chon: (ten) => { if (ten !== undefined) chon = ten; return chon; },
   _nhinToi: (c, h) => nhinToi(c, h),
-  _dangODau: (cao, huong, ml, mlMai, luc) => dangODau(cao, huong, ml, mlMai, luc),
+  _dangODau: (cao, huong, ml, mlMai, luc, nguong) => dangODau(cao, huong, ml, mlMai, luc, nguong),
+  _nhipTrang: nhipTrang,
   _daChon: () => daChon,
   _troiNhin: (dt) => { troiNhin(dt); return { huongNhin, caoNhin, quanTinh }; },
   _quanTinh: (h, c) => { quanTinh = h === null ? null : { h, c }; },

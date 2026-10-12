@@ -465,5 +465,76 @@ console.log('\n— To nhỏ: đúng tỉ lệ ở đâu, nén ở đâu, và nó
   T._datGoc(75);
 }
 
+console.log('\n— "Sáng rồi Trăng không chịu lặn", "khuya mà Trăng không mọc" —');
+{
+  /* Người dùng ngờ app tính sai. Giờ mọc lặn khớp JPL Horizons (xem test-astro.js); cái thiếu là
+     lời: Trăng mọc tối nay lặn sáng mai thì không ghi giờ lặn, và không ai nói vì sao Trăng có
+     tuần ở trên trời buổi sáng, có tuần khuya không thấy. */
+  const A = global.TDTD_ASTRO;
+  const ngay = (s) => Date.parse(`${s}T00:00:00+07:00`);
+  const mlT = (s) => A.mocLan(ngay(s), 10.8231, 106.6297, 'trang');
+  const luc22 = Date.parse('2026-10-01T22:00:00+07:00');
+  const caoTr = (ms) => { const JD = A.ngayJulius(ms), m = A.matTrang(JD); return A.docCao(m.ra, m.dec, 10.8231, 106.6297, JD); };
+  const p22 = caoTr(luc22);
+  const c22 = T._dangODau(p22.cao, p22.huong, mlT('2026-10-01'), mlT('2026-10-02'), luc22, A.NGUONG.trang);
+  ok('22:00 ngày 1/10: ghi giờ lặn sáng mai', /lặn lúc 10:4\d|lặn lúc 10:5\d/.test(c22) && /sáng mai/.test(c22), c22);
+  const luc20 = Date.parse('2026-10-12T20:00:00+07:00'), p20 = caoTr(luc20);
+  const c20 = T._dangODau(p20.cao, p20.huong, mlT('2026-10-12'), mlT('2026-10-13'), luc20, A.NGUONG.trang);
+  ok('20:00 ngày 12/10: đã lặn, mai mọc lúc mấy giờ, buổi nào', /đã lặn lúc 18:\d\d/.test(c20) && /mai mọc lúc 07:\d\d sáng/.test(c20), c20);
+  ok('vừa ló khỏi chân trời thì nói "sát chân trời", không ghi độ cao âm',
+     /sát chân trời phía đông/.test(T._dangODau(-0.3, 90, { moc: luc20 - 6e4, lan: luc20 + 6 * 36e5 }, null, luc20, -0.833)));
+  ok('cao hẳn thì vẫn ghi số độ', /đang ở 30° trên/.test(T._dangODau(30, 90, { moc: luc20 - 36e5, lan: luc20 + 36e5 }, null, luc20)));
+
+  /* Mỗi câu giải thích của từng pha phải ĐÚNG trên bầu trời tính được: chạy cả năm 2026 ở TP.HCM và
+     Hà Nội, ngày nào Trăng đang ở pha đó thì kiểm đúng điều câu ấy nói. */
+  const tenPha = (t) => t < 1.5 || t > 28 ? 'non' : t < 6.5 ? 'dau' : t < 8.5 ? 'thuong' : t < 13.5 ? 'khuyetDau'
+    : t < 16.5 ? 'tron' : t < 21.5 ? 'khuyetCuoi' : t < 23.5 ? 'ha' : 'cuoi';
+  const MAU = { non: 0.5, dau: 4, thuong: 7.4, khuyetDau: 11, tron: 15, khuyetCuoi: 19, ha: 22.5, cuoi: 26 };
+  const KIEM = {
+    non:        [[/cả đêm không có trăng/, (d) => d + 24 * 36e5, false]],
+    dau:        [[/đầu hôm ở phía tây/, (d, r, l) => l + 20 * 6e4, true, 'tay'], [/khuya là đã lặn/, (d) => d + 24.5 * 36e5, false]],
+    thuong:     [[/nửa đầu đêm/, (d) => d + 20 * 36e5, true], [/khuya thì không/, (d) => d + 27 * 36e5, false]],
+    khuyetDau:  [[/gần hết đêm/, (d) => d + 22 * 36e5, true]],
+    tron:       [[/suốt đêm/, (d) => d + 24 * 36e5, true]],
+    khuyetCuoi: [[/sáng ra vẫn còn trăng ở phía tây/, (d, r) => r + 30 * 6e4, true, 'tay']],
+    ha:         [[/cả buổi sáng vẫn thấy trăng/, (d) => d + 8 * 36e5, true]],
+    cuoi:       [[/phía đông trước bình minh/, (d, r) => r - 20 * 6e4, true, 'dong'], [/sáng rồi vẫn chưa lặn/, (d) => d + 8 * 36e5, true]],
+  };
+  for (const [ten, vi, kinh] of [['TP.HCM', 10.8231, 106.6297], ['Hà Nội', 21.0285, 105.8542]]) {
+    let dem = 0, sai = [];
+    for (let i = 0; i < 365; i++) {
+      const d = Date.parse('2026-01-01T00:00:00+07:00') + i * 864e5;
+      const mt = A.mocLan(d, vi, kinh);
+      for (const pha in KIEM) for (const [cau, khi, tren, huong] of KIEM[pha]) {
+        const ms = khi(d, mt.moc, mt.lan), JD = A.ngayJulius(ms), m = A.matTrang(JD);
+        if (tenPha(m.tuoi) !== pha) continue;
+        const p = A.docCao(m.ra, m.dec, vi, kinh, JD);
+        let dung = (p.cao > A.NGUONG.trang) === tren;
+        if (dung && huong) dung = huong === 'tay' ? p.huong > 180 && p.huong < 360 : p.huong > 0 && p.huong < 180;
+        dem++;
+        if (!dung) sai.push(`${pha} ${new Date(ms + 7 * 36e5).toISOString().slice(0, 16)}`);
+      }
+    }
+    ok(`${ten}, cả năm 2026: mọi câu giải thích theo pha đều đúng với vị trí Trăng tính được`, dem > 450 && sai.length === 0,
+       `${dem} lần kiểm, ${sai.length} sai ${sai.slice(0, 3).join('; ')}`);
+  }
+  ok('câu giải thích nói đúng điều được kiểm, pha nào cũng có',
+     Object.keys(KIEM).every(pha => KIEM[pha].every(([cau]) => cau.test(T._nhipTrang(MAU[pha])))),
+     Object.keys(KIEM).filter(pha => !KIEM[pha].every(([cau]) => cau.test(T._nhipTrang(MAU[pha])))).join(', '));
+  ok('các mốc chia pha của câu giải thích trùng mốc tên pha',
+     Object.keys(MAU).every(pha => tenPha(MAU[pha]) === pha) &&
+     [1.4, 1.6, 6.4, 6.6, 8.4, 8.6, 13.4, 13.6, 16.4, 16.6, 21.4, 21.6, 23.4, 23.6, 27.9, 28.1].every((t, i, a) =>
+       i % 2 === 0 || (T._tenTrang(t, 0) !== T._tenTrang(a[i - 1], 0)) === (T._nhipTrang(t) !== T._nhipTrang(a[i - 1]))));
+
+  /* Thẻ Mặt Trăng có câu đó. 8/10/2026 7:00 — tuần "sáng rồi Trăng không chịu lặn". */
+  T._noi(10.8231, 106.6297, 'TP.HCM');
+  const luc7 = Date.parse('2026-10-08T07:00:00+07:00');
+  T._chon('Mặt Trăng');
+  const the = T._the(luc7) || '';
+  ok('thẻ Mặt Trăng sáng 8/10: còn trên trời, ghi giờ lặn chiều nay, và nói vì sao', /lặn lúc 15:5\d/.test(the) &&
+     /sáng rồi vẫn chưa lặn/.test(the) && /mọc trễ hơn chừng 50 phút/.test(the), the.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 260));
+  T._chon(null);
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);
