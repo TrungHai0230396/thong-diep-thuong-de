@@ -966,6 +966,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 @media (prefers-reduced-motion:reduce){.lx-hoa-trong{transition:none}.lx-quang{animation:none}}
 
 /* ---------- cài app ---------- */
+.cai-lien{white-space:nowrap}
 .cai-dau{display:flex;gap:14px;align-items:center;margin:0 0 14px}
 .cai-dau img{flex:0 0 52px;border-radius:13px;box-shadow:0 2px 10px rgba(0,0,0,.35)}
 .cai-dau p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink-dim,rgba(244,239,230,.75))}

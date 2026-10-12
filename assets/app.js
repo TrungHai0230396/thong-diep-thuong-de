@@ -229,7 +229,7 @@ function about() {
 const CA = self.TDTD_CAIAPP;
 const loaiCai = () => (CA ? CA.loaiMay(navigator.userAgent, {
   standalone: !!navigator.standalone || matchMedia('(display-mode: standalone)').matches,
-  coNhacCai: !!CA.nhacCai(), chamDuoc: navigator.maxTouchPoints > 1 }) : 'mayTinh');
+  coNhacCai: !!CA.nhacCai(), chamDuoc: navigator.maxTouchPoints > 1, daCaiNho: !!(CA.docTT() || {}).daCai }) : 'mayTinh');
 const ICO_CHIA_SE = '<svg class="cai-ico" viewBox="0 0 24 24" aria-label="nút Chia sẻ"><path d="M12 3v12M7.5 7.5L12 3l4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 10.5H6v10h12v-10h-2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
 const ICO_THEM = '<svg class="cai-ico" viewBox="0 0 24 24" aria-label="biểu tượng Thêm"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const ICO_BA_CHAM = '<b class="cai-cham">⋯</b>';
@@ -238,30 +238,44 @@ function moCaiApp() {
   const loai = loaiCai(), link = location.origin + location.pathname;
   if (loai === 'daCai') { toast('Bạn đang dùng app rồi'); return; }
   const buoc = (ds) => `<ol class="cai-buoc">${ds.map((d, i) => `<li><span>${i + 1}</span><p>${d}</p></li>`).join('')}</ol>`;
+  /* Các bước trên iPhone, iPad: giống hệt Nhớ Nha (nho-nha/src/ui/InstallSheet.tsx, ShareSteps) — nút Chia sẻ ở
+     đâu, "Thêm vào MH chính" nằm sau "Xem thêm" hay phải kéo xuống, theo CA.cachChiaSe(). */
+  const ua = navigator.userAgent, c = CA.cachChiaSe(ua, CA.laIpad(ua, navigator.maxTouchPoints > 1));
+  /* chữ và biểu tượng luôn liền một dòng: biểu tượng rớt xuống dòng riêng trông như một bước khác (như Nhớ Nha) */
+  const CHIA_SE = `<span class="cai-lien"><b>Chia sẻ</b> ${ICO_CHIA_SE}</span>`;
+  const buocIos = buoc([
+    { baCham: `Bấm nút ${ICO_BA_CHAM} ở thanh dưới, chọn ${CHIA_SE}.`,
+      thanhDuoi: `Bấm nút ${CHIA_SE} ở thanh dưới.`,
+      tren: `Bấm nút ${CHIA_SE} ở góc trên bên phải.`,
+      menu: `Mở menu của trình duyệt, chọn ${CHIA_SE}.` }[c.nut],
+    (c.bang === 'keo' ? 'Kéo xuống, chọn ' : `Bấm <b>Xem thêm</b>${c.bang === 'caHai' ? ' (hoặc kéo xuống)' : ''}, chọn `) +
+      `<span class="cai-lien"><b>Thêm vào MH chính</b> ${ICO_THEM}</span>.`,
+    `Bấm <b>Thêm</b>.`,
+    `Mở <b>Thông Điệp</b> từ màn hình chính.`]);
+  /* Trong Zalo, Facebook…: gọi đúng tên app, nút mở thẳng bằng Safari (iOS 17 trở lên) hay Chrome, rồi link để
+     chép, rồi menu của chính app đó — như Nhớ Nha (EscapeInApp). */
+  const tenApp = CA.tenTrongApp(ua) || 'ứng dụng này', iosApp = loai === 'trongAppIos';
+  const trinhDuyet = iosApp ? 'Safari' : 'Chrome';
+  const ngoai = iosApp ? CA.linkSafari(link) : loai === 'trongAppAndroid' ? CA.linkChrome(link) : null;   // intent:// chỉ Android hiểu
+  const trongApp = `<p class="cai-luu"><b>Mở bằng ${trinhDuyet} để cài được.</b> Trình duyệt trong ${esc(tenApp)} không cài được app.</p>
+      ${ngoai ? `<a class="primary wide cai-nut" href="${esc(ngoai)}">Mở bằng ${trinhDuyet}</a>` : ''}
+      <button class="ghost wide-ghost" id="btn-chep-cai">Chép link</button>
+      <p class="cai-luu">Không mở được thì bấm ${ICO_BA_CHAM} ở góc trên, chọn mở bằng trình duyệt. Mở được rồi thì bấm nút
+        <b>?</b> → <b>Cài app vào điện thoại</b>.</p>`;
   const than = {
     nhacCai: `<button class="primary wide" id="btn-cai">Cài app</button>`,
-    iosSafari: buoc([
-      `Bấm nút ${ICO_BA_CHAM} cạnh thanh địa chỉ, rồi chọn <b>Chia sẻ</b> ${ICO_CHIA_SE}<small>Máy đời cũ: bấm luôn nút Chia sẻ ${ICO_CHIA_SE} ở thanh dưới.</small>`,
-      `Kéo xuống, chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
-      `Bấm <b>Thêm</b> ở góc trên bên phải. Biểu tượng app hiện ngay trên màn hình chính.`]),
-    iosKhac: buoc([
-      `Bấm biểu tượng <b>Chia sẻ</b> ${ICO_CHIA_SE} ở góc phải thanh địa chỉ.`,
-      `Bấm <b>Xem thêm</b>, rồi chọn <b>Thêm vào MH chính</b> ${ICO_THEM}`,
-      `Bấm <b>Thêm</b>.`]) +
+    daCaiTrinhDuyet: `<p>App đã cài trên máy này. Mở <b>Thông Điệp</b> từ biểu tượng ngoài màn hình chính.</p>`,
+    iosSafari: buocIos,
+    iosKhac: buocIos +
       `<p class="cai-luu">Không thấy mục <b>Thêm vào MH chính</b>? Mở trang này bằng <b>Safari</b> rồi bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.</p>
       <button class="ghost wide-ghost" id="btn-chep-cai">Chép link để dán vào Safari</button>`,
     iosKhacCu: `<p class="cai-luu">iPhone này chạy iOS cũ hơn 16.4 nên chỉ <b>Safari</b> mới cài được app — Chrome, Firefox thì chưa.</p>` + buoc([
       `Chép link bên dưới, mở <b>Safari</b> rồi dán vào thanh địa chỉ.`,
       `Trong Safari, bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.`]) +
       `<button class="ghost wide-ghost" id="btn-chep-cai">Chép link để dán vào Safari</button>`,
-    trongAppIos: `<p class="cai-luu">Bạn đang mở trong một ứng dụng khác (Zalo, Facebook, Messenger…) — ở đây không cài được.</p>` + buoc([
-      `Bấm nút ${ICO_BA_CHAM} ở góc màn hình, chọn <b>Mở bằng trình duyệt</b> hoặc <b>Mở trong Safari</b>.`,
-      `Trong Safari, bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.`]) +
-      `<button class="ghost wide-ghost" id="btn-chep-cai">Hoặc chép link để dán vào Safari</button>`,
-    trongAppAndroid: `<p class="cai-luu">Bạn đang mở trong một ứng dụng khác (Zalo, Facebook, Messenger…) — ở đây không cài được. Mở bằng Chrome rồi bấm <b>?</b> → <b>Cài app vào điện thoại</b>.</p>
-      <a class="primary wide cai-nut" href="${CA.linkChrome(link)}">Mở bằng Chrome</a>
-      <button class="ghost wide-ghost" id="btn-chep-cai">Hoặc chép link để dán vào trình duyệt</button>`,
-    androidTay: buoc([`Bấm nút menu <b class="cai-cham">⋮</b> của trình duyệt (thường ở góc trên bên phải).`, `Chọn <b>Cài đặt ứng dụng</b> hoặc <b>Thêm vào màn hình chính</b>.`]),
+    trongAppIos: trongApp,
+    trongAppAndroid: trongApp,
+    androidTay: buoc([`Mở menu của trình duyệt (dấu <b class="cai-cham">⋮</b> hoặc ${ICO_BA_CHAM}).`, `Chọn <b>Cài đặt ứng dụng</b> hoặc <b>Thêm vào màn hình chính</b>.`]),
     mayTinh: `<p>Trên điện thoại, mở <b>${location.host}</b> rồi bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>. Trên máy tính, Chrome và Edge có biểu tượng cài ở cuối thanh địa chỉ.</p>`,
   };
   than.trongApp = than.trongAppAndroid;
@@ -281,7 +295,7 @@ function moCaiApp() {
   };
   const chep = $('#btn-chep-cai');
   if (chep) chep.onclick = () => {
-    const xong = () => toast('Đã chép link, dán vào trình duyệt nhé');
+    const xong = () => toast(loai.startsWith('trongApp') ? `Đã chép link. Mở ${trinhDuyet}, dán vào ô địa chỉ.` : 'Đã chép link, dán vào trình duyệt nhé');
     if (navigator.clipboard) navigator.clipboard.writeText(link).then(xong, () => chepTay(link, xong)); else chepTay(link, xong);
   };
 }

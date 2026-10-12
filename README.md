@@ -668,6 +668,12 @@ Người dùng muốn "một cái popup cài app, để mọi người dễ dùn
 | Mở link trong **Zalo, Facebook, Messenger**, Instagram, TikTok | ở đó không cài được: hướng dẫn mở bằng trình duyệt; Android có nút **Mở bằng Chrome** (link `intent://`, máy không có Chrome thì mở link thường); kèm nút chép link |
 | Máy tính | **không hiện gì** — không tự gợi ý, không có nút trong bảng Giới thiệu, kể cả khi Chrome hay Edge trên máy tính có hộp cài (bản đầu thấy hộp cài là gợi ý luôn, nên bảng hiện cả trên máy tính; người dùng chỉ muốn nó ở bản điện thoại) |
 
+**Làm giống dự án Nhớ Nha** (người dùng dặn; `nho-nha/src/lib/pwa.ts`, `src/ui/InstallSheet.tsx`, `EscapeInApp.tsx` — cùng thư mục `Project`):
+
+- **Các bước trên iPhone theo trình duyệt và đời Safari** (`cachChiaSe`, như `shareWay`): Safari 26 — nút ⋯ ở thanh dưới → *Chia sẻ* → **Xem thêm** → *Thêm vào MH chính* → *Thêm*; Safari cũ hơn — *Chia sẻ* ở thanh dưới → kéo xuống; Chrome — *Chia sẻ* góc trên bên phải → Xem thêm (hoặc kéo xuống); Firefox, Edge — menu của trình duyệt; iPad — góc trên bên phải. Safari ghi `Version/` theo đời iOS (iOS 26 vẫn ghi "OS 18_6"). Bước cuối: mở Thông Điệp từ màn hình chính. Chữ và biểu tượng luôn liền một dòng.
+- **Trong Zalo, Facebook, Messenger, Instagram, TikTok, LINE, WeChat**: gọi đúng tên app (`tenTrongApp` — Messenger nhận trước Facebook vì chuỗi của nó mang cả dấu hiệu Facebook; Orca-Android là Messenger), nút **Mở bằng Safari** (địa chỉ `x-safari-https://`, iOS 17 trở lên) hay **Mở bằng Chrome** (`intent://`), link để chép, rồi menu ⋯ của chính app đó.
+- **Nhớ là đã cài**: Android đã cài mà mở bằng Chrome thì Chrome thôi đưa hộp cài; bày bước cài tay lúc đó là bắt đi tìm một mục menu không còn — nên báo "App đã cài trên máy này". Chrome lại đưa hộp cài (app bị gỡ) thì thôi nhớ.
+
 **Trong trò phát âm:** người đến từ link phát âm đi thẳng vào trò, không thấy trang chính nên trước đây không bao giờ được gợi ý cài. Người dùng chọn: vào trò **3 giây** thì gợi ý (trò khai `goiYCai: true` trong `SAO`), cùng luật bên dưới; rời trò trước 3 giây thì thôi. Bảng gợi ý nâng lên trên màn trò (z-index 35, trò là 30) — không thì nó hiện mà bị che mất.
 
 **Khi nào hiện:** không chặn ngay lúc vào. Tự gợi ý **3,2 giây sau khi lật lá hôm nay** — đọc xong thông điệp rồi — chỉ trên điện thoại, chỉ ở trang chính (không đang mở ngôi sao hay bảng khác), **tối đa 3 lần, cách nhau ít nhất 7 ngày**; đã cài (hoặc đang mở từ biểu tượng ngoài màn hình chính) thì thôi. Lúc nào cũng mở lại được từ nút **?** → *Cài app vào điện thoại*. Chỉ ghi một mẩu nhỏ `tdtd.caiApp`: số lần đã gợi ý, lần cuối, đã cài chưa.
@@ -1516,7 +1522,7 @@ assets/sohoc.js            thần số học: hàm thuần, ngày sinh vào, cá
 assets/thanso.js           giao diện ngôi sao thần số học
 scripts/test-sohoc.js      48 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
 assets/caiapp.js           gợi ý cài app: nhận dạng máy, khi nào tự gợi ý, bắt hộp cài của trình duyệt
-scripts/test-caiapp.js     24 kiểm thử gợi ý cài app
+scripts/test-caiapp.js     46 kiểm thử gợi ý cài app (có các trường hợp lấy từ Nhớ Nha)
 assets/thongke.js          đếm lượt truy cập bằng Vercel Web Analytics: mỗi lần mở một lượt, tách trình duyệt / app / cài mới
 scripts/test-thongke.js    20 kiểm thử đếm lượt truy cập
 assets/rungu.js            nhạc ngủ: tạo âm thành đoạn lặp liền mạch, tính hẹn giờ; chạy được làm Web Worker
@@ -1546,7 +1552,7 @@ node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự bá
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
-node scripts/test-caiapp.js      # chạy 24 kiểm thử gợi ý cài app
+node scripts/test-caiapp.js      # chạy 46 kiểm thử gợi ý cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
