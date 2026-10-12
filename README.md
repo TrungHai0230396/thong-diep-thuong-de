@@ -672,6 +672,7 @@ Người dùng muốn "một cái popup cài app, để mọi người dễ dùn
 
 - **Các bước trên iPhone theo trình duyệt và đời Safari** (`cachChiaSe`, như `shareWay`): Safari 26 — nút ⋯ ở thanh dưới → *Chia sẻ* → **Xem thêm** → *Thêm vào MH chính* → *Thêm*; Safari cũ hơn — *Chia sẻ* ở thanh dưới → kéo xuống; Chrome — *Chia sẻ* góc trên bên phải → Xem thêm (hoặc kéo xuống); Firefox, Edge — menu của trình duyệt; iPad — góc trên bên phải. Safari ghi `Version/` theo đời iOS (iOS 26 vẫn ghi "OS 18_6"). Bước cuối: mở Thông Điệp từ màn hình chính. Chữ và biểu tượng luôn liền một dòng.
 - **Trong Zalo, Facebook, Messenger, Instagram, TikTok, LINE, WeChat**: gọi đúng tên app (`tenTrongApp` — Messenger nhận trước Facebook vì chuỗi của nó mang cả dấu hiệu Facebook; Orca-Android là Messenger), nút **Mở bằng Safari** (địa chỉ `x-safari-https://`, iOS 17 trở lên) hay **Mở bằng Chrome** (`intent://`), link để chép, rồi menu ⋯ của chính app đó.
+- **Link đưa ra Safari, Chrome giữ đúng trò đang mở** (`linkCaiApp`). Người dùng báo: mở link phát âm trong Zalo, bấm *Mở bằng Safari* thì Safari ra trang chính — bản đầu lấy `origin + pathname`, bỏ mất trò. Giờ đang ở trò nào thì ba nút (Mở bằng Safari, Mở bằng Chrome, Chép link) dùng link của trò đó; trò có trang riêng dùng trang riêng `/luyen-phat-am/`, vì link `intent://…#Intent;…` của Chrome không mang được phần sau dấu `#`.
 - **Nhớ là đã cài**: Android đã cài mà mở bằng Chrome thì Chrome thôi đưa hộp cài; bày bước cài tay lúc đó là bắt đi tìm một mục menu không còn — nên báo "App đã cài trên máy này". Chrome lại đưa hộp cài (app bị gỡ) thì thôi nhớ.
 
 **Trong trò phát âm:** người đến từ link phát âm đi thẳng vào trò, không thấy trang chính nên trước đây không bao giờ được gợi ý cài. Người dùng chọn: vào trò **3 giây** thì gợi ý (trò khai `goiYCai: true` trong `SAO`), cùng luật bên dưới; rời trò trước 3 giây thì thôi. Bảng gợi ý nâng lên trên màn trò (z-index 35, trò là 30) — không thì nó hiện mà bị che mất.
@@ -1512,7 +1513,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        96 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        102 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ

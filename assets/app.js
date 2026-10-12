@@ -234,8 +234,16 @@ const ICO_CHIA_SE = '<svg class="cai-ico" viewBox="0 0 24 24" aria-label="nút C
 const ICO_THEM = '<svg class="cai-ico" viewBox="0 0 24 24" aria-label="biểu tượng Thêm"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const ICO_BA_CHAM = '<b class="cai-cham">⋯</b>';
 
+/* Link đưa ra ngoài (Mở bằng Safari, Mở bằng Chrome, Chép link): đang ở trong trò nào thì là link của trò đó.
+   Người dùng báo: mở link phát âm trong Zalo, bấm Mở bằng Safari để cài thì Safari ra trang chính — bản trước lấy
+   origin + pathname, bỏ mất trò đang mở. Trò có trang riêng thì dùng trang riêng (/luyen-phat-am/), vì link mở
+   bằng Chrome (intent://…#Intent;…) không mang được phần sau dấu # của mình. */
+function linkCaiApp() {
+  return saoDangMo ? linkTro(saoDangMo) : location.origin + location.pathname;
+}
+
 function moCaiApp() {
-  const loai = loaiCai(), link = location.origin + location.pathname;
+  const loai = loaiCai(), link = linkCaiApp();
   if (loai === 'daCai') { toast('Bạn đang dùng app rồi'); return; }
   const buoc = (ds) => `<ol class="cai-buoc">${ds.map((d, i) => `<li><span>${i + 1}</span><p>${d}</p></li>`).join('')}</ol>`;
   /* Các bước trên iPhone, iPad: giống hệt Nhớ Nha (nho-nha/src/ui/InstallSheet.tsx, ShareSteps) — nút Chia sẻ ở

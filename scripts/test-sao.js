@@ -285,6 +285,23 @@ console.log('\n— Gợi ý cài app trong trò phát âm —');
      z('sheet-wrap') > z('phatam') && z('sheet-wrap') < z('toast'), `bảng ${z('sheet-wrap')}, trò ${z('phatam')}, thông báo ${z('toast')}`);
 }
 
+console.log('\n— Bảng cài app: link đưa ra Safari, Chrome giữ đúng trò đang mở —');
+{
+  /* Người dùng báo: mở link phát âm trong Zalo, bấm Mở bằng Safari thì Safari ra trang chính, mất phần tiếng Anh. */
+  const cat = (ten) => { const a = nguon.indexOf(`function ${ten}(`); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
+  const CA = require('../assets/caiapp.js');
+  const tao = (sao) => new Function('location', 'saoDangMo', `${cat('linkTro')}\n${cat('linkCaiApp')}\nreturn linkCaiApp();`)(
+    { origin: 'https://thong-diep-thuong-de.vercel.app', pathname: '/' }, sao);
+  const pa = { duong: 'phat-am', trang: 'luyen-phat-am/' }, hd = { duong: 'tha-den' };
+  ok('đang ở trò phát âm: link là trang riêng /luyen-phat-am/', tao(pa) === 'https://thong-diep-thuong-de.vercel.app/luyen-phat-am/', tao(pa));
+  ok('Mở bằng Safari giữ nguyên trang phát âm', CA.linkSafari(tao(pa)) === 'x-safari-https://thong-diep-thuong-de.vercel.app/luyen-phat-am/');
+  ok('Mở bằng Chrome (Android) giữ nguyên trang phát âm', CA.linkChrome(tao(pa)).startsWith('intent://thong-diep-thuong-de.vercel.app/luyen-phat-am/#Intent;'), CA.linkChrome(tao(pa)));
+  ok('trò không có trang riêng: link #trò cho Safari', tao(hd) === 'https://thong-diep-thuong-de.vercel.app/#tha-den');
+  ok('không ở trò nào (mở từ nút ?): trang chính', tao(null) === 'https://thong-diep-thuong-de.vercel.app/');
+  ok('bảng cài app dùng đúng hàm này cho cả ba nút', /function moCaiApp\(\) \{\s*const loai = loaiCai\(\), link = linkCaiApp\(\);/.test(nguon) &&
+     /CA\.linkSafari\(link\)/.test(nguon) && /CA\.linkChrome\(link\)/.test(nguon) && /writeText\(link\)/.test(nguon));
+}
+
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
 {
   /* Ngày 9/9 khung bảng trượt bị xoá nhầm khỏi index.html; app.js vẫn gọi $('#sheet-title') nên nút "?"
