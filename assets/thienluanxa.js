@@ -6,7 +6,10 @@
    nhắm mắt, tắt màn hình, JS có bị bóp cũng không lệch nhịp. Giữ chạy khi khoá màn hình: cùng cách
    với nhạc ngủ (xem đầu nhacngu.js).
 
-   Chỉ lưu hai lựa chọn: mấy phút mỗi luân xa, âm lượng. */
+   Hai cách thiền: đi cả bảy luân xa, hoặc dành cả buổi cho một luân xa người dùng tự chọn — app không đo
+   được luân xa nào "tắc", nên không đoán thay.
+
+   Chỉ lưu mấy lựa chọn: cả bảy hay một (luân xa nào), bao nhiêu phút, âm lượng. */
 (function () {
 'use strict';
 
@@ -24,7 +27,7 @@ const iOSCu = iOS && (() => {
 })();
 
 let tam = null;
-let chon = { phut: 2, am: 70 };
+let chon = { che: 'ca7', phut: 2, lx: 0, phutMot: 10, am: 70 };   // che: 'ca7' | 'mot'
 let ac = null, gAm = null, t0 = 0, lich = null, nut = [];
 let trangThai = 'nghi';                     // nghi · chuanBi · phat · dung (tạm dừng) · tat (đang tắt)
 let daTao = null, dangTao = null, tho = null, thoHong = false, tienTao = 0;
@@ -37,10 +40,16 @@ function docChon() {
   try {
     const o = JSON.parse(localStorage.getItem(KEY) || 'null');
     if (o && L().PHUT.includes(o.phut)) chon.phut = o.phut;
+    if (o && L().PHUT_MOT.includes(o.phutMot)) chon.phutMot = o.phutMot;
+    if (o && (o.che === 'ca7' || o.che === 'mot')) chon.che = o.che;
+    if (o && Number.isInteger(o.lx) && o.lx >= 0 && o.lx < 7) chon.lx = o.lx;
     if (o && o.am >= 5 && o.am <= 100) chon.am = Math.round(o.am);
   } catch (e) {}
 }
 function luuChon() { try { localStorage.setItem(KEY, JSON.stringify(chon)); } catch (e) {} }
+
+/* Buổi đang chọn: luân xa nào, mỗi chặng mấy phút. */
+const buoiChon = () => (chon.che === 'mot' ? { ds: [chon.lx], phut: chon.phutMot } : { ds: L().CA_BAY, phut: chon.phut });
 
 /* ---------- tạo âm: luồng riêng nếu được ---------- */
 
@@ -104,15 +113,16 @@ function datLich(param, ds) {
 
 function phat(kq) {
   const X = L();
-  lich = X.lichBuoi(chon.phut);
+  const b = buoiChon();
+  lich = X.lichBuoi(b.phut, b.ds);
   gAm = ac.createGain(); gAm.gain.value = heSo(chon.am); gAm.connect(ac.destination);
   t0 = ac.currentTime + 0.1;
   const dem = (x) => { const b = ac.createBuffer(1, x.length, X.SR); b.getChannelData(0).set(x); return b; };
   const bufChuong = kq.chuong.map(dem);
   nut = [];
-  lich.nen.forEach((n, i) => {                           // bảy đoạn đàn, mỗi đoạn chỉ chạy trong khoảng của nó
+  lich.nen.forEach((n) => {                              // mỗi chặng một đoạn đàn, chỉ chạy trong khoảng của nó
     const src = ac.createBufferSource(), g = ac.createGain(), m = ac.createGain();
-    src.buffer = dem(kq.nen[i]); src.loop = true;
+    src.buffer = dem(kq.nen[n.i]); src.loop = true;
     g.gain.value = 0; m.gain.value = MUC_NEN;            // gain mặc định là 1: đặt 0 trước, kẻo kêu một nhịp ở mức đủ
     datLich(g.gain, n.ds);
     src.connect(g); g.connect(m); m.connect(gAm);
@@ -183,7 +193,9 @@ function datAm() { if (gAm && ac && trangThai !== 'tat') gAm.gain.setTargetAtTim
 function phienMedia() {
   const ms = nav.mediaSession;
   if (!ms) return;
-  try { ms.metadata = new MediaMetadata({ title: 'Thiền luân xa', artist: `${chon.phut} phút mỗi luân xa`, album: 'Thông Điệp Của Thượng Đế' }); } catch (e) {}
+  const tieuDe = chon.che === 'mot' ? `Thiền ${L().LUAN_XA[chon.lx].ten}` : 'Thiền luân xa';
+  const phu = chon.che === 'mot' ? `${chon.phutMot} phút` : `${chon.phut} phút mỗi luân xa`;
+  try { ms.metadata = new MediaMetadata({ title: tieuDe, artist: phu, album: 'Thông Điệp Của Thượng Đế' }); } catch (e) {}
   const dat = (a, f) => { try { ms.setActionHandler(a, f); } catch (e) {} };
   dat('play', tiepTuc); dat('pause', tamDung); dat('stop', () => tat());
   trangThaiMedia();
@@ -291,12 +303,43 @@ function ve() {
 }
 
 function veChon() {
-  const X = L(), o = tam.querySelector('.lx-chon'), tong = 7 * chon.phut + X.KET / 60;
+  const X = L(), o = tam.querySelector('.lx-chon'), mot = chon.che === 'mot', lxMot = X.LUAN_XA[chon.lx];
+  const tong = mot ? chon.phutMot + X.KET / 60 : 7 * chon.phut + X.KET / 60;
+  const nutChon = (ten, ds, gt, nhan, them = '') => ds.map(v => `
+        <button type="button" role="radio" aria-checked="${v === gt}" class="${v === gt ? 'chon' : ''}" data-${ten}="${v}">${nhan(v)}${them}</button>`).join('');
   o.innerHTML = `
     <p class="xn-tieude">Thiền luân xa</p>
     ${vuaXong ? '<p class="lx-xong">Buổi thiền vừa xong. Ngồi yên thêm chút nữa nếu bạn muốn.</p>' : ''}
-    <p class="lx-mo">Một buổi thiền đi qua bảy luân xa, từ đáy cột sống lên đỉnh đầu. Ở mỗi luân xa: đặt sự chú ý vào đúng chỗ,
-      thở chậm, tụng âm chủng tử theo tiếng đàn tanpura; chuông xoay ngân mỗi ba hơi thở. Âm thanh tạo ngay trên máy, không cần mạng.</p>
+    <p class="lx-mo">Đi lần lượt qua bảy luân xa từ đáy cột sống lên đỉnh đầu, hoặc dành cả buổi cho một luân xa. Ở mỗi luân xa:
+      đặt sự chú ý vào đúng chỗ, thở chậm, tụng âm chủng tử theo tiếng đàn tanpura; chuông xoay ngân mỗi ba hơi thở.
+      Âm thanh tạo ngay trên máy, không cần mạng.</p>
+
+    <section class="xn-khoi lx-dat">
+      <p class="xn-tieu">Thiền</p>
+      <div class="ng-gio lx-che" role="radiogroup" aria-label="Thiền cả bảy hay một luân xa">${nutChon('che', ['ca7', 'mot'], chon.che,
+        v => (v === 'ca7' ? 'Cả bảy luân xa' : 'Một luân xa'))}
+      </div>
+      ${mot ? `
+      <div class="lx-chonlx" role="radiogroup" aria-label="Chọn luân xa">${X.LUAN_XA.map((lx, i) => `
+        <button type="button" role="radio" aria-checked="${i === chon.lx}" class="${i === chon.lx ? 'chon' : ''}" data-lx="${i}">
+          <i style="background:${lx.mau}"></i><b>${lx.so}</b><span>${esc(lx.goi.replace('Luân xa ', ''))}</span></button>`).join('')}
+      </div>
+      <p class="xn-ghi">App không đo được luân xa nào đang “tắc” — chưa có cách nào đo điều đó — nên bạn tự chọn luân xa muốn
+        dành thời gian, theo cảm nhận của mình.</p>` : ''}
+      <p class="xn-tieu">${mot ? 'Thời gian' : 'Mỗi luân xa'}</p>
+      <div class="ng-gio lx-gio" role="radiogroup" aria-label="${mot ? 'Số phút của buổi thiền' : 'Số phút cho mỗi luân xa'}">${
+        nutChon('phut', mot ? X.PHUT_MOT : X.PHUT, mot ? chon.phutMot : chon.phut, v => v, '<small> phút</small>')}
+      </div>
+      <p class="xn-ghi">${mot ? `Cả buổi ${tong} phút: ${chon.phutMot} phút với ${esc(lxMot.ten)} (${esc(lxMot.goi.toLowerCase())}), rồi một phút ngồi yên.`
+        : `Cả buổi ${tong} phút: bảy luân xa, mỗi luân xa ${chon.phut} phút, rồi một phút ngồi yên.`}</p>
+      <p class="xn-tieu">Âm lượng</p>
+      <input class="ng-am lx-am" type="range" min="5" max="100" step="1" value="${chon.am}" aria-label="Âm lượng">
+    </section>
+
+    <button class="ng-batdau lx-batdau" type="button">${mot ? `Bắt đầu thiền ${esc(lxMot.ten)}` : 'Bắt đầu'}</button>
+    <p class="ng-loi lx-loi" hidden></p>
+    ${iOSCu ? `<p class="ng-canh">iPhone chạy iOS cũ hơn 17.5 sẽ dừng tiếng khi khoá màn hình, nên trong lúc thiền trang giữ màn hình sáng
+      — hạ độ sáng xuống thấp nhất. Không nghe tiếng thì gạt tắt chế độ im lặng.</p>` : ''}
 
     <section class="xn-khoi">
       <p class="xn-tieu">Bảy luân xa</p>
@@ -310,24 +353,11 @@ function veChon() {
           <p>${esc(lx.kinh)}</p>
           <p>Chủng tử: ${lx.bija ? `<b>${esc(lx.bija)}</b> (${lx.deva}) — ${esc(lx.doc)}` : esc(lx.doc)}.</p>
           <p class="lx-mot-hz">Chuông ${lx.hz} Hz, đàn Sa ${X.goc(lx.hz).toFixed(1).replace('.', ',')} Hz — bảng tần số thời nay, xem “Nói cho đúng”.</p>
+          <button class="lx-rieng" type="button" data-lx="${lx.so - 1}">Thiền riêng luân xa này</button>
         </div>
       </details>`).join('')}
     </section>
 
-    <section class="xn-khoi">
-      <p class="xn-tieu">Mỗi luân xa</p>
-      <div class="ng-gio lx-gio" role="radiogroup" aria-label="Số phút cho mỗi luân xa">${X.PHUT.map(p => `
-        <button type="button" role="radio" aria-checked="${p === chon.phut}" class="${p === chon.phut ? 'chon' : ''}" data-phut="${p}">${p}<small> phút</small></button>`).join('')}
-      </div>
-      <p class="xn-ghi">Cả buổi ${tong} phút: bảy luân xa, mỗi luân xa ${chon.phut} phút, rồi một phút ngồi yên.</p>
-      <p class="xn-tieu">Âm lượng</p>
-      <input class="ng-am lx-am" type="range" min="5" max="100" step="1" value="${chon.am}" aria-label="Âm lượng">
-    </section>
-
-    <button class="ng-batdau lx-batdau" type="button">Bắt đầu</button>
-    <p class="ng-loi lx-loi" hidden></p>
-    ${iOSCu ? `<p class="ng-canh">iPhone chạy iOS cũ hơn 17.5 sẽ dừng tiếng khi khoá màn hình, nên trong lúc thiền trang giữ màn hình sáng
-      — hạ độ sáng xuống thấp nhất. Không nghe tiếng thì gạt tắt chế độ im lặng.</p>` : ''}
 
     <section class="xn-khoi ng-vi">
       <p class="xn-tieu">Cách ngồi</p>
@@ -368,7 +398,15 @@ function veChon() {
       International Journal of Yoga 2011; Gołaś & Filipek, Archives of Acoustics 2016; Inácio và cs., Acta Acustica 2006; Terwagne & Bush,
       Tibetan Singing Bowls (2011). Đây là bài thiền tham khảo, không thay lời khuyên của bác sĩ.</p>`;
 
-  o.querySelectorAll('.lx-gio button').forEach(n => { n.onclick = () => { chon.phut = +n.dataset.phut; luuChon(); veChon(); }; });
+  const doi = (f) => { f(); luuChon(); veChon(); };
+  o.querySelectorAll('.lx-che button').forEach(n => { n.onclick = () => doi(() => { chon.che = n.dataset.che; }); });
+  o.querySelectorAll('.lx-chonlx button').forEach(n => { n.onclick = () => doi(() => { chon.lx = +n.dataset.lx; }); });
+  o.querySelectorAll('.lx-gio button').forEach(n => { n.onclick = () => doi(() => { if (mot) chon.phutMot = +n.dataset.phut; else chon.phut = +n.dataset.phut; }); });
+  o.querySelectorAll('.lx-rieng').forEach(n => { n.onclick = () => {
+    doi(() => { chon.che = 'mot'; chon.lx = +n.dataset.lx; });
+    const dat = o.querySelector('.lx-dat');                // đưa lên phần cài đặt, nút Bắt đầu ở ngay dưới
+    if (dat && dat.scrollIntoView) dat.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }; });
   const am = o.querySelector('.lx-am');
   am.oninput = () => { chon.am = +am.value; luuChon(); };
   o.querySelector('.lx-batdau').onclick = batDau;
@@ -431,37 +469,42 @@ function capNhat() {
   if (trangThai === 'chuanBi' || !lich) {
     if (veCu.chang !== -1) {
       veCu.chang = -1;
-      hoa.innerHTML = veSen(lx7[0]); tam.querySelector('.lx-than-o').innerHTML = veThan(0);
-      tam.querySelector('.lx-so').textContent = 'Luân xa 1 / 7'; tam.querySelector('.lx-ten').textContent = lx7[0].ten;
-      tam.querySelector('.lx-bija').textContent = lx7[0].bija;
+      const dau = buoiChon().ds[0], lx = lx7[dau];
+      hoa.innerHTML = veSen(lx); tam.querySelector('.lx-than-o').innerHTML = veThan(dau);
+      tam.style.setProperty('--lx-mau', lx.mau);
+      tam.querySelector('.lx-so').textContent = `Luân xa ${lx.so}`; tam.querySelector('.lx-ten').textContent = lx.ten;
+      tam.querySelector('.lx-bija').textContent = lx.bija || 'Im lặng';
       tam.querySelector('.lx-doc').textContent = ''; tam.querySelector('.lx-chuy').textContent = '';
     }
     veTien();
     return;
   }
-  const t = viTri(), o = X.dangO(t, lich), i = o.ket ? 7 : o.i;
-  if (veCu.chang !== i) {
-    veCu.chang = i;
-    const lx = lx7[Math.min(i, 6)];
+  /* lúc ngồi yên ở cuối thì vẫn để hoa sen của luân xa vừa thiền (thiền riêng luân xa gốc thì là sen bốn cánh) */
+  const t = viTri(), o = X.dangO(t, lich), i = o.ket ? lich.ds[lich.ds.length - 1] : o.i, khoa = o.ket ? 'ket' : i;
+  if (veCu.chang !== khoa) {
+    veCu.chang = khoa;
+    const lx = lx7[i];
     hoa.innerHTML = veSen(lx);
     tam.querySelector('.lx-than-o').innerHTML = veThan(o.ket ? 7 : i);
     tam.style.setProperty('--lx-mau', lx.mau);
-    tam.querySelector('.lx-so').textContent = o.ket ? 'Xong bảy luân xa' : `Luân xa ${lx.so} / 7 · ${lx.goi}`;
+    const motLx = lich.ds.length === 1;
+    tam.querySelector('.lx-so').textContent = o.ket ? (motLx ? `Xong ${lx.ten}` : 'Xong bảy luân xa')
+      : motLx ? `Luân xa ${lx.so} · ${lx.goi}` : `Luân xa ${lx.so} / 7 · ${lx.goi}`;
     tam.querySelector('.lx-ten').textContent = o.ket ? '' : lx.ten;
     tam.querySelector('.lx-bija').textContent = o.ket ? '' : (lx.bija || 'Im lặng');
     tam.querySelector('.lx-doc').textContent = o.ket ? '' : lx.doc;
     tam.querySelector('.lx-chuy').textContent = o.ket ? 'Ngồi yên thêm một lúc. Mở mắt khi bạn sẵn sàng.' : `Đặt sự chú ý ở ${lx.viTri}.`;
   }
-  const h = X.hoiTho(t), lx = lx7[Math.min(i, 6)];
+  const h = X.hoiTho(t), lx = lx7[i];
   const cauTho = trangThai === 'dung' ? 'Đang tạm dừng' : trangThai === 'tat' ? 'Đang dừng…' : o.ket ? ''
     : h.pha === 'hit' ? 'Hít vào…' : lx.bija ? `Thở ra, tụng ${lx.bija}` : 'Thở ra, lặng yên';
   if (cauTho !== veCu.tho) { veCu.tho = cauTho; tam.querySelector('.lx-tho').textContent = cauTho; }
-  const dem = o.ket ? `còn ${X.dongHo(o.con)}` : `còn ${X.dongHo(o.conChang)} ở luân xa này · cả buổi còn ${X.dongHo(o.con)}`;
+  const dem = o.ket || lich.ds.length === 1 ? `còn ${X.dongHo(o.con)}` : `còn ${X.dongHo(o.conChang)} ở luân xa này · cả buổi còn ${X.dongHo(o.con)}`;
   if (dem !== veCu.dem) { veCu.dem = dem; tam.querySelector('.lx-dem').textContent = dem; }
   /* hoa sen phồng lên khi hít vào, thu lại khi thở ra; lúc kết thì mờ dần theo tiếng đàn */
   const em = (p) => 0.5 - 0.5 * Math.cos(Math.PI * p);
   const co = o.ket ? 0.94 : h.pha === 'hit' ? 0.9 + 0.12 * em(h.tien) : 1.02 - 0.12 * em(h.tien);
-  const mo = o.ket ? Math.max(0.15, X.muc(t, lich.nen[6].ds)) : 1;
+  const mo = o.ket ? Math.max(0.15, X.muc(t, lich.nen[lich.nen.length - 1].ds)) : 1;
   hoa.style.transform = `scale(${co.toFixed(3)})`;
   hoa.style.opacity = mo.toFixed(3);
 }

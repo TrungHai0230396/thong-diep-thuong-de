@@ -815,6 +815,8 @@ Nghĩa chín ô (`Y_O` trong `sohoc.js`) chỉ lấy chỗ hai nguồn nhất tr
 
 Người dùng muốn "một ngôi sao nhạc thiền định để kích hoạt các luân xa, tìm hiểu tài liệu xong mới làm, làm cho đúng". Ngôi sao hoa sen hồng (`#thien-luan-xa`): một buổi thiền đi qua bảy luân xa từ gốc lên đỉnh. Mỗi luân xa có hoa sen vẽ theo kinh văn, chữ chủng tử để tụng, nhịp thở 4 – 6, tiếng đàn tanpura cùng nốt và chuông xoay ngân mỗi ba hơi thở. Chọn 1, 2, 3 hay 5 phút mỗi luân xa; cuối buổi có một phút ngồi yên với ba tiếng chuông.
 
+**Thiền riêng một luân xa.** Người dùng hỏi tiếp: "người dùng không thiền riêng một luân xa đang tắc nghẽn được hả". Giờ có hai cách: *Cả bảy luân xa* (1, 2, 3, 5 phút mỗi luân xa) hoặc *Một luân xa* — chọn trong ô bảy luân xa, hay bấm "Thiền riêng luân xa này" ngay trong phần mô tả của luân xa đó — rồi 5, 10, 15, 20 phút, cộng một phút ngồi yên. App nói thẳng là **không đo được luân xa nào "tắc"** (chưa có cách nào đo điều đó), nên người dùng tự chọn theo cảm nhận; app không làm bài trắc nghiệm đoán luân xa tắc. `lichBuoi(phut, ds)` nhận danh sách luân xa: cả bảy là `[0…6]`, thiền riêng là một phần tử — cùng một đường lịch, cùng trình phát.
+
 **Nội dung theo kinh văn, không theo bảng trên mạng.** Hệ bảy luân xa dựa trên Ṣaṭ-cakra-nirūpaṇa của Pūrṇānanda (1577), bản dịch Arthur Avalon 1919 ([wisdomlib.org](https://www.wisdomlib.org/hinduism/book/shat-cakra-nirupana-english)), đối chiếu Wikipedia từng luân xa:
 
 | | Tên | Cánh | Chủng tử | Yếu tố | Kinh văn tả |
@@ -841,7 +843,7 @@ Hoa sen trong app tô **màu kinh văn**. Màu cầu vồng (đỏ ở gốc →
 
 **Cả buổi hẹn trước trên luồng âm thanh** ngay lúc bấm Bắt đầu (`lichBuoi`): bảy đoạn đàn chỉ chạy trong khoảng của mình, chuyển nhau trong 8 giây (đan tuyến tính, cộng lại vẫn đủ), mọi tiếng chuông đặt sẵn đúng giây — luôn rơi vào đầu một nhịp hít vào — và một mẫu lặng ở giây cuối báo hết buổi. Nhắm mắt, tắt màn hình, JS bị bóp cũng không lệch nhịp. Giữ chạy khi khoá màn hình giống nhạc ngủ; đang thiền thì app không tự tải lại bản mới (cả hai cùng báo `tdtd-ngu-het` khi tắt).
 
-`scripts/test-luanxa.js`, 86 bài: nội dung khớp kinh văn (số cánh, chủng tử, màu cánh Maṇipūra xanh thẫm và Anāhata đỏ chứ không theo cầu vồng); đỉnh phổ của chuông đúng từng tần số riêng (lệch dưới 0,5%), nhịp ngân rung đo ra 1,6 Hz, độ tắt đo ra đúng hằng số đã chọn; mỗi dây đàn có đỉnh nốt rõ, đỉnh bồi âm jawari trượt từ bậc 6 lên bậc 20; lịch buổi đúng từng giây với cả bốn lựa chọn phút; trình phát đặt đúng từng mốc lên luồng âm thanh (Web Audio giả), tạm dừng, tắt, hết buổi tự về; hoa sen vẽ đúng số cánh. Đã thử trong trình duyệt ở cỡ điện thoại: màn chọn, hoa sen từng luân xa, màn đang thiền đổi chữ theo nhịp thở, Worker tạo âm chạy được, bấm Tắt là đóng hẳn luồng âm thanh.
+`scripts/test-luanxa.js`, 95 bài: nội dung khớp kinh văn (số cánh, chủng tử, màu cánh Maṇipūra xanh thẫm và Anāhata đỏ chứ không theo cầu vồng); đỉnh phổ của chuông đúng từng tần số riêng (lệch dưới 0,5%), nhịp ngân rung đo ra 1,6 Hz, độ tắt đo ra đúng hằng số đã chọn; mỗi dây đàn có đỉnh nốt rõ, đỉnh bồi âm jawari trượt từ bậc 6 lên bậc 20; lịch buổi đúng từng giây với cả bốn lựa chọn phút; trình phát đặt đúng từng mốc lên luồng âm thanh (Web Audio giả), tạm dừng, tắt, hết buổi tự về; hoa sen vẽ đúng số cánh; thiền riêng luân xa nào cũng chỉ có đàn và chuông của chính nó (kiểm cả bảy luân xa × bốn mức phút), trình phát nạp đúng đoạn đàn của luân xa đã chọn. Đã thử trong trình duyệt ở cỡ điện thoại: màn chọn, hoa sen từng luân xa, màn đang thiền đổi chữ theo nhịp thở, Worker tạo âm chạy được, bấm Tắt là đóng hẳn luồng âm thanh.
 
 ## Bầu trời đêm nay
 
@@ -1497,7 +1499,7 @@ assets/nhacngu.js          giao diện ngôi sao nhạc ngủ, phát bằng Web 
 scripts/test-ngu.js        53 kiểm thử nhạc ngủ: phổ, tần số, mối nối, lịch nhỏ dần
 assets/luanxa.js           thiền luân xa: bảy luân xa theo kinh văn, tạo âm tanpura và chuông xoay, lịch buổi thiền; chạy được làm Web Worker
 assets/thienluanxa.js      giao diện ngôi sao thiền luân xa: hoa sen, nhịp thở, phát bằng Web Audio
-scripts/test-luanxa.js     86 kiểm thử thiền luân xa: nội dung, phổ chuông, đàn, lịch, trình phát
+scripts/test-luanxa.js     95 kiểm thử thiền luân xa: nội dung, phổ chuông, đàn, lịch, thiền riêng, trình phát
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1522,7 +1524,7 @@ node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
 node scripts/test-caiapp.js      # chạy 24 kiểm thử gợi ý cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
-node scripts/test-luanxa.js      # chạy 86 kiểm thử thiền luân xa
+node scripts/test-luanxa.js      # chạy 95 kiểm thử thiền luân xa
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 182 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

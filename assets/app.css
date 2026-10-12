@@ -936,6 +936,19 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .lx-tho{min-height:24px;margin:18px 0 0;font-size:17px;color:rgba(244,239,230,.88)}
 .lx-dem{margin:6px 0 0;font-size:12.5px;color:rgba(244,239,230,.45);font-variant-numeric:tabular-nums}
 .lx-nut{margin:22px 0 18px}
+.lx-che{margin-bottom:4px}
+.lx-che button{font-size:14px}
+.lx-chonlx{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 0}
+.lx-chonlx button{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:9px 2px 8px;border-radius:12px;cursor:pointer;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.03);color:rgba(244,239,230,.85);font:inherit}
+.lx-chonlx button i{width:10px;height:10px;border-radius:50%}
+.lx-chonlx button b{font-size:15px;font-weight:500}
+.lx-chonlx button span{font-size:11px;line-height:1.25;color:rgba(244,239,230,.55);text-align:center}
+.lx-chonlx button.chon{border-color:rgba(242,167,195,.6);background:rgba(242,167,195,.1)}
+.lx-chonlx button:focus-visible,.lx-rieng:focus-visible{outline:2px solid rgba(242,167,195,.7);outline-offset:2px}
+.lx-rieng{display:block;width:100%;margin:4px 0 0;padding:10px;border-radius:12px;cursor:pointer;font:inherit;font-size:14px;
+  border:1px solid rgba(242,167,195,.4);background:rgba(242,167,195,.08);color:#f2c6d8}
+.lx-rieng:hover{background:rgba(242,167,195,.15)}
 @media (prefers-reduced-motion:reduce){.lx-hoa-trong{transition:none}}
 
 /* ---------- cài app ---------- */

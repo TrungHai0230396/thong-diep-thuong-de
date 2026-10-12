@@ -197,31 +197,36 @@ function taoTatCa(baoTien) {
 
 /* ---------- lịch một buổi ---------- */
 
-const PHUT = [1, 2, 3, 5];          // phút cho mỗi luân xa
+const PHUT = [1, 2, 3, 5];          // cả bảy: phút cho mỗi luân xa
+const PHUT_MOT = [5, 10, 15, 20];   // thiền riêng một luân xa: phút cho cả buổi
 const XF = 8;                       // giây chuyển đàn từ luân xa này sang luân xa kế
 const VAO = 6;                      // giây to dần lúc bắt đầu
 const KET = 60;                     // giây ngồi yên sau luân xa cuối
 const CHUONG_CACH = 30;             // một tiếng chuông mỗi 30 giây = mỗi ba hơi thở
 const SAN = 0.001;                  // −60 dB thì coi như im
 const HIT = 4, THO = 6;             // hít 4 giây, thở ra 6 giây: sáu hơi mỗi phút
+const CA_BAY = LUAN_XA.map((_, i) => i);
 
-/* nen[i].ds: lịch âm lượng đàn của luân xa i ('dat' = setValueAtTime, 'thang' = linearRamp, 'mu' =
-   exponentialRamp), tính từ lúc bắt đầu buổi. chuong: mỗi tiếng chuông một mốc. */
-function lichBuoi(phut) {
-  const D = phut * 60, tong = 7 * D + KET;
-  const chang = LUAN_XA.map((lx, i) => ({ i, batDau: i * D, ketThuc: (i + 1) * D }));
-  const nen = chang.map(({ i, batDau, ketThuc }) => {
-    const vao = i === 0 ? [{ kieu: 'dat', luc: 0, gt: 0 }, { kieu: 'thang', luc: VAO, gt: 1 }]
+/* Một buổi đi lần lượt qua các luân xa trong ds (mặc định cả bảy, từ gốc lên đỉnh; thiền riêng thì
+   chỉ một), mỗi chặng phut phút, rồi một phút ngồi yên.
+   chang[k], nen[k]: chặng thứ k và lịch âm lượng đàn của nó ('dat' = setValueAtTime, 'thang' =
+   linearRamp, 'mu' = exponentialRamp), tính từ lúc bắt đầu buổi; i là luân xa của chặng đó.
+   chuong: mỗi tiếng chuông một mốc, i là chuông của luân xa nào. */
+function lichBuoi(phut, ds = CA_BAY) {
+  const D = phut * 60, n = ds.length, tong = n * D + KET;
+  const chang = ds.map((i, k) => ({ k, i, batDau: k * D, ketThuc: (k + 1) * D }));
+  const nen = chang.map(({ k, i, batDau, ketThuc }) => {
+    const vao = k === 0 ? [{ kieu: 'dat', luc: 0, gt: 0 }, { kieu: 'thang', luc: VAO, gt: 1 }]
                         : [{ kieu: 'dat', luc: batDau - XF / 2, gt: 0 }, { kieu: 'thang', luc: batDau + XF / 2, gt: 1 }];
-    const ra = i < 6 ? [{ kieu: 'dat', luc: ketThuc - XF / 2, gt: 1 }, { kieu: 'thang', luc: ketThuc + XF / 2, gt: 0 }]
-                     : [{ kieu: 'dat', luc: ketThuc, gt: 1 }, { kieu: 'mu', luc: ketThuc + 45, gt: SAN }, { kieu: 'dat', luc: ketThuc + 45, gt: 0 }];
-    const ds = [...vao, ...ra];
-    return { i, chay: ds[0].luc, dung: ds[ds.length - 1].luc + 0.05, ds };
+    const ra = k < n - 1 ? [{ kieu: 'dat', luc: ketThuc - XF / 2, gt: 1 }, { kieu: 'thang', luc: ketThuc + XF / 2, gt: 0 }]
+                         : [{ kieu: 'dat', luc: ketThuc, gt: 1 }, { kieu: 'mu', luc: ketThuc + 45, gt: SAN }, { kieu: 'dat', luc: ketThuc + 45, gt: 0 }];
+    const lich = [...vao, ...ra];
+    return { k, i, chay: lich[0].luc, dung: lich[lich.length - 1].luc + 0.05, ds: lich };
   });
   const ch = [];
   for (const c of chang) for (let t = c.batDau + 0.3; t < c.ketThuc - 6; t += CHUONG_CACH) ch.push({ i: c.i, luc: t, to: 1 });
-  for (let k = 0; k < 3; k++) ch.push({ i: 6, luc: 7 * D + 0.3 + 6 * k, to: 0.8 });   // ba tiếng chuông kết
-  return { phut, D, tong, chang, nen, chuong: ch };
+  for (let k = 0; k < 3; k++) ch.push({ i: ds[n - 1], luc: n * D + 0.3 + 6 * k, to: 0.8 });   // ba tiếng chuông kết
+  return { phut, D, tong, ds: ds.slice(), chang, nen, chuong: ch };
 }
 
 /* Mức âm lượng ở giây t theo đúng một lịch như trên — đường luồng âm thanh sẽ chạy. */
@@ -238,11 +243,12 @@ function muc(t, ds) {
   return v;
 }
 
-/* Đang ở đâu trong buổi. */
+/* Đang ở đâu trong buổi: chặng thứ k, luân xa i. */
 function dangO(t, L) {
-  if (t >= 7 * L.D) return { ket: true, con: Math.max(0, L.tong - t) };
-  const i = Math.max(0, Math.min(6, Math.floor(t / L.D)));
-  return { i, trong: t - i * L.D, conChang: (i + 1) * L.D - t, con: L.tong - t };
+  const n = L.chang.length;
+  if (t >= n * L.D) return { ket: true, con: Math.max(0, L.tong - t) };
+  const k = Math.max(0, Math.min(n - 1, Math.floor(t / L.D)));
+  return { k, i: L.chang[k].i, trong: t - k * L.D, conChang: (k + 1) * L.D - t, con: L.tong - t };
 }
 
 function hoiTho(t) {
@@ -256,7 +262,7 @@ const dongHo = (giay) => {
 };
 
 const API = { SR, LUAN_XA, DO_CHUONG, TI_CHUONG, TACH, TAU_396, VONG, SO_VONG, DAI, GAY, DAY, TRAM,
-  PHUT, XF, VAO, KET, CHUONG_CACH, SAN, HIT, THO,
+  PHUT, PHUT_MOT, CA_BAY, XF, VAO, KET, CHUONG_CACH, SAN, HIT, THO,
   ngauNhien, goc, tauChuong, chuong, gay, tanpura, taoTatCa, lichBuoi, muc, dangO, hoiTho, dongHo };
 if (typeof module !== 'undefined' && module.exports) module.exports = API;
 else self.TDTD_LUANXA_AM = API;

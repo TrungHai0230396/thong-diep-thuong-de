@@ -165,6 +165,21 @@ for (const phut of L.PHUT) {
   ok('đồng hồ đếm ngược', L.dongHo(75) === '1:15' && L.dongHo(0.2) === '0:01' && L.dongHo(-3) === '0:00');
 }
 
+console.log('\n— Thiền riêng một luân xa —');
+/* Người dùng hỏi "người dùng không thiền riêng một luân xa đang tắc nghẽn được hả". */
+for (const phut of L.PHUT_MOT) {
+  const D = phut * 60, sai = [];
+  LX.forEach((lx, i) => {
+    const lich = L.lichBuoi(phut, [i]), soChuong = Math.floor((D - 6 - 0.3) / 30) + 1;
+    if (lich.tong !== D + 60) sai.push(`${lx.so}: dài ${lich.tong}`);
+    if (lich.nen.length !== 1 || lich.nen[0].i !== i) sai.push(`${lx.so}: đàn`);
+    if (lich.chuong.length !== soChuong + 3 || lich.chuong.some(c => c.i !== i)) sai.push(`${lx.so}: chuông`);
+    if (L.muc(D / 2, lich.nen[0].ds) !== 1 || L.muc(D + 46, lich.nen[0].ds) !== 0) sai.push(`${lx.so}: âm lượng`);
+    if (L.dangO(D / 2, lich).i !== i || L.dangO(D / 2, lich).k !== 0 || !L.dangO(D + 1, lich).ket) sai.push(`${lx.so}: chặng`);
+  });
+  ok(`${phut} phút: luân xa nào cũng chỉ có đàn và chuông của chính nó, ${D / 60 + 1} phút gồm phút ngồi yên`, !sai.length, sai.join(', '));
+}
+
 console.log('\n— Trình phát: hẹn đúng lịch lên luồng âm thanh —');
 (async () => {
   /* DOM giả tối thiểu, như test-sao.js */
@@ -187,7 +202,8 @@ console.log('\n— Trình phát: hẹn đúng lịch lên luồng âm thanh —'
   global.addEventListener = () => {};
   global.dispatchEvent = (e) => suKien.push(e.type);
   global.Event = function (t) { this.type = t; };
-  global.localStorage = { getItem: () => null, setItem() {} };
+  const kho = new Map();
+  global.localStorage = { getItem: (k) => (kho.has(k) ? kho.get(k) : null), setItem: (k, v) => kho.set(k, String(v)) };
   global.requestAnimationFrame = () => 1; global.cancelAnimationFrame = () => {};
   const ghi = { nguon: [], gain: [] };
   const thamSo = () => {
@@ -246,6 +262,25 @@ console.log('\n— Trình phát: hẹn đúng lịch lên luồng âm thanh —'
   for (let k = 0; k < 200 && P._trangThai() !== 'phat'; k++) await new Promise(r => setTimeout(r, 20));
   P.dong();
   ok('đóng ngôi sao là dừng ngay, không để tiếng chạy ngầm', P._trangThai() === 'nghi' && !P.dangPhat());
+
+  /* Thiền riêng: chọn Anāhata, 5 phút (như người dùng bấm chọn rồi đóng mở lại ngôi sao) */
+  kho.set('tdtd.luanxa', JSON.stringify({ che: 'mot', lx: 3, phutMot: 5, phut: 2, am: 40 }));
+  P.mo();
+  const manChon = (global.document.body.children.find(c => c.className === 'luanxa') || nut())._q['lx-chon'].innerHTML;
+  ok('màn chọn: có ô chọn luân xa, nút ghi rõ thiền luân xa nào, và nói thẳng app không đo được luân xa nào "tắc"',
+     manChon.includes('lx-chonlx') && manChon.includes('Bắt đầu thiền Anāhata') && manChon.includes('không đo được luân xa nào đang “tắc”'));
+  ok('mỗi luân xa trong danh sách có nút "Thiền riêng luân xa này"', (manChon.match(/class="lx-rieng"/g) || []).length === 7);
+  ghi.nguon.length = 0; ghi.gain.length = 0;
+  P._batDau();
+  for (let k = 0; k < 200 && P._trangThai() !== 'phat'; k++) await new Promise(r => setTimeout(r, 20));
+  const lichMot = P._lich(), ngMot = ghi.nguon.slice(1);
+  const danMot = ngMot.filter(s => s.loop), chMot = ngMot.filter(s => !s.loop && s.buffer && s.buffer.length > 1);
+  const mau = L.tanpura(LX[3].hz, SR, L.ngauNhien(103)), duLieu = danMot[0] && danMot[0].buffer.getChannelData(0);
+  ok('thiền riêng Anāhata 5 phút: buổi dài 6 phút, đúng một đoạn đàn', lichMot.tong === 360 && lichMot.ds.join() === '3' && danMot.length === 1);
+  ok('đoạn đàn đó đúng là đàn của Anāhata (Sa 159,75 Hz), không phải luân xa gốc',
+     !!duLieu && [0, 1000, 99999, 300000].every(j => duLieu[j] === mau[j]));
+  ok('mọi tiếng chuông đều là chuông 639 Hz của Anāhata', chMot.length === lichMot.chuong.length && chMot.every(s => s.buffer.length === L.chuong(639).length));
+  P.dong();
 
   console.log('\n— Hình —');
   const canh = (svg) => ((svg.match(/<g class="lx-canh"[^>]*>([\s\S]*?)<\/g>/) || [])[1] || '').split('<path').length - 1;
