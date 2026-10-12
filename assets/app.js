@@ -13,6 +13,7 @@ const { ymd, cardFor, newSeed } = self.TDTD;
      nhan : mô tả cho trình đọc màn hình, không hiện thành chữ
      hinh : 'sao5' | 'lap-lanh' | 'sao4' | 'hoa' | chuỗi path SVG riêng
      mo   : hàm chạy khi bấm vào
+     tieuDe, trang (không bắt buộc): tên riêng của trò, và trang riêng mang tên đó để chia sẻ link — xem linkTro()
    Bỏ một ngôi sao thì xoá dòng của nó, hoặc thêm bat: false.
    Các sao tự rải ngẫu nhiên, không bao giờ đè lên nhau, cũng không đè chữ.
    ───────────────────────────────────────────────────────────── */
@@ -43,7 +44,7 @@ const SAO = [
   { id: 'sao-troi', mau: '#aebff0', hinh: 'sao5',      nhan: 'Bầu trời thật đêm nay, ngay trên đầu bạn',
     duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM' },
   { id: 'sao-phatam', mau: '#e8c37a', hinh: 'tia',     nhan: 'Luyện phát âm, xem miệng đặt lưỡi ở đâu',
-    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM' },
+    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'phat-am/' },
   { id: 'sao-lich', mau: '#e58a7a', hinh: 'sao8',      nhan: 'Xem ngày tốt xấu, nên và không nên làm gì',
     duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY' },
   { id: 'sao-so',   mau: '#b99ae8', hinh: 'sao6',      nhan: 'Thần số học: con số chủ đạo, biểu đồ ngày sinh',
@@ -325,12 +326,15 @@ const boDau = () => {
   if (location.hash) history.replaceState(null, '', location.pathname + location.search);
 };
 
+const TEN_GOC = document.title;
+
 function moSao(s) {
   const m = self[s.mun];
   if (!m) return;
   if (saoDangMo && saoDangMo !== s) dongSao(true);
   saoDangMo = s;
   m.mo();
+  if (s.tieuDe) document.title = s.tieuDe;          // tên thẻ trình duyệt, và tên khi chia sẻ bằng nút của trình duyệt
   if (location.hash.slice(1) !== s.duong) location.hash = s.duong;
   themNutChepLink(s);
   theoDoiDong(s);
@@ -341,6 +345,7 @@ function dongSao(imLang) {
   saoDangMo = null;
   if (dangTheoDoi) { dangTheoDoi.disconnect(); dangTheoDoi = null; }
   if (s && self[s.mun]) self[s.mun].dong();
+  document.title = TEN_GOC;
   if (!imLang) boDau();
 }
 
@@ -352,7 +357,7 @@ function theoDoiDong(s) {
   if (dangTheoDoi) dangTheoDoi.disconnect();
   dangTheoDoi = new MutationObserver(() => {
     if (!k.classList.contains('hien')) {
-      dangTheoDoi.disconnect(); dangTheoDoi = null; saoDangMo = null; boDau();
+      dangTheoDoi.disconnect(); dangTheoDoi = null; saoDangMo = null; document.title = TEN_GOC; boDau();
       const n = $('#nut-chep-link'); if (n) n.remove();
     }
   });
@@ -372,11 +377,20 @@ function themNutChepLink(s) {
   k.appendChild(b);
 }
 
+/* Link của một trò. Zalo, Facebook, Tin nhắn hiện tiêu đề của TRANG mà link trỏ tới, còn phần sau dấu #
+   không bao giờ được gửi lên máy chủ — nên link …/#phat-am lúc nào cũng hiện "Thông Điệp Của Thượng Đế".
+   Trò nào có trang riêng (trang: 'phat-am/') thì chia sẻ trang đó: nó mang tiêu đề riêng rồi tự chuyển vào trò. */
+function linkTro(s) {
+  return s.trang ? location.origin + location.pathname.replace(/[^/]*$/, '') + s.trang
+                 : location.origin + location.pathname + '#' + s.duong;
+}
+
 function chepLink(s) {
-  const d = location.origin + location.pathname + '#' + s.duong;
-  const loi = `${s.nhan} — ${d}`;
+  const d = linkTro(s);
   const xong = () => toast('Đã chép địa chỉ trò này');
-  if (navigator.share) { navigator.share({ text: loi, url: d }).catch(() => {}); return; }
+  /* Link CHỈ nằm ở url. Bản trước ghi link cả trong text ("… — https://…") lẫn url, nên Zalo, Tin nhắn
+     dán ra hai link liền nhau. */
+  if (navigator.share) { navigator.share({ title: s.tieuDe || TEN_GOC, text: s.nhan, url: d }).catch(() => {}); return; }
   if (navigator.clipboard) { navigator.clipboard.writeText(d).then(xong, () => chepTay(d, xong)); return; }
   chepTay(d, xong);
 }

@@ -221,6 +221,37 @@ console.log('\n— Tệp lịch (.ics) của trang Xem ngày —');
   }
 }
 
+console.log('\n— Chia sẻ link một trò —');
+{
+  /* Người dùng báo: bấm chia sẻ thì ra hai link (link nằm cả trong chữ lẫn trong địa chỉ). Và muốn link phát âm
+     tiếng Anh đừng hiện tên "Thông Điệp Của Thượng Đế". Chạy thẳng hai hàm linkTro, chepLink cắt ra từ app.js. */
+  const cat = (ten) => { const a = nguon.indexOf(`function ${ten}(`); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
+  const goi = [];
+  const chay = new Function('location', 'navigator', 'toast', 'chepTay', 'TEN_GOC',
+    `${cat('linkTro')}\n${cat('chepLink')}\nreturn { linkTro, chepLink };`)(
+    { origin: 'https://x.vercel.app', pathname: '/' }, { share: (o) => { goi.push(o); return Promise.resolve(); } },
+    () => {}, () => {}, 'Thông Điệp Của Thượng Đế');
+  const dsSao = [...khoiSao.matchAll(/\{ id: '([^']+)'[\s\S]*?\}/g)].map(m => {
+    const k = m[0], lay = (t) => ((k.match(new RegExp(`${t}:\\s*'([^']*)'`)) || [])[1]);
+    return { id: lay('id'), nhan: lay('nhan'), duong: lay('duong'), tieuDe: lay('tieuDe'), trang: lay('trang') };
+  });
+  for (const sao of dsSao) chay.chepLink(sao);
+  ok('mọi trò: chia sẻ chỉ có MỘT link — chữ đi kèm không chứa link', goi.length === dsSao.length && goi.every(o => !/https?:/.test(o.text || '') && /^https:/.test(o.url)),
+     goi.filter(o => /https?:/.test(o.text || '')).map(o => o.url).join(', '));
+  const pa = dsSao.find(x => x.id === 'sao-phatam'), oPa = goi[dsSao.indexOf(pa)];
+  ok('phát âm: chia sẻ trang riêng /phat-am/, tiêu đề "Luyện phát âm tiếng Anh"', oPa.url === 'https://x.vercel.app/phat-am/' && oPa.title === 'Luyện phát âm tiếng Anh', oPa.url);
+  ok('trò khác vẫn chia sẻ link #trò như cũ', goi[dsSao.findIndex(x => x.id === 'sao-hoadang')].url === 'https://x.vercel.app/#tha-den');
+  for (const sao of dsSao.filter(x => x.trang)) {
+    const f = path.join(__dirname, '..', sao.trang, 'index.html');
+    const html = fs.existsSync(f) ? fs.readFileSync(f, 'utf8') : '';
+    const tieuDe = (html.match(/<title>([^<]*)<\/title>/) || [])[1], og = (html.match(/property="og:title" content="([^"]*)"/) || [])[1];
+    ok(`${sao.trang}: có trang riêng, tiêu đề và og:title trùng tieuDe trong app.js, không nhắc tên app`,
+       tieuDe === sao.tieuDe && og === sao.tieuDe && !/Thông Điệp/.test(html), `${tieuDe} / ${og}`);
+    ok(`${sao.trang}: mở ra là chuyển ngay vào #${sao.duong} (cả khi tắt JavaScript)`,
+       html.includes(`location.replace('../#${sao.duong}')`) && html.includes(`content="0; url=../#${sao.duong}"`));
+  }
+}
+
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
 {
   /* Ngày 9/9 khung bảng trượt bị xoá nhầm khỏi index.html; app.js vẫn gọi $('#sheet-title') nên nút "?"

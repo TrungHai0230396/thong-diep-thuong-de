@@ -65,6 +65,15 @@ Trong mỗi trò có một nút hình mắt xích cạnh nút đóng, bấm là 
 
 Toàn bộ phần này nằm gọn trong `assets/app.js`, không phải sửa file của từng trò. Trò nào cũng có nút đóng và phím Esc riêng, nên thay vì đi sửa năm chỗ, `app.js` ngồi nhìn lớp `hien` của thẻ bọc: mất lớp đó nghĩa là người dùng vừa đóng, thì xoá địa chỉ đi.
 
+## Chia sẻ link một trò
+
+Nút 🔗 trong mỗi trò mở bảng chia sẻ của máy (không có thì chép link).
+
+- **Bấm chia sẻ ra hai link.** Người dùng báo. Bản đầu gửi `text: "<mô tả> — <link>"` cùng `url: <link>`, nên Zalo, Tin nhắn dán ra hai link liền nhau. Giờ link chỉ nằm ở `url`, chữ đi kèm là mô tả trò.
+- **Link phát âm đừng hiện "Thông Điệp Của Thượng Đế".** Zalo, Facebook, Tin nhắn hiện tiêu đề của trang mà link trỏ tới, còn phần sau dấu `#` không bao giờ được gửi lên máy chủ — nên mọi link `…/#trò` đều hiện tên app. Trò nào khai `tieuDe` và `trang` trong `SAO` (hiện có phát âm: `tieuDe: 'Luyện phát âm tiếng Anh', trang: 'phat-am/'`) thì nút chia sẻ gửi link trang riêng `/phat-am/`: trang tĩnh mang tiêu đề và mô tả riêng (cả thẻ `og:`), mở ra là chuyển ngay vào `/#phat-am` (bằng JS, và bằng `meta refresh` khi tắt JS). Đang ở trong trò thì tên thẻ trình duyệt cũng là tên riêng, đóng trò thì trả về tên app.
+
+`scripts/test-sao.js` chạy thẳng `linkTro`, `chepLink` cắt ra từ `app.js` cho mọi trò: chữ đi kèm không chứa link, phát âm gửi `/phat-am/`, trò khác vẫn `#trò`; trang riêng có tiêu đề trùng `tieuDe`, không nhắc tên app, chuyển đúng chỗ.
+
 ## Bầu trời sao
 
 Trên nền có những ngôi sao nhỏ đủ màu, mỗi ngôi là một trò riêng. Chúng rơi vào vị trí ngẫu nhiên mỗi lần tải trang, **không bao giờ đè lên nhau**, cũng không đè chữ.
@@ -1485,7 +1494,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        81 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        86 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
