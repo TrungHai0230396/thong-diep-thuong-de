@@ -292,6 +292,12 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   -webkit-tap-highlight-color:transparent}
 .nut-link svg{width:17px;height:17px}
 .nut-link:hover{background:rgba(255,255,255,.12)}
+.nut-cai{position:absolute;z-index:8;top:calc(env(safe-area-inset-top,0px) + 14px);right:100px;
+  height:34px;padding:0 12px 0 9px;border-radius:999px;cursor:pointer;display:flex;align-items:center;gap:5px;
+  border:1px solid rgba(232,195,122,.4);background:rgba(0,0,0,.32);color:#f0c48a;font:inherit;font-size:13px;
+  -webkit-tap-highlight-color:transparent}
+.nut-cai svg{width:16px;height:16px}
+.nut-cai:hover{background:rgba(232,195,122,.12)}
 
 /* số ếch trong hồ — xếp cùng hàng với nút chép link và dấu x, bên trái hai nút đó */
 .ho-dem{position:absolute;z-index:8;margin:0;pointer-events:none;

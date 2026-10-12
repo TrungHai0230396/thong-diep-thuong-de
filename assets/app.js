@@ -364,7 +364,14 @@ function moSao(s) {
   if (s.goiYCai) setTimeout(() => { if (saoDangMo === s) goiYCaiApp(s); }, 3000);
   if (location.hash.slice(1) !== s.duong) location.hash = s.duong;
   themNutChepLink(s);
+  themNutCaiApp(s);
   theoDoiDong(s);
+}
+
+/* Gỡ các nút app gắn thêm vào trò. Phải gỡ ở MỌI đường đóng trò: bản trước chỉ gỡ khi bấm ✕ của trò, nên đóng
+   bằng nút Back rồi mở trò khác thì nút 🔗 vẫn nằm trong trò cũ, themNutChepLink thấy "đã có" và trò mới không có nút. */
+function goNutTro() {
+  ['#nut-chep-link', '#nut-cai-app'].forEach(id => { const n = $(id); if (n) n.remove(); });
 }
 
 function dongSao(imLang) {
@@ -372,6 +379,7 @@ function dongSao(imLang) {
   saoDangMo = null;
   if (dangTheoDoi) { dangTheoDoi.disconnect(); dangTheoDoi = null; }
   if (s && self[s.mun]) self[s.mun].dong();
+  goNutTro();
   document.title = TEN_GOC;
   if (!imLang) boDau();
 }
@@ -385,7 +393,7 @@ function theoDoiDong(s) {
   dangTheoDoi = new MutationObserver(() => {
     if (!k.classList.contains('hien')) {
       dangTheoDoi.disconnect(); dangTheoDoi = null; saoDangMo = null; document.title = TEN_GOC; boDau();
-      const n = $('#nut-chep-link'); if (n) n.remove();
+      goNutTro();
     }
   });
   dangTheoDoi.observe(k, { attributes: true, attributeFilter: ['class'] });
@@ -412,6 +420,23 @@ function themNutChepLink(s) {
 function linkTro(s) {
   return s.trang ? location.origin + location.pathname.replace(/[^/]*$/, '') + s.trang
                  : location.origin + location.pathname + '#' + s.duong;
+}
+
+/* Nút "Cài app" trong trò có goiYCai (phát âm). Người vào từ link đi thẳng vào trò, không thấy nút ? ở trang chính;
+   bảng tự hiện chỉ tối đa 3 lần, cách nhau 7 ngày, và mỗi trình duyệt nhớ riêng — người dùng thử trong Zalo, đã thấy
+   một lần nên không hiện lại, mà không có chỗ nào mở lại được. Người dùng chọn thêm nút này. Máy đã cài, máy tính
+   thì không có nút. */
+function themNutCaiApp(s) {
+  const k = $(s.khung);
+  if (!k || !s.goiYCai || !CA || $('#nut-cai-app')) return;
+  if (['daCai', 'daCaiTrinhDuyet', 'mayTinh'].includes(loaiCai())) return;
+  const b = document.createElement('button');
+  b.id = 'nut-cai-app';
+  b.className = 'nut-cai';
+  b.type = 'button';
+  b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Cài app';
+  b.onclick = moCaiApp;
+  k.appendChild(b);
 }
 
 function chepLink(s) {

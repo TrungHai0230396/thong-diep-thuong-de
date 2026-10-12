@@ -677,6 +677,8 @@ Người dùng muốn "một cái popup cài app, để mọi người dễ dùn
 
 **Trong trò phát âm:** người đến từ link phát âm đi thẳng vào trò, không thấy trang chính nên trước đây không bao giờ được gợi ý cài. Người dùng chọn: vào trò **3 giây** thì gợi ý (trò khai `goiYCai: true` trong `SAO`), cùng luật bên dưới; rời trò trước 3 giây thì thôi. Bảng gợi ý nâng lên trên màn trò (z-index 35, trò là 30) — không thì nó hiện mà bị che mất.
 
+**Nút "Cài app" trong trò phát âm.** Người dùng thử trong Zalo: đã thấy bảng một lần nên không hiện lại (luật 3 lần, cách 7 ngày, mỗi trình duyệt nhớ riêng), mà trong trò không có nút ? để mở lại. Người dùng chọn thêm nút: góc trên, cạnh nút 🔗, bấm lúc nào cũng mở bảng (không qua luật); máy đã cài và máy tính thì không có nút. Lúc làm phát hiện lỗi có sẵn: đóng trò bằng Back thì nút 🔗 không được gỡ khỏi trò cũ, mở trò khác thì `themNutChepLink` thấy "đã có" và trò mới mất nút — giờ `goNutTro()` gỡ cả hai nút ở mọi đường đóng trò.
+
 **Khi nào hiện:** không chặn ngay lúc vào. Tự gợi ý **3,2 giây sau khi lật lá hôm nay** — đọc xong thông điệp rồi — chỉ trên điện thoại, chỉ ở trang chính (không đang mở ngôi sao hay bảng khác), **tối đa 3 lần, cách nhau ít nhất 7 ngày**; đã cài (hoặc đang mở từ biểu tượng ngoài màn hình chính) thì thôi. Lúc nào cũng mở lại được từ nút **?** → *Cài app vào điện thoại*. Chỉ ghi một mẩu nhỏ `tdtd.caiApp`: số lần đã gợi ý, lần cuối, đã cài chưa.
 
 `scripts/test-caiapp.js`, 24 bài: nhận dạng 15 trường hợp theo chuỗi nhận dạng thật (iPhone Safari cả iOS 26, iPad tự xưng Mac mà không nhầm máy Mac thật, Chrome iPhone, Zalo, Facebook, Messenger trên cả hai hệ, Android có và chưa có hộp cài, máy tính, đã cài); quy tắc tự gợi ý; link mở bằng Chrome. Đã thử trên trình duyệt: nút Cài app gọi hộp cài đúng một lần, đóng bảng, ghi đã cài; lật lá xong 3 giây thì bảng tự hiện.
@@ -1513,7 +1515,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        102 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        107 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ

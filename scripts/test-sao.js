@@ -302,13 +302,29 @@ console.log('\n— Bảng cài app: link đưa ra Safari, Chrome giữ đúng tr
      /CA\.linkSafari\(link\)/.test(nguon) && /CA\.linkChrome\(link\)/.test(nguon) && /writeText\(link\)/.test(nguon));
 }
 
+console.log('\n— Nút Cài app trong trò phát âm —');
+{
+  /* Người dùng: trong Zalo đã thấy bảng một lần nên không hiện lại (luật 3 lần, cách 7 ngày), mà không có chỗ mở lại.
+     Chọn thêm nút "Cài app" trong trò. */
+  ok('mở trò là gắn nút Cài app (chỉ trò có goiYCai)', /themNutChepLink\(s\);\s*themNutCaiApp\(s\);/.test(nguon) &&
+     /function themNutCaiApp\(s\) \{[\s\S]{0,200}!s\.goiYCai/.test(nguon));
+  ok('nút mở thẳng bảng hướng dẫn, không qua luật 3 lần/7 ngày', /function themNutCaiApp[\s\S]{0,900}b\.onclick = moCaiApp;/.test(nguon));
+  ok('máy đã cài, máy tính thì không có nút', /function themNutCaiApp[\s\S]{0,400}\['daCai', 'daCaiTrinhDuyet', 'mayTinh'\]\.includes\(loaiCai\(\)\)\) return;/.test(nguon));
+  ok('đóng trò bằng đường nào cũng gỡ nút (✕ của trò, Back, mở trò khác)',
+     /function dongSao[\s\S]{0,300}goNutTro\(\);/.test(nguon) && /saoDangMo = null; document\.title = TEN_GOC; boDau\(\);\s*goNutTro\(\);/.test(nguon) &&
+     /function goNutTro\(\) \{\s*\['#nut-chep-link', '#nut-cai-app'\]/.test(nguon));
+  const css = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.css'), 'utf8');
+  const phai = (lop) => +((css.match(new RegExp(`\\.${lop}\\{[^}]*right:(\\d+)px`)) || [])[1] || 0);
+  ok('nút Cài app nằm bên trái nút 🔗, không đè lên nhau (🔗 rộng 34px từ right:58px)', phai('nut-cai') >= phai('nut-link') + 34 + 6, `Cài app right:${phai('nut-cai')}px, 🔗 right:${phai('nut-link')}px`);
+}
+
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
 {
   /* Ngày 9/9 khung bảng trượt bị xoá nhầm khỏi index.html; app.js vẫn gọi $('#sheet-title') nên nút "?"
      ném lỗi và không mở gì — gần một tháng không ai biết, vì không bài kiểm nào đọc index.html. */
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const can = [...new Set([...nguon.matchAll(/\$\('#([\w-]+)'\)/g)].map(m => m[1]))];
-  const tuSinh = new Set(['nut-chep-link']);                // phần tử app.js tự tạo bằng createElement
+  const tuSinh = new Set(['nut-chep-link', 'nut-cai-app']); // phần tử app.js tự tạo bằng createElement
   /* id nằm trong chuỗi HTML do chính app.js dựng (như nút xáo lại trong bảng Giới thiệu) cũng tính là có */
   const thieu = can.filter(id => !tuSinh.has(id) && !html.includes(`id="${id}"`) && !nguon.includes(`id="${id}"`));
   ok(`${can.length} #id mà app.js dùng đều có trong index.html`, !thieu.length, thieu.join(', '));
