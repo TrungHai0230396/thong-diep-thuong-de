@@ -925,7 +925,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .lx-hoa::before{content:'';position:absolute;inset:14%;border-radius:50%;background:var(--lx-mau,#a97ddb);opacity:.22;filter:blur(30px)}
 .lx-hoa-trong{position:relative;width:100%;height:100%;transition:transform .2s linear,opacity .5s linear}
 .lx-hang{display:flex;align-items:center;justify-content:center;gap:16px;max-width:360px;margin:0 auto}
-.lx-than-o{flex:none;width:62px}
+.lx-than-o{flex:none;width:72px}
 .lx-than{display:block;width:100%;height:auto}
 .lx-chu{min-width:0;text-align:left}
 .lx-so{margin:0;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:rgba(244,239,230,.45)}
@@ -936,6 +936,20 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .lx-tho{min-height:24px;margin:18px 0 0;font-size:17px;color:rgba(244,239,230,.88)}
 .lx-dem{margin:6px 0 0;font-size:12.5px;color:rgba(244,239,230,.45);font-variant-numeric:tabular-nums}
 .lx-nut{margin:22px 0 18px}
+.lx-hinh{display:flex;align-items:center;gap:14px}
+.lx-hinh-ve{flex:0 0 48%;max-width:200px}
+.lx-hinh-chu{flex:1;min-width:0}
+.lx-hinh-chu .lx-bija{font-size:28px}
+.lx-hinh-sen{width:78px;margin-top:10px}
+.lx-hinh-ghi{text-align:center}
+.lx-hinh-ve svg{cursor:pointer}
+.lx-cham[data-lx]{outline:none}
+.lx-cham[data-lx]:focus-visible circle:last-of-type{stroke:#fff;stroke-width:.8}
+.lx-quang{animation:lx-sang 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes lx-sang{0%,100%{opacity:.16;transform:scale(.8)}50%{opacity:.45;transform:scale(1.18)}}
+.lx-mot-hinh{display:flex;align-items:center;justify-content:center;gap:18px;margin:4px 0 10px}
+.lx-mot-nguoi{flex:none;width:72px}
+.lx-mot-hinh .lx-mot-sen{margin:0}
 .lx-che{margin-bottom:4px}
 .lx-che button{font-size:14px}
 .lx-chonlx{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:12px 0 0}
@@ -949,7 +963,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .lx-rieng{display:block;width:100%;margin:4px 0 0;padding:10px;border-radius:12px;cursor:pointer;font:inherit;font-size:14px;
   border:1px solid rgba(242,167,195,.4);background:rgba(242,167,195,.08);color:#f2c6d8}
 .lx-rieng:hover{background:rgba(242,167,195,.15)}
-@media (prefers-reduced-motion:reduce){.lx-hoa-trong{transition:none}}
+@media (prefers-reduced-motion:reduce){.lx-hoa-trong{transition:none}.lx-quang{animation:none}}
 
 /* ---------- cài app ---------- */
 .cai-dau{display:flex;gap:14px;align-items:center;margin:0 0 14px}

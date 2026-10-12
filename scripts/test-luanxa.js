@@ -287,9 +287,37 @@ console.log('\n— Trình phát: hẹn đúng lịch lên luồng âm thanh —'
   ok('hoa sen vẽ đúng số cánh 4, 6, 10, 12, 16, 2; nghìn cánh vẽ ba vòng', [0, 1, 2, 3, 4, 5].every(i => canh(P._veSen(i)) === LX[i].canh) && canh(P._veSen(6)) === 96,
      [0, 1, 2, 3, 4, 5, 6].map(i => canh(P._veSen(i))).join(','));
   ok('giữa hoa sen có chữ chủng tử Devanagari; đỉnh đầu không có', [0, 1, 2, 3, 4, 5].every(i => P._veSen(i).includes(LX[i].deva)) && !/<text/.test(P._veSen(6)));
+  /* Cung tròn SVG có bán kính nhỏ hơn nửa dây cung thì trình duyệt tự nới bán kính ra — lưỡi liềm của
+     Svādhiṣṭhāna từng dẹt thành không vì vậy. Mọi cung trong mọi hoa sen phải đủ bán kính. */
+  const cungHong = [];
+  for (let i = 0; i < 7; i++) for (const d of (P._veSen(i).match(/d="([^"]*A[^"]*)"/g) || [])) {
+    const so = d.slice(3, -1).match(/[MA]|-?[\d.]+/g); let x = 0, y = 0;
+    for (let k = 0; k < so.length;) {
+      if (so[k] === 'M') { x = +so[k + 1]; y = +so[k + 2]; k += 3; }
+      else if (so[k] === 'A') { const r = +so[k + 1], x1 = +so[k + 6], y1 = +so[k + 7]; if (r < Math.hypot(x1 - x, y1 - y) / 2 - 1e-6) cungHong.push(`${LX[i].ten}: r${r}`); x = x1; y = y1; k += 8; }
+      else k++;
+    }
+  }
+  ok('mọi cung tròn trong hoa sen đủ bán kính (lưỡi liềm không bị dẹt)', cungHong.length === 0, cungHong.join(', '));
+  ok('chữ chủng tử giữa lưỡi liềm tô trắng trên nền tối', /<text[^>]*fill="#fff">वं<\/text>/.test(P._veSen(1).replace(/\s+/g, ' ')));
   ok('cánh sen tô màu kinh văn', [0, 1, 2, 3, 4, 5, 6].every(i => P._veSen(i).includes(`fill="${LX[i].sen.canh}"`)));
-  ok('thân người: chấm của luân xa đang tới sáng lên theo màu cầu vồng', [0, 3, 6].every(i => P._veThan(i).includes(`r="9" fill="${LX[i].mau}"`)) &&
-     (P._veThan(3).match(/r="9"/g) || []).length === 1);
+  ok('thân người: chấm của luân xa đang tới sáng lên, phát quang theo màu cầu vồng', [0, 3, 6].every(i => P._veThan(i).includes(`class="lx-quang" cx="50" cy="${[96, 85, 75, 59, 41, 20, 8][i]}" r="10" fill="${LX[i].mau}"`)) &&
+     (P._veThan(3).match(/lx-quang/g) || []).length === 1);
+  ok('hình ở màn chọn: đủ bảy chấm chạm được, có số thứ tự; hình lúc thiền thì không chạm', (P._veThan(2, 'chon').match(/data-lx="\d"/g) || []).length === 7 &&
+     (P._veThan(2, 'chon').match(/<text/g) || []).length === 7 && !/data-lx/.test(P._veThan(2)));
+  ok('hình minh hoạ hiện đều cả bảy vị trí (không mờ hẳn chấm chưa tới như lúc đang thiền)',
+     (P._veThan(0, 'xem').match(/opacity="0\.5"/g) || []).length === 6 && (P._veThan(0).match(/opacity="0\.25"/g) || []).length === 6);
+  /* Màn chọn: hình người ở đầu màn sáng đúng luân xa đang chọn; trong danh sách, mỗi luân xa có hình riêng sáng chỗ của nó */
+  kho.set('tdtd.luanxa', JSON.stringify({ che: 'mot', lx: 4, phutMot: 10, phut: 2, am: 40 }));
+  P.mo();
+  const man = (global.document.body.children.find(c => c.className === 'luanxa') || nut())._q['lx-chon'].innerHTML;
+  const dau = (man.match(/<div class="lx-hinh-ve">([\s\S]*?)<\/svg>/) || [])[1] || '';
+  ok('đầu màn chọn có hình người, sáng đúng luân xa đang chọn (Viśuddha, hõm cổ)', /class="lx-cham sang" data-lx="4"/.test(dau) && (dau.match(/lx-quang/g) || []).length === 1 &&
+     man.includes('<p class="lx-ten">Viśuddha</p>'));
+  const nho = man.split('class="lx-mot-nguoi"').slice(1);
+  ok('mỗi luân xa trong danh sách có hình người riêng, sáng đúng chỗ của luân xa đó', nho.length === 7 &&
+     nho.every((h, k) => h.includes(`class="lx-quang" cx="50" cy="${[96, 85, 75, 59, 41, 20, 8][k]}"`)));
+  P.dong();
 
   console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
   process.exit(fail ? 1 : 0);

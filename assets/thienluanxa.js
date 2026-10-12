@@ -33,6 +33,7 @@ let trangThai = 'nghi';                     // nghi · chuanBi · phat · dung (
 let daTao = null, dangTao = null, tho = null, thoHong = false, tienTao = 0;
 let khung = 0, khoaMan = null, vuaXong = false;
 let veCu = { chang: -2, chu: '', dem: '', tho: '' };
+let xem = 0;                                 // luân xa đang sáng trên hình ở màn chọn
 
 /* ---------- lựa chọn đã lưu ---------- */
 
@@ -244,7 +245,10 @@ function veSen(lx) {
   const m = S.mauGiua;
   const giua = {
     vuong: `<rect x="-21" y="-21" width="42" height="42" fill="${m}"/>`,
-    liem: `<path d="M-23 -4 A23 23 0 0 0 23 -4 A18 18 0 0 1 -23 -4Z" fill="${m}"/>`,
+    /* lưỡi liềm sừng hướng lên: cung dưới của vòng r22 tâm (0,0) trừ cung dưới của vòng r20 tâm (0,−8); hai vòng
+       cắt nhau ở (±19,96; −9,25). Bản đầu lấy cung trong r18 cho dây cung dài 46: bán kính nhỏ hơn nửa dây cung
+       nên trình duyệt tự nới ra bằng cung ngoài, lưỡi liềm dẹt thành không. */
+    liem: `<path d="M-19.96 -9.25 A22 22 0 1 0 19.96 -9.25 A20 20 0 1 1 -19.96 -9.25Z" fill="${m}"/>`,
     tamGiac: `<path d="M-27 -15 L27 -15 L0 30Z" fill="${m}"/>`,
     sao6: `<g fill="${m}" opacity=".9"><path d="M0 -28 L24 14 L-24 14Z"/><path d="M0 28 L24 -14 L-24 -14Z"/></g>`,
     tamGiacTrang: `<path d="M-28 -16 L28 -16 L0 32Z" fill="${m}"/><circle cy="-2" r="12.5" fill="#f4f1ea"/>`,
@@ -255,7 +259,7 @@ function veSen(lx) {
     const a = k / 24 * 2 * Math.PI;
     return `<circle cx="${(29 * Math.cos(a)).toFixed(1)}" cy="${(29 * Math.sin(a)).toFixed(1)}" r="1.8" fill="${S.nhuy}"/>`;
   }).join('') : '';
-  const nenChu = S.giua === 'tamGiacTrang' ? '#f4f1ea' : S.giua === 'tamGiacVien' ? '#141022' : m;
+  const nenChu = S.giua === 'tamGiacTrang' ? '#f4f1ea' : ['tamGiacVien', 'liem'].includes(S.giua) ? '#141022' : m;   // chữ nằm trên nền nào
   /* chữ nằm gọn trong hình: trong vòng trăng của Viśuddha, trong lòng tam giác của Ājñā */
   const [yChu, coChu] = { tamGiacTrang: [6, 15], tamGiacVien: [4, 15] }[S.giua] || [9, 24];
   const chu = lx.deva ? `<text y="${yChu}" text-anchor="middle" font-size="${coChu}"
@@ -267,16 +271,25 @@ function veSen(lx) {
   </svg>`;
 }
 
-/* Thân người ngồi thiền, bảy chấm ở bảy vị trí; chấm đang tới sáng lên theo màu cầu vồng. */
+/* Thân người ngồi thiền, bảy chấm ở bảy vị trí; chấm của luân xa i sáng lên và phát quang theo màu cầu vồng.
+   kieu 'buoi': đang thiền — chấm đã qua mờ vừa, chấm chưa tới mờ hẳn.
+   kieu 'xem':  hình minh hoạ — mọi chấm hiện đều cho thấy đủ bảy vị trí.
+   kieu 'chon': như 'xem', thêm số thứ tự và chạm vào chấm được (người dùng hỏi "bấm vào luân xa nào thì
+                luân xa đó sáng để mọi người dễ hình dung"). */
 const CHAM = [[50, 96], [50, 85], [50, 75], [50, 59], [50, 41], [50, 20], [50, 8]];
-function veThan(i) {
+function veThan(i, kieu = 'buoi') {
+  const chon = kieu === 'chon';
   const cham = L().LUAN_XA.map((lx, k) => {
-    const [x, y] = CHAM[k];
-    const op = k === i ? 1 : k < i ? 0.55 : 0.25;
-    return (k === i ? `<circle cx="${x}" cy="${y}" r="9" fill="${lx.mau}" opacity=".3"/>` : '') +
-      `<circle cx="${x}" cy="${y}" r="${k === i ? 4.6 : 3.2}" fill="${lx.mau}" opacity="${op}"/>`;
+    const [x, y] = CHAM[k], sang = k === i;
+    const op = sang ? 1 : kieu !== 'buoi' ? 0.5 : k < i ? 0.55 : 0.25;
+    return `<g class="lx-cham${sang ? ' sang' : ''}"${chon ? ` data-lx="${k}" role="button" tabindex="0" aria-label="Luân xa ${lx.so}, ${esc(lx.ten)}: ${esc(lx.viTri)}"` : ''}>` +
+      (chon ? `<circle cx="${x}" cy="${y}" r="6" fill="transparent"/>` : '') +
+      (sang ? `<circle class="lx-quang" cx="${x}" cy="${y}" r="10" fill="${lx.mau}" opacity=".32"/>` : '') +
+      `<circle cx="${x}" cy="${y}" r="${sang ? (chon ? 5 : 4.6) : chon ? 3.6 : 3.2}" fill="${lx.mau}" opacity="${op}"/>` +
+      (chon ? `<text x="${x + 7}" y="${y + 1.9}" font-size="5.4" fill="${sang ? lx.mau : 'rgba(244,239,230,.5)'}">${lx.so}</text>` : '') +
+      '</g>';
   }).join('');
-  return `<svg class="lx-than" viewBox="0 0 100 120" aria-hidden="true">
+  return `<svg class="lx-than" viewBox="0 0 100 120"${chon ? '' : ' aria-hidden="true"'}>
     <g fill="rgba(255,255,255,.07)" stroke="rgba(255,255,255,.2)" stroke-width="1">
       <circle cx="50" cy="20" r="12"/>
       <path d="M45 31 L55 31 L56 38 L44 38Z"/>
@@ -302,8 +315,49 @@ function ve() {
   tam.querySelector('.xn-trong').scrollTop = 0;
 }
 
+/* Khối hình ở đầu màn chọn: người ngồi thiền với luân xa đang xem sáng lên, bên cạnh là tên, vị trí, âm tụng, hoa sen. */
+function chuHinh(k) {
+  const lx = L().LUAN_XA[k];
+  return `<p class="lx-so">Luân xa ${lx.so} · ${esc(lx.goi.replace('Luân xa ', ''))}</p>
+    <p class="lx-ten">${esc(lx.ten)}</p>
+    <p class="lx-bija" style="color:${lx.mau}">${lx.bija ? esc(lx.bija) : 'Im lặng'}</p>
+    <p class="lx-doc">${esc(lx.viTri)}</p>
+    <div class="lx-hinh-sen">${veSen(lx)}</div>`;
+}
+function veHinh() {
+  const o = tam && tam.querySelector('.lx-chon');
+  if (!o || !o.querySelector('.lx-hinh-ve')) return;
+  o.querySelector('.lx-hinh-ve').innerHTML = veThan(xem, 'chon');
+  o.querySelector('.lx-hinh-chu').innerHTML = chuHinh(xem);
+  ganCham(o);
+}
+/* Chạm vào hình người: sáng luân xa GẦN CHỖ CHẠM NHẤT (theo chiều dọc — bảy chấm cùng nằm trên trục giữa).
+   Bản đầu chỉ nhận chạm trúng chấm, mà chấm cách nhau tới 16 đơn vị: thử bấm thật thì trượt vào khe giữa tim
+   và rốn, không có gì xảy ra. Bàn phím: Tab tới từng chấm, Enter để chọn. Đang chọn thiền một luân xa thì chọn
+   luôn luân xa ấy. */
+function ganCham(o) {
+  const bam = (k) => {
+    xem = k;
+    if (chon.che === 'mot') { chon.lx = xem; luuChon(); veChon(); } else veHinh();
+  };
+  const svg = o.querySelector('.lx-hinh-ve svg');
+  if (svg) svg.onclick = (e) => {
+    const m = svg.getScreenCTM && svg.getScreenCTM();
+    if (!m || !svg.createSVGPoint) return;
+    const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    const y = pt.matrixTransform(m.inverse()).y;
+    let k = 0;
+    CHAM.forEach(([, cy], j) => { if (Math.abs(cy - y) < Math.abs(CHAM[k][1] - y)) k = j; });
+    bam(k);
+  };
+  o.querySelectorAll('.lx-cham[data-lx]').forEach(g => {
+    g.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); bam(+g.dataset.lx); } };
+  });
+}
+
 function veChon() {
   const X = L(), o = tam.querySelector('.lx-chon'), mot = chon.che === 'mot', lxMot = X.LUAN_XA[chon.lx];
+  if (mot) xem = chon.lx;
   const tong = mot ? chon.phutMot + X.KET / 60 : 7 * chon.phut + X.KET / 60;
   const nutChon = (ten, ds, gt, nhan, them = '') => ds.map(v => `
         <button type="button" role="radio" aria-checked="${v === gt}" class="${v === gt ? 'chon' : ''}" data-${ten}="${v}">${nhan(v)}${them}</button>`).join('');
@@ -313,6 +367,14 @@ function veChon() {
     <p class="lx-mo">Đi lần lượt qua bảy luân xa từ đáy cột sống lên đỉnh đầu, hoặc dành cả buổi cho một luân xa. Ở mỗi luân xa:
       đặt sự chú ý vào đúng chỗ, thở chậm, tụng âm chủng tử theo tiếng đàn tanpura; chuông xoay ngân mỗi ba hơi thở.
       Âm thanh tạo ngay trên máy, không cần mạng.</p>
+
+    <section class="xn-khoi lx-hinh-khoi">
+      <div class="lx-hinh">
+        <div class="lx-hinh-ve">${veThan(xem, 'chon')}</div>
+        <div class="lx-hinh-chu">${chuHinh(xem)}</div>
+      </div>
+      <p class="xn-ghi lx-hinh-ghi">Chạm vào một chấm trên người để xem luân xa đó nằm ở đâu${mot ? ' — và chọn luôn để thiền' : ''}.</p>
+    </section>
 
     <section class="xn-khoi lx-dat">
       <p class="xn-tieu">Thiền</p>
@@ -348,7 +410,7 @@ function veChon() {
         <summary><i style="background:${lx.mau}"></i><span class="lx-mot-ten"><b>${lx.so} · ${esc(lx.ten)}</b>
           <small>${esc(lx.goi)} · ${lx.bija ? esc(lx.bija) : 'im lặng'} · ${esc(lx.viTri)}</small></span></summary>
         <div class="lx-mot-than">
-          <div class="lx-mot-sen">${veSen(lx)}</div>
+          <div class="lx-mot-hinh"><div class="lx-mot-nguoi">${veThan(lx.so - 1, 'xem')}</div><div class="lx-mot-sen">${veSen(lx)}</div></div>
           <p><b>${esc(lx.ten)}</b> nghĩa là “${esc(lx.nghia)}”. Yếu tố: ${esc(lx.yeuTo)}. ${lx.canh === 1000 ? 'Nghìn' : lx.canh} cánh.</p>
           <p>${esc(lx.kinh)}</p>
           <p>Chủng tử: ${lx.bija ? `<b>${esc(lx.bija)}</b> (${lx.deva}) — ${esc(lx.doc)}` : esc(lx.doc)}.</p>
@@ -400,8 +462,11 @@ function veChon() {
 
   const doi = (f) => { f(); luuChon(); veChon(); };
   o.querySelectorAll('.lx-che button').forEach(n => { n.onclick = () => doi(() => { chon.che = n.dataset.che; }); });
-  o.querySelectorAll('.lx-chonlx button').forEach(n => { n.onclick = () => doi(() => { chon.lx = +n.dataset.lx; }); });
+  o.querySelectorAll('.lx-chonlx button').forEach(n => { n.onclick = () => doi(() => { chon.lx = xem = +n.dataset.lx; }); });
   o.querySelectorAll('.lx-gio button').forEach(n => { n.onclick = () => doi(() => { if (mot) chon.phutMot = +n.dataset.phut; else chon.phut = +n.dataset.phut; }); });
+  ganCham(o);
+  /* mở luân xa nào trong danh sách thì hình ở đầu màn cũng sáng luân xa đó */
+  o.querySelectorAll('.lx-mot').forEach((d, k) => d.addEventListener('toggle', () => { if (d.open && chon.che !== 'mot') { xem = k; veHinh(); } }));
   o.querySelectorAll('.lx-rieng').forEach(n => { n.onclick = () => {
     doi(() => { chon.che = 'mot'; chon.lx = +n.dataset.lx; });
     const dat = o.querySelector('.lx-dat');                // đưa lên phần cài đặt, nút Bắt đầu ở ngay dưới
@@ -539,6 +604,7 @@ function dungKhung() {
 function mo() {
   dungKhung();
   docChon();
+  xem = chon.lx;
   vuaXong = false;
   document.body.classList.add('khoa-cuon');
   tam.classList.add('hien');
