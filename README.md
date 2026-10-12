@@ -1461,8 +1461,8 @@ hình khẩu hình của màn 44 âm.
 Giờ một âm trong bảng được gói thành cùng dạng một bài (`baiAm`) rồi đi chung `veBuoc`:
 
 - **Cùng đầu màn**: tên, nút "Nói thử", hàng chip sang âm (hay bài) cùng nhóm, thanh chấm báo bước.
-- **Cùng thứ tự bước**: nghe người thật đọc → luyện tai (khi có cặp tối thiểu có một người đọc cả hai từ)
-  → xem miệng → nghe so từng cặp (khi có cái để so) → nói. /iː/ đi đủ năm bước; /h/ chỉ ba.
+- **Cùng thứ tự bước**: xem miệng → nghe người thật đọc → luyện tai (khi có cặp tối thiểu có một người đọc cả
+  hai từ) → nghe so từng cặp (khi có cái để so) → nói. /iː/ đi đủ năm bước; /h/ chỉ ba.
 - **Xem miệng theo kiểu màn 44 âm**: hình nhìn thẳng và hình bên trong miệng đặt cạnh nhau, chạy cùng nhịp,
   có sơ đồ lưỡi cho nguyên âm. Bài so hai tư thế (/l/ với /n/...) bấm qua lại giữa hai cặp hình, không bày
   bốn hình chồng nhau dài cả màn trên điện thoại.
@@ -1470,6 +1470,12 @@ Giờ một âm trong bảng được gói thành cùng dạng một bài (`baiA
   tại chỗ; không lấy tiếng của vế sai làm mẫu), cộng máy đo ở bài nào có.
 - Bấm chip sang âm khác lúc đang xem miệng thì vẫn ở bước xem miệng, để so hai hình; "Sang /y/ →" ở bước
   nghe so mở âm kia đúng ở bước nghe so. Vào âm từ một bài thì nút quay lại về đúng bài, đúng bước.
+
+## "Phần xem miệng làm gì phải ở đầu tiên chứ"
+
+Người dùng hỏi, và đúng. Trước đây mỗi âm đi: nghe người thật đọc → luyện tai → **xem miệng** → nghe so → nói, với ghi chú "tai đi trước miệng" dẫn bằng chứng luyện nghe phân biệt kéo phát âm lên mạnh hơn luyện nói. Nhưng bằng chứng ấy là **tai trước nói** (Bradlow và cs. 1997: luyện nhận /r/ /l/ thì người Nhật nói /r/ /l/ cũng khá lên), không phải tai trước hình miệng. Khung dạy phát âm phổ biến nhất (Celce-Murcia, Brinton & Goodwin, *Teaching Pronunciation*, 2010) đi: mô tả cách tạo âm (hình cơ quan phát âm) → luyện tai phân biệt → luyện có kiểm soát → … → giao tiếp. Và thấy mặt người nói giúp phát âm: Hazan và cs. 2004 cho người Nhật luyện /l/ /r/ có nhìn mặt, phát âm khá lên nhiều hơn nhóm chỉ nghe.
+
+Giờ: **xem miệng → nghe người thật đọc → luyện tai → nghe so → nói**. Luyện tai vẫn đứng trước bước nói. Bước xem miệng tự có tiếng người thật đọc chính âm đó (bản thu GS Peter Roach ở màn 44 âm, từ thật ở bài sửa lỗi), mở âm là phát luôn và hình chạy theo — bước đầu vừa thấy vừa nghe. Lúc làm việc này mới phát hiện một bài kiểm của `sw.js` đỏ từ bản v135 (bài dò nguyên văn `laTieng(new URL(e.request.url))`, mà lần thêm bộ đếm truy cập viết gọn thành `laTieng(u)` — hành vi không đổi); đã sửa bài kiểm.
 
 ## Cấu trúc
 

@@ -806,17 +806,21 @@ function thoiHinh() { dungHinh(); }
 /* ---- màn một âm: dắt tay từng bước, không phải một trang dài cuộn xuống ---- */
 let buoc = 0;
 
-/* Thứ tự này theo bằng chứng, không theo thói quen: TAI ĐI TRƯỚC MIỆNG.
-   Luyện nghe phân biệt tự nó kéo theo cải thiện phát âm, và kéo mạnh hơn là luyện nói
-   (tri giác d=0,92 so với sản sinh d=0,54; tổng hợp 79 nghiên cứu cho g=0,92).
-   Ngoài ra bước luyện tai là chỗ DUY NHẤT trong cả trò có điểm số thật — vì app biết đáp án.
+/* Thứ tự: xem miệng → nghe người thật → luyện tai → nghe so → nói.
+   Người dùng hỏi sao bước "xem miệng làm gì" không đứng đầu. Đúng: khung dạy phát âm phổ biến nhất
+   (Celce-Murcia, Brinton & Goodwin, Teaching Pronunciation, 2010) đi từ mô tả cách tạo âm (hình cơ quan
+   phát âm) → luyện tai phân biệt → luyện nói. Bản trước ghi "tai đi trước miệng" và dẫn bằng chứng luyện
+   nghe phân biệt kéo phát âm lên, mạnh hơn luyện nói (tri giác d=0,92 so với sản sinh d=0,54; tổng hợp 79
+   nghiên cứu cho g=0,92) — nhưng bằng chứng ấy là TAI TRƯỚC NÓI, không phải tai trước hình miệng. Thứ tự
+   mới vẫn giữ luyện tai trước bước nói. Bước xem miệng tự có tiếng người thật đọc chính âm đó, mở bài là
+   phát luôn, nên bước đầu vừa thấy vừa nghe.
+   Bước luyện tai là chỗ DUY NHẤT trong cả trò có điểm số thật — vì app biết đáp án.
    Máy nhận giọng thì không: nó chỉ đoán chữ, nên không bao giờ được quy thành điểm. */
 function cacBuoc(a) {
-  const ds = ['nghe'];
+  const ds = ['mieng', 'nghe'];
   if (a.cap.length) ds.push('tai');
-  ds.push('mieng');
   /* nghe so từng cặp: chỉ khi có cặp để so — bản trước bài không có cặp thì bước này lặp lại y hệt
-     khối "Trong từ" của bước 1 */
+     khối "Trong từ" của bước nghe */
   if (a.le ? a.le.doi.length : a.cap.length) ds.push('so');
   ds.push('noi');
   return ds;
@@ -1076,7 +1080,7 @@ function veBuoc() {
        thật là cách duy nhất có được cả hai: giọng người, và âm đứng một mình. */
     const hang = x ? [{ x, laSai: false, tu: x.vd[0].tu }] : dsNguoi(a);
     than = `
-      <p class="pa-buoc">Bước 1 — nghe người thật đọc âm này</p>
+      <p class="pa-buoc">Bước ${so('nghe')} — nghe người thật đọc âm này</p>
       <p class="pa-le-to${a.ipa.length > 6 ? ' dai' : ''}">${esc(a.ipa)}</p>
       <div class="pa-nguoi">${hang.map(({ x: y, laSai, tu }) => `
         <div class="pa-nguoi-hang${laSai ? ' sai' : ''}">
@@ -1302,11 +1306,11 @@ function veBuoc() {
   });
   if (ten === 'noi') { ganNoiThu(); if (a.do) ganDo(a); }
   noiHinh();
-  if (ten === 'nghe') {
-    /* mở bước 1 là nghe ngay nút đầu tiên — đúng cái người học đang nhìn */
-    const d = oTrong.querySelector('.pa-nguoi .pa-le-phat');
-    if (d) d.click();
-  }
+  /* vào bước nghe, hay mở bài (bước đầu là xem miệng), là nghe ngay nút đầu tiên — đúng cái người học đang
+     nhìn; ở bước xem miệng, tiếng phát thì hình chạy theo */
+  const nutDau = ten === 'nghe' ? oTrong.querySelector('.pa-nguoi .pa-le-phat')
+    : ten === 'mieng' && buoc === 0 ? oTrong.querySelector('.pa-hinh-tu:not([hidden]) .pa-le-phat') : null;
+  if (nutDau) nutDau.click();
 }
 
 /* ---- máy đo tiếng bạn, ngay trên máy ----

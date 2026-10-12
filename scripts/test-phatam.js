@@ -155,11 +155,13 @@ ok('mã âm nào cũng dựng ra tiếng được',
 ok('âm tắc được đánh dấu để dựng kèm nguyên âm, vì phát rời chỉ nghe như tiếng tách',
    AM.filter(a => ['p', 'b', 't', 'd', 'k', 'g'].includes(a.am)).every(a => a.tac));
 
-console.log('\n— Bài nghe: tai đi trước miệng, và không ra bài cho cặp không ai phân biệt nổi —');
+console.log('\n— Bài nghe: xem miệng trước, tai đi trước nói, và không ra bài cho cặp không ai phân biệt nổi —');
 ok('không còn nhãn luyện tai kiểu cũ nằm lại làm dữ liệu chết',
    AM.every(a => a.taiA === undefined && a.taiB === undefined));
 const ds0 = self.TDTD_PHATAM._soBuoc(AM[0]);
-ok('bước luyện tai đứng trước bước xem miệng', ds0.indexOf('tai') < ds0.indexOf('mieng'), ds0.join(' → '));
+/* Người dùng hỏi sao "xem miệng làm gì" không đứng đầu: khung Celce-Murcia đi mô tả cách tạo âm → luyện tai → nói.
+   Bằng chứng luyện tai kéo phát âm lên là tai trước NÓI — vẫn giữ. */
+ok('bước xem miệng đứng đầu; luyện tai vẫn đứng trước bước nói', ds0[0] === 'mieng' && ds0.indexOf('tai') < ds0.indexOf('noi'), ds0.join(' → '));
 /* /f/ và /θ/ dựng đúng thì vẫn gần như không phân biệt được bằng tai — thí nghiệm 1961 cho
    người bản ngữ nghe cũng chịu. Ra bài bắt chọn giữa hai âm đó là bịa ra một tương phản
    không tồn tại, và người học sẽ "đúng" nhờ đoán. */
@@ -270,10 +272,10 @@ const TN = require('../assets/tunguoi.js');
 self.TDTD_AMNGUOI = AN; self.TDTD_TUNGUOI = TN;
 const P = self.TDTD_PHATAM;
 ok('bước đầu dẫn bằng bản thu người thật',
-   /Bước 1 — nghe người thật đọc âm này[\s\S]{0,300}pa-nguoi/.test(nguon));
+   /Bước \$\{so\('nghe'\)\} — nghe người thật đọc âm này[\s\S]{0,300}pa-nguoi/.test(nguon));
 ok('bước đầu không còn nút âm máy dựng', !/data-am="1"/.test(nguon) && !/tách riêng \(tiếng máy dựng\)/.test(nguon));
 ok('từ ví dụ vẫn còn, nhưng lùi xuống sau bản thu',
-   /Bước 1 — nghe người thật[\s\S]{0,2500}<p class="pa-nhan">Trong từ — người bản xứ đọc<\/p>/.test(nguon));
+   /Bước \$\{so\('nghe'\)\} — nghe người thật[\s\S]{0,2500}<p class="pa-nhan">Trong từ — người bản xứ đọc<\/p>/.test(nguon));
 ok('đọc từ thì lấy bản thu người thật trước, máy đọc chỉ là đường lùi',
    /function doc\(chu, cham, iGiong, nut\) \{[\s\S]{0,120}banThu\(chu\)[\s\S]{0,300}docMay\(chu, cham, iGiong\)/.test(nguon)
    && /function banThu\(chu\) \{[\s\S]{0,80}TDTD_TUNGUOI/.test(nguon));
@@ -387,7 +389,7 @@ ok('phần lớn từ có Anh-Mỹ khác nhau có ít nhất một bản giọng
 ok('đường dẫn tiếng mang dấu nội dung (?v=) để bộ nhớ đệm không phát bản cũ',
    Object.values(TN.TU).flat().concat(banAm).every(b => /\?v=[0-9a-f]{8}$/.test(b.f)));
 ok('sw.js giữ tiếng đã nghe trong kho riêng, không xoá khi deploy', /const TIENG = /.test(sw) && /x !== V && x !== TIENG/.test(sw));
-ok('tải tiếng lỗi thì sw.js không trả index.html thay mp3', /laTieng\(new URL\(e\.request\.url\)\)\) \{[\s\S]{0,500}return;\s*\}/.test(sw));
+ok('tải tiếng lỗi thì sw.js không trả index.html thay mp3', /laTieng\((?:new URL\(e\.request\.url\)|u)\)\) \{[\s\S]{0,500}return;\s*\}/.test(sw));
 
 console.log('\n— Nói thử: máy nghe ra chữ gì —');
 /* Người dùng: "chưa có chỗ nói thử để xem máy có nghe được mình nói gì không". Phần nhận giọng có, nhưng
@@ -563,16 +565,16 @@ const lop = (ds) => ds.join(' → ');
 const buocAm = AN.DS.map(x => ({ x, ds: P._soBuoc(P._baiAm(x.ma)) }));
 ok('mở một âm trong bảng là mở cùng lối từng bước với bài sửa lỗi',
    /function veLe\(ma, ten\) \{[\s\S]{0,400}moAm\(baiAm\(x\), ten\)/.test(nguon) && !/pa-le-to">\/\$\{esc\(x\.ipa\)\}/.test(nguon));
-ok('cả 44 âm và 17 bài đều đi đúng thứ tự: nghe → (luyện tai) → xem miệng → (nghe so) → nói',
+ok('cả 44 âm và 17 bài đều đi đúng thứ tự: xem miệng → nghe → (luyện tai) → (nghe so) → nói',
    buocAm.map(b => b.ds).concat(AM.map(a => P._soBuoc(a))).every(ds => {
-     const thu = ['nghe', 'tai', 'mieng', 'so', 'noi'];
-     return ds[0] === 'nghe' && ds.includes('mieng') && ds[ds.length - 1] === 'noi'
+     const thu = ['mieng', 'nghe', 'tai', 'so', 'noi'];
+     return ds[0] === 'mieng' && ds[1] === 'nghe' && ds[ds.length - 1] === 'noi'
        && ds.every((b, i) => i === 0 || thu.indexOf(b) > thu.indexOf(ds[i - 1]));
    }));
 ok('âm có cặp tối thiểu thì có luyện tai, như bài: /iː/ đi đủ năm bước',
-   lop(P._soBuoc(P._baiAm('ii'))) === 'nghe → tai → mieng → so → noi', lop(P._soBuoc(P._baiAm('ii'))));
+   lop(P._soBuoc(P._baiAm('ii'))) === 'mieng → nghe → tai → so → noi', lop(P._soBuoc(P._baiAm('ii'))));
 ok('âm không có gì để so thì bỏ bước nghe so, không bày bước rỗng: /h/',
-   lop(P._soBuoc(P._baiAm('h'))) === 'nghe → mieng → noi', lop(P._soBuoc(P._baiAm('h'))));
+   lop(P._soBuoc(P._baiAm('h'))) === 'mieng → nghe → noi', lop(P._soBuoc(P._baiAm('h'))));
 const capAmHong = buocAm.flatMap(({ x }) => P._baiAm(x.ma).cap.filter(c => ![...ngNguoi(c[0])].some(n => ngNguoi(c[1]).has(n))).map(c => x.ipa + ':' + c[0] + '/' + c[1]));
 ok('luyện tai của âm trong bảng chỉ dùng cặp có một người đọc cả hai từ (giọng không lộ đáp án)', !capAmHong.length, capAmHong.join(', '));
 ok('luyện tai của âm trong bảng chỉ dùng cặp tối thiểu khai báo sẵn, không ghép bừa từ ví dụ',
