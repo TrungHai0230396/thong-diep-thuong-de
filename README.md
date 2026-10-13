@@ -1078,6 +1078,15 @@ Ba chỗ kỹ thuật đáng ghi:
   dạng bịa**. Phần thiên văn thì vẫn đúng như cũ: máy tự giải phương trình, ngoại tuyến vẫn
   chạy; chỉ riêng dòng mưa là đi xin người khác, và giao diện tách bạch hai thứ đó.
 
+## Dự báo mưa theo chỗ đang đứng
+
+Người dùng hỏi dự báo mưa có đoán đúng vị trí hiện tại không. Hai giới hạn khác nhau:
+
+- **Dữ liệu** (không sửa được): Việt Nam chỉ có mô hình toàn cầu; Open-Meteo tự chọn mô hình chi tiết nhất, ô rộng chừng 9 km (ECMWF IFS HRES); phần trăm khả năng mưa lấy từ mô hình tập hợp ô 27 km; số theo giờ — mốc 15 phút ngoài châu Âu, Bắc Mỹ chỉ là nội suy từ số theo giờ ([tài liệu Open-Meteo](https://open-meteo.com/en/docs)). Nên dự báo nói được "khoảng giờ nào vùng quanh bạn dễ mưa", không nói được đúng từng con đường — mưa giông chiều ở Việt Nam thường chỉ vài km.
+- **Vị trí** (đã sửa): bản trước lấy vị trí đúng một lần lúc bấm "Dùng vị trí của máy" rồi nhớ luôn — đi sang quận khác, tỉnh khác vẫn dự báo chỗ cũ. Giờ ai đã chọn vị trí máy thì mỗi lần mở bầu trời app lấy lại vị trí (`capNhatViTri`), đi xa hơn 1 km thì đổi sang chỗ mới và xin lại dự báo. Chỉ khi quyền vị trí **đã được cho** (Permissions API báo `granted`): không bao giờ tự bật hộp hỏi quyền — chưa biết hay bị từ chối thì giữ chỗ đã lưu, bấm Đổi nơi để cập nhật tay. Dời chưa tới 1 km thì thôi, khỏi xoá dự báo đang có.
+
+`scripts/test-troidem.js` thêm 9 bài: đo khoảng cách, chọn thành phố thì không động tới định vị, chưa cho quyền thì không hỏi, không có Permissions API thì không hỏi, dời vài trăm mét thì giữ, đi xa thì đổi và xin lại dự báo, lấy vị trí lỗi thì giữ.
+
 ## Hỏi nơi ở ngay lần đầu
 
 Trước đây ai chưa bấm **Đổi nơi** đều được gán lặng lẽ là TP.HCM, nên người ở Hà Nội mở ra thấy
@@ -1509,7 +1518,7 @@ scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trì
 scripts/test-astro.js      73 kiểm thử thiên văn, đối chiếu số liệu ngoài (có giờ mọc lặn Trăng theo JPL Horizons)
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
-scripts/test-troidem.js    101 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
+scripts/test-troidem.js    110 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
 assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
@@ -1550,7 +1559,7 @@ python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 101 kiểm thử bầu trời đêm
+node scripts/test-troidem.js     # chạy 110 kiểm thử bầu trời đêm
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên

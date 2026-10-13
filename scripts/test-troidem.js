@@ -536,5 +536,43 @@ console.log('\n— "Sáng rồi Trăng không chịu lặn", "khuya mà Trăng k
   T._chon(null);
 }
 
-console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
-process.exit(fail ? 1 : 0);
+console.log('\n— Dự báo mưa theo chỗ đang đứng: mở bầu trời là lấy lại vị trí —');
+(async () => {
+  /* Người dùng hỏi dự báo mưa có đúng vị trí hiện tại không: bản trước lấy vị trí một lần lúc bấm nút rồi nhớ luôn. */
+  const HCM = { vi: 10.8231, kinh: 106.6297 }, HN = { vi: 21.0285, kinh: 105.8542 };
+  const kmHN = T._cachKm(HCM, HN);
+  ok('đo khoảng cách: TP.HCM – Hà Nội chừng 1.140 km, 0,01 độ vĩ chừng 1,1 km',
+     Math.abs(kmHN - 1140) < 25 && Math.abs(T._cachKm({ vi: 10, kinh: 106 }, { vi: 10.01, kinh: 106 }) - 1.11) < 0.02, `${Math.round(kmHN)} km`);
+  const gocNav = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+  const dat = (quyen, viTri, coPerm = true) => {
+    const ghi = { hoi: 0 };
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, writable: true, value: {
+      permissions: coPerm ? { query: async () => ({ state: quyen }) } : undefined,
+      geolocation: { getCurrentPosition: (xong, loi) => { ghi.hoi++; viTri ? xong({ coords: { latitude: viTri.vi, longitude: viTri.kinh } }) : loi(new Error('x')); } },
+    } });
+    return ghi;
+  };
+  let g = dat('granted', { vi: 10.9, kinh: 106.7 });
+  T._noi(HCM.vi, HCM.kinh, 'TP.HCM');
+  ok('chọn thành phố (không phải vị trí máy): không động tới định vị', await T._capNhatViTri() === 'bo' && g.hoi === 0);
+  T._noiMay(HCM.vi, HCM.kinh);
+  g = dat('prompt', { vi: 10.9, kinh: 106.7 });
+  ok('quyền vị trí chưa cho (hay bị từ chối): KHÔNG tự bật hộp hỏi quyền, giữ chỗ đã lưu',
+     await T._capNhatViTri() === 'bo' && g.hoi === 0 && T._noiHienTai().vi === HCM.vi);
+  g = dat('granted', { vi: 10.9, kinh: 106.7 }, false);
+  ok('trình duyệt không có Permissions API: không hỏi, giữ chỗ đã lưu', await T._capNhatViTri() === 'bo' && g.hoi === 0);
+  g = dat('granted', { vi: HCM.vi + 0.002, kinh: HCM.kinh + 0.002 });
+  ok('đã cho quyền, mới dời vài trăm mét: giữ nguyên, khỏi xoá dự báo đang có', await T._capNhatViTri() === 'gan' && g.hoi === 1 && T._noiHienTai().vi === HCM.vi);
+  g = dat('granted', { vi: 10.9, kinh: 106.7 });
+  const r = await T._capNhatViTri(), n = T._noiHienTai();
+  ok('đã cho quyền, đi xa hơn 1 km: đổi sang chỗ mới, vẫn là vị trí máy', r === 'doi' && n.vi === 10.9 && n.kinh === 106.7 && n.tuMay === true, `${r} → ${n.vi}, ${n.kinh}`);
+  ok('đổi chỗ là xin lại dự báo mưa cho chỗ mới (dự báo cũ hết giá trị)', T._muaLuc() === 0);
+  g = dat('granted', null);
+  ok('lấy vị trí bị lỗi: giữ chỗ đã lưu', await T._capNhatViTri() === 'loi' && T._noiHienTai().vi === 10.9);
+  ok('mở bầu trời là cập nhật vị trí (khi đã chọn nơi rồi)', /if \(!daChon\) moBangChonNoi\(\);\s*else capNhatViTri\(\)/.test(require('fs').readFileSync(require('path').join(__dirname, '..', 'assets', 'nightsky.js'), 'utf8')));
+  if (gocNav) Object.defineProperty(globalThis, 'navigator', gocNav); else delete globalThis.navigator;
+  T._noi(HCM.vi, HCM.kinh, 'TP.HCM');
+  console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
+  process.exit(fail ? 1 : 0);
+})();
+

@@ -1254,6 +1254,32 @@ function xinViTri() {
     { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 });
 }
 
+/* Đã chọn "Dùng vị trí của máy" thì mỗi lần mở bầu trời lấy lại vị trí, để đi đâu dự báo mưa cũng là chỗ đang
+   đứng. Người dùng hỏi "dự báo mưa đoán đúng vị trí hiện tại được không": bản trước lấy vị trí đúng một lần lúc
+   bấm nút rồi nhớ luôn, đi sang quận khác, tỉnh khác vẫn dự báo cho chỗ cũ.
+   Chỉ khi quyền vị trí ĐÃ được cho (Permissions API báo 'granted'): không bao giờ tự bật hộp hỏi quyền — chưa biết,
+   hay bị từ chối, thì giữ chỗ đã lưu. Dời chưa tới 1 km thì thôi: toạ độ gửi đi vốn làm tròn chừng 1 km, ô dự báo
+   rộng chừng 9 km, đổi nơi lại xoá bộ nhớ giờ mọc lặn và dự báo đang có. */
+const DOI_TOI_THIEU = 1;                                 // km
+function cachKm(a, b) {
+  const rad = Math.PI / 180;
+  return 6371 * Math.hypot((b.kinh - a.kinh) * rad * Math.cos((a.vi + b.vi) / 2 * rad), (b.vi - a.vi) * rad);
+}
+async function capNhatViTri() {
+  const nav = self.navigator || {};
+  if (!noi.tuMay || !nav.geolocation || !nav.permissions || !nav.permissions.query) return 'bo';
+  let q = null;
+  try { q = await nav.permissions.query({ name: 'geolocation' }); } catch (e) { return 'bo'; }
+  if (!q || q.state !== 'granted') return 'bo';
+  const p = await new Promise((xong) => nav.geolocation.getCurrentPosition(xong, () => xong(null),
+    { enableHighAccuracy: false, timeout: 10000, maximumAge: 600000 }));
+  if (!p || !noi.tuMay) return 'loi';                    // trong lúc chờ mà người dùng chọn thành phố khác thì thôi
+  const moi = { ten: 'chỗ bạn đứng', vi: p.coords.latitude, kinh: p.coords.longitude, tuMay: true };
+  if (cachKm(noi, moi) < DOI_TOI_THIEU) return 'gan';
+  doiNoi(moi); luuNoi();
+  return 'doi';
+}
+
 /* ---------- xoay theo máy ---------- */
 
 function ganCamBien() {
@@ -1311,6 +1337,7 @@ function mo() {
   /* Chưa chọn nơi thì hỏi ngay, không lặng lẽ lấy TP.HCM. Không tự bật định vị: chỉ hỏi vị trí
      khi người dùng bấm nút. Bấm "Để sau" thì lần mở sau hỏi lại. */
   if (!daChon) moBangChonNoi();
+  else capNhatViTri().catch(() => {});
 }
 
 function dong() {
@@ -1345,6 +1372,9 @@ self.TDTD_TROIDEM = { mo, dong,
   _mocLanNho: (ms, t) => mocLanNho(ms, t),
   _coNhoMocLan: () => khoMocLan.size,
   _xinMua: () => xinMua(),
+  _capNhatViTri: () => capNhatViTri(), _cachKm: cachKm,
+  _noiMay: (v, k) => doiNoi({ ten: 'chỗ bạn đứng', vi: v, kinh: k, tuMay: true }),
+  _noiHienTai: () => ({ ...noi }), _muaLuc: () => mua.luc,
   _mua: () => ({ tinh: mua.tinh, dong: cauMua(Date.now()) }),
   _quenMua: () => { mua = { luc: 0, tinh: 'chua', gio: null, dangXin: false }; },
   _moc: () => moc.map(m => ({ ten: m.ten, loai: m.loai, x: Math.round(m.x), y: Math.round(m.y), r: m.r })),
