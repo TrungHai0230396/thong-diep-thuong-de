@@ -105,6 +105,20 @@ console.log('\n— Gợi ý từng bước —');
   ok('chương điều kiện: gợi ý ô nằm trong phần "không thì"', (r => r.loai === 'them' && r.k === 'neu-trai')(gy(83, 'w(?d(d)())')));
 }
 
+console.log('\n— Âm thanh, mở hết để thử —');
+{
+  const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8');
+  ok('thắp sao có tiếng chuông, sao sau cao hơn sao trước', /ve\.sang\.add\(b\.sang\);[^\n]*tingSao\(ve\.sang\.size - 1\)/.test(src) && /const BAC = \[523\.25, 659\.25, 783\.99/.test(src));
+  ok('thắng có nhạc mừng, vướng có tiếng bộp nhỏ', /setTimeout\(nhacThang, 250\)/.test(src) && /if \(!b\.ok\) \{[^}]*tiengVuong\(\)/.test(src));
+  ok('tắt được âm thanh; mở âm thanh ngay lúc bấm Chạy (iPhone đòi), đóng trò thì ngắt', /coTieng = !coTieng/.test(src) && /function batDauChay\(tungBuoc\) \{\s*amThanh\(\);/.test(src) && /am\.suspend\(\)/.test(src));
+  L._moHet(false);
+  const thuong = L._moToi();
+  L._moHet(true);
+  ok('chế độ thử mở tới bài 100; bình thường chỉ tới bài chưa xong đầu tiên', thuong === 0 && L._moToi() === 99, `${thuong} → ${L._moToi()}`);
+  L._moHet(false);
+  ok('mở hết bằng ?mohet trên link, hoặc chạm 7 lần vào tên trò — không ghi gì xuống máy', /\[\?&\]mohet/.test(src) && /bamBi\.n >= 7/.test(src));
+}
+
 console.log('\n— Gắn vào app —');
 const app = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.js'), 'utf8');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');

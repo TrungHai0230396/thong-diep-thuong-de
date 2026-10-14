@@ -1619,7 +1619,18 @@ Thanh nút dưới cùng: ▶ Chạy · ⏭ Từng bước · ↶ Hoàn tác · 
 
 Ba chỗ sửa khi tự thử trên màn điện thoại: khung chương trình dài ra thì cảnh co lại mà tấm vẽ không co theo, lòi xuống như ô lệnh đè lên cảnh — giờ khung cao cố định và tấm vẽ tự đo lại khi đổi cỡ; nút 🔗 của app đè lên nút ? — chừa chỗ ở góc trên; lời báo "chưa thắp hết" của bài trước còn dính sang bài sau — mở bài mới là xoá, và góc xoay về lại góc quen.
 
-`scripts/test-laptrinh.js`, 38 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gợi ý từng bước (ô tiếp theo, ô sai, ô thừa, thiếu ô ngay trước ô nào, số lần lặp, thêm vào thân vòng lặp lồng, vào Hàm ★, vào phần "không thì"); gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
+#### Âm thanh, và mở hết 100 bài để thử
+
+"Thêm âm thanh khi thắp sao" — tạo ngay trên máy bằng Web Audio, không tải tệp nào. Thắp sao: tiếng chuông nhỏ, một âm chính kèm hai bồi âm lệch (tỉ lệ 2,76 và 5,4 như chuông kim loại) tắt nhanh; **mỗi sao sau cao hơn sao trước một bậc** (Đô 523 Hz, Mi 659, Son 784, Đố, Mí, Sol) cho bé nghe thấy mình đang tiến tới. Thắng: bốn nốt đi lên rồi một hợp âm. Robot vướng: tiếng "bộp" trầm, nhỏ. Âm thanh được mở ngay lúc bấm Chạy (iPhone chỉ cho mở âm thanh trong lúc người dùng bấm), đóng trò thì ngắt; không ép loa khi máy để im lặng. Bật/tắt ở danh sách bài (☰). Thử trên trình duyệt: bài 5 (ba sao) phát đúng ba tiếng chuông 523 → 659 → 784 Hz rồi nhạc mừng.
+
+"Nếu tôi muốn test bài nào cũng được thì sao" — **mở hết 100 bài** bằng một trong hai cách, chỉ trong lần mở đó, không ghi gì xuống máy và không đánh dấu bài nào là đã xong:
+
+- thêm `?mohet` vào link: `https://thong-diep-thuong-de.vercel.app/?mohet#lap-trinh`;
+- hoặc trong app (cả bản đã cài ra màn hình chính): bấm ☰, **chạm 7 lần liền vào chữ "Robot thắp sao"**.
+
+Ở chế độ thử, danh sách bài có thêm nút **Điền lời giải mẫu** cho bài đang mở, để kiểm bài nhanh.
+
+`scripts/test-laptrinh.js`, 43 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gợi ý từng bước (ô tiếp theo, ô sai, ô thừa, thiếu ô ngay trước ô nào, số lần lặp, thêm vào thân vòng lặp lồng, vào Hàm ★, vào phần "không thì"); âm thanh (chuông cao dần, nhạc mừng, tiếng vướng, tắt được, mở lúc bấm); chế độ thử mở tới bài 100, bình thường chỉ tới bài chưa xong đầu tiên; gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
 
 ## Cấu trúc
 
@@ -1669,7 +1680,7 @@ assets/thienluanxa.js      giao diện ngôi sao thiền luân xa: hoa sen, nh�
 scripts/test-luanxa.js     101 kiểm thử thiền luân xa: nội dung, phổ chuông, đàn, lịch, thiền riêng, hình, trình phát
 assets/laptrinh.js         Robot thắp sao: chạy chương trình, dựng bản đồ từ lời giải, cảnh 3D nhìn nghiêng, xếp ô lệnh
 assets/baicode.js          100 bài, 10 chương của Robot thắp sao, viết bằng cú pháp gọn, mỗi bài có lời giải mẫu
-scripts/test-laptrinh.js   38 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy, gợi ý
+scripts/test-laptrinh.js   43 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy, gợi ý
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1696,7 +1707,7 @@ node scripts/test-caiapp.js      # chạy 38 kiểm thử cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
-node scripts/test-laptrinh.js    # chạy 38 kiểm thử Robot thắp sao (cả 100 bài)
+node scripts/test-laptrinh.js    # chạy 43 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 192 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

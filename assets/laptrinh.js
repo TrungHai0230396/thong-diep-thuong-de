@@ -230,7 +230,12 @@ let dangChay = null;
 
 const docXong = () => { try { return (localStorage.getItem(KHOA) || '').padEnd(BAI.length, '0').slice(0, BAI.length); } catch (e) { return '0'.repeat(BAI.length); } };
 const ghiXong = (i) => { try { const s = docXong().split(''); s[i] = '1'; localStorage.setItem(KHOA, s.join('')); } catch (e) {} };
-const moToi = () => { const s = docXong(), i = s.indexOf('0'); return i < 0 ? BAI.length - 1 : i; };   // bài xa nhất được mở
+const baiTiep = () => { const i = docXong().indexOf('0'); return i < 0 ? BAI.length - 1 : i; };          // bài chưa xong đầu tiên
+/* Mở hết 100 bài để người làm app thử (người dùng hỏi): thêm ?mohet vào link, hoặc chạm 7 lần liền vào chữ
+   "Robot thắp sao" trong danh sách bài (dùng được cả trong app đã cài). Chỉ trong lần mở này, không ghi gì xuống máy,
+   không đánh dấu bài nào là đã xong. */
+let moHet = typeof location !== 'undefined' && /[?&]mohet\b/i.test(location.search || '');
+const moToi = () => moHet ? BAI.length - 1 : baiTiep();                                                  // bài xa nhất được mở
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
 /* ---------- vẽ cảnh 3D nhìn nghiêng ---------- */
@@ -417,8 +422,8 @@ function buocTiep(t) {
   if (d.tungBuoc) { if (!d.cho) return; d.cho = false; }                 // chạy từng bước: chờ bấm ⏭
   const b = d.kq.buoc[d.i++], n = d.kq.buoc.length;
   ve.dang = b; ve.tBuoc = t; ve.lau = d.tungBuoc ? 420 : n > 24 ? 220 : n > 14 ? 300 : 400;   // chương trình dài thì chạy nhanh hơn
-  if (b.k === 'thap' && b.ok) { ve.sang.add(b.sang); ve.no = { k: b.sang, t }; }
-  if (!b.ok) { sai.add(b.id); danhDauSai(); }
+  if (b.k === 'thap' && b.ok) { ve.sang.add(b.sang); ve.no = { k: b.sang, t }; tingSao(ve.sang.size - 1); }
+  if (!b.ok) { sai.add(b.id); danhDauSai(); tiengVuong(); }
   sangO(b.id);
 }
 
@@ -472,7 +477,47 @@ function doCo() {
 /* ---------- chương trình đang xếp ----------
    dich: danh sách đang nhận ô mới — 'chinh', 'ham', hay thân một ô chứa ('12.than', '12.thi', '12.khac');
    viTri: chèn vào chỗ thứ mấy trong danh sách đó (null: cuối). chonId: ô đang chọn (có nút × để xoá). */
-let viTri = null, chonId = null, lichSu = [];
+let viTri = null, chonId = null, lichSu = [], bamBi = { n: 0, luc: 0 };
+
+/* ---------- âm thanh ----------
+   Tạo ngay trên máy bằng Web Audio, không tải tệp nào. Thắp sao: tiếng chuông nhỏ — một âm chính và hai bồi âm lệch
+   (tỉ lệ 2,76 và 5,4 như chuông kim loại) tắt nhanh; mỗi sao sau cao hơn sao trước một bậc (Đô Mi Son Đố Mí) cho bé
+   nghe thấy mình đang tiến tới. Thắng: bốn nốt đi lên rồi một hợp âm. Vướng: một tiếng "bộp" trầm, nhỏ. Không ép
+   loa khi máy để im lặng (iPhone gạt chế độ im lặng thì không kêu). Bật/tắt ở danh sách bài. */
+let am = null, coTieng = true;
+function amThanh() {
+  if (!coTieng) return null;
+  try {
+    if (!am) { const AC = self.AudioContext || self.webkitAudioContext; if (!AC) return null; am = new AC(); }
+    if (am.state === 'suspended') am.resume();
+    return am;
+  } catch (e) { return null; }
+}
+function not(f, luc, lau, to, kieu = 'sine') {
+  const a = am, o = a.createOscillator(), v = a.createGain();
+  o.type = kieu; o.frequency.value = f;
+  v.gain.setValueAtTime(0, luc); v.gain.linearRampToValueAtTime(to, luc + .008); v.gain.exponentialRampToValueAtTime(.0001, luc + lau);
+  o.connect(v); v.connect(a.destination); o.start(luc); o.stop(luc + lau + .05);
+  return o;
+}
+const BAC = [523.25, 659.25, 783.99, 1046.5, 1318.51, 1567.98];         // Đô Mi Son Đố Mí Sol (Hz)
+function tingSao(thu) {
+  if (!amThanh()) return;
+  const t = am.currentTime + .01, f = BAC[Math.min(thu, BAC.length - 1)];
+  not(f, t, 1.1, .2); not(f * 2.756, t, .45, .06); not(f * 5.404, t, .22, .03);
+}
+function nhacThang() {
+  if (!amThanh()) return;
+  const t = am.currentTime + .02;
+  [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => not(f, t + i * .11, .5, .14, 'triangle'));
+  [523.25, 659.25, 783.99].forEach(f => not(f, t + .5, 1.4, .08, 'triangle'));
+  not(2093, t + .5, .8, .025);
+}
+function tiengVuong() {
+  if (!amThanh()) return;
+  const t = am.currentTime + .01, o = not(190, t, .18, .12);
+  o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(110, t + .15);
+}
 const sai = new Set();                                                   // ô làm robot khựng ở lần chạy vừa rồi
 function timNut(id, ds = chinh.concat(ham)) {
   for (const n of ds) {
@@ -678,7 +723,9 @@ function moTin(loai, them) {
 
 function moDs() {
   const xong = docXong(), toi = moToi();
-  tam.querySelector('.lt-ds-trong').innerHTML = `<h2>Robot thắp sao</h2><p class="lt-ds-phu">100 bài lập trình. Làm xong bài này thì mở bài sau.</p>` +
+  tam.querySelector('.lt-ds-trong').innerHTML = `<h2 data-bi="1">Robot thắp sao</h2><p class="lt-ds-phu">100 bài lập trình. Làm xong bài này thì mở bài sau.</p>
+    <button type="button" class="lt-ds-tieng" data-tieng="1">${coTieng ? '🔊 Âm thanh: bật' : '🔇 Âm thanh: tắt'}</button>
+    ${moHet ? `<p class="lt-ds-thu">Chế độ thử: đã mở hết 100 bài (chỉ trong lần mở này).</p><button type="button" class="lt-ds-dien" data-dien="1">Điền lời giải mẫu cho bài ${bai + 1}</button>` : ''}` +
     CHUONG.map((ch, ci) => {
       const cacBai = BAI.map((b, i) => [b, i]).filter(([b]) => b.chuong === ci);
       return `<h3>Chương ${ci + 1} · ${esc(ch.ten)}</h3><div class="lt-ds-luoi">${cacBai.map(([b, i]) =>
@@ -757,6 +804,19 @@ function bam(e) {
   if (q('.lt-dsnut')) { moDs(); return; }
   if ((n = q('[data-bai]'))) { tam.querySelector('.lt-ds').hidden = true; moBai(+n.dataset.bai); return; }
   if (q('.lt-ds-dong')) { tam.querySelector('.lt-ds').hidden = true; return; }
+  if (q('[data-bi]')) {                                                  // chạm 7 lần liền vào tên trò: mở hết để thử
+    const bay = Date.now();
+    bamBi = bay - bamBi.luc < 1500 ? { n: bamBi.n + 1, luc: bay } : { n: 1, luc: bay };
+    if (bamBi.n >= 7 && !moHet) { moHet = true; moDs(); bao('Đã mở hết 100 bài để thử.'); }
+    return;
+  }
+  if (q('[data-tieng]')) { coTieng = !coTieng; if (!coTieng && am) am.suspend(); moDs(); if (coTieng) tingSao(0); return; }
+  if (q('[data-dien]')) {                                                // chế độ thử: điền lời giải mẫu để kiểm bài
+    const b = BAI[bai];
+    luu(); chinh = docMa(b.giai); ham = docMa(b.ham || ''); dich = 'chinh'; viTri = null; chonId = null;
+    tam.querySelector('.lt-ds').hidden = true; daSua();
+    return;
+  }
   if (q('.lt-tin-tiep')) { tam.querySelector('.lt-tin').hidden = true; moBai(bai + 1); return; }
   if (q('.lt-tin-dong')) { tam.querySelector('.lt-tin').hidden = true; if (bai < 2) goiY(true); return; }
 }
@@ -768,6 +828,7 @@ function nutChay() {
   tam.classList.toggle('lt-dangchay', !!dangChay);
 }
 function batDauChay(tungBuoc) {
+  amThanh();                                                             // mở âm thanh ngay trong lúc bấm (iPhone đòi vậy)
   if (!chinh.length) { bao('Xếp vài ô lệnh vào Chương trình rồi bấm Chạy nhé.'); goiY(true); return; }
   chonId = null; sai.clear(); datLai(); veMa();
   const kq = chay(ban, chinh, ham);
@@ -787,6 +848,7 @@ function ketThuc() {
   danhDauSai();
   if (kq.thang) {
     ghiXong(bai);
+    setTimeout(nhacThang, 250);
     setTimeout(() => moTin('thang', { so: tongO() }), 450);
   } else if (kq.het) bao('Robot chạy mãi không dừng. Xem lại vòng lặp nhé.', 3600);
   else bao(`Chưa thắp hết — còn ${kq.conLai} ngôi sao.${sai.size ? ' Ô tô đỏ là chỗ robot bị vướng.' : ' Xem robot đi lạc ở đâu rồi sửa nhé.'}`, 3800);
@@ -797,11 +859,12 @@ function mo() {
   document.body.classList.add('khoa-cuon');
   tam.classList.add('hien');
   doCo();
-  if (BAI.length) moBai(moToi());
+  if (BAI.length) moBai(baiTiep());
   if (!raf) raf = requestAnimationFrame(vong);
 }
 function dong() {
   dungChay();
+  if (am && am.state === 'running') am.suspend();
   if (raf) { cancelAnimationFrame(raf); raf = 0; }
   if (tam) tam.classList.remove('hien');
   document.body.classList.remove('khoa-cuon');
@@ -809,5 +872,5 @@ function dong() {
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
 
 self.TDTD_LAPTRINH = { mo, dong, BAI, CHUONG, HUONG, docMa, soO, loaiO, dungBan, chay, itNhat, banBai, O,
-  goiYBuoc, _moBai: (i) => moBai(i, false), _themO: themO, _ct: () => ({ chinh, ham, dich, viTri, chonId }), _ve: () => ve, _chayNgay: batDauChay };
+  goiYBuoc, _moToi: () => moToi(), _moHet: (b) => { moHet = !!b; }, _moBai: (i) => moBai(i, false), _themO: themO, _ct: () => ({ chinh, ham, dich, viTri, chonId }), _ve: () => ve, _chayNgay: batDauChay };
 })();
