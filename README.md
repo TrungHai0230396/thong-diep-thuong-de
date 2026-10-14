@@ -979,7 +979,7 @@ Lúc thêm cỡ mới, tên Trái Đất bị mất hẳn: Mặt Trời to ra ch
 1. **Rời mặt đất** — được nâng thẳng lên từ chỗ bạn, 30 km tới 417 km: chân trời tụt dần và cong dần.
 2. **Trên quỹ đạo** — độ cao 417 km, nghiêng 51,64°, vòng 92,9 phút, 7,67 km/s như Trạm Vũ trụ Quốc tế, tua nhanh 100 lần; đi ngang qua ngày, chạng vạng, đêm có đèn thành phố.
 3. **Lớp áo mỏng** — nhìn sát viền: toàn bộ khí quyển mỏng như lớp vỏ táo.
-4. **Không có biên giới** — lùi ra 9.000 km, thấy cả một mặt địa cầu.
+4. **Không có biên giới** — thôi bay ngang, bay thẳng lên từ 417 km tới 9.000 km ngay trên chỗ bạn, thấy cả một mặt địa cầu.
 5. **Từ phía Mặt Trăng** — tới đúng chỗ Mặt Trăng đang ở **lúc này**; Trái Đất nhìn từ đó khuyết đúng bằng phần đang được chiếu sáng, rộng chừng 1,9°.
 6. **Chấm xanh mờ** — lùi tới 6,06 tỉ km, chỗ Voyager 1 chụp tấm *Pale Blue Dot* năm 1990.
 7. **Nhìn lại** — vài dòng kết, nút xem lại.
@@ -1018,7 +1018,17 @@ Bay ngang, và đúng là vậy: lên tới quỹ đạo thì trạm không lên
 
 Có — đó là lỗi. Hành trình lấy nơi đã chọn trong Trời đêm; bấm "Để sau" thì không có nơi nào, app lấy TP.HCM, và chặng cuối ghi "TP.HCM — chỗ bạn đang ngồi — nằm trên chấm sáng ấy" với cả người ở Hà Nội hay ở nước ngoài. Trong khi chính Trời đêm ghi trung thực là "Xem tạm TP.HCM". Còn chọn vị trí máy thì ra câu lặp "Chỗ bạn đang đứng — chỗ bạn đang ngồi —". Giờ lời theo ba trường hợp: chọn thành phố thì gọi tên thành phố là nơi bạn ở; vị trí máy thì "từ ngay chỗ bạn đứng", "chỗ bạn đang ngồi lúc này"; chưa chọn thì nói là xem tạm TP.HCM, và câu cuối thành "dù bạn đang ngồi ở đâu, chỗ ấy cũng nằm trên chấm sáng này".
 
-`scripts/test-toancanh.js`, 74 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm; máy quay chặng đầu giữ nguyên góc, chỉ đi lên, chân trời tụt từ trên xuống dưới giữa màn; cỡ ba ảnh trong app (đọc từ tệp JPEG); vẽ bằng card đồ hoạ cùng công thức với bản bộ xử lý, có mipmap, lọc dị hướng, xử lý kinh tuyến 180°, tự giảm tải; ảnh chi tiết: tâm làm tròn 1 độ, trưa chỉ xin ảnh ngày, nửa đêm chỉ xin ảnh đèn, chạng vạng cả hai, bỏ qua sát kinh tuyến 180°, địa chỉ đúng chuẩn WMS 1.3.0, kho riêng giữ qua các lần deploy; lời dẫn quỹ đạo nói vì sao độ cao không đổi; đếm đêm trên biển ở giữa Thái Bình Dương, đêm trên đất ở nước Mỹ, ban ngày, và câu về đèn theo đó; lời theo nơi ở: chọn thành phố, vị trí máy, chưa chọn (không gọi TP.HCM là chỗ bạn ngồi).
+#### "Phải giải thích bay ngang chứ, vì mặc định mọi người nghĩ bay thẳng"
+
+Người xem hỏi "hiệu ứng toàn cảnh có khúc bay ngang hả?", rồi "nếu bay ngang thì khi nào bay lên". Hành trình có hai khúc bay lên (chặng 1: 30 → 417 km; chặng 4: lên tiếp) kẹp một khúc bay ngang (chặng 2–3, trên quỹ đạo), nhưng màn không nói lúc nào đổi kiểu, và giữa chặng 3 với chặng 4 chỉ là tối rồi sáng: đang bay ngang ở 417 km, mở mắt ra đã ở 1.200 km. Giờ:
+
+- **Báo trước và giải thích ngay lúc đổi.** Cuối chặng 1: "Tới đây thì thôi bay lên — chặng sau bay ngang." Đầu chặng 2: "Vì sao giờ lại bay ngang? Ở độ cao này mà đứng yên thì sẽ rơi thẳng xuống đất", rồi: phải lao ngang 7,67 km mỗi giây, vẫn rơi nhưng luôn trượt qua mép Trái Đất nên rơi mãi không chạm đất — đó là quỹ đạo. Đầu chặng 4: "Thôi bay ngang. Giờ bay thẳng lên, ngay trên chỗ bạn, nhìn thẳng xuống."
+- **Dòng số nhỏ trên cùng ghi luôn đang bay kiểu gì:** "độ cao 94 km · đang bay thẳng lên", "độ cao 417 km · đang bay ngang 7,67 km/giây · tua nhanh 100 lần", "độ cao 2.518 km · đang bay thẳng lên", "cách tâm Trái Đất 172.129 km · đang bay ra xa".
+- **Chặng 4 nối liền từ 417 km** thay vì nhảy lên 1.200 km. Bản đầu bắt đầu ở 1.200 km vì thấp hơn thì ảnh 10 km mỗi điểm nhoè khi nhìn thẳng xuống; giờ ngay dưới chỗ bạn có ảnh chi tiết 500 m, nhìn từ 417 km vẫn nét (thử trên màn điện thoại: miền Nam rõ sông, bờ biển, vòng vàng đánh dấu TP.HCM).
+
+Người dùng còn muốn "câu kiểu chào mừng bạn đến với chuyến bay cho vui nhộn": mở đầu như tiếp viên hàng không — "Xin chào quý khách! Chào mừng bạn lên chuyến bay TĐ-417, điểm đến: vũ trụ. Thắt dây an toàn — không cần tắt điện thoại, nó chính là ô cửa sổ của bạn." — và chặng cuối cảm ơn: "Cảm ơn quý khách đã bay cùng chuyến TĐ-417. Mời bạn mở mắt ra — thật ra bạn chưa từng rời khỏi chấm sáng ấy."
+
+`scripts/test-toancanh.js`, 80 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm; máy quay chặng đầu giữ nguyên góc, chỉ đi lên, chân trời tụt từ trên xuống dưới giữa màn; cỡ ba ảnh trong app (đọc từ tệp JPEG); vẽ bằng card đồ hoạ cùng công thức với bản bộ xử lý, có mipmap, lọc dị hướng, xử lý kinh tuyến 180°, tự giảm tải; ảnh chi tiết: tâm làm tròn 1 độ, trưa chỉ xin ảnh ngày, nửa đêm chỉ xin ảnh đèn, chạng vạng cả hai, bỏ qua sát kinh tuyến 180°, địa chỉ đúng chuẩn WMS 1.3.0, kho riêng giữ qua các lần deploy; lời dẫn quỹ đạo nói vì sao độ cao không đổi; đếm đêm trên biển ở giữa Thái Bình Dương, đêm trên đất ở nước Mỹ, ban ngày, và câu về đèn theo đó; lời theo nơi ở: chọn thành phố, vị trí máy, chưa chọn (không gọi TP.HCM là chỗ bạn ngồi); báo trước, giải thích bay ngang đúng lúc đổi; dòng số ghi lên / ngang / lên / ra xa; chặng 4 bắt đầu đúng 417 km ngay trên chỗ bạn và chỉ đi lên; câu chào mừng, câu cảm ơn.
 
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
@@ -1573,7 +1583,7 @@ assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt T
 assets/toancanh.js         hiệu ứng toàn cảnh: hành trình từ chỗ bạn đứng ra tới chấm xanh mờ, tia chiếu tự viết
 assets/traidat/            ba ảnh Trái Đất của NASA: đất 4096×2048, mây 2048×1024, đèn đêm 3600×1800, sinh bởi scripts/lam-traidat.py
 scripts/lam-traidat.py     thu nhỏ ảnh Visible Earth của NASA thành assets/traidat/
-scripts/test-toancanh.js   74 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, lời dẫn, card đồ hoạ, ảnh chi tiết NASA
+scripts/test-toancanh.js   80 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, lời dẫn, card đồ hoạ, ảnh chi tiết NASA
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
@@ -1614,7 +1624,7 @@ node scripts/test-core.js        # chạy 39 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 48 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 110 kiểm thử bầu trời đêm
-node scripts/test-toancanh.js    # chạy 74 kiểm thử hiệu ứng toàn cảnh
+node scripts/test-toancanh.js    # chạy 80 kiểm thử hiệu ứng toàn cảnh
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên

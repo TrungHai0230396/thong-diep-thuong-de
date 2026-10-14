@@ -423,22 +423,24 @@ function veTraiDatGL(may, S, th, f, Rt, Uu, chiDat) {
 /* Mỗi chặng: tên, thời lượng (giây), các dòng chữ hiện dần (mốc phần trăm của chặng) */
 const CHANG = [
   { id: 'bay', ten: 'Rời mặt đất', dai: 22, chu: [
-    [0, (c) => `${tuDau(c)} Lên tới 30 km, bầu trời đã đen, đường chân trời bắt đầu cong.`],
+    [0, () => 'Xin chào quý khách! Chào mừng bạn lên chuyến bay TĐ-417, điểm đến: vũ trụ. Thắt dây an toàn — không cần tắt điện thoại, nó chính là ô cửa sổ của bạn.'],
+    [.16, (c) => `${tuDau(c)} Lên tới 30 km, bầu trời đã đen, đường chân trời bắt đầu cong.`],
     [.4, () => '100 km: ranh giới quy ước của vũ trụ (đường Kármán).'],
     [.62, () => 'Tên lửa thật không bay thẳng như vầy: Soyuz lên tới quỹ đạo 205 km thì đã bay ngang 1.640 km.'],
-    [.86, () => '417 km: độ cao của Trạm Vũ trụ Quốc tế.']] },
+    [.86, () => '417 km: độ cao của Trạm Vũ trụ Quốc tế. Tới đây thì thôi bay lên — chặng sau bay ngang.']] },
   { id: 'quyDao', ten: 'Trên quỹ đạo', dai: 53, chu: [
-    [0, () => 'Tới đây thì thôi lên cao: trạm bay ngang 7,67 km mỗi giây — từ TP.HCM ra Hà Nội chưa tới 3 phút.'],
-    [.2, () => 'Ở trên quỹ đạo là vừa rơi về phía Trái Đất vừa lao ngang đủ nhanh để luôn trượt qua nó, nên độ cao gần như không đổi.'],
+    [0, () => 'Vì sao giờ lại bay ngang? Ở độ cao này mà đứng yên thì sẽ rơi thẳng xuống đất.'],
+    [.14, () => 'Muốn ở lại trên này phải lao ngang thật nhanh — 7,67 km mỗi giây, từ TP.HCM ra Hà Nội chưa tới 3 phút. Trạm vẫn rơi, nhưng lao ngang nhanh tới mức luôn trượt qua mép Trái Đất, nên rơi mãi mà không chạm đất. Đó là quỹ đạo.'],
     [.42, () => 'Một vòng quanh Trái Đất mất 92,9 phút: một ngày thấy chừng 15–16 lần bình minh. Đang tua nhanh 100 lần.'],
     [.66, (c) => loiDen(c.duoi ? c.duoi() : null)]] },
   { id: 'khi', ten: 'Lớp áo mỏng', dai: 25, chu: [
     [0, () => 'Dải sáng ở mép Trái Đất là toàn bộ bầu không khí ta thở.'],
     [.45, () => 'Nếu Trái Đất to bằng quả bóng đá, lớp không khí tới độ cao 100 km dày chưa tới 2 mm.']] },
   { id: 'bienGioi', ten: 'Không có biên giới', dai: 26, chu: [
-    [0, () => 'Từ trên này không thấy một đường biên giới nào.'],
-    [.3, () => 'Một phi hành gia Ả Rập Xê Út bay năm 1985 kể: ngày đầu ai cũng chỉ về nước mình, ngày thứ ba, thứ tư chỉ về châu lục — tới ngày thứ năm, chỉ còn thấy một Trái Đất.'],
-    [.72, () => 'Cảm giác kinh ngạc, thấy mình gắn với mọi người ấy được gọi là hiệu ứng toàn cảnh.']] },
+    [0, () => 'Thôi bay ngang. Giờ bay thẳng lên, ngay trên chỗ bạn, nhìn thẳng xuống.'],
+    [.22, () => 'Từ trên này không thấy một đường biên giới nào.'],
+    [.42, () => 'Một phi hành gia Ả Rập Xê Út bay năm 1985 kể: ngày đầu ai cũng chỉ về nước mình, ngày thứ ba, thứ tư chỉ về châu lục — tới ngày thứ năm, chỉ còn thấy một Trái Đất.'],
+    [.74, () => 'Cảm giác kinh ngạc, thấy mình gắn với mọi người ấy được gọi là hiệu ứng toàn cảnh.']] },
   { id: 'trang', ten: 'Từ phía Mặt Trăng', dai: 25, chu: [
     [0, () => '384.400 km — xa bằng Mặt Trăng.'],
     [.35, (c) => `Trái Đất lúc này nhìn từ Mặt Trăng: sáng ${c.sangTuTrang}%. Ngày 24/12/1968, William Anders (Apollo 8) chụp Trái Đất mọc lên trên chân trời Mặt Trăng.`]] },
@@ -447,7 +449,8 @@ const CHANG = [
     [.4, () => 'Trong tấm ảnh ấy, Trái Đất chỉ chiếm 0,12 điểm ảnh.'],
     [.7, () => 'Carl Sagan viết: mọi người ta từng yêu, từng biết, từng nghe tên, đều sống trên chấm nhỏ ấy.']] },
   { id: 've', ten: 'Nhìn lại', dai: 16, chu: [
-    [0, (c) => `Hít một hơi thật chậm. ${choBan(c)}`]] },
+    [0, (c) => `Hít một hơi thật chậm. ${choBan(c)}`],
+    [.5, () => 'Cảm ơn quý khách đã bay cùng chuyến TĐ-417. Mời bạn mở mắt ra — thật ra bạn chưa từng rời khỏi chấm sáng ấy.']] },
 ];
 /* Lời theo nơi ở. c.chon: đã chọn nơi trong Trời đêm; c.tuMay: lấy vị trí máy. Chưa chọn thì Trời đêm ghi
    "Xem tạm TP.HCM" — ở đây cũng phải nói là xem tạm, đừng gọi TP.HCM là "chỗ bạn đang ngồi" với người ở nơi khác. */
@@ -498,7 +501,7 @@ function mayLuc(t, g) {
     const u = viTriNguoi(ms), k = khung(u), h = muLog(30, ISS.cao, em(0, 1, p));
     const cui = GOC_CUI_BAY * RAD;
     P = nhan(u, 1 + h / R_KM); F = don(cong(nhan(k.bac, Math.cos(cui)), nhan(u, -Math.sin(cui)))); U = u; fov = 56;
-    them = { cao: h };
+    them = { cao: h, di: 'len' };
   } else if (ch.c.id === 'quyDao' || ch.c.id === 'khi') {
     const q = quyDaoQua(g.vi, g.kinh + th0);
     const phutQD = ch.c.id === 'quyDao' ? tc * 100 / 60 : CHANG[1].dai * 100 / 60 + tc * 10 / 60;   // tua 100 lần, rồi 10 lần
@@ -516,12 +519,14 @@ function mayLuc(t, g) {
       const chuc = gocChucChanTroi(ISS.cao) * RAD;
       F = don(cong(nhan(ngang, Math.cos(chuc)), nhan(ra, -Math.sin(chuc)))); fov = tron(60, 16, em(0, .5, p));
     }
-    P = o.P; U = ra; them = { cao: ISS.cao, tua: ch.c.id === 'quyDao' ? 100 : 10 };
+    P = o.P; U = ra; them = { cao: ISS.cao, tua: ch.c.id === 'quyDao' ? 100 : 10, di: 'ngang' };
   } else {
     /* bienGioi → trang → cham: lùi ra xa theo thang log, nhìn thẳng vào tâm Trái Đất */
     const u = viTriNguoi(ms), m = A().matTrang(A().ngayJulius(ms)), vM = tuXichDao(m.ra, m.dec);
     let huong, d;
-    if (ch.c.id === 'bienGioi') { huong = u; d = muLog(R_KM + 1200, R_KM + 9000, em(0, 1, p)); fov = 64; }   // từ 1.200 km: thấp hơn ảnh nguồn nhoè
+    /* chặng 4 bắt đầu ngay ở 417 km cho nối liền với quỹ đạo (bản đầu nhảy lên 1.200 km vì thấp hơn thì ảnh nguồn
+       nhoè; giờ ngay dưới chỗ bạn có ảnh chi tiết 500 m, nhìn thẳng xuống từ 417 km vẫn nét) */
+    if (ch.c.id === 'bienGioi') { huong = u; d = muLog(R_KM + ISS.cao, R_KM + 9000, em(0, 1, p)); fov = 64; }
     else if (ch.c.id === 'trang') {
       const s = em(0, .6, p); huong = don(cong(nhan(u, 1 - s), nhan(vM, s))); d = muLog(R_KM + 9000, m.kc, em(0, .6, p)); fov = tron(64, 14, em(0, .6, p));
       them = { sangTuTrang: Math.round((1 + cham(vM, tuXichDao(A().matTroi(A().ngayJulius(ms)).ra, A().matTroi(A().ngayJulius(ms)).dec))) / 2 * 100) };
@@ -529,7 +534,7 @@ function mayLuc(t, g) {
     P = nhan(huong, d / R_KM); F = nhan(huong, -1);
     const bac = tru(v3(0, 0, 1), nhan(huong, huong.z));
     U = dai(bac) > 1e-3 ? don(bac) : v3(1, 0, 0);
-    them = { ...(them || {}), d };
+    them = { ...(them || {}), d, di: ch.c.id === 'bienGioi' ? 'len' : ch.c.id === 've' ? null : 'xa' };
   }
   return { P, F, U, fov, ms, mo, ch, them };
 }
@@ -727,7 +732,14 @@ function veChu(may, S, th) {
   }
   const so = phu.querySelector('.tc-so');
   const them = may.them || {};
-  so.textContent = them.d ? `cách tâm Trái Đất ${fmtKm(them.d)}` : them.cao ? `độ cao ${Math.round(them.cao)} km${them.tua ? ` · tua nhanh ${them.tua} lần` : ''}` : '';
+  so.textContent = dongSo(them);
+}
+/* Dòng số nhỏ trên cùng: bao xa, và đang bay kiểu gì — người xem mặc định nghĩ là bay thẳng lên suốt, nên ghi rõ
+   lúc nào bay lên, lúc nào bay ngang, lúc nào lùi ra xa. */
+const DI = { len: 'đang bay thẳng lên', ngang: 'đang bay ngang 7,67 km/giây', xa: 'đang bay ra xa' };
+function dongSo(them) {
+  const xa = them.d ? (them.di === 'len' ? `độ cao ${fmtKm(them.d - R_KM)}` : `cách tâm Trái Đất ${fmtKm(them.d)}`) : them.cao ? `độ cao ${Math.round(them.cao)} km` : '';
+  return [xa, them.di ? DI[them.di] : '', them.tua ? `tua nhanh ${them.tua} lần` : ''].filter(Boolean).join(' · ');
 }
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function fmtKm(d) {
@@ -851,5 +863,5 @@ self.TDTD_TOANCANH = { mo, dong, dangMo,
   _quyDaoQua: quyDaoQua, _viTriQuyDao: viTriQuyDao, _gocChucChanTroi: gocChucChanTroi, _gocTraiDat: goc_TraiDat,
   _giaoCau: giaoCau, _quaKhi: quaKhi, _mauKhi: mauKhi, _mauMat: mauMat, _datAnh: (a) => { anh = a; }, _chang: chang, _mayLuc: mayLuc,
   _tuXichDao: tuXichDao, _tGio: () => tGio, _dung: () => dung, _g0: () => g0, _co: () => !!(anhGoc || anh), _gl: () => !!gl, _glTi: () => glTi,
-  _epCPU: (b) => { epCPU = !!b; }, _toi: (t) => { tGio = t; batDau = performance.now() - t * 1000; if (dung && ctx) veKhung(); }, _canChiTiet: canChiTiet, _nhinDuoi: nhinDuoi, _loiDen: loiDen, _noiDangDung: noiDangDung, _urlChiTiet: urlChiTiet, _chiTiet: () => chiTiet, CT, GOC_CUI_BAY };
+  _epCPU: (b) => { epCPU = !!b; }, _toi: (t) => { tGio = t; batDau = performance.now() - t * 1000; if (dung && ctx) veKhung(); }, _canChiTiet: canChiTiet, _dongSo: dongSo, _nhinDuoi: nhinDuoi, _loiDen: loiDen, _noiDangDung: noiDangDung, _urlChiTiet: urlChiTiet, _chiTiet: () => chiTiet, CT, GOC_CUI_BAY };
 })();

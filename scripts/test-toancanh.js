@@ -31,7 +31,7 @@ const o1 = T._viTriQuyDao(q, 92.9);
 ok('sau 92,9 phút về đúng chỗ cũ (trong hệ trời)', dai({ x: o1.P.x - o0.P.x, y: o1.P.y - o0.P.y, z: o1.P.z - o0.P.z }) < 1e-9);
 const tocDo = 2 * Math.PI * (R + 417) / (92.9 * 60);
 ok('tốc độ suy ra từ độ cao và chu kỳ khớp 7,67 km/s (lệch dưới 1%)', Math.abs(tocDo - 7.67) / 7.67 < .01, tocDo.toFixed(3) + ' km/s');
-ok('TP.HCM – Hà Nội (1.138 km) chưa tới 3 phút ở tốc độ đó, như lời dẫn', 1138 / 7.67 < 180 && T.CHANG[1].chu[0][1]().includes('chưa tới 3 phút'));
+ok('TP.HCM – Hà Nội (1.138 km) chưa tới 3 phút ở tốc độ đó, như lời dẫn', 1138 / 7.67 < 180 && T.CHANG[1].chu[1][1]().includes('chưa tới 3 phút'));
 ok('một ngày 15–16 lần bình minh: 24 giờ / 92,9 phút', Math.abs(1440 / 92.9 - 15.5) < .1 && T.CHANG[1].chu[2][1]().includes('15–16 lần bình minh'));
 
 console.log('\n— Chân trời và khí quyển —');
@@ -121,12 +121,12 @@ ok('trên quỹ đạo: đúng độ cao trạm, tua nhanh 100 lần', Math.abs(
   ok('chặng đầu: máy chỉ đi lên, không trôi ngang', Math.hypot(h0[0] - h1[0], h0[1] - h1[1], h0[2] - h1[2]) < 1e-9);
   const tren = (km) => T.GOC_CUI_BAY - T._gocChucChanTroi(km);   // chân trời cao hơn giữa màn bao nhiêu độ
   ok('chân trời tụt dần trên màn, từ trên giữa màn xuống dưới giữa màn: dấu hiệu đang lên', tren(30) > 0 && tren(417) < 0 && tren(30) - tren(417) > 14, `${tren(30).toFixed(1)}° → ${tren(417).toFixed(1)}°`);
-  ok('lời dẫn: được nâng thẳng lên; tên lửa thật bay ngang (Soyuz: quỹ đạo 205 km, cách bãi phóng 1.640 km)', T.CHANG[0].chu[0][1]({ noi: 'TP.HCM' }).includes('nâng thẳng lên') && T.CHANG[0].chu.some(([, h]) => /205 km.*1\.640 km/.test(h({}))));
+  ok('lời dẫn: được nâng thẳng lên; tên lửa thật bay ngang (Soyuz: quỹ đạo 205 km, cách bãi phóng 1.640 km)', T.CHANG[0].chu[1][1]({ noi: 'TP.HCM' }).includes('nâng thẳng lên') && T.CHANG[0].chu.some(([, h]) => /205 km.*1\.640 km/.test(h({}))));
 }
 ok('giữa hai chặng tối dần rồi sáng dần, không giật cảnh', T._mayLuc(21.9, g).mo < .2 && T._mayLuc(22.1, g).mo < .2 && T._mayLuc(30, g).mo === 1);
 {
   /* "Lỡ một người ở nơi khác thì có ghi TP.HCM chỗ bạn đang ngồi không?" — chưa chọn nơi thì chỉ là xem tạm */
-  const dau = (c) => T.CHANG[0].chu[0][1](c), cuoi = (c) => T.CHANG[6].chu[0][1](c);
+  const dau = (c) => T.CHANG[0].chu[1][1](c), cuoi = (c) => T.CHANG[6].chu[0][1](c);
   ok('đã chọn thành phố: gọi đúng tên nơi ấy là nơi bạn ở', dau({ noi: 'Hà Nội', chon: true }).includes('từ Hà Nội') && cuoi({ noi: 'Hà Nội', chon: true }).includes('Hà Nội — nơi bạn đang ở'));
   ok('chưa chọn nơi: nói rõ là xem tạm TP.HCM, chặng cuối không gọi TP.HCM là chỗ bạn ngồi',
      dau({ noi: 'TP.HCM', chon: false }).includes('xem tạm') && !cuoi({ noi: 'TP.HCM', chon: false }).includes('TP.HCM') && cuoi({ noi: 'TP.HCM', chon: false }).includes('Dù bạn đang ngồi ở đâu'));
@@ -143,7 +143,23 @@ ok('giữa hai chặng tối dần rồi sáng dần, không giật cảnh', T._
 }
 
 console.log('\n— Trên quỹ đạo: bay ngang, độ cao không đổi; lời về đèn theo cái đang thấy —');
-ok('lời dẫn giải thích vì sao độ cao không tăng nữa: bay ngang, vừa rơi vừa trượt qua Trái Đất', T.CHANG[1].chu[0][1]().includes('bay ngang') && T.CHANG[1].chu[1][1]().includes('luôn trượt qua nó'));
+/* "Phải giải thích bay ngang chứ, vì mặc định mọi người nghĩ bay thẳng" */
+ok('mở đầu chào như tiếp viên: chuyến bay TĐ-417, điểm đến vũ trụ; kết thúc cảm ơn quý khách', T.CHANG[0].chu[0][0] === 0 && /Chào mừng bạn lên chuyến bay TĐ-417/.test(T.CHANG[0].chu[0][1]()) && /Cảm ơn quý khách đã bay cùng chuyến TĐ-417/.test(T.CHANG[6].chu[1][1]()));
+ok('cuối chặng 1 báo trước: tới 417 km thì thôi bay lên, chặng sau bay ngang', /thôi bay lên — chặng sau bay ngang/.test(T.CHANG[0].chu[4][1]()));
+ok('ngay đầu chặng 2 giải thích vì sao bay ngang: đứng yên thì rơi, lao ngang thì rơi mãi không chạm đất', T.CHANG[1].chu[0][0] === 0 &&
+   /Vì sao giờ lại bay ngang\?/.test(T.CHANG[1].chu[0][1]()) && /rơi thẳng xuống/.test(T.CHANG[1].chu[0][1]()) && /luôn trượt qua mép Trái Đất/.test(T.CHANG[1].chu[1][1]()));
+{
+  const so = (t) => T._dongSo(T._mayLuc(t, g).them);
+  const d4 = T.CHANG.slice(0, 3).reduce((s, c) => s + c.dai, 0), d5 = d4 + T.CHANG[3].dai;
+  ok('dòng số ghi đang bay kiểu gì: lên, ngang, lên, ra xa', /đang bay thẳng lên/.test(so(10)) && /đang bay ngang 7,67 km\/giây/.test(so(40)) && /tua nhanh 100 lần/.test(so(40)) &&
+     /^độ cao .* · đang bay thẳng lên$/.test(so(d4 + 10)) && /cách tâm Trái Đất .* · đang bay ra xa/.test(so(d5 + 10)), [so(10), so(40), so(d4 + 10), so(d5 + 10)].join(' | '));
+  /* chặng 4 nối liền: bắt đầu ở 417 km, ngay trên chỗ bạn, chỉ đi lên */
+  const P0 = T._mayLuc(d4 + .01, g).P, P1 = T._mayLuc(d4 + T.CHANG[3].dai - .01, g).P, l0 = dai(P0), l1 = dai(P1);
+  const th = A.gioSao(A.ngayJulius(ms0)), u = T._tuXichDao(g.kinh + th, g.vi);
+  ok('chặng 4 bắt đầu ngay ở 417 km (nối liền quỹ đạo), lên tới 9.000 km', Math.abs((l0 - 1) * R - 417) < 1 && Math.abs((l1 - 1) * R - 9000) < 5, `${((l0 - 1) * R).toFixed(0)} → ${((l1 - 1) * R).toFixed(0)} km`);
+  ok('chặng 4 bay thẳng lên ngay trên chỗ bạn, không trôi ngang', [P0, P1].every((P) => { const l = dai(P); return Math.hypot(P.x / l - u.x, P.y / l - u.y, P.z / l - u.z) < 1e-9; }));
+  ok('đầu chặng 4 nói rõ: thôi bay ngang, giờ bay thẳng lên', /Thôi bay ngang\. Giờ bay thẳng lên/.test(T.CHANG[3].chu[0][1]()));
+}
 {
   /* máy nhìn thẳng xuống từ 417 km, giờ sao 0 (hệ trời trùng hệ địa lý), Mặt Trời ở phía bên kia: ban đêm */
   const nhin = (vi, kinh, ngay) => {
