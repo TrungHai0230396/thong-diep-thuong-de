@@ -1567,6 +1567,48 @@ Người dùng hỏi, và đúng. Trước đây mỗi âm đi: nghe người th
 
 Giờ: **xem miệng → nghe người thật đọc → luyện tai → nghe so → nói**. Luyện tai vẫn đứng trước bước nói. Bước xem miệng tự có tiếng người thật đọc chính âm đó (bản thu GS Peter Roach ở màn 44 âm, từ thật ở bài sửa lỗi), mở âm là phát luôn và hình chạy theo — bước đầu vừa thấy vừa nghe. Lúc làm việc này mới phát hiện một bài kiểm của `sw.js` đỏ từ bản v135 (bài dò nguyên văn `laTieng(new URL(e.request.url))`, mà lần thêm bộ đếm truy cập viết gọn thành `laTieng(u)` — hành vi không đổi); đã sửa bài kiểm.
 
+## Robot thắp sao — 100 bài lập trình cho bé
+
+Người dùng: "làm 1 ngôi sao 100 bài code thiếu nhi", "code dạng game 3D", "ý là hình minh hoạ". Ngôi sao **Robot thắp sao** (`assets/laptrinh.js`, bài học ở `assets/baicode.js`): chú robot đi trên các khối đá bay trong vũ trụ, trẻ xếp ô lệnh để robot thắp sáng những ngôi sao còn tắt.
+
+**Tìm hiểu trước khi làm** (người dùng dặn):
+
+- Dạng trò như **Lightbot**: robot trên các khối hộp nhìn nghiêng ba chiều. Chiều cao là một phần của câu đố — khối cao hơn một nấc phải Nhảy — chứ không chỉ để trang trí.
+- **Thứ tự dạy theo Code.org CS Fundamentals** ([code.org/csf](https://code.org/csf)): làm theo thứ tự, vòng lặp, sự kiện, điều kiện, rồi hàm; sửa lỗi xen suốt ("phần lớn thời gian lập trình thật ra là sửa lỗi").
+- **Trẻ nhỏ học được bằng khối lệnh có hình, không cần đọc nhiều** ([ScratchJr — MIT Media Lab, Tufts](https://www.media.mit.edu/publications/designing-scratchjr-support-for-early-childhood-learning-through-computer-programming/)). Nghiên cứu thử ScratchJr của Joan Ganz Cooney Center thấy trẻ nhỏ không hiểu biểu tượng trừu tượng, nên mỗi ô lệnh có hình cụ thể (mũi tên, ngôi sao, bậc thang) kèm một chữ ngắn.
+- Chương trình Tin học 2018 ở Việt Nam đưa lập trình trực quan vào từ lớp 4: điều khiển một nhân vật chuyển động ([Tạp chí Thiết bị Giáo dục](https://vjol.info.vn/tctbgd/article/download/86766/73783/); chưa đọc được văn bản gốc của chương trình).
+
+Người dùng chọn: **6–10 tuổi** (hình kèm chữ ngắn), **3D nhìn nghiêng xoay được** (nhẹ, chạy mượt mọi điện thoại, không thư viện ngoài), **robot thắp sáng ngôi sao** (hợp với bầu trời sao của app).
+
+**10 chương, 100 bài:**
+
+| Chương | Bài | Học gì |
+|---|---|---|
+| 1. Đi và Thắp | 1–6 | làm đúng thứ tự |
+| 2. Rẽ trái, rẽ phải | 7–18 | quay tại chỗ, trái phải theo hướng robot nhìn |
+| 3. Nhảy lên bậc | 19–28 | khối cao hơn một nấc phải Nhảy; nhảy xuống bao nhiêu cũng được |
+| 4. Sửa lỗi | 29–36 | chương trình cho sẵn sai một hai chỗ, chạy thử rồi sửa |
+| 5. Vòng lặp | 37–48 | Lặp N lần |
+| 6. Lặp trong lặp | 49–58 | nhiều lệnh trong vòng lặp, vòng lặp lồng nhau |
+| 7. Hàm ★ | 59–68 | viết một lần, gọi nhiều lần |
+| 8. Hàm và vòng lặp | 69–78 | hàm trong vòng lặp, vòng lặp trong hàm |
+| 9. Nếu… thì… | 79–90 | Lặp đến khi hết sao; Nếu có đường phía trước / bên trái / bên phải, Nếu đứng trên sao — robot tự tìm đường |
+| 10. Thử thách | 91–100 | tổng hợp, có bài sửa vòng lặp, sửa hàm, sửa điều kiện |
+
+Đầu mỗi chương có một bảng giới thiệu ngắn (khái niệm mới, ô lệnh mới, gợi ý bài đầu); nút **?** mở lại bất cứ lúc nào. Làm xong bài này thì mở bài sau; chỉ nhớ một chuỗi 100 ký tự 0/1 (`tdtd.code`) là bài nào đã xong.
+
+**Luật chạy** (như Lightbot cho trẻ khỏi bị dừng phắt): Đi chỉ sang khối cùng độ cao; Nhảy lên khối cao hơn đúng một nấc hoặc xuống khối thấp hơn; không được thì robot khựng lại tại chỗ rồi chạy lệnh sau, trẻ thấy rõ chỗ sai. Thắp chỉ ô sao. Thắp xong ngôi sao cuối là thắng ngay. Vòng lặp không bao giờ xong (hay hàm tự gọi mãi) thì tự dừng sau 800 bước và báo "robot chạy mãi".
+
+**Mỗi bài có lời giải mẫu, và bản đồ dựng từ chính đường đi đó** (`dungBan`): Đi thì đặt khối cùng độ cao phía trước, Nhảy thì đặt khối cao hơn hay thấp hơn, Thắp thì khối đó là sao — nên bản đồ nào cũng chắc chắn đi được. Chương điều kiện thì vẽ bản đồ bằng đường riêng (`duong`), vì lời giải là "tự nhìn đường". Số ô tối đa của mỗi bài = số ô của lời giải mẫu + vài ô dư (chương đầu dư 3, chương vòng lặp trở đi dư 1).
+
+**Hình minh hoạ kiểu 3D**, vẽ bằng canvas, không thư viện: khối đá nhìn nghiêng có mặt trên sáng, hai mặt bên tối theo ánh sáng từ phía tây bắc, viền sáng mảnh; càng cao khối càng sáng màu; ô đích có vòng tròn khắc, sao tắt mờ xám, sao thắp vàng rực có quầng sáng và nảy lên một nhịp. Robot thân tròn bóng (đổ bóng dưới chân), đầu có kính tối và hai mắt xanh nhìn theo hướng đi — quay lưng thì không thấy mắt — cùng một mũi tên trắng dưới chân chỉ hướng; ăng-ten sáng lên lúc thắp sao; đi thì bước, nhảy thì nảy theo vòng cung, khựng thì nhích tới rồi lùi lại. Bấm ⟲ ⟳ xoay cảnh từng góc 90°. Ô lệnh đang chạy được làm sáng viền trắng.
+
+**Xếp ô lệnh trên điện thoại** (bấm, không cần kéo): bấm ô ở bảng dưới là thêm vào chỗ đang chọn (dấu + nhấp nháy); thêm ô Lặp hay Nếu thì ô tiếp theo tự vào bên trong; bấm dấu + ở dòng khác để đổi chỗ; bấm con số của ô Lặp để đổi 2 → 9; bấm ô đã xếp để bỏ. Khung chương trình cao cố định, dài thì cuộn, để cảnh 3D không co giãn mỗi lần thêm ô.
+
+Ba chỗ sửa khi tự thử trên màn điện thoại: khung chương trình dài ra thì cảnh co lại mà tấm vẽ không co theo, lòi xuống như ô lệnh đè lên cảnh — giờ khung cao cố định và tấm vẽ tự đo lại khi đổi cỡ; nút 🔗 của app đè lên nút ? — chừa chỗ ở góc trên; lời báo "chưa thắp hết" của bài trước còn dính sang bài sau — mở bài mới là xoá, và góc xoay về lại góc quen.
+
+`scripts/test-laptrinh.js`, 28 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
+
 ## Cấu trúc
 
 ```
@@ -1594,7 +1636,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        108 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        113 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -1613,6 +1655,9 @@ scripts/test-ngu.js        53 kiểm thử nhạc ngủ: phổ, tần số, mố
 assets/luanxa.js           thiền luân xa: bảy luân xa theo kinh văn, tạo âm tanpura và chuông xoay, lịch buổi thiền; chạy được làm Web Worker
 assets/thienluanxa.js      giao diện ngôi sao thiền luân xa: hoa sen, nhịp thở, phát bằng Web Audio
 scripts/test-luanxa.js     101 kiểm thử thiền luân xa: nội dung, phổ chuông, đàn, lịch, thiền riêng, hình, trình phát
+assets/laptrinh.js         Robot thắp sao: chạy chương trình, dựng bản đồ từ lời giải, cảnh 3D nhìn nghiêng, xếp ô lệnh
+assets/baicode.js          100 bài, 10 chương của Robot thắp sao, viết bằng cú pháp gọn, mỗi bài có lời giải mẫu
+scripts/test-laptrinh.js   28 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1639,6 +1684,7 @@ node scripts/test-caiapp.js      # chạy 38 kiểm thử cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
+node scripts/test-laptrinh.js    # chạy 28 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 192 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)
