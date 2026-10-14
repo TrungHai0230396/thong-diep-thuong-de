@@ -108,6 +108,18 @@ ok('trên quỹ đạo: đúng độ cao trạm, tua nhanh 100 lần', Math.abs(
   const F = T._mayLuc(batDauCham + 5, g).F, Pm = T._mayLuc(batDauCham + 5, g).P, l = dai(Pm);
   ok('lùi ra xa thì máy luôn nhìn thẳng vào Trái Đất', Math.abs(F.x + Pm.x / l) < 1e-9 && Math.abs(F.y + Pm.y / l) < 1e-9 && Math.abs(F.z + Pm.z / l) < 1e-9);
 }
+{
+  /* "Cảm giác đang bay ngang và lên chứ không phải bay lên": bản cũ cho máy cúi dần đúng nhịp chân trời chúc xuống */
+  const goc = (t) => { const m = T._mayLuc(t, g), l = dai(m.P); return Math.asin((m.F.x * m.P.x + m.F.y * m.P.y + m.F.z * m.P.z) / l) / RAD; };
+  const cac = [0, 5, 11, 16, 21.9].map(goc);
+  ok('chặng đầu: máy quay giữ nguyên góc nhìn chếch xuống suốt chặng', cac.every(x => Math.abs(x + T.GOC_CUI_BAY) < 1e-6), cac.map(x => x.toFixed(2)).join(', '));
+  const huong = (t) => { const P = T._mayLuc(t, g).P, l = dai(P); return [P.x / l, P.y / l, P.z / l]; };
+  const h0 = huong(0), h1 = huong(21.9);
+  ok('chặng đầu: máy chỉ đi lên, không trôi ngang', Math.hypot(h0[0] - h1[0], h0[1] - h1[1], h0[2] - h1[2]) < 1e-9);
+  const tren = (km) => T.GOC_CUI_BAY - T._gocChucChanTroi(km);   // chân trời cao hơn giữa màn bao nhiêu độ
+  ok('chân trời tụt dần trên màn, từ trên giữa màn xuống dưới giữa màn: dấu hiệu đang lên', tren(30) > 0 && tren(417) < 0 && tren(30) - tren(417) > 14, `${tren(30).toFixed(1)}° → ${tren(417).toFixed(1)}°`);
+  ok('lời dẫn: được nâng thẳng lên; tên lửa thật bay ngang (Soyuz: quỹ đạo 205 km, cách bãi phóng 1.640 km)', T.CHANG[0].chu[0][1]({ noi: 'TP.HCM' }).includes('nâng thẳng lên') && T.CHANG[0].chu.some(([, h]) => /205 km.*1\.640 km/.test(h({}))));
+}
 ok('giữa hai chặng tối dần rồi sáng dần, không giật cảnh', T._mayLuc(21.9, g).mo < .2 && T._mayLuc(22.1, g).mo < .2 && T._mayLuc(30, g).mo === 1);
 ok('lời dẫn chặng cuối gọi đúng nơi của bạn', T.CHANG[6].chu[0][1]({ noi: 'TP.HCM' }).includes('TP.HCM'));
 
@@ -124,7 +136,47 @@ const z = (lop) => +((css.match(new RegExp(`\\.${lop}\\{[^}]*z-index:(\\d+)`)) |
 ok('hành trình nằm trên Trời đêm', z('toancanh') > z('troidem'), `${z('toancanh')} > ${z('troidem')}`);
 const tc = fs.readFileSync(path.join(__dirname, '..', 'assets', 'toancanh.js'), 'utf8');
 ok('phím Esc chỉ đóng hành trình, không rơi xuống đóng luôn Trời đêm', /e\.preventDefault\(\); e\.stopImmediatePropagation\(\); dong\(\);[\s\S]{0,20}\}, true\);/.test(tc) && /e\.key === 'Escape' && !e\.defaultPrevented && tam/.test(ns));
-ok('ảnh NASA có trong app, cỡ 2048×1024', ['ngay', 'may', 'dem'].every(t => fs.existsSync(path.join(__dirname, '..', 'assets', 'traidat', t + '.jpg'))));
+/* cỡ ảnh JPEG đọc từ khối SOF trong tệp */
+const coJpg = (f) => {
+  const b = fs.readFileSync(f);
+  for (let i = 2; i < b.length - 9;) {
+    if (b[i] !== 0xFF) return null;
+    const m = b[i + 1], dai = b.readUInt16BE(i + 2);
+    if (m >= 0xC0 && m <= 0xC3) return b.readUInt16BE(i + 7) + '×' + b.readUInt16BE(i + 5);
+    i += 2 + dai;
+  }
+  return null;
+};
+const anhApp = (t) => path.join(__dirname, '..', 'assets', 'traidat', t);
+const co = ['ngay-4096.jpg', 'may.jpg', 'dem-3600.jpg'].map(t => fs.existsSync(anhApp(t)) ? coJpg(anhApp(t)) : null);
+ok('ảnh NASA trong app giữ cỡ to nhất nguồn có: mặt đất 4096×2048, mây 2048×1024 (nguồn chỉ có vậy), đèn 3600×1800', co.join(' ') === '4096×2048 2048×1024 3600×1800', co.join(' '));
+ok('app gọi đúng ba tệp ấy', ['ngay-4096.jpg', 'may.jpg', 'dem-3600.jpg'].every(t => tc.includes(`assets/traidat/${t}`)));
+
+console.log('\n— Vẽ bằng card đồ hoạ —');
+ok('có WebGL2 thì mỗi điểm ảnh màn hình một tia trên card đồ hoạ, không có thì lùi về bộ xử lý', /getContext\('webgl2'/.test(tc) && /if \(epCPU \|\| !veTraiDatGL\(/.test(tc));
+ok('cùng công thức với bản bộ xử lý: ngưỡng ngày đêm, mây, loá biển, tán xạ, đèn, khí quyển', ['em(-.06, .12, mu)', 'em(70., 215.', 'pow(cc, 60.) * 150.', 'vec3(16., 38., 78.)', '* 320.', 'em(-.18, .08, nang)', 'exp(-tong * 260.)'].every(k => tc.includes(k)));
+ok('ảnh lọc theo mipmap và dị hướng: ở xa không lấm tấm, sát chân trời vẫn nét', /LINEAR_MIPMAP_LINEAR/.test(tc) && /EXT_texture_filter_anisotropic/.test(tc));
+ok('kinh tuyến 180° không thành đường kẻ (đạo hàm của bản uv dời nửa vòng)', tc.includes('fract(uv.x + .5) - .5') && /textureGrad\(tNgay, uv, gx, gy\)/.test(tc));
+ok('máy yếu thì tự giảm số điểm ảnh phải tô, tới một nửa là thôi', /if \(tb > 26 && glTi > \.5\) glTi = Math\.max\(\.5, glTi \* \.8\)/.test(tc));
+ok('lời dẫn chỉ giữ hai dòng mới nhất, khỏi che Trái Đất', /\.map\(\(\[, h\]\) => h\(boi\)\)\.slice\(-2\)/.test(tc));
+
+console.log('\n— Ảnh chi tiết quanh chỗ bạn (GIBS của NASA) —');
+{
+  const trua = Date.UTC(2026, 9, 14, 5, 0, 0), nuaDem = Date.UTC(2026, 9, 14, 17, 0, 0);   // 12 giờ trưa, nửa đêm ở TP.HCM
+  const a = T._canChiTiet(10.8231, 106.6297, trua), b = T._canChiTiet(10.8231, 106.6297, nuaDem);
+  ok('tâm ảnh làm tròn tới 1 độ: máy chủ chỉ biết vùng, không biết chỗ', a.vi === 11 && a.kinh === 107);
+  ok('giữa trưa chỉ xin ảnh ban ngày, nửa đêm chỉ xin ảnh đèn — mỗi lần một ảnh', a.ngay && !a.dem && !b.ngay && b.dem);
+  let cv = null;
+  for (let ph = 0; ph < 150 && !cv; ph++) { const c = T._canChiTiet(10.8231, 106.6297, Date.UTC(2026, 9, 14, 10, 0, 0) + ph * 60000); if (c.ngay && c.dem) cv = c; }
+  ok('chạng vạng: xin cả hai', !!cv);
+  ok('sát kinh tuyến 180° (Fiji): thôi, dùng ảnh có sẵn', T._canChiTiet(-17.7, 178.4, trua) === null);
+  const u = T._urlChiTiet('BlueMarble_NextGeneration', 11, 107);
+  ok('địa chỉ: máy chủ GIBS của NASA, ô 10° quanh tâm (WMS 1.3.0 ghi vĩ độ trước), 2048 điểm ảnh', u.startsWith('https://gibs.earthdata.nasa.gov/wms/epsg4326/best/wms.cgi?') && /&bbox=6,102,16,112&/.test(u) && /WIDTH=2048&HEIGHT=2048/.test(u) && /CRS=EPSG:4326/.test(u));
+  ok('chỗ bạn lệch tâm nhiều nhất 0,5° nên luôn cách mép ô 4,5°, ngoài dải mờ dần 0,6°', T.CT.nua - .5 - .6 > 3.5 && /\/ \.6, 0\., 1\.\)/.test(tc));
+  ok('ban ngày: Blue Marble Next Generation; ban đêm: Black Marble', /ngay: 'BlueMarble_NextGeneration', dem: 'VIIRS_Black_Marble'/.test(tc));
+  const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+  ok('cất ảnh vào kho riêng, giữ qua các lần deploy, chỉ cất khi đúng là ảnh', /const NASA = 'tdtd-nasa'/.test(sw) && /x !== V && x !== TIENG && x !== NASA/.test(sw) && /startsWith\('image\/'\)\) c\.put/.test(sw));
+}
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

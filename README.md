@@ -976,7 +976,7 @@ Lúc thêm cỡ mới, tên Trái Đất bị mất hẳn: Mặt Trời to ra ch
 
 Đọc trước khi làm: *hiệu ứng toàn cảnh* (overview effect) là tên Frank White đặt năm 1987 sau khi phỏng vấn phi hành gia — cảm giác kinh ngạc, xúc động khi lần đầu thấy cả Trái Đất từ vũ trụ. Yaden và cộng sự (*Psychology of Consciousness*, 2016) mô tả nó là một dạng kinh ngạc (awe) vượt khỏi bản thân: thấy đẹp, thấy Trái Đất mong manh, thấy mình gắn với mọi người. Stepanova và cộng sự (*Frontiers in Digital Humanities*, 2019) làm thực tế ảo về hiệu ứng này và thấy người xem cần thấy an toàn, thấy nơi quen thuộc của mình, có chút hồi hộp. Nên hành trình bắt đầu **từ chính chỗ bạn đứng** và đi ra xa dần:
 
-1. **Rời mặt đất** — bay thẳng lên từ chỗ bạn, đường chân trời cong dần.
+1. **Rời mặt đất** — được nâng thẳng lên từ chỗ bạn, 30 km tới 417 km: chân trời tụt dần và cong dần.
 2. **Trên quỹ đạo** — độ cao 417 km, nghiêng 51,64°, vòng 92,9 phút, 7,67 km/s như Trạm Vũ trụ Quốc tế, tua nhanh 100 lần; đi ngang qua ngày, chạng vạng, đêm có đèn thành phố.
 3. **Lớp áo mỏng** — nhìn sát viền: toàn bộ khí quyển mỏng như lớp vỏ táo.
 4. **Không có biên giới** — lùi ra 9.000 km, thấy cả một mặt địa cầu.
@@ -987,14 +987,28 @@ Lúc thêm cỡ mới, tên Trái Đất bị mất hẳn: Mặt Trời to ra ch
 Cái gì thật, cái gì không — ghi cả trên màn:
 
 - **Thật lúc này:** ngày đêm trên Trái Đất (Mặt Trời theo `astro.js`), vị trí và pha Mặt Trăng, chỗ bạn đứng (nơi đã chọn trong Trời đêm, chưa chọn thì TP.HCM).
-- **Ảnh của NASA** (Visible Earth, dùng tự do), thu nhỏ còn 2048 × 1024 trong `assets/traidat/` (182 + 393 + 57 KB) bằng `scripts/lam-traidat.py`: mặt đất Blue Marble Next Generation tháng 7/2004, mây ghép từ vệ tinh năm 2002 — **không phải mây hôm nay** — và đèn ban đêm Black Marble 2016. Ảnh chỉ tải khi mở hành trình, không nằm trong bộ nhớ đệm cài sẵn.
+- **Ảnh của NASA** (Visible Earth, dùng tự do) trong `assets/traidat/`, làm bằng `scripts/lam-traidat.py`, giữ cỡ to nhất nguồn có (trần 4096 cho điện thoại nào cũng nạp được): mặt đất Blue Marble Next Generation tháng 7/2004, 4096 × 2048 (595 KB, 10 km mỗi điểm ảnh); mây ghép từ vệ tinh năm 2002, 2048 × 1024 (393 KB, nguồn chỉ có cỡ này) — **không phải mây hôm nay**; đèn ban đêm Black Marble 2016, 3600 × 1800 (160 KB). Ảnh chỉ tải khi mở hành trình, không nằm trong bộ nhớ đệm cài sẵn.
+- **Ảnh chi tiết quanh chỗ bạn**, tải lúc mở từ GIBS, máy chủ ảnh công khai của NASA (không cần khoá, cho trang khác dùng): một ô 10° × 10°, 2048 điểm ảnh (chừng 540 m mỗi điểm) — Blue Marble Next Generation 500 m nếu ở chỗ bạn đang là ngày, Black Marble nếu đang là đêm, chạng vạng thì cả hai; mỗi ảnh 190–300 KB, cất lại trong kho riêng `tdtd-nasa` nên mở lại ở cùng chỗ khỏi tải. **Tâm ô làm tròn tới 1 độ** (chừng 110 km): máy chủ NASA chỉ biết bạn ở vùng nào. Mất mạng thì vẫn vẽ bằng ảnh có sẵn.
 - **Quỹ đạo:** số liệu đúng của Trạm Vũ trụ Quốc tế nhưng đặt cho đi ngang qua chỗ bạn — **không phải** vị trí thật của trạm.
 - **Khí quyển:** mật độ giảm theo hàm mũ (thang độ cao 8 km, vỏ 100 km), độ dày tia đi qua tính bằng xấp xỉ Chapman; xanh khi nắng chiếu thẳng, cam đỏ ở dải hoàng hôn. Gần đúng, không phải mô phỏng tán xạ đầy đủ.
-- Không thư viện 3D: mỗi điểm ảnh một tia chiếu tự viết, tô ở nửa độ phân giải rồi phóng lên (ảnh nguồn 20 km mỗi điểm, tô dày hơn cũng không nét hơn). Đo trên máy bàn khoảng 50 khung hình mỗi giây.
+- Không thư viện 3D: mỗi điểm ảnh màn hình một tia chiếu, chạy trên card đồ hoạ (WebGL2, mã tự viết); máy không có WebGL2 thì lùi về bản tô bằng bộ xử lý ở độ phân giải thấp. Đo trên máy bàn 60 khung hình mỗi giây ở cỡ điện thoại; máy yếu (dưới chừng 38 khung) tự giảm số điểm ảnh phải tô, tới một nửa là thôi.
 
 Ba chỗ sửa khi tự xem: ở xa, viền Trái Đất lốm đốm như chuỗi hạt vì tia chiếu bắt hụt lớp khí mỏng — giờ xa thì vẽ viền bằng nét liền; từ phía Mặt Trăng, Trái Đất sáng 88% mà biển đen như ban đêm — thêm màu tán xạ của khí quyển phía ban ngày; một lần bấm Esc đóng luôn cả Trời đêm — giờ hành trình nhận phím trước và đánh dấu đã xử lý, Trời đêm thấy vậy thì bỏ qua.
 
-`scripts/test-toancanh.js`, 44 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm.
+#### "Hình bị mờ"
+
+Hai nguyên nhân chồng lên nhau, đo được chứ không đoán:
+
+- **Tô thô rồi phóng lên.** Bản đầu tô bằng bộ xử lý, tối đa 60 nghìn tia mỗi khung: trên điện thoại 375 × 812 mỗi tia phủ chừng 2,2 điểm ảnh CSS, tức 4–7 điểm ảnh thật. Mép Trái Đất, dải khí quyển, mây đều nhoè. Giờ vẽ trên card đồ hoạ: mỗi điểm ảnh một tia, ảnh lọc theo mipmap (ở xa không lấm tấm) và lọc dị hướng (mặt đất sát chân trời bị nén dẹt vẫn nét), mép đĩa Trái Đất làm mịn theo phần điểm ảnh nằm trên đĩa. Kinh tuyến 180° không thành đường kẻ nhờ lấy đạo hàm của bản toạ độ dời nửa vòng (cách của Tarini). Toạ độ tính theo hướng từ máy tới tâm Trái Đất, không trừ hai số to gần bằng nhau, để số 32 bit của card đồ hoạ vẫn đủ chính xác khi máy lùi ra tới Mặt Trăng. So bản card đồ hoạ với bản bộ xử lý trên cùng một khung, lấy trung bình từng ô của lưới 12 × 24: ở chặng quỹ đạo lệch 0/255, chỉ lệch ở vùng quanh chỗ bạn — nơi giờ dùng ảnh chi tiết.
+- **Ảnh nguồn quá thô ở gần.** Ở chặng đầu, mặt đất phía dưới màn chỉ cách 30–200 km; ảnh 10–20 km mỗi điểm ảnh thì một điểm nguồn phủ cả chục điểm màn hình — card đồ hoạ cũng không làm nét được. Nên tải thêm ảnh 500 m của NASA cho riêng vùng quanh chỗ bạn (người dùng chọn cách này). Trong ô đó, lớp mây 20 km của năm 2002 mỏng còn 30%, kẻo phủ vệt nhoè lên ảnh nét; sát mép ô mờ dần sang ảnh thường trong 0,6°, không thấy đường ranh.
+
+#### "Cảm giác đang bay ngang và lên chứ không phải bay lên — thực tế là vậy à?"
+
+Thực tế đúng là tên lửa bay ngang nhiều hơn bay lên: muốn ở lại trên quỹ đạo phải chạy ngang gần 8 km mỗi giây. Theo RussianSpaceWeb (Anatoly Zak), tầng ba đưa tàu Soyuz vào quỹ đạo ở độ cao 205–208 km, **cách bãi phóng 1.640 km**, chưa tới 9 phút sau khi rời bệ.
+
+Nhưng chặng này không mô phỏng tên lửa — máy được nâng thẳng lên, đứng đúng trên đầu bạn. Cảm giác "bay ngang" là do máy quay: nó cúi dần từ 9° xuống 30° đúng lúc chân trời chúc xuống (5,6° ở 30 km, 20,2° ở 417 km). Hai cái bù nhau, chân trời đứng yên trên màn, chỉ có mặt đất trôi xuống — đúng hình ảnh khi bay tới. Giờ máy quay giữ nguyên góc cúi 10° suốt chặng: chân trời từ trên giữa màn 4,4° tụt xuống dưới giữa màn 10,2°, cong dần, mặt đất co về phía dưới. Người dùng chọn giữ cách bay thẳng lên cho dễ hình dung; lời dẫn thêm một dòng về đường bay thật của Soyuz. Lời dẫn mỗi lúc chỉ hiện hai dòng mới nhất, vì bốn dòng chồng lên nhau che mất Trái Đất trên màn điện thoại.
+
+`scripts/test-toancanh.js`, 63 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm; máy quay chặng đầu giữ nguyên góc, chỉ đi lên, chân trời tụt từ trên xuống dưới giữa màn; cỡ ba ảnh trong app (đọc từ tệp JPEG); vẽ bằng card đồ hoạ cùng công thức với bản bộ xử lý, có mipmap, lọc dị hướng, xử lý kinh tuyến 180°, tự giảm tải; ảnh chi tiết: tâm làm tròn 1 độ, trưa chỉ xin ảnh ngày, nửa đêm chỉ xin ảnh đèn, chạng vạng cả hai, bỏ qua sát kinh tuyến 180°, địa chỉ đúng chuẩn WMS 1.3.0, kho riêng giữ qua các lần deploy.
 
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
@@ -1547,9 +1561,9 @@ scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
 scripts/test-troidem.js    110 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
 assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
 assets/toancanh.js         hiệu ứng toàn cảnh: hành trình từ chỗ bạn đứng ra tới chấm xanh mờ, tia chiếu tự viết
-assets/traidat/            ba ảnh Trái Đất của NASA 2048×1024 (đất, mây, đèn đêm), sinh bởi scripts/lam-traidat.py
+assets/traidat/            ba ảnh Trái Đất của NASA: đất 4096×2048, mây 2048×1024, đèn đêm 3600×1800, sinh bởi scripts/lam-traidat.py
 scripts/lam-traidat.py     thu nhỏ ảnh Visible Earth của NASA thành assets/traidat/
-scripts/test-toancanh.js   44 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, nút trong Trời đêm
+scripts/test-toancanh.js   63 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, vẽ bằng card đồ hoạ, ảnh chi tiết NASA
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
@@ -1590,7 +1604,7 @@ node scripts/test-core.js        # chạy 39 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 48 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 110 kiểm thử bầu trời đêm
-node scripts/test-toancanh.js    # chạy 44 kiểm thử hiệu ứng toàn cảnh
+node scripts/test-toancanh.js    # chạy 63 kiểm thử hiệu ứng toàn cảnh
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
