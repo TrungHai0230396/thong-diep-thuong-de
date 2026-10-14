@@ -5,6 +5,8 @@
    - Trăng đã lặn mà dòng chữ bảo "chưa lên khỏi chân trời";
    - bấm vào Mặt Trăng, Mặt Trời thì không có gì xảy ra, vì app chưa hề có chức năng chạm chọn.
    Nên tệp này dựng một bộ DOM và canvas giả vừa đủ để chạy thật vòng vẽ, rồi soi vào đó. */
+/* Mọi mốc giờ trong tệp tính theo giờ Việt Nam: chạy trên máy đặt múi giờ khác thì bài vẫn phải ra như nhau. */
+process.env.TZ = 'Asia/Ho_Chi_Minh';
 const fs = require('fs');
 const path = require('path');
 
@@ -191,9 +193,12 @@ ok('hai thang lệch nhau ít nhất một triệu lần, đủ để không bao
 console.log('\n— Đóng màn thì buông lựa chọn ra —');
 /* Không buông thì mở lại, vòng kéo hướng nhìn sẽ lôi mắt về thiên thể chọn từ lần trước, ghi
    đè hướng mà mo() vừa đặt — người dùng mở ra thấy đang chúi xuống đất mà không hiểu vì sao. */
-T._nhin(180, 25, 75);
+/* Chạm vào một thiên thể ĐANG NẰM TRONG MÀN. Bản trước lấy bừa cái đầu danh sách — Sao Thổ, mà nó ở (−13, −21),
+   ngoài mép, chạm không trúng; bài này chỉ đỗ nhờ hành tinh còn lệch 0,37° (chưa tính tuế sai) nên lọt vào màn. */
+const bM = T._bauTroi(DEM);
+T._nhin(bM.trang.huong, Math.max(-80, Math.min(80, bM.trang.cao)), 75);
 T._ve(DEM);
-const mm = T._moc();
+const mm = T._moc().filter(m => m.x > 0 && m.y > 0 && m.x < 380 && m.y < 720);     // màn giả 380×720
 if (mm.length) T._chonTai(mm[0].x, mm[0].y);
 ok('chọn được một thiên thể trước đã', T._chon() !== null, String(T._chon()));
 T.dong();
@@ -430,12 +435,17 @@ console.log('\n— Nhìn từ vũ trụ: Trái Đất, Mặt Trăng, Hệ Mặt 
   let loi = null;
   try {
     V.vao(); V.ve(ctxGia, 380, 720, 2, DEM, noi);
-    V.doiCanh(); V.ve(ctxGia, 380, 720, 2, DEM, noi); V.doiCanh();
+    V.doiCanh(); V.ve(ctxGia, 380, 720, 2, DEM, noi);
+    V.doiCanh(); V.ve(ctxGia, 380, 720, 2, DEM, noi);
+    /* Về lại cảnh Trái Đất rồi mới kéo, phóng. Bản trước gọi doiCanh hai lần, tưởng là về chỗ cũ — đúng khi còn
+       hai cảnh; từ khi có cảnh thứ ba thì nó dừng ở So kích thước, và hai bài dưới không còn kiểm gì. */
+    while (V.canh() !== 'traiDat') V.doiCanh();
     V.batDauKeo(100, 100); V.keo(200, 50); V.thaKeo(); V.phong(.5); V.phong(100);
   } catch (e) { loi = e.message; }
-  ok('vẽ hai cảnh, kéo xoay, phóng to thu nhỏ không nổ lỗi', loi === null, loi || '');
+  ok('vẽ cả ba cảnh, kéo xoay, phóng to thu nhỏ không nổ lỗi', loi === null, loi || '');
   const cam = V._cam();
-  ok('phóng to thu nhỏ có giới hạn: không chui vào trong Trái Đất, không bay quá xa', cam.traiDat.xa >= 2.4 && cam.traiDat.xa <= 30, `${cam.traiDat.xa}`);
+  ok('phóng to thu nhỏ có giới hạn: không chui vào trong Trái Đất, không bay quá xa', cam.traiDat.xa >= 2.4 && cam.traiDat.xa <= 30
+     && cam.traiDat.xa !== 9, `${cam.traiDat.xa}`);
   ok('ngước quá đầu không lộn ngược: góc ngẩng kẹp trong ±85°', Math.abs(cam.traiDat.pitch) <= 85);
   T._vuTru(true);
   ok('bật cảnh vũ trụ từ bầu trời, rồi đóng màn thì về lại bầu trời', T._vuTru() === true && (T.dong(), T._vuTru() === false));
@@ -485,10 +495,28 @@ console.log('\n— To nhỏ: đúng tỉ lệ ở đâu, nén ở đâu, và nó
 {
   const V = global.TDTD_VUTRU;
   /* Đường kính NASA (Planetary Fact Sheet, Sun Fact Sheet), chép lại để đối chiếu */
-  const NASA = { troi: 1391400, moc: 142984, tho: 120536, dat: 12756, kim: 12104, hoa: 6792, thuy: 4879, trang: 3475 };
+  /* Đường kính: NASA Planetary Fact Sheet, Sun Fact Sheet, Pluto Fact Sheet; Ceres, Ganymede, Titan theo bán kính
+     trung bình của JPL (469,7; 2631,2; 2574,7 km) */
+  const NASA = { troi: 1391400, moc: 142984, tho: 120536, thien: 51118, hai: 49528, dat: 12756, kim: 12104, hoa: 6792,
+                 gany: 5262, titan: 5149, thuy: 4879, trang: 3475, diem: 2376, ceres: 939 };
+  /* khối chữ + hàng nút ở đáy đo trên Chromium 375×812 là 214px — đưa đúng số đó vào, khỏi đo theo số đoán 290 */
+  { const cvG = { measureText: () => ({ width: 40 }) }, ctxG = new Proxy(cvG, { get: (o, k2) => k2 in o ? o[k2] : (k2 === 'createRadialGradient' || k2 === 'createLinearGradient') ? () => ({ addColorStop() {} }) : () => {}, set: () => true });
+    V.ve(ctxG, 375, 812, 2, DEM, { ten: 'TP.HCM', vi: 10.8231, kinh: 106.6297 }, 214); }
+  V._cam().kichThuoc.w = 0;                                   // tính cỡ lại từ đầu cho 375×812
   const ds = V._boKichThuoc(375, 812), dat = ds.find(b => b.ma === 'dat');
   const sai = ds.filter(b => Math.abs(b.r / dat.r - NASA[b.ma] / NASA.dat) > 1e-9).map(b => b.ten);
-  ok('cảnh So kích thước: mọi bán kính đúng tỉ lệ đường kính thật của NASA', ds.length === 8 && !sai.length, sai.join(', '));
+  ok('cảnh So kích thước: đủ 14 vật thể (Mặt Trời, 8 hành tinh, 2 hành tinh lùn, 3 mặt trăng), bán kính đúng tỉ lệ đường kính thật',
+     ds.length === 14 && Object.keys(NASA).every(m => ds.some(b => b.ma === m)) && !sai.length, sai.join(', ') || `${ds.length} vật thể`);
+  const yCua = (m) => ds.find(b => b.ma === m).y;
+  ok('Thiên Vương, Hải Vương đứng giữa Sao Thổ và Trái Đất (to thứ ba, thứ tư)',
+     yCua('tho') < yCua('thien') && yCua('thien') === yCua('hai') && yCua('hai') < yCua('dat'));
+  const thuTu = ['dat', 'kim', 'hoa', 'gany', 'titan', 'thuy', 'trang', 'diem', 'ceres'];
+  ok('hàng vật thể nhỏ xếp từ to tới nhỏ: Trái Đất … Ceres', thuTu.every((m, i) => !i || NASA[m] < NASA[thuTu[i - 1]])
+     && thuTu.every((m, i) => !i || yCua(m) >= yCua(thuTu[i - 1])));
+  ok('màn 375×812: cả khối vừa khoảng trống trên khối chữ ở đáy (không phải kéo mới thấy Ceres)',
+     yCua('ceres') + 56 <= 812 - 214, `đáy ở ${Math.round(yCua('ceres') + 56)}`);
+  ok('không quả cầu nào tràn ra ngoài bề ngang', ds.filter(b => b.ma !== 'troi').every(b => b.x - b.r * (b.ma === 'tho' ? 2.27 : 1) > 0
+     && b.x + b.r * (b.ma === 'tho' ? 2.27 : 1) < 375));
   ok('Mặt Trời rộng gấp 109 lần Trái Đất, Sao Mộc 11,2 lần, Mặt Trăng 0,27 lần',
      Math.abs(V._soTD('troi') - 109.08) < .05 && Math.abs(V._soTD('moc') - 11.21) < .01 && Math.abs(V._soTD('trang') - .2724) < .001);
   const moc = ds.find(b => b.ma === 'moc'), tho = ds.find(b => b.ma === 'tho'), troi = ds.find(b => b.ma === 'troi');
@@ -496,8 +524,8 @@ console.log('\n— To nhỏ: đúng tỉ lệ ở đâu, nén ở đâu, và nó
      troi.y + troi.r < moc.y - moc.r && moc.y + moc.r < tho.y - tho.r && tho.y + tho.r < dat.y);
   ok('mặc định Sao Mộc và cả vành Sao Thổ (2,27 lần bán kính) nằm gọn trong bề ngang màn',
      2 * moc.r < 375 && 2 * tho.r * 2.27 < 375);
-  const co = ['troi', 'moc', 'tho', 'dat', 'kim', 'hoa', 'thuy'].map(V._coNen);
-  ok('cảnh Hệ Mặt Trời: cỡ nén theo căn bậc ba nhưng thứ tự to nhỏ đúng (Mặt Trời > Mộc > Thổ > Đất > Kim > Hoả > Thuỷ)',
+  const co = ['troi', 'moc', 'tho', 'thien', 'hai', 'dat', 'kim', 'hoa', 'thuy'].map(V._coNen);
+  ok('cảnh Hệ Mặt Trời: cỡ nén theo căn bậc ba nhưng thứ tự to nhỏ đúng (Mặt Trời > Mộc > Thổ > Thiên Vương > Hải Vương > Đất > Kim > Hoả > Thuỷ)',
      co.every((c, i) => i === 0 || c < co[i - 1]), co.map(c => c.toFixed(1)).join(' > '));
   ok('Sao Mộc vẽ to hơn Trái Đất hẳn (bản đầu: chỉ 1,6 lần)', V._coNen('moc') / V._coNen('dat') > 2);
 
@@ -589,6 +617,167 @@ console.log('\n— "Sáng rồi Trăng không chịu lặn", "khuya mà Trăng k
   ok('thẻ Mặt Trăng sáng 8/10: còn trên trời, ghi giờ lặn chiều nay, và nói vì sao', /lặn lúc 15:5\d/.test(the) &&
      /sáng rồi vẫn chưa lặn/.test(the) && /mọc trễ hơn chừng 50 phút/.test(the), the.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 260));
   T._chon(null);
+}
+
+console.log('\n— Hệ Mặt Trời đủ tám hành tinh: vừa màn, Mặt Trời không che Sao Thuỷ, chạm ra thông tin —');
+{
+  /* Người dùng hỏi "hệ mặt trời đầy đủ chưa hay thiếu": bản trước dừng ở Sao Thổ (sáu hành tinh). */
+  const V = global.TDTD_VUTRU, A = global.TDTD_ASTRO, noi = { ten: 'TP.HCM', vi: 10.8231, kinh: 106.6297 };
+  const cv = { measureText: () => ({ width: 40 }) };
+  const ctxGia = new Proxy(cv, { get: (o, k2) => k2 in o ? o[k2] : (k2 === 'createRadialGradient' || k2 === 'createLinearGradient') ? () => ({ addColorStop() {} }) : () => {}, set: () => true });
+  ok('cảnh Hệ Mặt Trời vẽ đủ tám hành tinh, từ Sao Thuỷ tới Hải Vương', V._HANH.join() === 'thuy,kim,dat,hoa,moc,tho,thien,hai', V._HANH.join());
+  ok('bảng quỹ đạo có Thiên Vương, Hải Vương', A.TEN_HANH_TINH.includes('thien') && A.TEN_HANH_TINH.includes('hai'));
+  const nen2 = (q) => { const r = Math.hypot(q.x, q.y, q.z), k = V._nenKC(r) / r; return { x: q.x * k, y: q.y * k, z: q.z * k }; };
+  V.vao();
+  while (V.canh() !== 'heMatTroi') V.doiCanh();
+  const cam = V._cam().heMatTroi, goc = { ...cam };
+  /* Mọi quỹ đạo, kể cả Hải Vương, nằm gọn trong khoảng trống giữa nút đóng và khối chữ ở đáy — trên ba cỡ màn */
+  const JD = A.ngayJulius(DEM), tran = [];
+  for (const [w, h] of [[320, 568], [375, 812], [430, 932], [1280, 800]]) {
+    for (let i = 0; i < 40; i++) V.ve(ctxGia, w, h, 2, DEM, noi, 290);      // để tâm dọc trượt tới chỗ
+    for (const ma of V._HANH) for (const q of A.quyDao(ma, JD, 72)) {
+      const p = V._chieu(nen2(q));
+      if (!p || p.x < 4 || p.x > w - 4 || p.y < 50 || p.y > h - 290) { tran.push(`${w}×${h} ${ma}`); break; }
+    }
+  }
+  ok('quỹ đạo Hải Vương và cả tám quỹ đạo nằm gọn trong màn, không đè lên khối chữ ở đáy (4 cỡ màn)', !tran.length, [...new Set(tran)].join(', '));
+  /* Mặt Trời đo bằng cùng đơn vị với khoảng cách: lúc nào cũng nằm trong chỗ gần nhất của quỹ đạo Sao Thuỷ */
+  ok('Mặt Trời nhỏ hơn chỗ gần nhất của quỹ đạo Sao Thuỷ (0,307 đvtv), ở mọi độ phóng', V._coNen('troi') < V._nenKC(.3075) * .8,
+     `${V._coNen('troi').toFixed(2)} so với ${V._nenKC(.3075).toFixed(2)}`);
+  const hong = [];
+  for (const xa of [6, 30, 60]) {
+    Object.assign(cam, { xa, pitch: 85 });
+    V.ve(ctxGia, 375, 812, 2, DEM, noi, 290);
+    const d = V._diemCham(), troi = d.find(x => x.ma === 'troi'), thuy = d.find(x => x.ma === 'thuy');
+    if (!troi || !thuy || Math.hypot(thuy.x - troi.x, thuy.y - troi.y) < troi.rv + thuy.rv) hong.push(xa);
+  }
+  ok('nhìn từ trên xuống, phóng gần hay lùi xa thì Mặt Trời cũng không che Sao Thuỷ (bản trước: lùi xa là che)', !hong.length, hong.join(', '));
+  Object.assign(cam, goc);
+  /* Chạm: trúng Sao Mộc thì chữ dưới đáy thành thông tin Sao Mộc; chạm chỗ trống thì bỏ chọn */
+  let kq = V.ve(ctxGia, 375, 812, 2, DEM, noi, 290);
+  const moc = V._diemCham().find(x => x.ma === 'moc');
+  ok('chạm trúng Sao Mộc là chọn nó', moc && V.cham(moc.x, moc.y) === true && V._chon() === 'moc');
+  kq = V.ve(ctxGia, 375, 812, 2, DEM, noi, 290);
+  const chu = V.giaiThich(kq, noi);
+  ok('chữ dưới đáy thành thông tin Sao Mộc: cách Mặt Trời bao xa lúc này, to gấp mấy, một vòng bao lâu',
+     /Sao Mộc · hành tinh khí khổng lồ/.test(chu) && /cách Mặt Trời 5,\d+ đơn vị thiên văn/.test(chu) && /Rộng gấp 11 lần/.test(chu) && /11,9 năm/.test(chu), chu.replace(/<[^>]+>/g, ' ').slice(0, 160));
+  ok('chạm chỗ trống thì bỏ chọn, chữ về như cũ', V.cham(3, 3) === true && V._chon() === null && !/Chạm chỗ trống để bỏ chọn/.test(V.giaiThich(V.ve(ctxGia, 375, 812, 2, DEM, noi, 290), noi)));
+  const hai = V._thongTinHT('hai', JD).dong.join(' ');
+  ok('thông tin Hải Vương: cách Mặt Trời chừng 30 đơn vị thiên văn, nắng đi hơn 4 giờ mới tới, một vòng 164,8 năm (chu kỳ so với sao)',
+     /cách Mặt Trời 29,\d+|cách Mặt Trời 30,\d+/.test(hai) && /4,\d giờ/.test(hai) && /164,8 năm/.test(hai), hai.slice(0, 160));
+  ok('đang tua sang năm khác thì ghi "Ngày …", không ghi "Lúc này"', /^Ngày 19\/3\/2043 cách Mặt Trời/.test(V._thongTinHT('hoa', A.ngayJulius(Date.UTC(2043, 2, 19)), new Date(Date.UTC(2043, 2, 19, 5))).dong[0]));
+  ok('nhỏ hơn Trái Đất thì nói "chỉ bằng", không nói "gấp 0,38 lần"', /Rộng chỉ bằng 0,38 lần Trái Đất/.test(V._thongTinHT('thuy', JD).dong[1]) && /— chỉ bằng 0,07 lần Trái Đất/.test(V._thongTinKT('ceres').dong[0]));
+  /* Dòng chữ nói cả Sao Kim lẫn Sao Thuỷ (bản trước tính Sao Thuỷ xong rồi bỏ) */
+  const chu0 = V.giaiThich(V.ve(ctxGia, 375, 812, 2, DEM, noi, 290), noi);
+  const dong2 = (chu0.match(/<p class="td-dong2">([\s\S]*?)<\/p>/) || [, ''])[1];
+  ok('dòng chữ cảnh Hệ Mặt Trời nói cả Sao Kim lẫn Sao Thuỷ', /Sao Kim (cách|đang)/.test(dong2) && /Sao Thuỷ (cách|đang)/.test(dong2), dong2.replace(/<[^>]+>/g, ' '));
+  /* 24/10/2026: Sao Kim đi ngang giữa Trái Đất và Mặt Trời. Bản trước ghi "thấy lúc rạng sáng (Sao Mai)" ở 0°. */
+  const giao = V._homMai(A.ngayJulius(Date.UTC(2026, 9, 24, 12))).find(h => h.ma === 'kim');
+  ok('lúc Sao Kim ở giữa Trái Đất và Mặt Trời (24/10/2026) thì báo "chìm trong nắng, không thấy được"',
+     !giao.thay && giao.truoc && /ở giữa Trái Đất và Mặt Trời .* chìm trong nắng, không thấy được/.test(V._cauHomMai(giao)), V._cauHomMai(giao));
+  /* 6/1/2026: Sao Kim ở phía bên kia Mặt Trời (giao hội trên); Sao Thuỷ cách Mặt Trời chừng 9°, dưới ngưỡng 14° */
+  const hm6 = V._homMai(A.ngayJulius(Date.UTC(2026, 0, 6, 12))), kim6 = hm6.find(h => h.ma === 'kim'), thuy6 = hm6.find(h => h.ma === 'thuy');
+  ok('giao hội trên (6/1/2026): Sao Kim "ở phía bên kia Mặt Trời", không thấy được', !kim6.thay && !kim6.truoc && /phía bên kia Mặt Trời/.test(V._cauHomMai(kim6)), V._cauHomMai(kim6));
+  ok('Sao Thuỷ dưới 14° cũng báo chìm trong nắng (6/1/2026)', !thuy6.thay && thuy6.goc < 14 && /chìm trong nắng/.test(V._cauHomMai(thuy6)), V._cauHomMai(thuy6));
+  ok('góc ghi trên màn là góc thật tới Mặt Trời, không phải hiệu kinh độ (24/10: 6–8°, không phải 0–1°)', giao.goc > 5 && giao.goc < 9, giao.goc.toFixed(1) + '°');
+  const hom = V._homMai(A.ngayJulius(Date.UTC(2026, 9, 14, 12))).find(h => h.ma === 'kim');
+  ok('14/10/2026 Sao Kim cách Mặt Trời 16–17° phía Đông: vẫn là Sao Hôm', hom.thay && hom.lech > 0 && Math.abs(hom.goc - 16.6) < 1.2 && /Sao Hôm/.test(V._cauHomMai(hom)), hom.goc.toFixed(1) + '°');
+  ok('tua ở cảnh Hệ Mặt Trời có thêm mức 100 ngày mỗi giây (Hải Vương đi một vòng mất 165 năm)',
+     [V.doiTua(), V.doiTua(), V.doiTua(), V.doiTua()].join(' · ') === '1 ngày mỗi giây · 10 ngày mỗi giây · 100 ngày mỗi giây · Giờ thật');
+  /* Bảng tua cảnh Trái Đất chỉ có 3 mức: đổi cảnh khi đang ở mức thứ tư mà không đặt lại thì mỗi khung ném lỗi */
+  V.doiTua(); V.doiTua(); V.doiTua();
+  let loiTua = null;
+  try { V.doiCanh(); V.doiCanh(); V.ve(ctxGia, 375, 812, 2, DEM, noi, 290); V.tua(); } catch (e) { loiTua = e.message; }
+  ok('đang tua 100 ngày mỗi giây mà đổi cảnh thì tua về giờ thật, không nổ lỗi', loiTua === null && V.tua() === 'Giờ thật', loiTua || V.tua());
+  while (V.canh() !== 'heMatTroi') V.doiCanh();
+  /* Khối chữ ở đáy cao bao nhiêu thì cả hệ dời theo bấy nhiêu (nightsky.js đo rồi đưa vào) */
+  for (let i = 0; i < 60; i++) V.ve(ctxGia, 375, 812, 2, DEM, noi, 200);
+  const cy200 = V._CY();
+  for (let i = 0; i < 60; i++) V.ve(ctxGia, 375, 812, 2, DEM, noi, 360);
+  ok('khối chữ đáy cao lên 160px thì tâm cảnh Hệ Mặt Trời lùi lên chừng 80px', Math.abs((cy200 - V._CY()) - 80) < 3, `${Math.round(cy200)} → ${Math.round(V._CY())}`);
+  /* So kích thước: chạm một quả cầu ra đường kính thật */
+  V.doiCanh();
+  kq = V.ve(ctxGia, 375, 812, 2, DEM, noi, 214);
+  for (let i = 0; i < 60; i++) V.ve(ctxGia, 375, 812, 2, DEM, noi, 214);
+  const dsK = V._boKichThuoc(375, 812), mocK = dsK.find(b => b.ma === 'moc');
+  V.cham(mocK.x, mocK.y + mocK.r + 16);                        // chạm vào chữ "Sao Mộc" ngay dưới Sao Mộc
+  ok('chạm vào chữ "Sao Mộc" không ra Sao Thổ (vùng chạm Sao Thổ là elip ôm vành, không phải hình tròn to)', V._chon() !== 'tho', String(V._chon()));
+  V._chon(null);
+  const thoK = dsK.find(b => b.ma === 'tho');
+  ok('chạm vào mép vành Sao Thổ thì ra Sao Thổ', V.cham(thoK.x + thoK.r * 2.1, thoK.y) && V._chon() === 'tho');
+  V._chon(null);
+  const ceres = V._diemCham().find(x => x.ma === 'ceres');
+  V.cham(ceres.x, ceres.y);
+  const kt = V.giaiThich(V.ve(ctxGia, 375, 812, 2, DEM, noi, 290), noi);
+  ok('cảnh So kích thước: chạm Ceres ra "hành tinh lùn", đường kính 939 km', /Ceres · hành tinh lùn/.test(kt) && /939 km/.test(kt), kt.replace(/<[^>]+>/g, ' ').slice(0, 120));
+  V._chon(null);
+  /* Màn thấp: không ép mọi thứ về tí hon; giữ cỡ tối thiểu, phần còn lại kéo lên mà xem, và có dòng nhắc */
+  const coMan = [];
+  for (const [w, h, d] of [[375, 812, 214], [430, 932, 214], [375, 667, 214], [360, 640, 230], [320, 568, 270]]) {
+    for (let i = 0; i < 60; i++) V.ve(ctxGia, w, h, 2, DEM, noi, d);
+    const dd = V._boKichThuoc(w, h), datK = dd.find(b => b.ma === 'dat');
+    coMan.push({ w, h, r: datK.r, tran: V._tranKT() });
+  }
+  ok('màn nào Trái Đất cũng không nhỏ dưới 2,5 điểm ảnh (bản trước: 0,5 ở 375×667)', coMan.every(m => m.r >= 2.49), coMan.map(m => `${m.w}×${m.h} ${m.r.toFixed(1)}`).join(', '));
+  ok('màn cao thì vừa hết, màn thấp thì nhắc "kéo lên để xem tiếp"', !coMan[0].tran && !coMan[1].tran && coMan[4].tran, coMan.map(m => `${m.w}×${m.h} ${m.tran ? 'tràn' : 'vừa'}`).join(', '));
+  for (let i = 0; i < 80; i++) V.ve(ctxGia, 375, 812, 2, DEM, noi, 214);              // để cỡ trượt tới chỗ, đứng yên
+  const k1 = V._cam().kichThuoc.k;
+  V.ve(ctxGia, 812, 375, 2, DEM, noi, 214); const k2 = V._cam().kichThuoc.k;     // cùng khối chữ đáy, chỉ đổi cỡ màn
+  ok('xoay máy (đổi cỡ màn) thì tính lại cỡ', k1 !== k2, `${k1.toFixed(2)} → ${k2.toFixed(2)}`);
+  V.doiCanh();
+  ok('đổi cảnh thì bỏ chọn', V._chon() === null);
+  /* Cảnh Trái Đất gọi tên tuần trăng giống hệt bầu trời (bản trước: bên theo % sáng, bên theo tuổi trăng) */
+  const lech = [];
+  for (let h = 0; h < 24 * 30; h += 7) {
+    const luc = DEM + h * 36e5, c = V._canhTD(A.ngayJulius(luc), noi);
+    const chuTD = V.giaiThich({ canh: 'traiDat', luc, sang: c.sang, tuoi: c.tuoi, kc: c.kc, ngay: true }, noi);
+    if (!chuTD.includes(T._tenTrang(T._bauTroi(luc).trang.tuoi))) lech.push(h);
+  }
+  ok('cảnh Trái Đất và bầu trời cùng một tên tuần trăng, suốt một tháng', !lech.length, `${lech.length} giờ lệch`);
+}
+
+console.log('\n— Bầu trời: Mặt Trăng tại chỗ đứng, hành tinh cùng hệ với sao —');
+{
+  /* JPL Horizons, TP.HCM (106,6297°E, 10,8231°N), 17/10/2026, độ cao không tính khúc xạ. Bản trước tính Trăng
+     từ tâm Trái Đất: cao hơn thật 0,6–0,75°. */
+  const H = [[12, 41.902244], [13, 32.146582], [14, 20.871177], [15, 8.749620]];
+  let lechMax = 0;
+  for (const [gio, cao] of H) lechMax = Math.max(lechMax, Math.abs(T._bauTroi(Date.UTC(2026, 9, 17, gio)).trang.cao - cao));
+  ok('Mặt Trăng đã trừ thị sai chỗ đứng: độ cao khớp JPL Horizons trong 0,25° (bản trước lệch tới 0,75°)', lechMax < .25, lechMax.toFixed(2) + '°');
+  const nguon = require('fs').readFileSync(require('path').join(__dirname, '..', 'assets', 'nightsky.js'), 'utf8');
+  /* Dòng trạng thái Trăng (đang trên trời / chưa mọc / đã lặn) phải khớp giờ mọc lặn in ngay bên cạnh, từng phút
+     suốt ngày — kể cả hôm Trăng ở gần nhất (17/5/2026, thị sai lớn nhất). Ngưỡng đặt cứng thì quanh lúc mọc lặn hai
+     thứ cãi nhau. Cho lệch trong 1 phút quanh mốc (giờ mọc lặn chỉ in tới phút). */
+  const caiNhau = [];
+  for (const [ten, vi, kinh, ngay] of [['TP.HCM', 10.8231, 106.6297, '2026-10-12'], ['Hà Nội', 21.0285, 105.8542, '2026-05-17']]) {
+    T._noi(vi, kinh, ten);
+    const dau = Date.parse(`${ngay}T00:00:00+07:00`), ml = A.mocLan(dau, vi, kinh, 'trang'), mlMai = A.mocLan(dau + 864e5, vi, kinh, 'trang');
+    for (let ms = dau; ms < dau + 864e5; ms += 30000) {
+      const b = T._bauTroi(ms), t = A.trangThaiMocLan(b.trang.cao, ml, mlMai, ms, b.trang.nguong).tinh;
+      const gan = [ml.moc, ml.lan].some(m => m !== null && Math.abs(ms - m) < 60000);
+      const tren = ml.moc !== null && ml.lan !== null ? (ml.moc < ml.lan ? ms >= ml.moc && ms < ml.lan : ms >= ml.moc || ms < ml.lan)
+        : ml.lan !== null ? ms < ml.lan : ml.moc !== null ? ms >= ml.moc : b.trang.cao > 0;
+      if (!gan && (t === 'tren') !== tren) caiNhau.push(`${ten} ${new Date(ms).toTimeString().slice(0, 5)}`);
+    }
+  }
+  T._noi(10.8231, 106.6297, 'TP.HCM');
+  ok('trạng thái Trăng khớp giờ mọc lặn từng nửa phút, cả hôm Trăng gần nhất', !caiNhau.length, caiNhau.slice(0, 4).join(', '));
+  /* 14/9/2026, TP.HCM: Mặt Trăng che Sao Kim. Theo JPL Horizons (tại chỗ, không khúc xạ): 11:40 UT còn cách 0,63°;
+     12:48 UT đã lọt vào trong đĩa (cách 0,15°), Trăng cao 2,7°; 13:12 UT Trăng đã xuống −2,8°. Công thức Mặt Trăng
+     của app sai chừng 0,1–0,3°, ngang bán kính đĩa, nên app chỉ được nói "bị che, hoặc ngay sát mép". */
+  const cau = (h, m) => T._cauGap(Date.UTC(2026, 8, 14, h, m));
+  ok('11:40 UT, Sao Kim còn cách Mặt Trăng 0,6°: báo "đang sát", không báo bị che', /Sao Kim đang sát Mặt Trăng, cách 0,[67]°/.test(cau(11, 40)), cau(11, 40));
+  ok('12:48 UT, Sao Kim đã nấp sau đĩa trăng: báo "đang bị Mặt Trăng che, hoặc ngay sát mép"', /Sao Kim đang bị Mặt Trăng che, hoặc ngay sát mép/.test(cau(12, 48)), cau(12, 48));
+  /* 12:36 UT: Horizons cách 0,24° — vừa lọt vào đĩa — mà app tính ra hơn bán kính (sai số Mặt Trăng): vẫn phải
+     báo "bị che, hoặc ngay sát mép", không được bảo "đang sát, cách 0,3°" */
+  ok('12:36 UT, vừa bị che (app tính hơi xa vì sai số Trăng): vẫn báo "bị che, hoặc ngay sát mép"', /Sao Kim đang bị Mặt Trăng che, hoặc ngay sát mép/.test(cau(12, 36)), cau(12, 36));
+  /* 13:05 UT: Trăng đã lặn (app ghi "đã lặn lúc 20:02"), Sao Kim sát chân trời −1,2° — trên −2° nên bản trước vẫn báo */
+  ok('13:05 UT, Trăng đã lặn: thôi báo (bản trước: vừa ghi "đã lặn" vừa ghi "đang nấp sau Mặt Trăng")', !/Sao Kim/.test(cau(13, 5)) && !/Sao Kim/.test(cau(13, 12)), cau(13, 5));
+  ok('không nói "không hành tinh nào trên trời" (Thiên Vương, Hải Vương vẫn có thể đang ở trên)',
+     !/'Không hành tinh nào trên trời lúc này'/.test(nguon) && /nhìn được bằng mắt thường/.test(nguon));
+  const css = require('fs').readFileSync(require('path').join(__dirname, '..', 'assets', 'app.css'), 'utf8');
+  ok('khối chữ đáy đứng trên hàng nút theo chiều cao đo được, hàng nút xuống dòng chứ không bóp chữ trong nút',
+     /\.td-tin\{[^}]*var\(--thanh/.test(css) && /\.td-thanh\{[^}]*flex-wrap:wrap/.test(css) && /\.td-thanh button\{[^}]*white-space:nowrap/.test(css));
 }
 
 console.log('\n— Dự báo mưa theo chỗ đang đứng: mở bầu trời là lấy lại vị trí —');

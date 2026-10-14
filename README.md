@@ -960,7 +960,7 @@ Chưa. Soát lại với số liệu của NASA ([Planetary Fact Sheet](https://
 | Hệ Mặt Trời | **sai, không nói ra**: cỡ đặt tay, Sao Mộc chỉ gấp 1,6 lần Trái Đất (thật 11,2), Mặt Trời 1,6 lần (thật 109) | nén căn bậc hai — có ghi |
 | Bầu trời | Mặt Trăng, Mặt Trời vẽ to hơn thật chừng 15 lần — **không nói ra** | — |
 
-Một hình không thể vừa đúng to nhỏ vừa đúng khoảng cách (Trái Đất chỉ bằng 1/11.700 bề rộng quỹ đạo của nó). Nên:
+Một hình không thể vừa đúng to nhỏ vừa đúng khoảng cách (Trái Đất chỉ bằng chừng 1/23.500 bề rộng quỹ đạo của nó — bản đầu ghi 1/11.700, nhầm bán kính với bề rộng). Nên:
 
 - **Cảnh mới "So kích thước"** (bấm nút đổi cảnh lần thứ hai): Mặt Trời, sáu hành tinh và Mặt Trăng đặt cạnh nhau, **cùng một tỉ lệ** theo đường kính NASA. Mặt Trời to tới mức chỉ thấy một cung ở trên cùng; Sao Thổ có cả vành, đúng cỡ theo bảng vành (vành B từ 1,526, vành A tới 2,270 lần bán kính, có khe Cassini); dưới mỗi cái ghi "gấp mấy lần Trái Đất". Kéo lên xuống, chụm để phóng.
 - **Hệ Mặt Trời**: cỡ nén theo căn bậc ba của đường kính thật — một quy tắc cho tất cả, kể cả Mặt Trời — nên thứ tự to nhỏ đúng (Mặt Trời > Mộc > Thổ > Đất > Kim > Hoả > Thuỷ), Mặt Trời vẫn nằm gọn trong quỹ đạo Sao Thuỷ; dòng chữ nói rõ cách nén và chỉ sang cảnh So kích thước.
@@ -969,6 +969,24 @@ Một hình không thể vừa đúng to nhỏ vừa đúng khoảng cách (Trá
 Lúc thêm cỡ mới, tên Trái Đất bị mất hẳn: Mặt Trời to ra chiếm chỗ, sáu chỗ thử ghi tên đều vướng. Giờ chỗ thử tỏa xa dần theo tám hướng, dời xa thì kẻ vạch nối, và riêng tên Trái Đất không bao giờ bị bỏ.
 
 `scripts/test-troidem.js` thêm 8 bài: mọi bán kính ở cảnh So kích thước đúng tỉ lệ đường kính NASA; xếp dọc không chồng; thứ tự to nhỏ ở Hệ Mặt Trời; thẻ Mặt Trăng ghi đúng "to gấp N lần", phóng to thì N nhỏ lại.
+
+### "Hệ Mặt Trời đầy đủ chưa hay thiếu"
+
+Thiếu. Cảnh "Hệ Mặt Trời" và "So kích thước" chỉ có 6/8 hành tinh — dừng ở Sao Thổ, không có Thiên Vương, Hải Vương — mà trên màn không nói gì; bảng quỹ đạo trong `astro.js` cũng bỏ hai hàng đó dù bảng JPL có sẵn. Bốn người soát độc lập (độ đầy đủ, số liệu, chữ trên màn, code và test), mỗi phát hiện có một người kiểm chứng lại; 43 phát hiện đứng vững. Số liệu đang có thì đúng: bảng quỹ đạo khớp JPL 72/72 số, đường kính khớp NASA. Làm xong lại cho bốn người soát độc lập đọc bản sửa (thiên văn, chạy trên màn, chữ và số liệu, bài kiểm): 32 phát hiện đứng vững, đã sửa — các ý bên dưới là bản sau cùng. Đã làm:
+
+- **Đủ tám hành tinh.** Thêm Thiên Vương, Hải Vương (bảng 1 của JPL, 1800–2050) vào `astro.js` và cảnh Hệ Mặt Trời. Nén căn bậc hai cũ làm quỹ đạo Hải Vương tràn hai mép điện thoại, nên khoảng cách giờ nén theo luỹ thừa 0,4 (Hải Vương xa gấp 78 lần Sao Thuỷ, vẽ thành 5,7). Cả hệ đặt vào khoảng trống thật giữa nút đóng và khối chữ ở đáy (nightsky.js đo rồi đưa vào), vừa trên 4 cỡ màn đã thử.
+- **Vành đai tiểu hành tinh** giữa Sao Hoả và Sao Mộc (2,06–3,28 đvtv, hai khe Kirkwood): 700 chấm, mỗi chấm đi đúng tốc độ quỹ đạo ở khoảng cách của nó — bấm Tua là thấy vành trong quay nhanh hơn vành ngoài. Tua có thêm mức 100 ngày mỗi giây (Hải Vương đi một vòng mất 165 năm, ở mức này chừng mười phút). Quá năm 2050 — hết bảng 1 của JPL — `astro.js` tự đổi sang bảng 2a + 2b (3000 TCN – 3000), nên tua đi được hết vòng Hải Vương; đối chiếu Horizons năm 2390, bảng dài hạn lệch 0,14–0,18°, còn cứ kéo dài bảng 1 ra thì lệch tới 1,1°. Quá năm 3000 thì quay về hôm nay.
+- **Mặt Trời co giãn theo khi phóng.** Bản trước vẽ Mặt Trời một cỡ cố định bằng điểm ảnh, thu nhỏ là nó che hết quỹ đạo Sao Thuỷ. Giờ mọi cỡ đo bằng cùng đơn vị với khoảng cách; Mặt Trời luôn nằm trong chỗ gần nhất của quỹ đạo Sao Thuỷ. Mặt Trời cũng được xếp theo độ xa như hành tinh, hết cảnh hành tinh phía sau đè lên đĩa của nó.
+- **So kích thước: 14 quả cầu.** Thêm Thiên Vương, Hải Vương, hai hành tinh lùn (Diêm Vương, Ceres) và hai mặt trăng to hơn cả Sao Thuỷ (Ganymede của Sao Mộc, Titan của Sao Thổ). Cỡ cả khối tính để vừa khoảng trống trên khối chữ; màn thấp quá (iPhone SE) thì giữ cỡ tối thiểu — Trái Đất không dưới 2,5 điểm ảnh — phần dưới mờ dần và có dòng "kéo lên để xem tiếp". Xoay máy thì tính lại cỡ.
+- **Chạm một hành tinh để xem thông tin.** Ở cảnh Hệ Mặt Trời: lúc này (hay đúng ngày đang tua tới) cách Mặt Trời bao xa (đvtv, triệu km, nắng đi mất bao lâu), cách Trái Đất bao xa, to gấp mấy (nhỏ hơn thì "chỉ bằng"), một vòng quanh Mặt Trời (chu kỳ so với sao — Hải Vương 164,8 năm), một ngày dài bao lâu, nhiệt độ trung bình (fact sheet của NASA). Ở So kích thước: đường kính thật và cùng các số đó. Vật đang chọn có vòng sáng, quỹ đạo sáng lên; chạm chỗ trống để bỏ chọn. Vùng chạm Sao Thổ là elip ôm vành (hình tròn thì trùm cả chữ "Sao Mộc"); hành tinh đang nấp sau Mặt Trời thì không chạm trúng.
+- **Sao Hôm / Sao Mai nói đúng lúc thấy, lúc không.** Bản trước không xét chuyện đứng quá sát Mặt Trời: quanh 24/10/2026 Sao Kim ở giữa Trái Đất và Mặt Trời mà app vẫn ghi "thấy lúc rạng sáng" ở 0°. Giờ ghi góc thật tới Mặt Trời; dưới 10° (Sao Kim) hay 14° (Sao Thuỷ) thì báo "chìm trong nắng, không thấy được", kèm đang ở giữa Trái Đất và Mặt Trời hay ở phía bên kia. Dòng Sao Thuỷ (tính xong mà bị bỏ) giờ hiện cùng Sao Kim.
+- **Mặt Trăng trên bầu trời trừ thị sai chỗ đứng** (Meeus chương 40). Bản trước tính từ tâm Trái Đất nên Trăng luôn cao hơn thật — tới gần 1° lúc sát chân trời. `thiSai` khớp Horizons tới 0,3 giây cung khi cùng đầu vào; phần lệch còn lại là sai số của chính công thức Mặt Trăng rút gọn: trung bình 0,1°, có lúc tới 0,3° — ngang bán kính đĩa trăng. Vì thế câu báo hành tinh sát Mặt Trăng không tách "bị che" với "sát mép" nữa: trong phạm vi bán kính + 0,2° nó nói "đang bị Mặt Trăng che, hoặc ngay sát mép" (đúng vụ che Sao Kim 14/9/2026 theo Horizons), và Trăng đã lặn thì thôi báo. Ngưỡng mọc lặn tính theo thị sai từng lúc, nên dòng trạng thái khớp giờ mọc lặn in bên cạnh.
+- **Hành tinh cùng hệ toạ độ với sao.** Bảng JPL cho toạ độ J2000, còn Mặt Trời, Mặt Trăng, sao thì theo ngày đang xem; để nguyên thì hành tinh lệch 0,37° so với sao nền. Giờ đổi sang xích đạo J2000 rồi tính tuế sai về ngày đó: đối chiếu Horizons ngày 14/10/2026, bảy hành tinh lệch 0,1–1,6 phút cung, riêng Sao Thổ 4,6′ (trong sai số bảng JPL).
+- Chữ dưới đáy không còn bị hàng nút đè (hàng nút xuống dòng, khối chữ đặt theo chiều cao đo được, cảnh Hệ Mặt Trời dời và co giãn êm theo); hai cảnh gọi tên tuần trăng chung một cách (`astro.js tenTrang`); "Không hành tinh nào trên trời" thành "không hành tinh nào nhìn được bằng mắt thường"; sửa bài kiểm phóng to (từ khi có cảnh thứ ba nó không kiểm gì) và bài chạm chọn (nó chạm vào Sao Thổ ngoài mép màn, chỉ đỗ nhờ đúng cái lỗi lệch 0,37°). Hai tệp test đặt cứng múi giờ Việt Nam.
+
+Còn lại, chấp nhận: lúc Sao Kim đi giữa Trái Đất và Mặt Trời (chừng 25 ngày mỗi 19 tháng), hai quả cầu Kim – Đất chạm nhau trên sơ đồ — cỡ đã phóng to theo căn bậc ba mà khoảng cách thì nén mạnh; thu nhỏ hành tinh tới mức hết chạm thì chúng chỉ còn hai điểm ảnh.
+
+Bầu trời đêm vẫn chỉ vẽ năm hành tinh mắt thường thấy — đó là chủ ý. `scripts/test-astro.js` từ 73 lên 80 bài, `scripts/test-troidem.js` từ 117 lên 157 bài: đối chiếu Horizons (bảy hành tinh, năm 2120 và 2390, thị sai ở TP.HCM và Hà Nội, vụ che Sao Kim 14/9/2026), trạng thái Trăng khớp giờ mọc lặn từng nửa phút, vừa màn ở 4 cỡ, cỡ tối thiểu ở 5 cỡ, Mặt Trời không che Sao Thuỷ ở mọi độ phóng, chạm chọn, Sao Kim lúc giao hội dưới và trên, đổi cảnh khi đang tua… Thử phá code ở 20 chỗ, bài kiểm bắt cả 20.
 
 ### Hiệu ứng toàn cảnh
 
@@ -1681,7 +1699,7 @@ scripts/test-astro.js      73 kiểm thử thiên văn, đối chiếu số li�
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
 scripts/test-troidem.js    117 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
-assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
+assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng, Hệ Mặt Trời (8 hành tinh), So kích thước; phép chiếu tự viết
 assets/toancanh.js         hiệu ứng toàn cảnh: hành trình từ chỗ bạn đứng ra tới chấm xanh mờ, tia chiếu tự viết
 assets/traidat/            ba ảnh Trái Đất của NASA: đất 4096×2048, mây 2048×1024, đèn đêm 3600×1800, sinh bởi scripts/lam-traidat.py
 scripts/lam-traidat.py     thu nhỏ ảnh Visible Earth của NASA thành assets/traidat/

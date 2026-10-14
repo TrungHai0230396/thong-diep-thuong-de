@@ -1,15 +1,17 @@
 /* Thiên văn thuần: đưa vào một mốc thời gian và một chỗ đứng trên Trái Đất, trả về
-   Mặt Trời, Mặt Trăng và năm hành tinh đang ở đâu trên bầu trời chỗ đó.
+   Mặt Trời, Mặt Trăng và tám hành tinh đang ở đâu trên bầu trời chỗ đó (bầu trời đêm chỉ vẽ năm
+   hành tinh mắt thường thấy; cảnh Hệ Mặt Trời vẽ đủ tám).
 
    Không mạng, không thư viện, không bảng tra sẵn — tính bằng công thức.
 
    Nguồn công thức:
    - Mặt Trời và Mặt Trăng: Jean Meeus, "Astronomical Algorithms" (ấn bản 2, 1998),
-     chương 25 và 47, lấy các số hạng lớn nhất. Sai số Mặt Trời chừng 0,01 độ,
-     Mặt Trăng chừng 0,1 độ — nhỏ hơn bề rộng của chính Mặt Trăng trên trời (0,5 độ).
+     chương 25 và 47, lấy các số hạng lớn nhất. Sai số Mặt Trời chừng 0,01 độ, Mặt Trăng
+     trung bình 0,1 độ, có lúc tới 0,3 độ (đối chiếu JPL Horizons 2026–2044) — tức có lúc
+     ngang bán kính của chính Mặt Trăng trên trời (0,25 độ).
    - Hành tinh: bảng phần tử Kepler của JPL, "Approximate Positions of the Planets",
-     https://ssd.jpl.nasa.gov/planets/approx_pos.html — bảng cho khoảng 1800–2050,
-     sai số vài phút cung với hành tinh trong, đủ để chỉ đúng chỗ trên trời.
+     https://ssd.jpl.nasa.gov/planets/approx_pos.html — bảng 1 cho 1800–2050 (sai số vài
+     phút cung), ngoài khoảng đó dùng bảng 2a + 2b (3000 TCN – 3000) cho lúc tua nhanh.
    - Giờ sao và phép đổi sang độ cao/phương vị: công thức chuẩn, xem Meeus chương 12–13.
 
    Mọi góc vào ra đều tính bằng **độ**, trừ chỗ nào ghi rõ khác. */
@@ -102,7 +104,39 @@ const BANG = {
           34.39644051, 3034.74612775, 14.72847983, 0.21252668, 100.47390909, 0.20469106],
   tho:   [9.53667594, -0.00125060, 0.05386179, -0.00050991,  2.48599187,  0.00193609,
           49.95424423, 1222.49362201, 92.59887831, -0.41897216, 113.66242448, -0.28867794],
+  /* Thiên Vương, Hải Vương: hai hàng cuối của cùng bảng 1 (1800–2050). Bản trước bỏ hai hàng này nên
+     cảnh "Hệ Mặt Trời" dừng ở Sao Thổ — người dùng hỏi "hệ mặt trời đầy đủ chưa hay thiếu". */
+  thien: [19.18916464, -0.00196176, 0.04725744, -0.00004397,  0.77263783, -0.00242939,
+          313.23810451, 428.48202785, 170.95427630, 0.40805281, 74.01692503, 0.04240589],
+  hai:   [30.06992276,  0.00026291, 0.00859048,  0.00005105,  1.77004347,  0.00035372,
+          -55.12002969, 218.45945325, 44.96476227, -0.32241464, 131.78422574, -0.00508664],
 };
+
+/* Bảng 2a (3000 TCN – 3000), cùng thứ tự cột với BANG, và bảng 2b: các số hạng b, c, s, f phải cộng thêm vào
+   dị thường trung bình M của Sao Mộc tới Hải Vương. Chỉ dùng khi ngày đang xem ra ngoài 1800–2050 — tức lúc tua
+   nhanh ở cảnh Hệ Mặt Trời: tua 100 ngày mỗi giây thì tám mươi giây là quá năm 2050, mà bản trước tới đó là quay
+   về hôm nay, nên không bao giờ xem hết một vòng Sao Thổ, Thiên Vương hay Hải Vương. */
+const BANG2 = {
+  thuy:  [0.38709843,  0.00000000, 0.20563661,  0.00002123,  7.00559432, -0.00590158,
+          252.25166724, 149472.67486623, 77.45771895, 0.15940013, 48.33961819, -0.12214182],
+  kim:   [0.72332102, -0.00000026, 0.00676399, -0.00005107,  3.39777545,  0.00043494,
+          181.97970850, 58517.81560260, 131.76755713, 0.05679648, 76.67261496, -0.27274174],
+  dat:   [1.00000018, -0.00000003, 0.01673163, -0.00003661, -0.00054346, -0.01337178,
+          100.46691572, 35999.37306329, 102.93005885, 0.31795260, -5.11260389, -0.24123856],
+  hoa:   [1.52371243,  0.00000097, 0.09336511,  0.00009149,  1.85181869, -0.00724757,
+          -4.56813164, 19140.29934243, -23.91744784, 0.45223625, 49.71320984, -0.26852431],
+  moc:   [5.20248019, -0.00002864, 0.04853590,  0.00018026,  1.29861416, -0.00322699,
+          34.33479152, 3034.90371757, 14.27495244, 0.18199196, 100.29282654, 0.13024619],
+  tho:   [9.54149883, -0.00003065, 0.05550825, -0.00032044,  2.49424102,  0.00451969,
+          50.07571329, 1222.11494724, 92.86136063, 0.54179478, 113.63998702, -0.25015002],
+  thien: [19.18797948, -0.00020455, 0.04685740, -0.00001550,  0.77298127, -0.00180155,
+          314.20276625, 428.49512595, 172.43404441, 0.09266985, 73.96250215, 0.05739699],
+  hai:   [30.06952752,  0.00006447, 0.00895439,  0.00000818,  1.77005520,  0.00022400,
+          304.22289287, 218.46515314, 46.68158724, 0.01009938, 131.78635853, -0.00606302],
+};
+const THEM2 = { moc: [-0.00012452, 0.06064060, -0.35635438, 38.35125000], tho: [0.00025899, -0.13434469, 0.87320147, 38.35125000],
+                thien: [0.00058331, -0.97731848, 0.17689245, 7.67025000], hai: [-0.00041348, 0.68346318, -0.10162547, 7.67025000] };
+const bangCho = (T) => (T < -2 || T > .5 ? BANG2 : BANG);   // T: thế kỷ Julius kể từ 2000; bảng 1 cho 1800–2050
 
 /* Giải phương trình Kepler bằng Newton, như JPL mô tả: lặp tới khi chênh dưới 1e-6 độ. */
 function keplerE(M, e) {
@@ -118,11 +152,12 @@ function keplerE(M, e) {
 
 /* Toạ độ hoàng đạo nhật tâm của một hành tinh, đơn vị thiên văn. */
 function nhatTam(ten, T) {
-  const b = BANG[ten];
+  const B = bangCho(T), b = B[ten];
   const a = b[0] + b[1] * T, e = b[2] + b[3] * T, I = b[4] + b[5] * T;
   const L = b[6] + b[7] * T, vp = b[8] + b[9] * T, On = b[10] + b[11] * T;
   const w = vp - On;                                   // đối số cận nhật
-  const M = quanh(L - vp);
+  const t2 = B === BANG2 && THEM2[ten];
+  const M = quanh(L - vp + (t2 ? t2[0] * T * T + t2[1] * cos(t2[3] * T) + t2[2] * sin(t2[3] * T) : 0));
   const E = keplerE(M, e);
   return xoayQuyDao(a * (cos(E) - e), a * Math.sqrt(1 - e * e) * sin(E), w, On, I);
 }
@@ -139,7 +174,7 @@ function xoayQuyDao(x, y, w, On, I) {
 /* Cho mô hình Hệ Mặt Trời: vị trí nhật tâm lúc JD, và cả vòng quỹ đạo (n điểm đều theo dị thường lệch tâm). */
 const nhatTamJD = (ten, JD) => nhatTam(ten, (JD - 2451545.0) / 36525);
 function quyDao(ten, JD, n = 120) {
-  const T = (JD - 2451545.0) / 36525, b = BANG[ten];
+  const T = (JD - 2451545.0) / 36525, b = bangCho(T)[ten];
   const a = b[0] + b[1] * T, e = b[2] + b[3] * T, I = b[4] + b[5] * T, vp = b[8] + b[9] * T, On = b[10] + b[11] * T;
   const ds = [];
   for (let k = 0; k < n; k++) {
@@ -149,21 +184,45 @@ function quyDao(ten, JD, n = 120) {
   return ds;
 }
 
+/* Bảng JPL cho toạ độ theo hoàng đạo và xuân phân J2000. Còn Mặt Trời, Mặt Trăng (công thức Meeus ở
+   trên) và sao (đã tính tuế sai) thì theo xuân phân CỦA NGÀY đang xem. Bản trước để nguyên hành tinh ở
+   J2000 nên lệch đúng một lượng tuế sai — 0,37° năm 2026 — so với sao nền, Mặt Trời và Mặt Trăng: phóng
+   to là thấy hành tinh đứng sai chỗ giữa các sao, và góc Trăng–hành tinh lệch theo. Giờ đổi sang xích đạo
+   J2000 (độ nghiêng của năm 2000) rồi tính tuế sai về ngày đó, y như sao; kinh độ hoàng đạo thì cộng tuế
+   sai theo kinh độ (5029″ mỗi thế kỷ) để so được với kinh độ Mặt Trời. */
+const EPS_J2000 = 23.4392911;
 function hanhTinh(ten, JD) {
   const T = (JD - 2451545.0) / 36525;
   const p = nhatTam(ten, T), e = nhatTam('dat', T);
   const x = p.x - e.x, y = p.y - e.y, z = p.z - e.z;   // đổi sang nhìn từ Trái Đất
   const kc = Math.hypot(x, y, z);
-  const kinh = chuan(Math.atan2(y, x) / RAD);
+  const kinh2000 = Math.atan2(y, x) / RAD;
   const vi = Math.asin(z / kc) / RAD;
-  const { ra, dec } = sangXichDao(kinh, vi, nghieng(JD - 2451545.0));
-  return { ra, dec, kinh, vi, kc };
+  const q = sangXichDao(kinh2000, vi, EPS_J2000);
+  const { ra, dec } = tueSai(q.ra, q.dec, JD);
+  return { ra, dec, kinh: chuan(kinh2000 + 1.396971 * T), vi, kc, kcTroi: Math.hypot(p.x, p.y, p.z) };
 }
 
 /* ---------- từ bầu trời xuống chỗ mình đứng ---------- */
 
 /* Giờ sao Greenwich, tính bằng độ. */
 const gioSao = (JD) => chuan(280.46061837 + 360.98564736629 * (JD - 2451545.0));
+
+/* Thị sai chỗ đứng, Meeus chương 40. Mặt Trăng chỉ cách 60 lần bán kính Trái Đất, nên đứng trên mặt đất
+   nhìn nó lệch đi so với nhìn từ tâm Trái Đất — tới gần 1° lúc nó sát chân trời (gấp đôi bề rộng của chính
+   Mặt Trăng), gần 0 lúc nó ở đỉnh đầu. Bản trước vẽ Trăng theo toạ độ tính từ tâm Trái Đất nên luôn cao hơn
+   thật, và câu "đang nấp sau Mặt Trăng" hiện sai giờ. kcKm: khoảng cách tới tâm Trái Đất, km. Bỏ độ cao so
+   với mặt biển. Đối chiếu JPL Horizons: cùng đầu vào thì ra khớp tới 0,3 giây cung. */
+function thiSai(ra, dec, kcKm, viDo, kinhDo, JD) {
+  const u = Math.atan(0.99664719 * Math.tan(viDo * RAD));
+  const rs = 0.99664719 * Math.sin(u), rc = Math.cos(u);   // ρ·sin φ′ và ρ·cos φ′ (Trái Đất hơi dẹt)
+  const sp = 6378.14 / kcKm;                                // sin của thị sai chân trời
+  const H = gioSao(JD) + kinhDo - ra;
+  const mau = cos(dec) - rc * sp * cos(H);
+  const dRa = Math.atan2(-rc * sp * sin(H), mau);
+  const dec2 = Math.atan2((sin(dec) - rs * sp) * Math.cos(dRa), mau);
+  return { ra: chuan(ra + dRa / RAD), dec: dec2 / RAD };
+}
 
 /* Đưa một điểm trên thiên cầu về độ cao so với chân trời và phương vị tính từ hướng Bắc. */
 function docCao(ra, dec, viDo, kinhDo, JD) {
@@ -205,6 +264,10 @@ function timNguong(hamViTri, nguong, msDauNgay, viDo, kinhDo, len) {
    - Mặt Trăng +0,125 độ: Trăng ở gần nên có thị sai chân trời chừng 0,95 độ, trừ đi khúc xạ
      0,57 và bán kính đĩa 0,26 thì còn dương — nên Trăng mọc muộn hơn là chỉ tính khúc xạ. */
 const NGUONG = { troi: -0.833, trang: 0.125 };
+/* Cùng mốc mọc lặn đó, nhưng so với độ cao ĐÃ trừ thị sai (thiSai): 0,125 trừ đi thị sai chân trời. Thị sai đổi
+   theo khoảng cách (0,90° lúc Trăng xa nhất tới 1,02° lúc gần nhất), nên ngưỡng tính theo kc chứ không đặt cứng
+   — đặt cứng thì quanh lúc mọc, lặn, dòng chữ trạng thái cãi giờ mọc lặn in ngay bên cạnh. */
+const nguongTrangTaiCho = (kcKm) => NGUONG.trang - Math.asin(6378.14 / kcKm) / RAD;
 function mocLan(msDauNgay, viDo, kinhDo, thienThe) {
   const trang = thienThe === 'trang';
   const f = (JD) => (trang ? matTrang(JD) : matTroi(JD));
@@ -287,6 +350,20 @@ function trangThaiMocLan(cao, ml, mlMai, luc, nguong = 0) {
   return { tinh: 'khongRo' };
 }
 
+/* Tên tuần trăng theo tuổi trăng (ngày kể từ mùng một). Đặt ở đây cho cả bầu trời lẫn cảnh nhìn từ vũ trụ
+   cùng dùng: bản trước mỗi bên một cách gọi (bên theo tuổi trăng, bên theo phần trăm đĩa sáng), nên cùng
+   một lúc bên này ghi "lưỡi liềm", bên kia ghi "khuyết". */
+function tenTrang(tuoi) {
+  if (tuoi < 1.5 || tuoi > 28.0) return 'trăng non';
+  if (tuoi < 6.5) return 'trăng lưỡi liềm đầu tháng';
+  if (tuoi < 8.5) return 'trăng thượng huyền';
+  if (tuoi < 13.5) return 'trăng khuyết đầu tháng';
+  if (tuoi < 16.5) return 'trăng tròn';
+  if (tuoi < 21.5) return 'trăng khuyết cuối tháng';
+  if (tuoi < 23.5) return 'trăng hạ huyền';
+  return 'trăng lưỡi liềm cuối tháng';
+}
+
 /* Trời tối tới mức nào: theo độ cao Mặt Trời dưới chân trời.
    Mốc chạng vạng là quy ước thiên văn chuẩn: -6 dân dụng, -12 hàng hải, -18 thiên văn. */
 function doToi(caoMatTroi) {
@@ -355,7 +432,7 @@ function giaiSao(du, dem) {
   return { ra, dec, v, bv };
 }
 
-const API = { ngayJulius, matTroi, matTrang, hanhTinh, docCao, gioSao, khucXa,
+const API = { ngayJulius, matTroi, matTrang, hanhTinh, docCao, gioSao, khucXa, thiSai, tenTrang, nguongTrangTaiCho,
               mocLan, NGUONG, trangThaiMocLan, huongMay, vecHuong, gocHuong, doToi, timNguong, chuan, quanh, TEN_HANH_TINH: Object.keys(BANG),
               tueSai, tuThienHa, CUC_THIEN_HA, khoiKhi, nhietDoSao, mauSao, giaiSao, nhatTamJD, quyDao, nghieng };
 

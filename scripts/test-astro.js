@@ -5,6 +5,7 @@
    - ngày giờ trăng non và trăng tròn năm 2026: lunaf.com, giờ UTC
    - vị trí hành tinh: đối chiếu chéo bằng những tính chất phải đúng về mặt hình học
      (Sao Kim không bao giờ rời xa Mặt Trời quá 47 độ, Sao Thuỷ quá 28 độ...) */
+process.env.TZ = 'Asia/Ho_Chi_Minh';                   // mốc giờ trong tệp theo giờ Việt Nam, máy đặt múi nào cũng vậy
 const A = require('../assets/astro.js');
 
 let pass = 0, fail = 0;
@@ -144,6 +145,54 @@ console.log('\n— Mấy tính chất hình học buộc phải đúng —');
      `${Math.min(...kcT).toFixed(4)}–${Math.max(...kcT).toFixed(4)}`);
   ok('gần Mặt Trời nhất vào đầu tháng Giêng', kcT.indexOf(Math.min(...kcT)) < 10,
      `ngày thứ ${kcT.indexOf(Math.min(...kcT)) + 1}`);
+}
+
+console.log('\n— Đủ tám hành tinh, đúng chỗ so với JPL Horizons —');
+{
+  /* Toạ độ biểu kiến theo xuân phân của ngày (JPL Horizons, tâm Trái Đất, 14/10/2026 12:00 UT). Sai số bảng
+     JPL vài phút cung; bản trước để hành tinh ở hệ J2000 nên lệch thêm 0,37° — đúng một lượng tuế sai. */
+  /* Ngưỡng: 3′ cho hành tinh trong và Mộc; 10′ cho Thổ, Thiên Vương, Hải Vương — sai số bảng JPL với hành tinh
+     ngoài lớn hơn (bảng "Accuracy" trên trang JPL). */
+  const HZ = { kim: [211.07016, -20.61420, 3], thuy: [222.64888, -19.54435, 3], hoa: [132.15027, 19.12130, 3], moc: [144.45039, 14.81769, 3],
+               tho: [10.73578, 1.67100, 10], thien: [63.33256, 21.02172, 10], hai: [2.85641, -0.30900, 10] };
+  const lechCua = (JD, bang) => {
+    const ra = [];
+    for (const [ma, [r, d, nguong]] of Object.entries(bang)) {
+      const p = A.hanhTinh(ma, JD), x = Math.hypot(A.quanh(p.ra - r) * Math.cos(d * Math.PI / 180), p.dec - d) * 60;
+      ra.push(`${ma} ${x.toFixed(1)}′${x > nguong ? ' QUÁ' : ''}`);
+    }
+    return ra;
+  };
+  const l26 = lechCua(A.ngayJulius(Date.UTC(2026, 9, 14, 12)), HZ);
+  ok('cả bảy hành tinh nằm đúng chỗ so với JPL Horizons (14/10/2026)', !l26.some(x => x.includes('QUÁ')), l26.join(', '));
+  /* Tua quá năm 2050 thì dùng bảng 2a + 2b (3000 TCN – 3000). Horizons, 1/6/2120 0h UT. */
+  const l2120 = lechCua(A.ngayJulius(Date.UTC(2120, 5, 1)), { tho: [80.96205, 21.98312, 25], thien: [105.60398, 23.03939, 10], hai: [207.18071, -9.31745, 10] });
+  ok('năm 2120 (bảng dài hạn của JPL): Thổ, Thiên Vương, Hải Vương vẫn đúng chỗ', !l2120.some(x => x.includes('QUÁ')), l2120.join(', '));
+  /* Năm 2390 (Horizons, tâm khối từng hệ hành tinh): bảng dài hạn lệch 0,14–0,18°; cứ kéo dài bảng 1 ra thì lệch
+     0,44° (Mộc, Thiên Vương) tới 1,1° (Thổ) — mốc này tách được hai cách. */
+  const l2390 = lechCua(A.ngayJulius(Date.UTC(2390, 0, 1)), { moc: [344.69769, -7.71263, 15], tho: [153.73522, 12.23293, 15], thien: [193.55440, -5.02742, 15] });
+  ok('năm 2390: Mộc, Thổ, Thiên Vương lệch Horizons dưới 15 phút cung (phải dùng bảng dài hạn mới được)', !l2390.some(x => x.includes('QUÁ')), l2390.join(', '));
+  const JD0 = 2451545 + .5 * 36525, nhay = [];
+  for (const ma of ['thuy', 'kim', 'hoa', 'moc', 'tho', 'thien', 'hai']) {
+    const a = A.hanhTinh(ma, JD0 - 1e-4), b = A.hanhTinh(ma, JD0 + 1e-4);
+    nhay.push(Math.hypot(A.quanh(a.ra - b.ra) * Math.cos(a.dec * Math.PI / 180), a.dec - b.dec) * 60);
+  }
+  ok('đổi bảng ở năm 2050 không làm hành tinh nhảy quá 10 phút cung', Math.max(...nhay) < 10, Math.max(...nhay).toFixed(1) + '′');
+  /* Thị sai chỗ đứng: cùng toạ độ tâm Trái Đất của Horizons (17/10/2026 12h UT) thì phải ra đúng toạ độ tại chỗ
+     của Horizons, ở TP.HCM và ở Hà Nội (vĩ độ cao hơn thì số hạng ρ·sin φ′ mới lộ). */
+  const kcTrang = 0.00270387613019 * 149597870.7, JDt = A.ngayJulius(Date.UTC(2026, 9, 17, 12)), tsai = [];
+  for (const [ten, vi, kinh, ra, dec] of [['TP.HCM', 10.8231, 106.6297, 282.211340084, -27.157846414], ['Hà Nội', 21.0285, 105.8542, 282.247764729, -27.280989280]]) {
+    const t = A.thiSai(282.714211065, -26.657622312, kcTrang, vi, kinh, JDt);
+    tsai.push(Math.hypot(A.quanh(t.ra - ra) * Math.cos(dec * Math.PI / 180), t.dec - dec) * 3600);
+  }
+  ok('thị sai chỗ đứng khớp JPL Horizons dưới 2 giây cung ở TP.HCM và Hà Nội', tsai.every(x => x < 2), tsai.map(x => x.toFixed(2) + '″').join(', '));
+  const kc = { thien: [17.2, 21.1], hai: [28.7, 31.4] }, xau = [];
+  for (const ten of Object.keys(kc)) for (let d = 0; d < 365 * 3; d += 9) {
+    const p = A.hanhTinh(ten, A.ngayJulius(Date.UTC(2024, 0, 1) + d * 86400000));
+    if (p.kc < kc[ten][0] || p.kc > kc[ten][1]) xau.push(`${ten} ${p.kc.toFixed(1)}`);
+  }
+  ok('Thiên Vương cách Trái Đất 17–21, Hải Vương 29–31 đơn vị thiên văn', !xau.length, xau.slice(0, 3).join(', '));
+  ok('tên tuần trăng có một chỗ chung cho cả bầu trời lẫn cảnh vũ trụ', A.tenTrang(15) === 'trăng tròn' && A.tenTrang(7.5) === 'trăng thượng huyền');
 }
 
 console.log('\n— Độ cao và phương vị —');

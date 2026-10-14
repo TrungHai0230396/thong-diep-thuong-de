@@ -36,17 +36,8 @@ const HANH_TINH = [
 
 const TAM_HUONG = ['Bắc', 'Đông Bắc', 'Đông', 'Đông Nam', 'Nam', 'Tây Nam', 'Tây', 'Tây Bắc'];
 
-/* Tên gọi tuần trăng theo tuổi trăng, tính bằng ngày kể từ mùng một. */
-function tenTrang(tuoi, sang) {
-  if (tuoi < 1.5 || tuoi > 28.0) return 'trăng non';
-  if (tuoi < 6.5) return 'trăng lưỡi liềm đầu tháng';
-  if (tuoi < 8.5) return 'trăng thượng huyền';
-  if (tuoi < 13.5) return 'trăng khuyết đầu tháng';
-  if (tuoi < 16.5) return 'trăng tròn';
-  if (tuoi < 21.5) return 'trăng khuyết cuối tháng';
-  if (tuoi < 23.5) return 'trăng hạ huyền';
-  return 'trăng lưỡi liềm cuối tháng';
-}
+/* Tên gọi tuần trăng theo tuổi trăng — dùng chung với cảnh nhìn từ vũ trụ (assets/astro.js tenTrang). */
+const tenTrang = (tuoi) => A().tenTrang(tuoi);
 
 /* Vì sao có hôm sáng bảnh mắt Trăng vẫn chưa lặn, có hôm khuya lại chẳng thấy Trăng đâu.
    Người dùng hỏi đúng hai câu đó và ngờ app tính sai — đối chiếu JPL Horizons thì giờ mọc lặn của
@@ -154,7 +145,10 @@ function bauTroi(luc) {
   const dat = (o) => A().docCao(o.ra, o.dec, noi.vi, noi.kinh, JD);
 
   const t = A().matTroi(JD), vtTroi = dat(t);
-  const tr = A().matTrang(JD), vtTrang = dat(tr);
+  /* Mặt Trăng: trừ thị sai chỗ đứng (astro.js thiSai) — nó gần tới mức nhìn từ mặt đất lệch tới gần 1° (lúc
+     sát chân trời) so với nhìn từ tâm Trái Đất. Mặt Trời, hành tinh ở xa, thị sai dưới 0,01°, bỏ qua. */
+  const tr = A().matTrang(JD), vtTrang = dat(A().thiSai(tr.ra, tr.dec, tr.kc, noi.vi, noi.kinh, JD));
+  const nguongTrang = A().nguongTrangTaiCho(tr.kc);
   const toi = A().doToi(vtTroi.cao);
 
   const ht = HANH_TINH.map(([ma, ten, mau, sang]) => {
@@ -171,14 +165,17 @@ function bauTroi(luc) {
 
   /* Có hôm Mặt Trăng đi ngang sát một hành tinh. Lúc đó hành tinh nấp sau đĩa trăng nên
      nhìn màn hình chẳng thấy gì — phải nói ra thì mới biết mà ngước lên xem.
-     Đúng hôm viết chỗ này, 14/9/2026, Mặt Trăng che Sao Kim thật, và máy tính ra 0,48 độ. */
+     Ngày 14/9/2026 Mặt Trăng che Sao Kim thật. Bản đầu tính Trăng từ tâm Trái Đất (lệch tới gần 1°) và
+     báo "nấp" khi còn cách 0,6°, gấp đôi bán kính đĩa trăng. Công thức Mặt Trăng còn sai chừng 0,1–0,3°, ngang
+     bán kính đĩa, nên app KHÔNG tách được "đang bị che" với "sát mép": gộp làm một câu cho trung thực.
+     Chỉ báo khi cả hai còn trên chân trời — Trăng đã lặn mà vẫn ghi "đang nấp sau Mặt Trăng" thì vô nghĩa. */
   const gapTrang = ht
-    .filter(p => p.cao > -2)
+    .filter(p => p.cao > -0.6 && vtTrang.cao > nguongTrang)
     .map(p => ({ ten: p.ten, cach: gocGiua(p.cao, p.huong, vtTrang.cao, vtTrang.huong) }))
     .filter(g => g.cach < 3)
     .sort((a, b) => a.cach - b.cach);
 
-  return { JD, troi: { ...t, ...vtTroi }, trang: { ...tr, ...vtTrang }, toi, ht, chom, gapTrang };
+  return { JD, troi: { ...t, ...vtTroi }, trang: { ...tr, ...vtTrang, nguong: nguongTrang }, toi, ht, chom, gapTrang, banKinhTrang: tr.gocNhin / 2 };
 }
 
 /* ---------- sao thật và Ngân Hà ----------
@@ -782,6 +779,13 @@ function veChom(b, ro, coSaoThat, duoi) {
 
 /* ---------- dòng chữ dưới đáy ---------- */
 
+/* Câu báo hành tinh đang sát hay bị Mặt Trăng che (xem gapTrang trong bauTroi). Sai số của Mặt Trăng ngang bán
+   kính đĩa trăng, nên trong phạm vi bán kính + 0,2° chỉ nói "bị che, hoặc ngay sát mép". */
+function cauGapTrang(b) {
+  return b.gapTrang.map(g => g.cach < b.banKinhTrang + .2 ? `${g.ten} đang bị Mặt Trăng che, hoặc ngay sát mép`
+    : `${g.ten} đang sát Mặt Trăng, cách ${so1(g.cach)}°`).join(' · ');
+}
+
 function capNhatChu(b, luc) {
   const gio = new Date(luc).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
   const dau = new Date(luc); dau.setHours(0, 0, 0, 0);
@@ -803,19 +807,17 @@ function capNhatChu(b, luc) {
     <p class="td-dong1">${daChon ? noi.ten : 'Xem tạm ' + noi.ten} · ${gio} · ${b.toi.ten}</p>
     <p class="td-dong2">
       <button class="td-ten" data-xem="Mặt Trời">Mặt Trời</button> ${dangODau(b.troi.cao, b.troi.huong, ml, mlMai, luc, A().NGUONG.troi)}
-      · ${tenTrang(b.trang.tuoi, b.trang.sang)}, sáng ${Math.round(b.trang.sang * 100)}%,
-      <button class="td-ten" data-xem="Mặt Trăng">Mặt Trăng</button> ${dangODau(b.trang.cao, b.trang.huong, mt, mtMai, luc, A().NGUONG.trang)}
+      · ${tenTrang(b.trang.tuoi)}, sáng ${Math.round(b.trang.sang * 100)}%,
+      <button class="td-ten" data-xem="Mặt Trăng">Mặt Trăng</button> ${dangODau(b.trang.cao, b.trang.huong, mt, mtMai, luc, b.trang.nguong)}
     </p>
     <p class="td-dong3">${tren.length ? 'Đang trên trời: ' + tren.join(' · ')
-                                      : 'Không hành tinh nào trên trời lúc này'}</p>
+                                      : 'Lúc này không hành tinh nào nhìn được bằng mắt thường đang ở trên trời'}</p>
     ${dongMua.length ? `<div class="td-mua">
       ${dongMua.map((c, i) => `<p class="${i ? 'td-mua-phu' : 'td-mua-chinh'}">${c}</p>`).join('')}
       <p class="td-mua-nguon"><a href="https://open-meteo.com/" target="_blank" rel="noopener">theo Open-Meteo.com</a></p>
     </div>` : mua.tinh === 'hong' ? `<p class="td-mua-hong">Chưa xin được dự báo mưa — có thể đang mất mạng.</p>`
       : !daChon ? `<p class="td-mua-hong">Bấm Đổi nơi để chọn chỗ bạn ở, app sẽ báo trời có mưa không.</p>` : ''}
-    ${b.gapTrang.length ? `<p class="td-gap">${b.gapTrang.map(g =>
-      g.cach < 0.6 ? `${g.ten} đang nấp ngay sau Mặt Trăng, cách ${so1(g.cach)}°`
-                   : `${g.ten} đang sát Mặt Trăng, cách ${so1(g.cach)}°`).join(' · ')}</p>` : ''}`;
+    ${cauGapTrang(b) ? `<p class="td-gap">${cauGapTrang(b)}</p>` : ''}`;
   /* Chỉ viết lại khi chữ thật sự đổi — thường là mỗi phút một lần, lúc đồng hồ nhảy số. Trước đây
      viết lại MỖI GIÂY, và mỗi lần như thế trình duyệt phải dàn trang, vẽ lại cả khối chữ; trên
      điện thoại đó là một cú khựng nhỏ lặp đều đặn giữa lúc đang kéo bầu trời. */
@@ -984,9 +986,9 @@ function veThe() {
     /* CẨN THẬN đơn vị: kc của Trăng tính bằng KM (~385000), còn kc của Mặt Trời và hành tinh
        tính bằng ĐƠN VỊ THIÊN VĂN. Cùng một tên trường, hai thang lệch nhau 150 triệu lần —
        viết một dòng hiển thị dùng chung cho cả ba là ra ngay một Mặt Trăng cách 385 nghìn tỉ km. */
-    phu = `${tenTrang(v.tuoi, v.sang)}, sáng ${Math.round(v.sang * 100)}% · ` +
+    phu = `${tenTrang(v.tuoi)}, sáng ${Math.round(v.sang * 100)}% · ` +
       dangODau(v.cao, v.huong, mocLanNho(dau.getTime(), 'trang'),
-               mocLanNho(mai.getTime(), 'trang'), luc, A().NGUONG.trang) +
+               mocLanNho(mai.getTime(), 'trang'), luc, v.nguong) +
       ` · cách Trái Đất ${Math.round(v.kc / 1000)} nghìn km, ánh sáng đi hết ${so1(v.kc / 299792.458)} giây` +
       toHonThat(17 * Math.pow(GOC_THUONG / goc, .75), v.gocNhin);
     nhip = nhipTrang(v.tuoi) + ' Mỗi ngày Trăng mọc trễ hơn chừng 50 phút.';
@@ -1052,13 +1054,18 @@ function vong(t) {
   vong.tr = t;
   const luc = Date.now();
   if (vuTru && V()) {
-    const kq = V().ve(ctx, W, H, DPR, luc, noi);
+    const kq = V().ve(ctx, W, H, DPR, luc, noi, duoiVuTru);
     if (!vong.t || luc - vong.t > 1000) {
       vong.t = luc;
       const q = tam.querySelector('.td-tin'), html = V().giaiThich(kq, noi);
       if (q._html !== html) { q._html = html; q.innerHTML = html; }
       const nt = tam.querySelector('.td-tua'), tt = 'Tua: ' + V().tua();
       if (nt.textContent !== tt) nt.textContent = tt;
+      doThanh();
+      /* Cảnh vũ trụ cần biết khối chữ và hàng nút chiếm bao nhiêu ở đáy, để đặt Hệ Mặt Trời vào đúng
+         khoảng trống còn lại thay vì giữa màn (bản trước: quỹ đạo ngoài cùng chạm vào chữ). */
+      const top = tam.getBoundingClientRect().top;
+      duoiVuTru = Math.max(120, H - (Math.min(q.getBoundingClientRect().top, tam.querySelector('.td-thanh').getBoundingClientRect().top) - top) + 8);
     }
     return;
   }
@@ -1067,7 +1074,7 @@ function vong(t) {
   const b = ve(luc);
   veThe.b = b; veThe.luc = luc;
   if (!vong.t || luc - vong.t > 1000) {
-    capNhatChu(b, luc); veThe(); vong.t = luc;
+    capNhatChu(b, luc); veThe(); vong.t = luc; doThanh();
     /* Bám vào nhánh một giây sẵn có: phép so sánh này gần như miễn phí, mà mạng thì chỉ chạm
        tới mười phút một lần. */
     if (daChon && luc - mua.luc > MUA_LAI) xinMua();
@@ -1076,6 +1083,18 @@ function vong(t) {
 
 /* ---------- khung ---------- */
 
+/* Hàng nút ở đáy cao bao nhiêu thì khối chữ phải đứng trên bấy nhiêu. Bản trước đặt cứng khối chữ cách đáy
+   62px, tính cho một hàng nút một dòng — nhưng ở cảnh vũ trụ trên điện thoại, bốn nút không vừa một hàng,
+   chữ trong nút xuống dòng, hàng nút cao gấp đôi và đè lên mấy dòng chữ giải thích. Giờ nút xuống hàng
+   (chữ trong nút thì không), và khối chữ đặt theo chiều cao đo được (biến --thanh trong app.css). */
+let duoiVuTru = 290, caoThanh = 0;
+function doThanh() {
+  const t = tam && tam.querySelector('.td-thanh');
+  if (!t) return;
+  const h = t.offsetHeight;
+  if (h && h !== caoThanh) { caoThanh = h; tam.style.setProperty('--thanh', h + 'px'); }
+}
+
 function doCo() {
   W = tam.clientWidth || innerWidth || 360;
   H = tam.clientHeight || innerHeight || 640;
@@ -1083,6 +1102,7 @@ function doCo() {
   cv.width = W * DPR; cv.height = H * DPR;
   cv.style.width = W + 'px'; cv.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  doThanh();
 }
 
 function dungKhung() {
@@ -1115,7 +1135,7 @@ function dungKhung() {
     const c = V().doiCanh();
     tam.querySelector('.td-canh').textContent = V().tenCanhSau();
     tam.querySelector('.td-tua').hidden = c === 'kichThuoc';          // so kích thước thì không có thời gian để tua
-    vong.t = 0;
+    vong.t = 0; doThanh();
   };
   tam.querySelector('.td-tua').onclick = () => { tam.querySelector('.td-tua').textContent = 'Tua: ' + V().doiTua(); vong.t = 0; };
   tam.querySelector('.td-toancanh').onclick = moToanCanh;
@@ -1160,7 +1180,7 @@ function dungKhung() {
       V().thaKeo();
       if (keo && keo.vu && (keo.xa || 0) < 9 && Date.now() - keo.luc < 450) {   // chạm, không kéo
         const r = cv.getBoundingClientRect();
-        V().cham(e.clientX - r.left, e.clientY - r.top);
+        if (V().cham(e.clientX - r.left, e.clientY - r.top)) vong.t = 0;    // chọn một hành tinh: đổi chữ ngay
       }
       keo = null;
       return;
@@ -1204,6 +1224,7 @@ function doiVuTru(bat = !vuTru) {
   if (bat) { q('.td-canh').textContent = V().tenCanhSau(); q('.td-tua').hidden = V().canh() === 'kichThuoc'; q('.td-tua').textContent = 'Tua: ' + V().tua(); }
   q('.td-tin')._html = null; vong.t = 0;
   tam.classList.toggle('vu-tru', bat);
+  doThanh();
 }
 
 /* Hiệu ứng toàn cảnh (toancanh.js): hành trình nhìn Trái Đất từ quỹ đạo, Mặt Trăng, rồi từ 6 tỉ km — mở đè lên trên.
@@ -1420,6 +1441,7 @@ self.TDTD_TROIDEM = { mo, dong,
   _nhin: (h, c, g) => { huongNhin = h; caoNhin = c; if (g) goc = g; return { huongNhin, caoNhin, goc }; },
   _chieu: (cao, huong) => chieu(cao, huong),
   _tenTrang: tenTrang,
+  _cauGap: (luc) => cauGapTrang(bauTroi(luc)),
   _mocLanNho: (ms, t) => mocLanNho(ms, t),
   _coNhoMocLan: () => khoMocLan.size,
   _xinMua: () => xinMua(),
