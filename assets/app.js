@@ -208,7 +208,7 @@ function taiAnh(blob, ten) {
 function about() {
   openSheet('Giới thiệu', `
     <p>Mỗi ngày, một thông điệp. Mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
-    <p>Ứng dụng không giữ lịch sử: không bộ sưu tập, không nhật ký, không tài khoản. Thông điệp cũ không xem lại được. Mỗi ngày chỉ nhận một lần, ngày mai sẽ có lá khác.</p>
+    <p>Ứng dụng không giữ lịch sử: không bộ sưu tập, không nhật ký, không tài khoản.</p>
     <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>
     ${['daCai', 'mayTinh', 'trongApp'].includes(loaiCai()) ? '' : '<button class="ghost" id="btn-cai-app" style="margin:4px 8px 0 0">Cài app vào điện thoại</button>'}
     <button class="ghost" id="btn-reshuffle" style="margin-top:4px">Xáo lại bộ bài của tôi</button>`);
