@@ -970,6 +970,32 @@ Lúc thêm cỡ mới, tên Trái Đất bị mất hẳn: Mặt Trời to ra ch
 
 `scripts/test-troidem.js` thêm 8 bài: mọi bán kính ở cảnh So kích thước đúng tỉ lệ đường kính NASA; xếp dọc không chồng; thứ tự to nhỏ ở Hệ Mặt Trời; thẻ Mặt Trăng ghi đúng "to gấp N lần", phóng to thì N nhỏ lại.
 
+### Hiệu ứng toàn cảnh
+
+"Mô phỏng hiệu ứng toàn cảnh" — không làm ngôi sao mới mà là **một chức năng nhỏ trong phần Nhìn từ vũ trụ**: nút **Hiệu ứng toàn cảnh** chỉ hiện khi đang ở cảnh vũ trụ, bấm vào thì phủ lên một hành trình khoảng ba phút (`assets/toancanh.js`). Bấm ✕ hoặc phím Esc thì về lại đúng cảnh vũ trụ đang xem, bầu trời chạy tiếp (lúc hành trình mở, vòng vẽ bầu trời bên dưới tạm dừng cho đỡ tốn pin).
+
+Đọc trước khi làm: *hiệu ứng toàn cảnh* (overview effect) là tên Frank White đặt năm 1987 sau khi phỏng vấn phi hành gia — cảm giác kinh ngạc, xúc động khi lần đầu thấy cả Trái Đất từ vũ trụ. Yaden và cộng sự (*Psychology of Consciousness*, 2016) mô tả nó là một dạng kinh ngạc (awe) vượt khỏi bản thân: thấy đẹp, thấy Trái Đất mong manh, thấy mình gắn với mọi người. Stepanova và cộng sự (*Frontiers in Digital Humanities*, 2019) làm thực tế ảo về hiệu ứng này và thấy người xem cần thấy an toàn, thấy nơi quen thuộc của mình, có chút hồi hộp. Nên hành trình bắt đầu **từ chính chỗ bạn đứng** và đi ra xa dần:
+
+1. **Rời mặt đất** — bay thẳng lên từ chỗ bạn, đường chân trời cong dần.
+2. **Trên quỹ đạo** — độ cao 417 km, nghiêng 51,64°, vòng 92,9 phút, 7,67 km/s như Trạm Vũ trụ Quốc tế, tua nhanh 100 lần; đi ngang qua ngày, chạng vạng, đêm có đèn thành phố.
+3. **Lớp áo mỏng** — nhìn sát viền: toàn bộ khí quyển mỏng như lớp vỏ táo.
+4. **Không có biên giới** — lùi ra 9.000 km, thấy cả một mặt địa cầu.
+5. **Từ phía Mặt Trăng** — tới đúng chỗ Mặt Trăng đang ở **lúc này**; Trái Đất nhìn từ đó khuyết đúng bằng phần đang được chiếu sáng, rộng chừng 1,9°.
+6. **Chấm xanh mờ** — lùi tới 6,06 tỉ km, chỗ Voyager 1 chụp tấm *Pale Blue Dot* năm 1990.
+7. **Nhìn lại** — vài dòng kết, nút xem lại.
+
+Cái gì thật, cái gì không — ghi cả trên màn:
+
+- **Thật lúc này:** ngày đêm trên Trái Đất (Mặt Trời theo `astro.js`), vị trí và pha Mặt Trăng, chỗ bạn đứng (nơi đã chọn trong Trời đêm, chưa chọn thì TP.HCM).
+- **Ảnh của NASA** (Visible Earth, dùng tự do), thu nhỏ còn 2048 × 1024 trong `assets/traidat/` (182 + 393 + 57 KB) bằng `scripts/lam-traidat.py`: mặt đất Blue Marble Next Generation tháng 7/2004, mây ghép từ vệ tinh năm 2002 — **không phải mây hôm nay** — và đèn ban đêm Black Marble 2016. Ảnh chỉ tải khi mở hành trình, không nằm trong bộ nhớ đệm cài sẵn.
+- **Quỹ đạo:** số liệu đúng của Trạm Vũ trụ Quốc tế nhưng đặt cho đi ngang qua chỗ bạn — **không phải** vị trí thật của trạm.
+- **Khí quyển:** mật độ giảm theo hàm mũ (thang độ cao 8 km, vỏ 100 km), độ dày tia đi qua tính bằng xấp xỉ Chapman; xanh khi nắng chiếu thẳng, cam đỏ ở dải hoàng hôn. Gần đúng, không phải mô phỏng tán xạ đầy đủ.
+- Không thư viện 3D: mỗi điểm ảnh một tia chiếu tự viết, tô ở nửa độ phân giải rồi phóng lên (ảnh nguồn 20 km mỗi điểm, tô dày hơn cũng không nét hơn). Đo trên máy bàn khoảng 50 khung hình mỗi giây.
+
+Ba chỗ sửa khi tự xem: ở xa, viền Trái Đất lốm đốm như chuỗi hạt vì tia chiếu bắt hụt lớp khí mỏng — giờ xa thì vẽ viền bằng nét liền; từ phía Mặt Trăng, Trái Đất sáng 88% mà biển đen như ban đêm — thêm màu tán xạ của khí quyển phía ban ngày; một lần bấm Esc đóng luôn cả Trời đêm — giờ hành trình nhận phím trước và đánh dấu đã xử lý, Trời đêm thấy vậy thì bỏ qua.
+
+`scripts/test-toancanh.js`, 44 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm.
+
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
 Người dùng báo: *"bấm vô ngôi sao thì ko ra"*. Đây là lỗi tôi tự gây ra và tự đẩy lên mạng.
@@ -1513,19 +1539,23 @@ assets/app.css             giao diện
 data/cards.json            209 lá dùng trong app (49 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
-scripts/test-core.js       38 kiểm thử lõi
-scripts/test-pond.js       43 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
+scripts/test-core.js       39 kiểm thử lõi
+scripts/test-pond.js       48 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
 scripts/test-astro.js      73 kiểm thử thiên văn, đối chiếu số liệu ngoài (có giờ mọc lặn Trăng theo JPL Horizons)
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
 scripts/test-troidem.js    110 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
 assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
+assets/toancanh.js         hiệu ứng toàn cảnh: hành trình từ chỗ bạn đứng ra tới chấm xanh mờ, tia chiếu tự viết
+assets/traidat/            ba ảnh Trái Đất của NASA 2048×1024 (đất, mây, đèn đêm), sinh bởi scripts/lam-traidat.py
+scripts/lam-traidat.py     thu nhỏ ảnh Visible Earth của NASA thành assets/traidat/
+scripts/test-toancanh.js   44 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, nút trong Trời đêm
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-sao.js        107 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
-scripts/test-phatam.js     97 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
+scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
 scripts/mau-am.js          tạo giọng mẫu bằng lệnh `say` của macOS, trộn tiếng ồn
@@ -1556,10 +1586,11 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
-node scripts/test-core.js        # chạy 38 kiểm thử lõi (Node 18+)
-node scripts/test-pond.js        # chạy 43 kiểm thử hồ, gồm một tiếng mô phỏng
+node scripts/test-core.js        # chạy 39 kiểm thử lõi (Node 18+)
+node scripts/test-pond.js        # chạy 48 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 110 kiểm thử bầu trời đêm
+node scripts/test-toancanh.js    # chạy 44 kiểm thử hiệu ứng toàn cảnh
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
@@ -1569,7 +1600,7 @@ node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy c�
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
-node scripts/test-phatam.js      # chạy 182 kiểm thử trò luyện phát âm
+node scripts/test-phatam.js      # chạy 192 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)
 node scripts/test-amvi.js        # chạy 47 phép đo bộ dựng âm vị
 python3 scripts/kiem-tieng-nguoi.py  # đo lại ~700 file tiếng người (cần ffmpeg, numpy); thêm --nghe để máy nghe lại từng từ

@@ -902,6 +902,35 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 @keyframes ng-nhay{0%,100%{opacity:.35}50%{opacity:1}}
 @media (prefers-reduced-motion:reduce){.ng-dp-ten::before{animation:none}}
 
+/* ---------- toàn cảnh: Trái Đất từ quỹ đạo ---------- */
+.toancanh{position:fixed;inset:0;z-index:33;display:none;background:#000;overflow:hidden}   /* trên Trời đêm (30) */
+.toancanh.hien{display:block}
+.tc-cv{position:absolute;inset:0;display:block}
+.tc-phu{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;pointer-events:none;
+  padding:calc(env(safe-area-inset-top,0px) + 60px) 18px calc(env(safe-area-inset-bottom,0px) + 18px)}
+.tc-phu button,.tc-phu details,.tc-phu summary{pointer-events:auto}
+.tc-dau{text-align:center;text-shadow:0 1px 6px #000}
+.tc-ten{margin:0;font-family:"Cormorant Garamond",Georgia,serif;font-size:24px;color:#e9f2ff}
+.tc-cham{display:flex;justify-content:center;gap:6px;margin:8px 0 4px}
+.tc-cham i{width:18px;height:3px;border-radius:2px;background:rgba(255,255,255,.18)}
+.tc-cham i.dang{background:#8ec9ff}
+.tc-so{margin:0;min-height:16px;font-size:12px;color:rgba(220,232,255,.6);font-variant-numeric:tabular-nums}
+.tc-chu{margin-top:auto;max-width:520px;align-self:center;text-align:center;text-shadow:0 1px 8px #000,0 0 2px #000}
+.tc-chu p{margin:0 0 10px;font-size:16px;line-height:1.55;color:rgba(244,246,255,.94);animation:tc-hien 1.2s ease}
+@keyframes tc-hien{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tc-xong{max-width:520px;align-self:center;width:100%;margin:6px 0 0;text-align:center}
+.tc-lai{padding:12px 22px;border-radius:999px;cursor:pointer;font:inherit;font-size:15px;
+  border:1px solid rgba(142,201,255,.5);background:rgba(142,201,255,.12);color:#cfe6ff}
+.tc-nguon{margin:12px 0 0;text-align:left;font-size:12.5px;line-height:1.6;color:rgba(220,232,255,.7);
+  background:rgba(0,0,0,.55);border-radius:12px;padding:8px 12px}
+.tc-nguon summary{cursor:pointer;color:rgba(220,232,255,.85)}
+.tc-nguon p{margin:8px 0 0}
+.tc-nut{display:flex;gap:8px;justify-content:center;margin-top:14px}
+.tc-nut[hidden]{display:none}
+.tc-nut button{padding:10px 18px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px;
+  border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.45);color:rgba(240,244,255,.9)}
+@media (prefers-reduced-motion:reduce){.tc-chu p{animation:none}}
+
 /* ---------- thiền luân xa: dùng lại khung xn-* và nút ng-* của nhạc ngủ ---------- */
 .luanxa{position:fixed;inset:0;z-index:30;display:none;
   background:radial-gradient(120% 80% at 50% 0%,#221a33 0%,#141022 55%,#0b0a14 100%)}

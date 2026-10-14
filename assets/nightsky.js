@@ -1085,6 +1085,7 @@ function dungKhung() {
       <button class="td-vutru" type="button">Nhìn từ vũ trụ</button>
       <button class="td-canh" type="button" hidden>Hệ Mặt Trời</button>
       <button class="td-tua" type="button" hidden>Tua: Giờ thật</button>
+      <button class="td-toancanh" type="button" hidden>Hiệu ứng toàn cảnh</button>
     </div>
     <div class="td-bang" hidden></div>`;
   document.body.appendChild(tam);
@@ -1101,6 +1102,7 @@ function dungKhung() {
     vong.t = 0;
   };
   tam.querySelector('.td-tua').onclick = () => { tam.querySelector('.td-tua').textContent = 'Tua: ' + V().doiTua(); vong.t = 0; };
+  tam.querySelector('.td-toancanh').onclick = moToanCanh;
 
   /* Hai ngón chạm cùng lúc là chụm để phóng to/thu nhỏ: khoảng cách hai ngón đổi bao nhiêu lần thì
      góc nhìn đổi ngược lại bấy nhiêu lần. Đang chụm thì thôi kéo, kẻo bầu trời vừa phóng vừa trượt. */
@@ -1180,11 +1182,21 @@ function doiVuTru(bat = !vuTru) {
   const q = (k) => tam.querySelector(k);
   q('.td-vutru').textContent = bat ? 'Về bầu trời' : 'Nhìn từ vũ trụ';
   q('.td-may').hidden = bat; q('.td-noi').hidden = bat; q('.td-canh').hidden = !bat; q('.td-tua').hidden = !bat;
+  q('.td-toancanh').hidden = !bat || !self.TDTD_TOANCANH;
   q('.td-the').hidden = true;
   q('.td-phong').hidden = bat || Math.abs(GOC_THUONG / goc - 1) < .08;
   if (bat) { q('.td-canh').textContent = V().tenCanhSau(); q('.td-tua').hidden = V().canh() === 'kichThuoc'; q('.td-tua').textContent = 'Tua: ' + V().tua(); }
   q('.td-tin')._html = null; vong.t = 0;
   tam.classList.toggle('vu-tru', bat);
+}
+
+/* Hiệu ứng toàn cảnh (toancanh.js): hành trình nhìn Trái Đất từ quỹ đạo, Mặt Trăng, rồi từ 6 tỉ km — mở đè lên trên.
+   Trong lúc đó dừng vòng vẽ của Trời đêm (hai bên cùng tô từng điểm ảnh thì điện thoại nóng máy); đóng lại thì chạy tiếp. */
+function moToanCanh() {
+  const TC = self.TDTD_TOANCANH;
+  if (!TC) return;
+  if (raf) { cancelAnimationFrame(raf); raf = null; }
+  TC.mo({ khiDong: () => { if (tam && tam.classList.contains('hien') && !raf) raf = requestAnimationFrame(vong); } });
 }
 
 /* Góc nhìn 12°–110°: hẹp nhất cỡ ống nhòm, rộng nhất cỡ mắt người. Lệch khỏi mặc định thì hiện
@@ -1341,6 +1353,7 @@ function mo() {
 }
 
 function dong() {
+  if (self.TDTD_TOANCANH && self.TDTD_TOANCANH.dangMo()) self.TDTD_TOANCANH.dong();
   if (raf) { cancelAnimationFrame(raf); raf = null; }
   if (vuTru && tam) doiVuTru(false);
   theoMay = false; mucMay = null; quanTinh = null;
@@ -1358,7 +1371,7 @@ function dong() {
   document.body.classList.remove('khoa-cuon');
 }
 
-addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
+addEventListener('keydown', e => { if (e.key === 'Escape' && !e.defaultPrevented && tam && tam.classList.contains('hien')) dong(); });
 
 self.TDTD_TROIDEM = { mo, dong,
   _bauTroi: (luc) => bauTroi(luc || Date.now()),
@@ -1372,6 +1385,7 @@ self.TDTD_TROIDEM = { mo, dong,
   _mocLanNho: (ms, t) => mocLanNho(ms, t),
   _coNhoMocLan: () => khoMocLan.size,
   _xinMua: () => xinMua(),
+  _moToanCanh: () => moToanCanh(), _raf: () => raf,
   _capNhatViTri: () => capNhatViTri(), _cachKm: cachKm,
   _noiMay: (v, k) => doiNoi({ ten: 'chỗ bạn đứng', vi: v, kinh: k, tuMay: true }),
   _noiHienTai: () => ({ ...noi }), _muaLuc: () => mua.luc,
