@@ -210,16 +210,9 @@ function about() {
     <p>Mỗi ngày, một thông điệp. Mở ứng dụng, hít một hơi thật sâu, rồi lật lá bài dành cho hôm nay.</p>
     <p>Ứng dụng không giữ lịch sử: không bộ sưu tập, không nhật ký, không tài khoản.</p>
     <p>Nội dung lấy cảm hứng từ bộ sách <em>Đối thoại với Thượng đế</em> của Neale Donald Walsch.</p>
-    ${['daCai', 'mayTinh', 'trongApp'].includes(loaiCai()) ? '' : '<button class="ghost" id="btn-cai-app" style="margin:4px 8px 0 0">Cài app vào điện thoại</button>'}
-    <button class="ghost" id="btn-reshuffle" style="margin-top:4px">Xáo lại bộ bài của tôi</button>`);
+    ${['daCai', 'mayTinh', 'trongApp'].includes(loaiCai()) ? '' : '<button class="ghost" id="btn-cai-app" style="margin-top:4px">Cài app vào điện thoại</button>'}`);
   const nc = $('#btn-cai-app');
   if (nc) nc.onclick = () => moCaiApp();
-  $('#btn-reshuffle').onclick = () => {
-    if (!confirm('Xáo lại bộ bài? Thông điệp hôm nay sẽ đổi sang lá khác.')) return;
-    seed = newSeed();
-    try { localStorage.setItem(SEED_KEY, String(seed)); localStorage.removeItem(DAY_KEY); } catch (e) {}
-    revealed = false; closeSheet(); render(); toast('Đã xáo lại bộ bài');
-  };
 }
 
 /* ---------- cài app lên điện thoại ----------

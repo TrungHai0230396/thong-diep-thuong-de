@@ -36,7 +36,7 @@ Cách chọn lá:
 - Mỗi vòng 209 ngày đi trọn bộ 209 thông điệp, không lá nào lặp trong vòng đó. Sang vòng mới bộ bài xáo lại.
 - Vòng sau được sắp sao cho nửa cuối vòng trước rơi vào nửa sau vòng này, nên hai lần gặp cùng một lá luôn cách nhau ít nhất **106 ngày**. Không bao giờ trùng thông điệp hai hôm liền.
 - Trình duyệt chặn lưu trữ (chế độ ẩn danh) thì hạt giống chỉ sống trong phiên đó. App vẫn chạy, chỉ là mở lại sẽ ra bộ bài khác.
-- Nút **Xáo lại bộ bài của tôi** trong phần giới thiệu sinh hạt giống mới nếu người dùng muốn đổi.
+- Không có nút xáo lại: bản trước có nút **Xáo lại bộ bài của tôi** trong bảng Giới thiệu (sinh hạt giống mới, lá hôm nay đổi sang lá khác); người dùng bảo bỏ.
 
 Ngày tính theo lịch địa phương của máy và đổi lúc 0:00. Nếu app đang mở lúc nửa đêm, lá tự úp lại.
 
