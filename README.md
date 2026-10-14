@@ -1008,7 +1008,17 @@ Thực tế đúng là tên lửa bay ngang nhiều hơn bay lên: muốn ở l�
 
 Nhưng chặng này không mô phỏng tên lửa — máy được nâng thẳng lên, đứng đúng trên đầu bạn. Cảm giác "bay ngang" là do máy quay: nó cúi dần từ 9° xuống 30° đúng lúc chân trời chúc xuống (5,6° ở 30 km, 20,2° ở 417 km). Hai cái bù nhau, chân trời đứng yên trên màn, chỉ có mặt đất trôi xuống — đúng hình ảnh khi bay tới. Giờ máy quay giữ nguyên góc cúi 10° suốt chặng: chân trời từ trên giữa màn 4,4° tụt xuống dưới giữa màn 10,2°, cong dần, mặt đất co về phía dưới. Người dùng chọn giữ cách bay thẳng lên cho dễ hình dung; lời dẫn thêm một dòng về đường bay thật của Soyuz. Lời dẫn mỗi lúc chỉ hiện hai dòng mới nhất, vì bốn dòng chồng lên nhau che mất Trái Đất trên màn điện thoại.
 
-`scripts/test-toancanh.js`, 63 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm; máy quay chặng đầu giữ nguyên góc, chỉ đi lên, chân trời tụt từ trên xuống dưới giữa màn; cỡ ba ảnh trong app (đọc từ tệp JPEG); vẽ bằng card đồ hoạ cùng công thức với bản bộ xử lý, có mipmap, lọc dị hướng, xử lý kinh tuyến 180°, tự giảm tải; ảnh chi tiết: tâm làm tròn 1 độ, trưa chỉ xin ảnh ngày, nửa đêm chỉ xin ảnh đèn, chạng vạng cả hai, bỏ qua sát kinh tuyến 180°, địa chỉ đúng chuẩn WMS 1.3.0, kho riêng giữ qua các lần deploy.
+#### "Độ cao chỗ này không tăng lên à, hay bay ngang?"
+
+Bay ngang, và đúng là vậy: lên tới quỹ đạo thì trạm không lên cao nữa mà lao ngang 7,67 km mỗi giây — vừa rơi về phía Trái Đất vừa trượt qua nó, nên độ cao gần như không đổi (trạm thật dao động 413–422 km). Lời dẫn chặng này giờ nói thẳng điều đó.
+
+Ảnh người dùng gửi còn cho thấy một chỗ sai khác: màn tối đen trong khi dòng chữ nói "ánh vàng phía đêm là đèn các thành phố". Lúc đó trạm (tua nhanh 100 lần) đang qua Thái Bình Dương ban đêm — giữa biển không có đèn, tối đen là đúng, chữ thì sai. Giờ khi dòng ấy hiện, app bắn 7 × 7 tia trong khung hình, đếm điểm đang là đêm trên đất liền, đêm trên biển hay ban ngày (đất, biển theo bản đồ Natural Earth), rồi chọn câu: đêm trên đất thì chỉ đèn bên dưới, đêm trên biển thì nói rõ tối vì không có thành phố, còn lại thì nói chung. Dòng đã hiện thì giữ nguyên chữ, không nhảy qua lại khi bay qua bờ biển.
+
+#### "Lỡ một người ở nơi khác thì có ghi TP.HCM là chỗ bạn đang ngồi không?"
+
+Có — đó là lỗi. Hành trình lấy nơi đã chọn trong Trời đêm; bấm "Để sau" thì không có nơi nào, app lấy TP.HCM, và chặng cuối ghi "TP.HCM — chỗ bạn đang ngồi — nằm trên chấm sáng ấy" với cả người ở Hà Nội hay ở nước ngoài. Trong khi chính Trời đêm ghi trung thực là "Xem tạm TP.HCM". Còn chọn vị trí máy thì ra câu lặp "Chỗ bạn đang đứng — chỗ bạn đang ngồi —". Giờ lời theo ba trường hợp: chọn thành phố thì gọi tên thành phố là nơi bạn ở; vị trí máy thì "từ ngay chỗ bạn đứng", "chỗ bạn đang ngồi lúc này"; chưa chọn thì nói là xem tạm TP.HCM, và câu cuối thành "dù bạn đang ngồi ở đâu, chỗ ấy cũng nằm trên chấm sáng này".
+
+`scripts/test-toancanh.js`, 74 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm; máy quay chặng đầu giữ nguyên góc, chỉ đi lên, chân trời tụt từ trên xuống dưới giữa màn; cỡ ba ảnh trong app (đọc từ tệp JPEG); vẽ bằng card đồ hoạ cùng công thức với bản bộ xử lý, có mipmap, lọc dị hướng, xử lý kinh tuyến 180°, tự giảm tải; ảnh chi tiết: tâm làm tròn 1 độ, trưa chỉ xin ảnh ngày, nửa đêm chỉ xin ảnh đèn, chạng vạng cả hai, bỏ qua sát kinh tuyến 180°, địa chỉ đúng chuẩn WMS 1.3.0, kho riêng giữ qua các lần deploy; lời dẫn quỹ đạo nói vì sao độ cao không đổi; đếm đêm trên biển ở giữa Thái Bình Dương, đêm trên đất ở nước Mỹ, ban ngày, và câu về đèn theo đó; lời theo nơi ở: chọn thành phố, vị trí máy, chưa chọn (không gọi TP.HCM là chỗ bạn ngồi).
 
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
@@ -1563,7 +1573,7 @@ assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt T
 assets/toancanh.js         hiệu ứng toàn cảnh: hành trình từ chỗ bạn đứng ra tới chấm xanh mờ, tia chiếu tự viết
 assets/traidat/            ba ảnh Trái Đất của NASA: đất 4096×2048, mây 2048×1024, đèn đêm 3600×1800, sinh bởi scripts/lam-traidat.py
 scripts/lam-traidat.py     thu nhỏ ảnh Visible Earth của NASA thành assets/traidat/
-scripts/test-toancanh.js   63 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, vẽ bằng card đồ hoạ, ảnh chi tiết NASA
+scripts/test-toancanh.js   74 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, lời dẫn, card đồ hoạ, ảnh chi tiết NASA
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
@@ -1604,7 +1614,7 @@ node scripts/test-core.js        # chạy 39 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 48 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 110 kiểm thử bầu trời đêm
-node scripts/test-toancanh.js    # chạy 63 kiểm thử hiệu ứng toàn cảnh
+node scripts/test-toancanh.js    # chạy 74 kiểm thử hiệu ứng toàn cảnh
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên

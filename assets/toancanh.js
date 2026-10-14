@@ -423,14 +423,15 @@ function veTraiDatGL(may, S, th, f, Rt, Uu, chiDat) {
 /* Mỗi chặng: tên, thời lượng (giây), các dòng chữ hiện dần (mốc phần trăm của chặng) */
 const CHANG = [
   { id: 'bay', ten: 'Rời mặt đất', dai: 22, chu: [
-    [0, (c) => `Bạn đang được nâng thẳng lên từ ${c.noi}. Lên tới 30 km, bầu trời đã đen, đường chân trời bắt đầu cong.`],
+    [0, (c) => `${tuDau(c)} Lên tới 30 km, bầu trời đã đen, đường chân trời bắt đầu cong.`],
     [.4, () => '100 km: ranh giới quy ước của vũ trụ (đường Kármán).'],
     [.62, () => 'Tên lửa thật không bay thẳng như vầy: Soyuz lên tới quỹ đạo 205 km thì đã bay ngang 1.640 km.'],
     [.86, () => '417 km: độ cao của Trạm Vũ trụ Quốc tế.']] },
   { id: 'quyDao', ten: 'Trên quỹ đạo', dai: 53, chu: [
-    [0, () => 'Trạm bay 7,67 km mỗi giây — từ TP.HCM ra Hà Nội chưa tới 3 phút.'],
-    [.3, () => 'Một vòng quanh Trái Đất mất 92,9 phút: một ngày thấy chừng 15–16 lần bình minh. Đang tua nhanh 100 lần.'],
-    [.62, () => 'Ánh vàng phía đêm là đèn các thành phố — hàng tỉ người đang ở dưới đó.']] },
+    [0, () => 'Tới đây thì thôi lên cao: trạm bay ngang 7,67 km mỗi giây — từ TP.HCM ra Hà Nội chưa tới 3 phút.'],
+    [.2, () => 'Ở trên quỹ đạo là vừa rơi về phía Trái Đất vừa lao ngang đủ nhanh để luôn trượt qua nó, nên độ cao gần như không đổi.'],
+    [.42, () => 'Một vòng quanh Trái Đất mất 92,9 phút: một ngày thấy chừng 15–16 lần bình minh. Đang tua nhanh 100 lần.'],
+    [.66, (c) => loiDen(c.duoi ? c.duoi() : null)]] },
   { id: 'khi', ten: 'Lớp áo mỏng', dai: 25, chu: [
     [0, () => 'Dải sáng ở mép Trái Đất là toàn bộ bầu không khí ta thở.'],
     [.45, () => 'Nếu Trái Đất to bằng quả bóng đá, lớp không khí tới độ cao 100 km dày chưa tới 2 mm.']] },
@@ -446,8 +447,27 @@ const CHANG = [
     [.4, () => 'Trong tấm ảnh ấy, Trái Đất chỉ chiếm 0,12 điểm ảnh.'],
     [.7, () => 'Carl Sagan viết: mọi người ta từng yêu, từng biết, từng nghe tên, đều sống trên chấm nhỏ ấy.']] },
   { id: 've', ten: 'Nhìn lại', dai: 16, chu: [
-    [0, (c) => `Hít một hơi thật chậm. ${c.noi[0].toUpperCase() + c.noi.slice(1)} — chỗ bạn đang ngồi — nằm trên chấm sáng ấy.`]] },
+    [0, (c) => `Hít một hơi thật chậm. ${choBan(c)}`]] },
 ];
+/* Lời theo nơi ở. c.chon: đã chọn nơi trong Trời đêm; c.tuMay: lấy vị trí máy. Chưa chọn thì Trời đêm ghi
+   "Xem tạm TP.HCM" — ở đây cũng phải nói là xem tạm, đừng gọi TP.HCM là "chỗ bạn đang ngồi" với người ở nơi khác. */
+function tuDau(c) {
+  if (c.tuMay) return 'Bạn đang được nâng thẳng lên từ ngay chỗ bạn đứng.';
+  if (c.chon) return `Bạn đang được nâng thẳng lên từ ${c.noi}.`;
+  return `Bạn đang được nâng thẳng lên từ ${c.noi} — xem tạm, vì chưa chọn nơi ở trong Trời đêm.`;
+}
+function choBan(c) {
+  if (c.tuMay) return 'Chỗ bạn đang ngồi lúc này nằm trên chấm sáng ấy.';
+  if (c.chon) return `${c.noi} — nơi bạn đang ở — nằm trên chấm sáng ấy.`;
+  return 'Dù bạn đang ngồi ở đâu, chỗ ấy cũng nằm trên chấm sáng này.';
+}
+/* Câu về đèn thành phố nói theo cái đang thấy bên dưới. Có lần dòng "ánh vàng là đèn thành phố" hiện đúng lúc trạm
+   đang bay qua Thái Bình Dương ban đêm: giữa biển không có đèn, màn tối đen, người xem tưởng hỏng. */
+function loiDen(d) {
+  if (d && d.demDat >= Math.max(3, d.n * .15)) return 'Ánh vàng bên dưới là đèn các thành phố — hàng tỉ người đang ở dưới đó.';
+  if (d && d.demBien > d.ngay) return 'Đang bay qua phía đêm trên biển: không có thành phố nên tối đen. Qua tới đất liền mới thấy ánh vàng của đèn.';
+  return 'Ở phía đêm của Trái Đất, chỗ nào có ánh vàng là đèn các thành phố — hàng tỉ người đang ở dưới đó.';
+}
 const TONG = CHANG.reduce((s, c) => s + c.dai, 0);
 const GOC_CUI_BAY = 10;                                                // độ, máy quay chặng bay lên nhìn chếch xuống
 const MO_CHUYEN = .8;                                                  // giây tối dần / sáng dần giữa hai chặng
@@ -600,7 +620,7 @@ function veKhung() {
   }
   /* chuyển chặng: tối dần, sáng dần */
   if (may.mo < 1) { ctx.fillStyle = `rgba(0,0,0,${(1 - may.mo).toFixed(3)})`; ctx.fillRect(0, 0, W, H); }
-  veChu(may);
+  veChu(may, S, th);
   if (!dung && t < TONG) raf = requestAnimationFrame(veKhung);
   else if (t >= TONG) xong();
 }
@@ -671,11 +691,29 @@ function veVanhKhi(may, S, f, Rt, Uu, rMan) {
   ctx.restore();
 }
 
-function veChu(may) {
+/* Trong khung hình đang thấy gì bên dưới: bắn 7 × 7 tia, đếm điểm chạm đất đang là đêm trên đất liền, đêm trên
+   biển, hay ban ngày (đất, biển theo bản đồ Natural Earth). */
+function nhinDuoi(may, S, th) {
+  const Rt = don(cheo(may.F, may.U)), Uu = cheo(Rt, may.F), k = Math.tan(may.fov / 2 * RAD);
+  const ra = { n: 0, ngay: 0, demDat: 0, demBien: 0 };
+  for (let j = -3; j <= 3; j++) for (let i = -3; i <= 3; i++) {
+    const D = don(cong(may.F, cong(nhan(Rt, i / 3 * k), nhan(Uu, j / 3 * k * (H / W)))));
+    const g = giaoCau(may.P, D, 1);
+    if (!g || g[0] <= 0) continue;
+    const X = cong(may.P, nhan(D, g[0])), mu = cham(X, S);
+    ra.n++;
+    if (mu > .05) ra.ngay++;
+    else if (mu < -.1) laBien(Math.asin(Math.max(-1, Math.min(1, X.z))) / RAD, Math.atan2(X.y, X.x) / RAD - th) ? ra.demBien++ : ra.demDat++;
+  }
+  return ra;
+}
+let chotChu = {};                                                       // dòng đã hiện thì giữ nguyên chữ, khỏi đổi giữa chừng
+function veChu(may, S, th) {
   if (!phu) return;
-  const c = may.ch, boi = { noi: g0.noi, sangTuTrang: (may.them && may.them.sangTuTrang) || 0 };
+  const c = may.ch, boi = { noi: g0.noi, chon: g0.chon, tuMay: g0.tuMay, sangTuTrang: (may.them && may.them.sangTuTrang) || 0, duoi: () => nhinDuoi(may, S, th) };
   /* chỉ giữ hai dòng mới nhất: bốn dòng chồng lên nhau che mất Trái Đất trên màn điện thoại */
-  const dong = c.c.chu.filter(([p]) => c.p >= p).map(([, h]) => h(boi)).slice(-2);
+  const dong = c.c.chu.map(([p, h], i) => ({ p, h, khoa: c.k + '.' + i })).filter(x => c.p >= x.p)
+    .map(x => (x.khoa in chotChu ? chotChu[x.khoa] : (chotChu[x.khoa] = x.h(boi)))).slice(-2);
   const chu = dong.join('\n');
   if (c.k !== changCu) {
     changCu = c.k;
@@ -688,8 +726,8 @@ function veChu(may) {
     phu.querySelector('.tc-chu').innerHTML = dong.map(s => `<p${truoc.includes(s) ? ' class="cu"' : ''}>${esc(s)}</p>`).join('');
   }
   const so = phu.querySelector('.tc-so');
-  const th = may.them || {};
-  so.textContent = th.d ? `cách tâm Trái Đất ${fmtKm(th.d)}` : th.cao ? `độ cao ${Math.round(th.cao)} km${th.tua ? ` · tua nhanh ${th.tua} lần` : ''}` : '';
+  const them = may.them || {};
+  so.textContent = them.d ? `cách tâm Trái Đất ${fmtKm(them.d)}` : them.cao ? `độ cao ${Math.round(them.cao)} km${them.tua ? ` · tua nhanh ${them.tua} lần` : ''}` : '';
 }
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 function fmtKm(d) {
@@ -701,21 +739,21 @@ function fmtKm(d) {
 /* ---------- điều khiển ---------- */
 function batDauLai() {
   const noi = noiDangDung();
-  g0 = { ms0: Date.now(), vi: noi.vi, kinh: noi.kinh, noi: noi.ten };
+  g0 = { ms0: Date.now(), vi: noi.vi, kinh: noi.kinh, noi: noi.ten, chon: noi.chon, tuMay: noi.tuMay };
   napChiTiet(g0);
-  batDau = performance.now(); dung = false; tGio = 0; changCu = -1; chuCu = '';
+  batDau = performance.now(); dung = false; tGio = 0; changCu = -1; chuCu = ''; chotChu = {};
   phu.querySelector('.tc-xong').hidden = true;
   phu.querySelector('.tc-nut').hidden = false;
   phu.querySelector('.tc-dung').textContent = 'Tạm dừng';
   cancelAnimationFrame(raf); raf = requestAnimationFrame(veKhung);
 }
-/* nơi ở: lấy chỗ đã chọn ở Trời đêm nếu có, không thì TP.HCM */
+/* nơi ở: chỗ đã chọn ở Trời đêm (thành phố, hoặc vị trí máy); chưa chọn thì xem tạm TP.HCM như Trời đêm */
 function noiDangDung() {
   try {
     const l = JSON.parse(localStorage.getItem('tdtd.troi.noi') || 'null');
-    if (l && Number.isFinite(l.vi) && Number.isFinite(l.kinh)) return { vi: l.vi, kinh: l.kinh, ten: l.ten === 'chỗ bạn đứng' ? 'chỗ bạn đang đứng' : l.ten };
+    if (l && Number.isFinite(l.vi) && Number.isFinite(l.kinh)) return { vi: l.vi, kinh: l.kinh, ten: l.ten, chon: true, tuMay: !!l.tuMay || l.ten === 'chỗ bạn đứng' };
   } catch (e) {}
-  return { vi: 10.8231, kinh: 106.6297, ten: 'TP.HCM' };
+  return { vi: 10.8231, kinh: 106.6297, ten: 'TP.HCM', chon: false, tuMay: false };
 }
 function tamDung() {
   if (!g0) return;
@@ -813,5 +851,5 @@ self.TDTD_TOANCANH = { mo, dong, dangMo,
   _quyDaoQua: quyDaoQua, _viTriQuyDao: viTriQuyDao, _gocChucChanTroi: gocChucChanTroi, _gocTraiDat: goc_TraiDat,
   _giaoCau: giaoCau, _quaKhi: quaKhi, _mauKhi: mauKhi, _mauMat: mauMat, _datAnh: (a) => { anh = a; }, _chang: chang, _mayLuc: mayLuc,
   _tuXichDao: tuXichDao, _tGio: () => tGio, _dung: () => dung, _g0: () => g0, _co: () => !!(anhGoc || anh), _gl: () => !!gl, _glTi: () => glTi,
-  _epCPU: (b) => { epCPU = !!b; }, _toi: (t) => { tGio = t; batDau = performance.now() - t * 1000; if (dung && ctx) veKhung(); }, _canChiTiet: canChiTiet, _urlChiTiet: urlChiTiet, _chiTiet: () => chiTiet, CT, GOC_CUI_BAY };
+  _epCPU: (b) => { epCPU = !!b; }, _toi: (t) => { tGio = t; batDau = performance.now() - t * 1000; if (dung && ctx) veKhung(); }, _canChiTiet: canChiTiet, _nhinDuoi: nhinDuoi, _loiDen: loiDen, _noiDangDung: noiDangDung, _urlChiTiet: urlChiTiet, _chiTiet: () => chiTiet, CT, GOC_CUI_BAY };
 })();

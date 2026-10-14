@@ -6,8 +6,10 @@ const path = require('path');
 global.self = global; global.window = global;
 global.addEventListener = () => {};
 global.TDTD_ASTRO = require('../assets/astro.js');
+global.TDTD_DATLIEN = require('../assets/datlien.js');
 new Function(fs.readFileSync(path.join(__dirname, '..', 'assets', 'toancanh.js'), 'utf8'))();
 const T = global.TDTD_TOANCANH, A = global.TDTD_ASTRO;
+const tc = fs.readFileSync(path.join(__dirname, '..', 'assets', 'toancanh.js'), 'utf8');
 
 let pass = 0, fail = 0;
 const ok = (n, c, them = '') => { c ? pass++ : fail++; console.log(`${c ? '  ✓' : '  ✗'} ${n}${them ? ' — ' + them : ''}`); };
@@ -30,7 +32,7 @@ ok('sau 92,9 phút về đúng chỗ cũ (trong hệ trời)', dai({ x: o1.P.x -
 const tocDo = 2 * Math.PI * (R + 417) / (92.9 * 60);
 ok('tốc độ suy ra từ độ cao và chu kỳ khớp 7,67 km/s (lệch dưới 1%)', Math.abs(tocDo - 7.67) / 7.67 < .01, tocDo.toFixed(3) + ' km/s');
 ok('TP.HCM – Hà Nội (1.138 km) chưa tới 3 phút ở tốc độ đó, như lời dẫn', 1138 / 7.67 < 180 && T.CHANG[1].chu[0][1]().includes('chưa tới 3 phút'));
-ok('một ngày 15–16 lần bình minh: 24 giờ / 92,9 phút', Math.abs(1440 / 92.9 - 15.5) < .1 && T.CHANG[1].chu[1][1]().includes('15–16 lần bình minh'));
+ok('một ngày 15–16 lần bình minh: 24 giờ / 92,9 phút', Math.abs(1440 / 92.9 - 15.5) < .1 && T.CHANG[1].chu[2][1]().includes('15–16 lần bình minh'));
 
 console.log('\n— Chân trời và khí quyển —');
 const chuc = T._gocChucChanTroi(417);
@@ -58,23 +60,24 @@ ok('ở 417 km, chân trời chúc xuống chừng 20°', Math.abs(chuc - Math.a
 
 console.log('\n— Ngày, đêm, đèn thành phố —');
 {
-  const S = { x: 1, y: 0, z: 0 }, D = { x: -1, y: 0, z: 0 };
-  const ngay = T._mauMat({ x: 1, y: 0, z: 0 }, D, S, 0), dem = T._mauMat({ x: -1, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, S, 0);
+  /* điểm giữa trưa trên đất liền (0°, 20° Đông): điểm 0°, 0° nằm giữa vịnh Guinea, dính loá mặt biển */
+  const S = T._tuXichDao(20, 0), D = { x: -S.x, y: -S.y, z: -S.z };
+  const ngay = T._mauMat(S, D, S, 0), dem = T._mauMat({ x: -1, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, S, 0);
   ok('chưa có ảnh NASA: vẫn vẽ được, phía ngày sáng hơn phía đêm nhiều', ngay[0] + ngay[1] + ngay[2] > 4 * (dem[0] + dem[1] + dem[2]));
   /* ảnh giả 8×4: mặt đất đỏ, không mây, chỗ nào cũng có đèn */
   const gia = (fn) => { const d = new Uint8ClampedArray(8 * 4 * 4); for (let i = 0; i < 32; i++) { const c = fn(i); d.set(c, i * 4); } return { w: 8, h: 4, d }; };
   /* đèn mức vừa (120/255): đèn sáng nhất thì bão hoà thành trắng vàng, như ảnh chụp thật */
   T._datAnh({ ngay: gia(() => [200, 30, 30, 255]), may: gia(() => [0, 0, 0, 255]), dem: gia(() => [120, 120, 120, 255]) });
-  const n2 = T._mauMat({ x: 1, y: 0, z: 0 }, D, S, 0), d2 = T._mauMat({ x: -1, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, S, 0);
+  const n2 = T._mauMat(S, D, S, 0), d2 = T._mauMat({ x: -1, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, S, 0);
   ok('có ảnh: phía ngày lấy màu ảnh mặt đất', n2[0] > 150 && n2[1] < 80);
   ok('phía đêm: đèn thành phố vàng ấm (đỏ > lục > lam), sáng hơn hẳn nền đêm', d2[0] > d2[1] && d2[1] > d2[2] && d2[0] > 120, d2.map(Math.round).join(','));
   T._datAnh({ ngay: gia(() => [200, 30, 30, 255]), may: gia(() => [255, 255, 255, 255]), dem: gia(() => [120, 120, 120, 255]) });
-  const d3 = T._mauMat({ x: -1, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, S, 0), n3 = T._mauMat({ x: 1, y: 0, z: 0 }, D, S, 0);
+  const d3 = T._mauMat({ x: -1, y: 0, z: 0 }, { x: 1, y: 0, z: 0 }, S, 0), n3 = T._mauMat(S, D, S, 0);
   ok('mây dày che bớt đèn ban đêm', d3[0] < d2[0]);
   ok('mây ban ngày trắng', n3[0] > 200 && n3[1] > 200 && n3[2] > 200);
   /* Ảnh Blue Marble đã lọc khí quyển nên biển gần như đen; nhìn thật từ vũ trụ biển xanh lam nhờ ánh tán xạ */
   T._datAnh({ ngay: gia(() => [2, 5, 20, 255]), may: gia(() => [0, 0, 0, 255]), dem: gia(() => [0, 0, 0, 255]) });
-  const bien = T._mauMat({ x: 1, y: 0, z: 0 }, D, S, 0);
+  const bien = T._mauMat(S, D, S, 0);
   ok('biển ban ngày xanh lam nhờ ánh tán xạ của khí quyển, không đen như ảnh gốc', bien[2] > 60 && bien[2] > bien[0] * 2, bien.map(Math.round).join(','));
   T._datAnh(null);
 }
@@ -121,7 +124,43 @@ ok('trên quỹ đạo: đúng độ cao trạm, tua nhanh 100 lần', Math.abs(
   ok('lời dẫn: được nâng thẳng lên; tên lửa thật bay ngang (Soyuz: quỹ đạo 205 km, cách bãi phóng 1.640 km)', T.CHANG[0].chu[0][1]({ noi: 'TP.HCM' }).includes('nâng thẳng lên') && T.CHANG[0].chu.some(([, h]) => /205 km.*1\.640 km/.test(h({}))));
 }
 ok('giữa hai chặng tối dần rồi sáng dần, không giật cảnh', T._mayLuc(21.9, g).mo < .2 && T._mayLuc(22.1, g).mo < .2 && T._mayLuc(30, g).mo === 1);
-ok('lời dẫn chặng cuối gọi đúng nơi của bạn', T.CHANG[6].chu[0][1]({ noi: 'TP.HCM' }).includes('TP.HCM'));
+{
+  /* "Lỡ một người ở nơi khác thì có ghi TP.HCM chỗ bạn đang ngồi không?" — chưa chọn nơi thì chỉ là xem tạm */
+  const dau = (c) => T.CHANG[0].chu[0][1](c), cuoi = (c) => T.CHANG[6].chu[0][1](c);
+  ok('đã chọn thành phố: gọi đúng tên nơi ấy là nơi bạn ở', dau({ noi: 'Hà Nội', chon: true }).includes('từ Hà Nội') && cuoi({ noi: 'Hà Nội', chon: true }).includes('Hà Nội — nơi bạn đang ở'));
+  ok('chưa chọn nơi: nói rõ là xem tạm TP.HCM, chặng cuối không gọi TP.HCM là chỗ bạn ngồi',
+     dau({ noi: 'TP.HCM', chon: false }).includes('xem tạm') && !cuoi({ noi: 'TP.HCM', chon: false }).includes('TP.HCM') && cuoi({ noi: 'TP.HCM', chon: false }).includes('Dù bạn đang ngồi ở đâu'));
+  ok('lấy vị trí máy: không lặp "chỗ bạn đứng — chỗ bạn đang ngồi"', dau({ noi: 'chỗ bạn đứng', chon: true, tuMay: true }).includes('ngay chỗ bạn đứng') && cuoi({ noi: 'chỗ bạn đứng', chon: true, tuMay: true }) === 'Hít một hơi thật chậm. Chỗ bạn đang ngồi lúc này nằm trên chấm sáng ấy.');
+  const kho = {};
+  global.localStorage = { getItem: (k) => (k in kho ? kho[k] : null) };
+  const n0 = T._noiDangDung();
+  kho['tdtd.troi.noi'] = JSON.stringify({ ten: 'Đà Nẵng', vi: 16.05, kinh: 108.2, tuMay: false });
+  const n1 = T._noiDangDung();
+  kho['tdtd.troi.noi'] = JSON.stringify({ ten: 'chỗ bạn đứng', vi: 21.03, kinh: 105.85, tuMay: true });
+  const n2 = T._noiDangDung();
+  ok('đọc đúng nơi Trời đêm đã lưu: chưa chọn / thành phố / vị trí máy', !n0.chon && n0.ten === 'TP.HCM' && n1.chon && !n1.tuMay && n1.ten === 'Đà Nẵng' && n2.chon && n2.tuMay && n2.vi === 21.03);
+  delete global.localStorage;
+}
+
+console.log('\n— Trên quỹ đạo: bay ngang, độ cao không đổi; lời về đèn theo cái đang thấy —');
+ok('lời dẫn giải thích vì sao độ cao không tăng nữa: bay ngang, vừa rơi vừa trượt qua Trái Đất', T.CHANG[1].chu[0][1]().includes('bay ngang') && T.CHANG[1].chu[1][1]().includes('luôn trượt qua nó'));
+{
+  /* máy nhìn thẳng xuống từ 417 km, giờ sao 0 (hệ trời trùng hệ địa lý), Mặt Trời ở phía bên kia: ban đêm */
+  const nhin = (vi, kinh, ngay) => {
+    const u = T._tuXichDao(kinh, vi), P = { x: u.x * (1 + 417 / R), y: u.y * (1 + 417 / R), z: u.z * (1 + 417 / R) };
+    const F = { x: -u.x, y: -u.y, z: -u.z }, U = Math.abs(u.z) < .9 ? { x: 0, y: 0, z: 1 } : { x: 1, y: 0, z: 0 };
+    const S = ngay ? u : F;
+    return T._nhinDuoi({ P, F, U, fov: 74 }, S, 0);
+  };
+  const bien = nhin(0, -150, false), dat = nhin(39, -97, false), ngay = nhin(39, -97, true);
+  ok('đêm giữa Thái Bình Dương: đếm ra toàn biển', bien.n > 30 && bien.demBien === bien.n, JSON.stringify(bien));
+  ok('đêm trên nước Mỹ: đếm ra toàn đất', dat.n > 30 && dat.demDat === dat.n, JSON.stringify(dat));
+  ok('ban ngày: đếm ra ngày', ngay.ngay === ngay.n);
+  ok('đêm trên biển thì nói thật là tối đen vì không có thành phố', /trên biển: không có thành phố nên tối đen/.test(T._loiDen(bien)));
+  ok('đêm trên đất liền thì chỉ ánh vàng bên dưới là đèn', /Ánh vàng bên dưới là đèn/.test(T._loiDen(dat)));
+  ok('ban ngày thì nói chung về phía đêm', /Ở phía đêm của Trái Đất/.test(T._loiDen(ngay)) && /Ở phía đêm/.test(T._loiDen(null)));
+  ok('dòng đã hiện thì giữ nguyên chữ, không đổi qua lại khi bay qua bờ biển', /x\.khoa in chotChu \? chotChu\[x\.khoa\] : \(chotChu\[x\.khoa\] = x\.h\(boi\)\)/.test(tc));
+}
 
 console.log('\n— Nằm trong Trời đêm, phần Nhìn từ vũ trụ —');
 const ns = fs.readFileSync(path.join(__dirname, '..', 'assets', 'nightsky.js'), 'utf8');
@@ -134,7 +173,6 @@ ok('đóng Trời đêm thì đóng luôn hành trình', /function dong\(\) \{\s
 const css = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.css'), 'utf8');
 const z = (lop) => +((css.match(new RegExp(`\\.${lop}\\{[^}]*z-index:(\\d+)`)) || [])[1] || 0);
 ok('hành trình nằm trên Trời đêm', z('toancanh') > z('troidem'), `${z('toancanh')} > ${z('troidem')}`);
-const tc = fs.readFileSync(path.join(__dirname, '..', 'assets', 'toancanh.js'), 'utf8');
 ok('phím Esc chỉ đóng hành trình, không rơi xuống đóng luôn Trời đêm', /e\.preventDefault\(\); e\.stopImmediatePropagation\(\); dong\(\);[\s\S]{0,20}\}, true\);/.test(tc) && /e\.key === 'Escape' && !e\.defaultPrevented && tam/.test(ns));
 /* cỡ ảnh JPEG đọc từ khối SOF trong tệp */
 const coJpg = (f) => {
@@ -158,7 +196,7 @@ ok('cùng công thức với bản bộ xử lý: ngưỡng ngày đêm, mây, l
 ok('ảnh lọc theo mipmap và dị hướng: ở xa không lấm tấm, sát chân trời vẫn nét', /LINEAR_MIPMAP_LINEAR/.test(tc) && /EXT_texture_filter_anisotropic/.test(tc));
 ok('kinh tuyến 180° không thành đường kẻ (đạo hàm của bản uv dời nửa vòng)', tc.includes('fract(uv.x + .5) - .5') && /textureGrad\(tNgay, uv, gx, gy\)/.test(tc));
 ok('máy yếu thì tự giảm số điểm ảnh phải tô, tới một nửa là thôi', /if \(tb > 26 && glTi > \.5\) glTi = Math\.max\(\.5, glTi \* \.8\)/.test(tc));
-ok('lời dẫn chỉ giữ hai dòng mới nhất, khỏi che Trái Đất', /\.map\(\(\[, h\]\) => h\(boi\)\)\.slice\(-2\)/.test(tc));
+ok('lời dẫn chỉ giữ hai dòng mới nhất, khỏi che Trái Đất', /= x\.h\(boi\)\)\)\)\.slice\(-2\)/.test(tc));
 
 console.log('\n— Ảnh chi tiết quanh chỗ bạn (GIBS của NASA) —');
 {
