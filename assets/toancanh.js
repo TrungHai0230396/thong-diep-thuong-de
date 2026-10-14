@@ -422,25 +422,25 @@ function veTraiDatGL(may, S, th, f, Rt, Uu, chiDat) {
 /* ---------- hành trình ---------- */
 /* Mỗi chặng: tên, thời lượng (giây), các dòng chữ hiện dần (mốc phần trăm của chặng) */
 const CHANG = [
-  { id: 'bay', ten: 'Rời mặt đất', dai: 22, chu: [
-    [0, () => 'Xin chào quý khách! Chuyến bay hôm nay ghép từ ba chuyến có thật: Trạm Vũ trụ Quốc tế, Apollo 8, Voyager 1. Thắt dây an toàn — không cần tắt điện thoại, nó chính là ô cửa sổ của bạn.'],
-    [.16, (c) => `${tuDau(c)} Lên tới 30 km, bầu trời đã đen, đường chân trời bắt đầu cong.`],
-    [.4, () => '100 km: ranh giới quy ước của vũ trụ (đường Kármán).'],
-    [.62, () => 'Tên lửa thật không bay thẳng như vầy: Soyuz lên tới quỹ đạo 205 km thì đã bay ngang 1.640 km.'],
-    [.86, () => '417 km: độ cao của Trạm Vũ trụ Quốc tế. Tới đây thì thôi bay lên — chặng sau bay ngang.']] },
+  { id: 'bay', ten: 'Rời mặt đất', dai: 38, chu: [
+    [0, () => 'Xin chào quý khách! Chuyến bay hôm nay ghép từ ba chuyến có thật: Trạm Vũ trụ Quốc tế, Apollo 8, Voyager 1. Thắt dây an toàn nhé — điện thoại chính là ô cửa sổ của bạn.'],
+    [.29, (c) => `${tuDau(c)} Từ 30 km trời đã đen, chân trời bắt đầu cong.`],
+    [.505, () => '100 km: ranh giới quy ước của vũ trụ (đường Kármán).'],
+    [.615, () => 'Tên lửa thật không bay thẳng như vầy: Soyuz lên tới quỹ đạo 205 km thì đã bay ngang 1.640 km.'],
+    [.79, () => '417 km: độ cao của Trạm Vũ trụ Quốc tế. Tới đây thì thôi bay lên — chặng sau bay ngang.']] },
   { id: 'quyDao', ten: 'Trên quỹ đạo', dai: 53, chu: [
     [0, () => 'Chặng của Trạm Vũ trụ Quốc tế. Vì sao giờ lại bay ngang? Ở độ cao này mà đứng yên thì sẽ rơi thẳng xuống đất.'],
-    [.14, () => 'Muốn ở lại trên này phải lao ngang thật nhanh — 7,67 km mỗi giây, từ TP.HCM ra Hà Nội chưa tới 3 phút. Trạm vẫn rơi, nhưng lao ngang nhanh tới mức luôn trượt qua mép Trái Đất, nên rơi mãi mà không chạm đất. Đó là quỹ đạo.'],
+    [.15, () => 'Muốn ở lại trên này phải lao ngang thật nhanh — 7,67 km mỗi giây, từ TP.HCM ra Hà Nội chưa tới 3 phút. Trạm vẫn rơi, nhưng lao ngang nhanh tới mức luôn trượt qua mép Trái Đất, nên rơi mãi mà không chạm đất. Đó là quỹ đạo.'],
     [.42, () => 'Một vòng quanh Trái Đất mất 92,9 phút: một ngày thấy chừng 15–16 lần bình minh. Đang tua nhanh 100 lần.'],
     [.66, (c) => loiDen(c.duoi ? c.duoi() : null)]] },
   { id: 'khi', ten: 'Lớp áo mỏng', dai: 25, chu: [
     [0, () => 'Dải sáng ở mép Trái Đất là toàn bộ bầu không khí ta thở.'],
     [.45, () => 'Nếu Trái Đất to bằng quả bóng đá, lớp không khí tới độ cao 100 km dày chưa tới 2 mm.']] },
-  { id: 'bienGioi', ten: 'Không có biên giới', dai: 26, chu: [
+  { id: 'bienGioi', ten: 'Không có biên giới', dai: 30, chu: [
     [0, () => 'Thôi bay ngang. Giờ bay thẳng lên, ngay trên chỗ bạn, nhìn thẳng xuống.'],
-    [.22, () => 'Từ trên này không thấy một đường biên giới nào.'],
-    [.42, () => 'Một phi hành gia Ả Rập Xê Út bay năm 1985 kể: ngày đầu ai cũng chỉ về nước mình, ngày thứ ba, thứ tư chỉ về châu lục — tới ngày thứ năm, chỉ còn thấy một Trái Đất.'],
-    [.74, () => 'Cảm giác kinh ngạc, thấy mình gắn với mọi người ấy được gọi là hiệu ứng toàn cảnh.']] },
+    [.18, () => 'Từ trên này không thấy một đường biên giới nào.'],
+    [.33, () => 'Một phi hành gia Ả Rập Xê Út bay năm 1985 kể: ngày đầu ai cũng chỉ về nước mình, ngày thứ ba, thứ tư chỉ về châu lục — tới ngày thứ năm, chỉ còn thấy một Trái Đất.'],
+    [.72, () => 'Cảm giác kinh ngạc, thấy mình gắn với mọi người ấy được gọi là hiệu ứng toàn cảnh.']] },
   { id: 'trang', ten: 'Từ phía Mặt Trăng', dai: 25, chu: [
     [0, () => 'Chặng của tàu Apollo 8 — chuyến đầu tiên đưa người bay vòng quanh Mặt Trăng, tháng 12/1968. 384.400 km: tới chỗ Mặt Trăng.'],
     [.35, (c) => `Trái Đất lúc này nhìn từ Mặt Trăng: sáng ${c.sangTuTrang}%. Ngày 24/12/1968, William Anders (Apollo 8) chụp Trái Đất mọc lên trên chân trời Mặt Trăng.`]] },
@@ -457,7 +457,7 @@ const CHANG = [
 function tuDau(c) {
   if (c.tuMay) return 'Bạn đang được nâng thẳng lên từ ngay chỗ bạn đứng.';
   if (c.chon) return `Bạn đang được nâng thẳng lên từ ${c.noi}.`;
-  return `Bạn đang được nâng thẳng lên từ ${c.noi} — xem tạm, vì chưa chọn nơi ở trong Trời đêm.`;
+  return `Bạn đang được nâng thẳng lên từ ${c.noi} (xem tạm vì chưa chọn nơi ở).`;
 }
 function choBan(c) {
   if (c.tuMay) return 'Chỗ bạn đang ngồi lúc này nằm trên chấm sáng ấy.';
@@ -712,24 +712,37 @@ function nhinDuoi(may, S, th) {
   }
   return ra;
 }
-let chotChu = {};                                                       // dòng đã hiện thì giữ nguyên chữ, khỏi đổi giữa chừng
+let chotChu = {}, doiChu = 0, chuCho = '';
+/* câu cũ mờ đi (0,35 giây) rồi câu mới hiện đúng chỗ đó — không chồng, không nhảy */
+function datChu(s) {
+  const hop = phu.querySelector('.tc-chu');
+  chuCho = s;
+  if (doiChu) return;                                                  // đang đổi dở: lúc xong sẽ lấy câu mới nhất
+  const coCu = !!hop.textContent;
+  hop.classList.add('tat');
+  doiChu = setTimeout(() => {
+    doiChu = 0;
+    hop.innerHTML = chuCho ? `<p>${esc(chuCho)}</p>` : '';
+    requestAnimationFrame(() => hop.classList.remove('tat'));
+  }, coCu ? 350 : 0);
+}
+/* thời gian cần để đọc một câu: chừng 4 từ mỗi giây, cộng 1,2 giây để mắt tìm tới chữ */
+const docLau = (s) => 1.2 + String(s).split(/\s+/).length / 4;                                                       // dòng đã hiện thì giữ nguyên chữ, khỏi đổi giữa chừng
 function veChu(may, S, th) {
   if (!phu) return;
   const c = may.ch, boi = { noi: g0.noi, chon: g0.chon, tuMay: g0.tuMay, sangTuTrang: (may.them && may.them.sangTuTrang) || 0, duoi: () => nhinDuoi(may, S, th) };
-  /* chỉ giữ hai dòng mới nhất: bốn dòng chồng lên nhau che mất Trái Đất trên màn điện thoại */
+  /* Mỗi lúc MỘT câu, câu mới nhất. Bản trước giữ hai dòng: câu mới tới thì câu cũ bị đẩy lên, cả khối chữ nhảy,
+     hai câu sát nhau như chồng lên nhau ("chữ nhảy khó đọc"). Mốc từng câu chia sao cho câu nào cũng đứng đủ lâu
+     để đọc (xem docLau và bài kiểm). */
   const dong = c.c.chu.map(([p, h], i) => ({ p, h, khoa: c.k + '.' + i })).filter(x => c.p >= x.p)
-    .map(x => (x.khoa in chotChu ? chotChu[x.khoa] : (chotChu[x.khoa] = x.h(boi)))).slice(-2);
-  const chu = dong.join('\n');
+    .map(x => (x.khoa in chotChu ? chotChu[x.khoa] : (chotChu[x.khoa] = x.h(boi))));
+  const chu = dong.length ? dong[dong.length - 1] : '';
   if (c.k !== changCu) {
     changCu = c.k;
     phu.querySelector('.tc-ten').textContent = c.c.ten;
     phu.querySelectorAll('.tc-cham i').forEach((n, k) => n.classList.toggle('dang', k <= c.k));
   }
-  if (chu !== chuCu) {
-    const truoc = chuCu.split('\n');                                   // dòng đã hiện thì đừng cho hiện dần lại
-    chuCu = chu;
-    phu.querySelector('.tc-chu').innerHTML = dong.map(s => `<p${truoc.includes(s) ? ' class="cu"' : ''}>${esc(s)}</p>`).join('');
-  }
+  if (chu !== chuCu) { chuCu = chu; datChu(chu); }
   const so = phu.querySelector('.tc-so');
   const them = may.them || {};
   so.textContent = dongSo(them);
@@ -754,6 +767,7 @@ function batDauLai() {
   g0 = { ms0: Date.now(), vi: noi.vi, kinh: noi.kinh, noi: noi.ten, chon: noi.chon, tuMay: noi.tuMay };
   napChiTiet(g0);
   batDau = performance.now(); dung = false; tGio = 0; changCu = -1; chuCu = ''; chotChu = {};
+  clearTimeout(doiChu); doiChu = 0; phu.querySelector('.tc-chu').innerHTML = ''; phu.querySelector('.tc-chu').classList.remove('tat');
   phu.querySelector('.tc-xong').hidden = true;
   phu.querySelector('.tc-nut').hidden = false;
   phu.querySelector('.tc-dung').textContent = 'Tạm dừng';
@@ -863,5 +877,5 @@ self.TDTD_TOANCANH = { mo, dong, dangMo,
   _quyDaoQua: quyDaoQua, _viTriQuyDao: viTriQuyDao, _gocChucChanTroi: gocChucChanTroi, _gocTraiDat: goc_TraiDat,
   _giaoCau: giaoCau, _quaKhi: quaKhi, _mauKhi: mauKhi, _mauMat: mauMat, _datAnh: (a) => { anh = a; }, _chang: chang, _mayLuc: mayLuc,
   _tuXichDao: tuXichDao, _tGio: () => tGio, _dung: () => dung, _g0: () => g0, _co: () => !!(anhGoc || anh), _gl: () => !!gl, _glTi: () => glTi,
-  _epCPU: (b) => { epCPU = !!b; }, _toi: (t) => { tGio = t; batDau = performance.now() - t * 1000; if (dung && ctx) veKhung(); }, _canChiTiet: canChiTiet, _dongSo: dongSo, _nhinDuoi: nhinDuoi, _loiDen: loiDen, _noiDangDung: noiDangDung, _urlChiTiet: urlChiTiet, _chiTiet: () => chiTiet, CT, GOC_CUI_BAY };
+  _epCPU: (b) => { epCPU = !!b; }, _toi: (t) => { tGio = t; batDau = performance.now() - t * 1000; if (dung && ctx) veKhung(); }, _canChiTiet: canChiTiet, _docLau: docLau, _tuDau: tuDau, _choBan: choBan, _dongSo: dongSo, _nhinDuoi: nhinDuoi, _loiDen: loiDen, _noiDangDung: noiDangDung, _urlChiTiet: urlChiTiet, _chiTiet: () => chiTiet, CT, GOC_CUI_BAY };
 })();

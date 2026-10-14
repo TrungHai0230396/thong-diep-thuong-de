@@ -90,13 +90,13 @@ for (const [k, c] of T.CHANG.entries()) { const x = T._chang(a + c.dai / 2); if 
 ok('mốc thời gian nào cũng rơi đúng một chặng', lien && T._chang(T.TONG + 5).k === 6);
 const ms0 = Date.UTC(2026, 9, 14, 13, 0, 0), g = { ms0, vi: viHCM, kinh: 106.6297, noi: 'TP.HCM' };
 const caoLuc = (t) => (dai(T._mayLuc(t, g).P) - 1) * R;
-ok('chặng đầu: bay lên từ 30 km tới 417 km ngay trên chỗ bạn', Math.abs(caoLuc(0) - 30) < .5 && Math.abs(caoLuc(21.99) - 417) < 2, `${caoLuc(0).toFixed(1)} → ${caoLuc(21.99).toFixed(1)} km`);
+ok('chặng đầu: bay lên từ 30 km tới 417 km ngay trên chỗ bạn', Math.abs(caoLuc(0) - 30) < .5 && Math.abs(caoLuc(T.CHANG[0].dai - .01) - 417) < 2, `${caoLuc(0).toFixed(1)} → ${caoLuc(T.CHANG[0].dai - .01).toFixed(1)} km`);
 {
   const m = T._mayLuc(0, g), th = A.gioSao(A.ngayJulius(ms0)), u = T._tuXichDao(g.kinh + th, g.vi);
   const P = m.P, l = dai(P);
   ok('lúc đầu máy ở đúng trên đầu bạn', Math.abs(P.x / l - u.x) < 1e-9 && Math.abs(P.y / l - u.y) < 1e-9 && Math.abs(P.z / l - u.z) < 1e-9);
 }
-const q1 = T._mayLuc(22 + 26.5, g);
+const q1 = T._mayLuc(T.CHANG[0].dai + 26.5, g);
 ok('trên quỹ đạo: đúng độ cao trạm, tua nhanh 100 lần', Math.abs(caoLuc(40) - 417) < 1e-6 && Math.abs((q1.ms - ms0) / 60000 - 26.5 * 100 / 60) < 1e-6 && q1.them.tua === 100);
 {
   const m = A.matTrang(A.ngayJulius(ms0));
@@ -123,7 +123,7 @@ ok('trên quỹ đạo: đúng độ cao trạm, tua nhanh 100 lần', Math.abs(
   ok('chân trời tụt dần trên màn, từ trên giữa màn xuống dưới giữa màn: dấu hiệu đang lên', tren(30) > 0 && tren(417) < 0 && tren(30) - tren(417) > 14, `${tren(30).toFixed(1)}° → ${tren(417).toFixed(1)}°`);
   ok('lời dẫn: được nâng thẳng lên; tên lửa thật bay ngang (Soyuz: quỹ đạo 205 km, cách bãi phóng 1.640 km)', T.CHANG[0].chu[1][1]({ noi: 'TP.HCM' }).includes('nâng thẳng lên') && T.CHANG[0].chu.some(([, h]) => /205 km.*1\.640 km/.test(h({}))));
 }
-ok('giữa hai chặng tối dần rồi sáng dần, không giật cảnh', T._mayLuc(21.9, g).mo < .2 && T._mayLuc(22.1, g).mo < .2 && T._mayLuc(30, g).mo === 1);
+ok('giữa hai chặng tối dần rồi sáng dần, không giật cảnh', T._mayLuc(T.CHANG[0].dai - .1, g).mo < .2 && T._mayLuc(T.CHANG[0].dai + .1, g).mo < .2 && T._mayLuc(T.CHANG[0].dai + 8, g).mo === 1);
 {
   /* "Lỡ một người ở nơi khác thì có ghi TP.HCM chỗ bạn đang ngồi không?" — chưa chọn nơi thì chỉ là xem tạm */
   const dau = (c) => T.CHANG[0].chu[1][1](c), cuoi = (c) => T.CHANG[6].chu[0][1](c);
@@ -218,7 +218,21 @@ ok('cùng công thức với bản bộ xử lý: ngưỡng ngày đêm, mây, l
 ok('ảnh lọc theo mipmap và dị hướng: ở xa không lấm tấm, sát chân trời vẫn nét', /LINEAR_MIPMAP_LINEAR/.test(tc) && /EXT_texture_filter_anisotropic/.test(tc));
 ok('kinh tuyến 180° không thành đường kẻ (đạo hàm của bản uv dời nửa vòng)', tc.includes('fract(uv.x + .5) - .5') && /textureGrad\(tNgay, uv, gx, gy\)/.test(tc));
 ok('máy yếu thì tự giảm số điểm ảnh phải tô, tới một nửa là thôi', /if \(tb > 26 && glTi > \.5\) glTi = Math\.max\(\.5, glTi \* \.8\)/.test(tc));
-ok('lời dẫn chỉ giữ hai dòng mới nhất, khỏi che Trái Đất', /= x\.h\(boi\)\)\)\)\.slice\(-2\)/.test(tc));
+ok('lời dẫn mỗi lúc một câu (câu mới nhất), đổi câu thì mờ ra rồi hiện vào — không chồng, không nhảy', /const chu = dong\.length \? dong\[dong\.length - 1\] : '';/.test(tc) && /hop\.classList\.add\('tat'\)/.test(tc) && /\.tc-chu\.tat\{opacity:0/.test(fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.css'), 'utf8')));
+{
+  /* "Chữ nhảy khó đọc": câu nào cũng phải đứng đủ lâu để đọc (chừng 4 từ mỗi giây + 1,2 giây), với mọi kiểu nơi ở và
+     mọi câu về đèn. Bản trước: câu chào 41 từ chỉ đứng 3,5 giây. */
+  const ngu = [{ noi: 'TP.HCM', chon: false }, { noi: 'Thừa Thiên Huế', chon: true }, { noi: 'chỗ bạn đứng', chon: true, tuMay: true }];
+  const den = [{ n: 49, ngay: 0, demDat: 49, demBien: 0 }, { n: 49, ngay: 0, demDat: 0, demBien: 49 }, null];
+  const thieu = [];
+  for (const ch of T.CHANG) ch.chu.forEach(([p, h], i) => {
+    const co = ((i + 1 < ch.chu.length ? ch.chu[i + 1][0] : 1) - p) * ch.dai;
+    let can = 0;
+    for (const c of ngu) for (const d of den) can = Math.max(can, T._docLau(h({ ...c, sangTuTrang: 100, duoi: () => d })));
+    if (co < can) thieu.push(`${ch.id}#${i}: ${co.toFixed(1)}s < ${can.toFixed(1)}s`);
+  });
+  ok('câu nào cũng đứng đủ thời gian đọc, ở mọi chặng', !thieu.length, thieu.join('; '));
+}
 
 console.log('\n— Ảnh chi tiết quanh chỗ bạn (GIBS của NASA) —');
 {

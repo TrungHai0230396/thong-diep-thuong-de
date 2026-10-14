@@ -921,9 +921,10 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .tc-cham i{width:18px;height:3px;border-radius:2px;background:rgba(255,255,255,.18)}
 .tc-cham i.dang{background:#8ec9ff}
 .tc-so{margin:0;min-height:16px;font-size:12px;color:rgba(220,232,255,.6);font-variant-numeric:tabular-nums}
-.tc-chu{margin-top:auto;max-width:520px;align-self:center;text-align:center;text-shadow:0 1px 8px #000,0 0 2px #000}
-.tc-chu p{margin:0 0 10px;font-size:16px;line-height:1.55;color:rgba(244,246,255,.94);animation:tc-hien 1.2s ease}
-@keyframes tc-hien{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tc-chu{margin-top:auto;max-width:520px;align-self:center;text-align:center;text-shadow:0 1px 8px #000,0 0 2px #000;
+  transition:opacity .6s ease}
+.tc-chu.tat{opacity:0;transition:opacity .35s ease}
+.tc-chu p{margin:0 0 10px;font-size:16px;line-height:1.55;color:rgba(244,246,255,.94)}
 .tc-xong{max-width:520px;align-self:center;width:100%;margin:6px 0 0;text-align:center}
 .tc-lai{padding:12px 22px;border-radius:999px;cursor:pointer;font:inherit;font-size:15px;
   border:1px solid rgba(142,201,255,.5);background:rgba(142,201,255,.12);color:#cfe6ff}
@@ -935,8 +936,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 .tc-nut[hidden]{display:none}
 .tc-nut button{padding:10px 18px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px;
   border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.45);color:rgba(240,244,255,.9)}
-.tc-chu p.cu{animation:none}
-@media (prefers-reduced-motion:reduce){.tc-chu p{animation:none}}
+@media (prefers-reduced-motion:reduce){.tc-chu,.tc-chu.tat{transition:none}}
 
 /* ---------- thiền luân xa: dùng lại khung xn-* và nút ng-* của nhạc ngủ ---------- */
 .luanxa{position:fixed;inset:0;z-index:30;display:none;

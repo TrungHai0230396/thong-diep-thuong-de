@@ -972,7 +972,7 @@ Lúc thêm cỡ mới, tên Trái Đất bị mất hẳn: Mặt Trời to ra ch
 
 ### Hiệu ứng toàn cảnh
 
-"Mô phỏng hiệu ứng toàn cảnh" — không làm ngôi sao mới mà là **một chức năng nhỏ trong phần Nhìn từ vũ trụ**: nút **Hiệu ứng toàn cảnh** chỉ hiện khi đang ở cảnh vũ trụ, bấm vào thì phủ lên một hành trình khoảng ba phút (`assets/toancanh.js`). Bấm ✕ hoặc phím Esc thì về lại đúng cảnh vũ trụ đang xem, bầu trời chạy tiếp (lúc hành trình mở, vòng vẽ bầu trời bên dưới tạm dừng cho đỡ tốn pin).
+"Mô phỏng hiệu ứng toàn cảnh" — không làm ngôi sao mới mà là **một chức năng nhỏ trong phần Nhìn từ vũ trụ**: nút **Hiệu ứng toàn cảnh** chỉ hiện khi đang ở cảnh vũ trụ, bấm vào thì phủ lên một hành trình chừng ba phút rưỡi (`assets/toancanh.js`). Bấm ✕ hoặc phím Esc thì về lại đúng cảnh vũ trụ đang xem, bầu trời chạy tiếp (lúc hành trình mở, vòng vẽ bầu trời bên dưới tạm dừng cho đỡ tốn pin).
 
 Đọc trước khi làm: *hiệu ứng toàn cảnh* (overview effect) là tên Frank White đặt năm 1987 sau khi phỏng vấn phi hành gia — cảm giác kinh ngạc, xúc động khi lần đầu thấy cả Trái Đất từ vũ trụ. Yaden và cộng sự (*Psychology of Consciousness*, 2016) mô tả nó là một dạng kinh ngạc (awe) vượt khỏi bản thân: thấy đẹp, thấy Trái Đất mong manh, thấy mình gắn với mọi người. Stepanova và cộng sự (*Frontiers in Digital Humanities*, 2019) làm thực tế ảo về hiệu ứng này và thấy người xem cần thấy an toàn, thấy nơi quen thuộc của mình, có chút hồi hộp. Nên hành trình bắt đầu **từ chính chỗ bạn đứng** và đi ra xa dần:
 
@@ -1028,7 +1028,13 @@ Người xem hỏi "hiệu ứng toàn cảnh có khúc bay ngang hả?", rồi 
 
 Người dùng còn muốn "câu kiểu chào mừng bạn đến với chuyến bay cho vui nhộn": mở đầu như tiếp viên hàng không, chặng cuối cảm ơn "quý khách đã bay cùng chúng tôi — thật ra bạn chưa từng rời khỏi chấm sáng ấy". Bản đầu đặt số hiệu tự chế "TĐ-417"; người dùng hỏi "sao không lấy tàu Apollo" — nhưng Apollo chỉ đúng ở chặng Mặt Trăng: các chuyến Apollo (1968–1972) chỉ quay vòng Trái Đất chừng 185 km chứ không ở 417 km (độ cao của Trạm Vũ trụ Quốc tế, lắp từ 1998), và xa nhất người từng tới là chừng 400.000 km (Apollo 13), còn 6 tỉ km là tàu không người lái Voyager 1. Người dùng chọn gắn mỗi chặng đúng một chuyến có thật: câu chào "Chuyến bay hôm nay ghép từ ba chuyến có thật: Trạm Vũ trụ Quốc tế, Apollo 8, Voyager 1", rồi chặng quỹ đạo, chặng Mặt Trăng, chặng 6 tỉ km mở đầu bằng "Chặng của …". Chặng cuối giờ nói "xa bằng chỗ Voyager 1 quay lại chụp" — máy quay chỉ lùi ra đúng khoảng cách, không đi đúng hướng tàu đã bay.
 
-`scripts/test-toancanh.js`, 82 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm; máy quay chặng đầu giữ nguyên góc, chỉ đi lên, chân trời tụt từ trên xuống dưới giữa màn; cỡ ba ảnh trong app (đọc từ tệp JPEG); vẽ bằng card đồ hoạ cùng công thức với bản bộ xử lý, có mipmap, lọc dị hướng, xử lý kinh tuyến 180°, tự giảm tải; ảnh chi tiết: tâm làm tròn 1 độ, trưa chỉ xin ảnh ngày, nửa đêm chỉ xin ảnh đèn, chạng vạng cả hai, bỏ qua sát kinh tuyến 180°, địa chỉ đúng chuẩn WMS 1.3.0, kho riêng giữ qua các lần deploy; lời dẫn quỹ đạo nói vì sao độ cao không đổi; đếm đêm trên biển ở giữa Thái Bình Dương, đêm trên đất ở nước Mỹ, ban ngày, và câu về đèn theo đó; lời theo nơi ở: chọn thành phố, vị trí máy, chưa chọn (không gọi TP.HCM là chỗ bạn ngồi); báo trước, giải thích bay ngang đúng lúc đổi; dòng số ghi lên / ngang / lên / ra xa; chặng 4 bắt đầu đúng 417 km ngay trên chỗ bạn và chỉ đi lên; câu chào mừng, câu cảm ơn.
+#### "Sao lại hiển thị câu trước chồng lên câu sau, chữ nhảy khó đọc"
+
+Hai lỗi chồng lên nhau. Lời dẫn giữ hai dòng mới nhất: câu mới tới thì câu cũ bị đẩy lên trên, cả khối chữ nhảy, hai câu sát nhau như chồng lên nhau. Và nhiều câu không đứng đủ lâu để đọc: đo bằng chừng 4 từ mỗi giây cộng 1,2 giây để mắt tìm tới chữ, chặng 1 cần 35 giây chữ mà chỉ dài 22 giây — câu chào 41 từ chỉ đứng 3,5 giây; câu kể của phi hành gia Ả Rập Xê Út cần 11 giây mà có 8.
+
+Giờ mỗi lúc **một câu**: câu cũ mờ đi trong 0,35 giây rồi câu mới hiện dần đúng chỗ đó (thử trên màn điện thoại: luôn một đoạn, mép dưới đứng yên). Chặng 1 dài 38 giây, chặng 4 dài 30 giây, mốc từng câu chia lại; vài câu rút gọn (câu chào, câu "từ 30 km trời đã đen", câu "xem tạm vì chưa chọn nơi ở"). Bài kiểm mới đo mọi câu ở mọi chặng, với cả ba kiểu nơi ở và ba kiểu câu về đèn: câu nào đứng ít hơn thời gian đọc là hỏng — lần đầu chạy nó bắt ngay câu thứ hai của chặng 1 (bản "xem tạm") thiếu 1 giây. Cả hành trình giờ chừng ba phút rưỡi.
+
+`scripts/test-toancanh.js`, 83 bài: quỹ đạo đi đúng qua chỗ bạn, đang lên phía bắc, độ cao không đổi, vĩ độ cao nhất đúng 51,64°, chu kỳ, vận tốc; chân trời từ 417 km thấp hơn mặt phẳng ngang khoảng 20,2°; tỉ lệ mật độ khí giữa 5 km và 60 km đúng e^(55/8); màu trời xanh, hoàng hôn cam, đêm tối; ngày, đêm, đèn, mây với ảnh giả; dòng thời gian các chặng; khoảng cách máy quay tới Mặt Trăng và tới 6,06 tỉ km; Trái Đất rộng 1,9° nhìn từ Mặt Trăng; nút chỉ hiện ở cảnh vũ trụ, không thành ngôi sao riêng, vòng vẽ bầu trời dừng và chạy lại, phím Esc không rơi xuống Trời đêm; máy quay chặng đầu giữ nguyên góc, chỉ đi lên, chân trời tụt từ trên xuống dưới giữa màn; cỡ ba ảnh trong app (đọc từ tệp JPEG); vẽ bằng card đồ hoạ cùng công thức với bản bộ xử lý, có mipmap, lọc dị hướng, xử lý kinh tuyến 180°, tự giảm tải; ảnh chi tiết: tâm làm tròn 1 độ, trưa chỉ xin ảnh ngày, nửa đêm chỉ xin ảnh đèn, chạng vạng cả hai, bỏ qua sát kinh tuyến 180°, địa chỉ đúng chuẩn WMS 1.3.0, kho riêng giữ qua các lần deploy; lời dẫn quỹ đạo nói vì sao độ cao không đổi; đếm đêm trên biển ở giữa Thái Bình Dương, đêm trên đất ở nước Mỹ, ban ngày, và câu về đèn theo đó; lời theo nơi ở: chọn thành phố, vị trí máy, chưa chọn (không gọi TP.HCM là chỗ bạn ngồi); báo trước, giải thích bay ngang đúng lúc đổi; dòng số ghi lên / ngang / lên / ra xa; chặng 4 bắt đầu đúng 417 km ngay trên chỗ bạn và chỉ đi lên; câu chào mừng, câu cảm ơn; mỗi lúc một câu, đổi câu thì mờ ra rồi hiện vào; câu nào cũng đứng đủ thời gian đọc ở mọi chặng.
 
 ## Một hàm bị nuốt mất, và cả app đứng hình
 
@@ -1583,7 +1589,7 @@ assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt T
 assets/toancanh.js         hiệu ứng toàn cảnh: hành trình từ chỗ bạn đứng ra tới chấm xanh mờ, tia chiếu tự viết
 assets/traidat/            ba ảnh Trái Đất của NASA: đất 4096×2048, mây 2048×1024, đèn đêm 3600×1800, sinh bởi scripts/lam-traidat.py
 scripts/lam-traidat.py     thu nhỏ ảnh Visible Earth của NASA thành assets/traidat/
-scripts/test-toancanh.js   82 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, lời dẫn, card đồ hoạ, ảnh chi tiết NASA
+scripts/test-toancanh.js   83 kiểm thử hiệu ứng toàn cảnh: quỹ đạo, khí quyển, màu, các chặng, lời dẫn, card đồ hoạ, ảnh chi tiết NASA
 assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth, sinh bởi scripts/lam-datlien.py
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
@@ -1624,7 +1630,7 @@ node scripts/test-core.js        # chạy 39 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 48 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 110 kiểm thử bầu trời đêm
-node scripts/test-toancanh.js    # chạy 82 kiểm thử hiệu ứng toàn cảnh
+node scripts/test-toancanh.js    # chạy 83 kiểm thử hiệu ứng toàn cảnh
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
