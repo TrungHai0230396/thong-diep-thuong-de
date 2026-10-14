@@ -144,7 +144,13 @@ ok('giữa hai chặng tối dần rồi sáng dần, không giật cảnh', T._
 
 console.log('\n— Trên quỹ đạo: bay ngang, độ cao không đổi; lời về đèn theo cái đang thấy —');
 /* "Phải giải thích bay ngang chứ, vì mặc định mọi người nghĩ bay thẳng" */
-ok('mở đầu chào như tiếp viên: chuyến bay TĐ-417, điểm đến vũ trụ; kết thúc cảm ơn quý khách', T.CHANG[0].chu[0][0] === 0 && /Chào mừng bạn lên chuyến bay TĐ-417/.test(T.CHANG[0].chu[0][1]()) && /Cảm ơn quý khách đã bay cùng chuyến TĐ-417/.test(T.CHANG[6].chu[1][1]()));
+ok('mở đầu chào như tiếp viên, kết thúc cảm ơn quý khách', T.CHANG[0].chu[0][0] === 0 && /^Xin chào quý khách!/.test(T.CHANG[0].chu[0][1]()) && /^Cảm ơn quý khách/.test(T.CHANG[6].chu[1][1]()));
+/* "Sao không lấy tàu Apollo đi" — Apollo chỉ đúng ở chặng Mặt Trăng: không bay ở 417 km (quay vòng Trái Đất chừng 185 km),
+   không đi tới 6 tỉ km (đó là Voyager 1). Người dùng chọn: mỗi chặng gắn đúng một chuyến có thật. */
+ok('câu chào nêu đúng ba chuyến có thật; chặng quỹ đạo, Mặt Trăng, 6 tỉ km mở đầu bằng đúng chuyến của nó', /ba chuyến có thật: Trạm Vũ trụ Quốc tế, Apollo 8, Voyager 1/.test(T.CHANG[0].chu[0][1]()) &&
+   /^Chặng của Trạm Vũ trụ Quốc tế/.test(T.CHANG[1].chu[0][1]()) && /^Chặng của tàu Apollo 8/.test(T.CHANG[4].chu[0][1]()) && /^Chặng của tàu Voyager 1/.test(T.CHANG[5].chu[0][1]()) &&
+   !T.CHANG.some(c => c.chu.some(([, h]) => /TĐ-417/.test(h({ noi: 'TP.HCM' })))));
+ok('chặng 6 tỉ km nói "xa bằng chỗ Voyager 1" — máy chỉ lùi ra đúng khoảng cách, không đi đúng hướng tàu đã bay', /xa bằng chỗ nó quay lại chụp/.test(T.CHANG[5].chu[0][1]()));
 ok('cuối chặng 1 báo trước: tới 417 km thì thôi bay lên, chặng sau bay ngang', /thôi bay lên — chặng sau bay ngang/.test(T.CHANG[0].chu[4][1]()));
 ok('ngay đầu chặng 2 giải thích vì sao bay ngang: đứng yên thì rơi, lao ngang thì rơi mãi không chạm đất', T.CHANG[1].chu[0][0] === 0 &&
    /Vì sao giờ lại bay ngang\?/.test(T.CHANG[1].chu[0][1]()) && /rơi thẳng xuống/.test(T.CHANG[1].chu[0][1]()) && /luôn trượt qua mép Trái Đất/.test(T.CHANG[1].chu[1][1]()));

@@ -423,13 +423,13 @@ function veTraiDatGL(may, S, th, f, Rt, Uu, chiDat) {
 /* Mỗi chặng: tên, thời lượng (giây), các dòng chữ hiện dần (mốc phần trăm của chặng) */
 const CHANG = [
   { id: 'bay', ten: 'Rời mặt đất', dai: 22, chu: [
-    [0, () => 'Xin chào quý khách! Chào mừng bạn lên chuyến bay TĐ-417, điểm đến: vũ trụ. Thắt dây an toàn — không cần tắt điện thoại, nó chính là ô cửa sổ của bạn.'],
+    [0, () => 'Xin chào quý khách! Chuyến bay hôm nay ghép từ ba chuyến có thật: Trạm Vũ trụ Quốc tế, Apollo 8, Voyager 1. Thắt dây an toàn — không cần tắt điện thoại, nó chính là ô cửa sổ của bạn.'],
     [.16, (c) => `${tuDau(c)} Lên tới 30 km, bầu trời đã đen, đường chân trời bắt đầu cong.`],
     [.4, () => '100 km: ranh giới quy ước của vũ trụ (đường Kármán).'],
     [.62, () => 'Tên lửa thật không bay thẳng như vầy: Soyuz lên tới quỹ đạo 205 km thì đã bay ngang 1.640 km.'],
     [.86, () => '417 km: độ cao của Trạm Vũ trụ Quốc tế. Tới đây thì thôi bay lên — chặng sau bay ngang.']] },
   { id: 'quyDao', ten: 'Trên quỹ đạo', dai: 53, chu: [
-    [0, () => 'Vì sao giờ lại bay ngang? Ở độ cao này mà đứng yên thì sẽ rơi thẳng xuống đất.'],
+    [0, () => 'Chặng của Trạm Vũ trụ Quốc tế. Vì sao giờ lại bay ngang? Ở độ cao này mà đứng yên thì sẽ rơi thẳng xuống đất.'],
     [.14, () => 'Muốn ở lại trên này phải lao ngang thật nhanh — 7,67 km mỗi giây, từ TP.HCM ra Hà Nội chưa tới 3 phút. Trạm vẫn rơi, nhưng lao ngang nhanh tới mức luôn trượt qua mép Trái Đất, nên rơi mãi mà không chạm đất. Đó là quỹ đạo.'],
     [.42, () => 'Một vòng quanh Trái Đất mất 92,9 phút: một ngày thấy chừng 15–16 lần bình minh. Đang tua nhanh 100 lần.'],
     [.66, (c) => loiDen(c.duoi ? c.duoi() : null)]] },
@@ -442,15 +442,15 @@ const CHANG = [
     [.42, () => 'Một phi hành gia Ả Rập Xê Út bay năm 1985 kể: ngày đầu ai cũng chỉ về nước mình, ngày thứ ba, thứ tư chỉ về châu lục — tới ngày thứ năm, chỉ còn thấy một Trái Đất.'],
     [.74, () => 'Cảm giác kinh ngạc, thấy mình gắn với mọi người ấy được gọi là hiệu ứng toàn cảnh.']] },
   { id: 'trang', ten: 'Từ phía Mặt Trăng', dai: 25, chu: [
-    [0, () => '384.400 km — xa bằng Mặt Trăng.'],
+    [0, () => 'Chặng của tàu Apollo 8 — chuyến đầu tiên đưa người bay vòng quanh Mặt Trăng, tháng 12/1968. 384.400 km: tới chỗ Mặt Trăng.'],
     [.35, (c) => `Trái Đất lúc này nhìn từ Mặt Trăng: sáng ${c.sangTuTrang}%. Ngày 24/12/1968, William Anders (Apollo 8) chụp Trái Đất mọc lên trên chân trời Mặt Trăng.`]] },
   { id: 'cham', ten: 'Chấm xanh mờ', dai: 28, chu: [
-    [0, () => '6 tỉ km — chỗ Voyager 1 quay lại chụp Trái Đất ngày 14/2/1990.'],
+    [0, () => 'Chặng của tàu Voyager 1, tàu không người lái. 6 tỉ km — xa bằng chỗ nó quay lại chụp Trái Đất ngày 14/2/1990.'],
     [.4, () => 'Trong tấm ảnh ấy, Trái Đất chỉ chiếm 0,12 điểm ảnh.'],
     [.7, () => 'Carl Sagan viết: mọi người ta từng yêu, từng biết, từng nghe tên, đều sống trên chấm nhỏ ấy.']] },
   { id: 've', ten: 'Nhìn lại', dai: 16, chu: [
     [0, (c) => `Hít một hơi thật chậm. ${choBan(c)}`],
-    [.5, () => 'Cảm ơn quý khách đã bay cùng chuyến TĐ-417. Mời bạn mở mắt ra — thật ra bạn chưa từng rời khỏi chấm sáng ấy.']] },
+    [.5, () => 'Cảm ơn quý khách đã bay cùng chúng tôi. Mời bạn mở mắt ra — thật ra bạn chưa từng rời khỏi chấm sáng ấy.']] },
 ];
 /* Lời theo nơi ở. c.chon: đã chọn nơi trong Trời đêm; c.tuMay: lấy vị trí máy. Chưa chọn thì Trời đêm ghi
    "Xem tạm TP.HCM" — ở đây cũng phải nói là xem tạm, đừng gọi TP.HCM là "chỗ bạn đang ngồi" với người ở nơi khác. */
