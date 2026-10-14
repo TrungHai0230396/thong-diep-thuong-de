@@ -578,6 +578,7 @@ function hoanTac() {
 }
 /* sau mỗi lần sửa: robot về chỗ cũ, bỏ dấu sai cũ, vẽ lại, hai bài đầu thì tự chỉ bước tiếp */
 function daSua() {
+  tatBao();
   if (!dsTheoTen(dich)) { dich = 'chinh'; viTri = null; }
   sai.clear(); datLai(); veMa();
   if (bai < 2) goiY(true);
@@ -633,10 +634,31 @@ function danhDauSai() {
   if (!tam) return;
   sai.forEach(id => { const n = tam.querySelector(`[data-maid="${id}"]`); if (n && n.classList) n.classList.add('lt-sai'); });
 }
+/* lau = 0: lời báo đứng yên tới khi bé sửa chương trình, chạy lại, hay chạm vào nó — báo vài giây rồi tắt thì dễ lỡ
+   (người dùng: "bấm chạy xong đứng luôn" — lời "chưa thắp hết" đã hiện rồi tắt mà không thấy) */
 function bao(chu, lau = 2800) {
   const p = tam.querySelector('.lt-bao');
   p.textContent = chu; p.hidden = false;
-  clearTimeout(bao.t); bao.t = setTimeout(() => { p.hidden = true; }, lau);
+  clearTimeout(bao.t); if (lau) bao.t = setTimeout(() => { p.hidden = true; }, lau);
+}
+const tatBao = () => { clearTimeout(bao.t); if (tam) tam.querySelector('.lt-bao').hidden = true; };
+
+/* Kiểm trước khi chạy. Ô Lặp, Nếu, Lặp tới hết sao còn trống thì không làm gì cả — robot chạy hết phần trước rồi đứng
+   im, trông như app bị treo (người dùng gặp ở bài 69: Lặp 3 lần còn trống, Hàm ★ có lệnh mà chưa được gọi). */
+function kiemChuongTrinh(chinhK, hamK) {
+  const timTrong = (ds) => {
+    for (const n of ds) {
+      if ((n.k === 'lap' || n.k === 'den') && !n.than.length) return { loai: 'trong', id: n.id, ds: n.id + '.than' };
+      if (n.k === 'neu' && !n.thi.length && !n.khac.length) return { loai: 'trong', id: n.id, ds: n.id + '.thi' };
+      const c = (n.than && timTrong(n.than)) || (n.thi && (timTrong(n.thi) || timTrong(n.khac)));
+      if (c) return c;
+    }
+    return null;
+  };
+  const goiHam = (ds) => ds.some(n => n.k === 'ham' || (n.than && goiHam(n.than)) || (n.thi && (goiHam(n.thi) || goiHam(n.khac))));
+  return timTrong(chinhK) || timTrong(hamK)
+    || (hamK.length && !goiHam(chinhK) ? { loai: 'hamChuaGoi' } : null)
+    || (!hamK.length && goiHam(chinhK) ? { loai: 'hamTrong' } : null);
 }
 
 /* ---------- gợi ý: so với lời giải mẫu ----------
@@ -788,6 +810,7 @@ function bam(e) {
   if (!t) return;
   const q = (sel) => t.closest(sel);
   if (q('.xn-dong')) { dong(); return; }
+  if (q('.lt-bao')) { tatBao(); return; }
   let n;
   if ((n = q('[data-them]'))) { themO(n.dataset.them); return; }
   if ((n = q('[data-xoa]'))) {                                           // × trên ô đang chọn: bỏ ô đó
@@ -860,6 +883,23 @@ function nutChay() {
 function batDauChay(tungBuoc) {
   amThanh();                                                             // mở âm thanh ngay trong lúc bấm (iPhone đòi vậy)
   if (!chinh.length) { bao('Xếp vài ô lệnh vào Chương trình rồi bấm Chạy nhé.'); goiY(true); return; }
+  const kt = kiemChuongTrinh(chinh, ham);
+  if (kt) {
+    if (kt.loai === 'trong') {
+      const n = timNut(kt.id), ten = n.k === 'lap' ? 'Lặp' : n.k === 'den' ? 'Lặp tới hết sao' : 'Nếu';
+      dich = kt.ds; viTri = null; chonId = null; sai.clear(); sai.add(kt.id); veMa();
+      bao(`Ô ${ten} đang trống nên robot không biết làm gì. Đặt lệnh vào bên trong (chỗ dấu + xanh) rồi chạy lại.`, 0);
+    } else if (kt.loai === 'hamChuaGoi') {
+      bao('Hàm ★ đã có lệnh nhưng Chương trình chưa gọi nó. Thêm ô Hàm ★ vào chỗ cần dùng (ô đó đang nhấp nháy ở dưới).', 0);
+      const nut = tam.querySelector('[data-them="ham"]');
+      if (nut && nut.classList) { nut.classList.add('lt-goiy-o'); setTimeout(() => nut.classList.remove('lt-goiy-o'), 4200); }
+    } else {
+      dich = 'ham'; viTri = null; chonId = null; veMa();
+      bao('Chương trình gọi Hàm ★ nhưng Hàm ★ chưa có lệnh nào. Xếp lệnh vào khung Hàm ★ rồi chạy lại.', 0);
+    }
+    return;
+  }
+  tatBao();
   chonId = null; sai.clear(); datLai(); veMa();
   const kq = chay(ban, chinh, ham);
   dangChay = { kq, i: 0, tungBuoc, cho: tungBuoc };
@@ -890,9 +930,9 @@ function ketThuc() {
       khongsao: 'Ô này không có sao để thắp — robot dừng lại.',
       dathap: 'Ngôi sao này thắp rồi — robot dừng lại.',
     };
-    bao(`${LY[kq.loi.ly]} Ô tô đỏ là lệnh robot không làm được.`, 4600);
-  } else if (kq.het) bao('Robot chạy mãi không dừng. Xem lại vòng lặp nhé.', 3600);
-  else bao(`Chưa thắp hết — còn ${kq.conLai} ngôi sao.${sai.size ? ' Ô tô đỏ là chỗ robot bị vướng.' : ' Xem robot đi lạc ở đâu rồi sửa nhé.'}`, 3800);
+    bao(`${LY[kq.loi.ly]} Ô tô đỏ là lệnh robot không làm được.`, 0);
+  } else if (kq.het) bao('Robot chạy mãi không dừng. Xem lại vòng lặp nhé.', 0);
+  else bao(`Chạy hết chương trình rồi mà còn ${kq.conLai} ngôi sao chưa thắp. Thêm lệnh để robot đi tiếp nhé.`, 0);
 }
 
 function mo() {
@@ -913,5 +953,5 @@ function dong() {
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
 
 self.TDTD_LAPTRINH = { mo, dong, BAI, CHUONG, HUONG, docMa, soO, loaiO, dungBan, chay, itNhat, banBai, O,
-  goiYBuoc, soSao, mauBai, gocTot, _moToi: () => moToi(), _moHet: (b) => { moHet = !!b; }, _moBai: (i) => moBai(i, false), _themO: themO, _ct: () => ({ chinh, ham, dich, viTri, chonId }), _ve: () => ve, _chayNgay: batDauChay };
+  goiYBuoc, soSao, mauBai, gocTot, kiemChuongTrinh, _moToi: () => moToi(), _moHet: (b) => { moHet = !!b; }, _moBai: (i) => moBai(i, false), _themO: themO, _ct: () => ({ chinh, ham, dich, viTri, chonId }), _ve: () => ve, _chayNgay: batDauChay };
 })();

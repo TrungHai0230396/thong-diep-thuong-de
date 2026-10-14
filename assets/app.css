@@ -1048,6 +1048,8 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .lt-bao{position:absolute;left:50%;bottom:58px;transform:translateX(-50%);width:max-content;max-width:86%;margin:0;padding:8px 14px;border-radius:12px;
   background:rgba(20,18,50,.92);border:1px solid rgba(255,214,120,.4);font-size:13.5px;line-height:1.45;text-align:center}
 .lt-bao[hidden]{display:none}
+.lt-bao{cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.lt-dangchay .lt-cho{visibility:hidden}
 .lt-ma{flex:none;height:26vh;min-height:150px;overflow:auto;padding:6px 12px 2px;background:#0d0b22}
 .lt-khung{margin:0 0 8px;padding:6px 8px 8px;border-radius:14px;border:1.5px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.03)}
 .lt-khung[hidden]{display:none}

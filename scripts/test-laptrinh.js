@@ -139,6 +139,23 @@ console.log('\n— Chấm sao theo số ô —');
   delete global.localStorage;
 }
 
+console.log('\n— Kiểm trước khi chạy —');
+{
+  /* Người dùng ở bài 69: "bấm chạy mà còn dấu + xong đứng luôn" — Lặp 3 lần còn trống, Hàm ★ có lệnh mà chưa gọi.
+     Chương trình chạy hết phần trước rồi đứng im, lời báo vài giây rồi tắt. */
+  const k = (c, h = '') => L.kiemChuongTrinh(L.docMa(c), L.docMa(h));
+  const r = k('d d R t 3()', 'd d t');
+  ok('ô Lặp trống: không chạy, chỉ ra đúng ô trống', r && r.loai === 'trong');
+  ok('ô Nếu trống cả hai phần, Lặp tới hết sao trống: cũng báo', k('w(?d()())').loai === 'trong' && k('w()').loai === 'trong');
+  ok('Nếu chỉ có phần "không thì" là hợp lệ', k('w(?d()(R) d)') === null);
+  ok('Hàm ★ có lệnh mà Chương trình không gọi: báo', k('d d R t', 'd d t').loai === 'hamChuaGoi');
+  ok('gọi Hàm ★ mà Hàm ★ trống: báo', k('F F').loai === 'hamTrong');
+  ok('chương trình đủ: cho chạy (kể cả gọi hàm nằm trong vòng lặp)', k('F R 3(F)', 'd d t') === null);
+  const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8');
+  ok('lời báo sau khi chạy đứng yên tới khi sửa hay chạm vào, không tự tắt', /bao\(`Chạy hết chương trình rồi mà còn \$\{kq\.conLai\} ngôi sao chưa thắp\.[^`]*`, 0\)/.test(src) && /function daSua\(\) \{\s*tatBao\(\);/.test(src));
+  ok('đang chạy thì ẩn dấu +', /\.lt-dangchay \.lt-cho\{visibility:hidden\}/.test(fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.css'), 'utf8')));
+}
+
 console.log('\n— Gắn vào app —');
 const app = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.js'), 'utf8');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');

@@ -83,6 +83,14 @@ let vuTru = false;       // đang ở cảnh "nhìn từ vũ trụ" (assets/vutr
 const V = () => self.TDTD_VUTRU;
 let keo = null, chon = null;
 let mucMay = null;       // hướng cảm biến vừa đọc; màn hình trôi dần về đó chứ không nhảy theo
+let loc = null;          // bộ lọc 1€: hướng cảm biến khung trước, tốc độ xoay đã làm mượt
+let lechLaBan = null;    // iPhone: độ lệch giữa alpha (con quay, mốc tuỳ ý) và hướng la bàn
+/* Bộ lọc 1€ (Casiez, Roussel, Vogel — CHI 2012): tần số cắt = LOC_MIN + LOC_BETA × tốc độ xoay (độ/giây).
+   Tay đứng yên: cắt thấp, lọc mạnh, hết rung. Tay xoay nhanh: cắt cao, gần như không lọc, hết trễ. Tham số theo cách
+   chỉnh của tác giả: LOC_MIN 1 Hz cho êm khi đứng yên, rồi tăng beta tới khi xoay nhanh không còn trễ; tốc độ được làm
+   mượt riêng ở 1 Hz. Bản trước trễ cố định 100 ms: xoay 90°/giây thì bầu trời luôn chậm sau tay 9° — người dùng
+   "xoay theo máy bị lag, không mượt". Giờ chậm chừng 2°. */
+const LOC_MIN = 1.0, LOC_BETA = .06, LOC_DAO = 1.0;
 let quanTinh = null;     // vận tốc còn lại sau khi nhấc ngón, độ mỗi mili giây
 /* Mốc chạm: mỗi khung vẽ ghi lại thiên thể nào nằm ở đâu trên màn, để chạm vào là dò ra được.
    Trước đây biến `chon` khai báo rồi bỏ không, tức app chưa hề có chức năng chạm chọn —
@@ -932,9 +940,17 @@ function troiNhin(dt) {
        tay rung, con số hướng nhảy 3,1 độ mỗi khung lúc nhìn ngang nhưng vọt lên 12,3 độ lúc
        chĩa gần thẳng đứng, trong khi vector chỉ nhảy đều 3,9 độ ở mọi tư thế. Kéo trên vector
        thì một cử động nhỏ của tay luôn ra một thay đổi nhỏ trên màn. */
-    const k = 1 - Math.exp(-dt / 100);
+    const s = Math.max(dt, 1) / 1000;
     const a = A().vecHuong(huongNhin, caoNhin), b = A().vecHuong(mucMay.h, mucMay.c);
-    const g = A().gocHuong({ x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k, z: a.z + (b.z - a.z) * k });
+    const tron = (p, q, k) => ({ x: p.x + (q.x - p.x) * k, y: p.y + (q.y - p.y) * k, z: p.z + (q.z - p.z) * k });
+    /* tốc độ xoay của chính hướng cảm biến (vector mỗi giây), làm mượt CÓ DẤU ở 1 Hz: rung tay qua lại triệt tiêu
+       nhau nên lúc đứng yên tốc độ gần 0, xoay thật thì ra đúng tốc độ */
+    const tr = loc ? loc.truoc : b, dx = { x: (b.x - tr.x) / s, y: (b.y - tr.y) / s, z: (b.z - tr.z) / s };
+    const kd = 1 - Math.exp(-2 * Math.PI * LOC_DAO * s);
+    loc = { truoc: b, dx: loc ? tron(loc.dx, dx, kd) : { x: 0, y: 0, z: 0 } };
+    const tocDo = Math.hypot(loc.dx.x, loc.dx.y, loc.dx.z) * 180 / Math.PI;    // độ mỗi giây
+    const k = 1 - Math.exp(-2 * Math.PI * (LOC_MIN + LOC_BETA * tocDo) * s);
+    const g = A().gocHuong(tron(a, b, k));
     huongNhin = A().chuan(g.huong);
     caoNhin = Math.max(-85, Math.min(88, g.cao));
   }
@@ -1303,20 +1319,42 @@ function ganCamBien() {
        gần thẳng đứng nghiêng 5 độ là sai 68 độ. Bầu trời bị quăng đi theo từng rung tay, bộ
        làm mượt đuổi theo một cái đích đang nhảy, và nhìn ra thì tưởng máy lag.
 
-       iOS có webkitCompassHeading đã trừ sẵn độ lệch từ nên chính xác hơn alpha; nó tương ứng
-       với alpha theo công thức alpha = 360 - heading, nên thay vào rồi dựng ma trận như thường. */
-    const al = typeof e.webkitCompassHeading === 'number' ? 360 - e.webkitCompassHeading : e.alpha;
+       Hướng ngang lấy ở đâu:
+       - Android: sự kiện deviceorientationabsolute cho alpha tính từ hướng Bắc (đã trộn con quay, la bàn). Có
+         thì chỉ nghe nó; deviceorientation thường trên Chrome Android có alpha tính từ một mốc tuỳ ý.
+       - iPhone: alpha tính từ mốc tuỳ ý; hướng Bắc chỉ có ở webkitCompassHeading (alpha la bàn = 360 − heading).
+         Bản trước lấy thẳng la bàn — mà la bàn iOS lọc rất nặng, chậm và nhảy bậc, nên xoay ngang bị giật trong
+         khi ngửa lên cúi xuống (lấy từ con quay) lại mượt. Kỹ sư Apple (Dean Jackson, W3C 2011) nói rõ iOS để
+         app tự trộn: con quay cho nhạy, la bàn để chỉnh trôi. Nên giờ hướng = alpha (con quay) + độ lệch, độ lệch
+         kéo dần về (la bàn − alpha) với hằng số chừng 2 giây, chỉ khi la bàn đáng tin (độ chính xác ≤ 30°) và máy
+         chưa ngửa quá 80° — ngửa quá thẳng đứng thì "hướng đỉnh máy" của la bàn lật ngược. Chưa có lúc nào đáng
+         tin thì tạm dùng la bàn như cũ. */
+    if (coHuongTuyetDoi && e.type === 'deviceorientation' && !e.absolute) return;
+    let al = e.alpha;
+    if (typeof e.webkitCompassHeading === 'number') {
+      const laBan = 360 - e.webkitCompassHeading;
+      const tinCay = !(e.webkitCompassAccuracy < 0 || e.webkitCompassAccuracy > 30) && typeof e.beta === 'number' && Math.abs(e.beta) < 80;
+      if (typeof al !== 'number') al = laBan;
+      else {
+        const d = ((laBan - al) % 360 + 540) % 360 - 180;
+        if (lechLaBan === null) { if (tinCay) lechLaBan = d; }
+        else if (tinCay) lechLaBan += (((d - lechLaBan) % 360 + 540) % 360 - 180) * .008;
+        al = lechLaBan === null ? laBan : al + lechLaBan;
+      }
+    }
     if (al === null && typeof e.beta !== 'number') return;
     const v = A().huongMay(al, e.beta, e.gamma);
     if (!v) return;
     mucMay = { h: A().chuan(v.huong), c: Math.max(-85, Math.min(88, v.cao)) };
   };
+  if (coHuongTuyetDoi) addEventListener('deviceorientationabsolute', batTheoMay, true);
   addEventListener('deviceorientation', batTheoMay, true);
 }
+const coHuongTuyetDoi = typeof self !== 'undefined' && 'ondeviceorientationabsolute' in self;
 
 async function doiTheoMay() {
   const nut = tam.querySelector('.td-may');
-  if (theoMay) { theoMay = false; mucMay = null; nut.classList.remove('bat'); nut.textContent = 'Xoay theo máy'; return; }
+  if (theoMay) { theoMay = false; mucMay = null; loc = null; nut.classList.remove('bat'); nut.textContent = 'Xoay theo máy'; return; }
   /* iOS 13 trở lên bắt phải xin phép, và chỉ xin được ngay trong một cú chạm. */
   const D = self.DeviceOrientationEvent;
   if (D && typeof D.requestPermission === 'function') {
@@ -1329,7 +1367,7 @@ async function doiTheoMay() {
     return;
   }
   if (!batTheoMay) ganCamBien();
-  quanTinh = null; mucMay = null;
+  quanTinh = null; mucMay = null; loc = null; lechLaBan = null;
   theoMay = true; nut.classList.add('bat'); nut.textContent = 'Đang xoay theo máy';
 }
 
@@ -1356,7 +1394,7 @@ function dong() {
   if (self.TDTD_TOANCANH && self.TDTD_TOANCANH.dangMo()) self.TDTD_TOANCANH.dong();
   if (raf) { cancelAnimationFrame(raf); raf = null; }
   if (vuTru && tam) doiVuTru(false);
-  theoMay = false; mucMay = null; quanTinh = null;
+  theoMay = false; mucMay = null; quanTinh = null; loc = null;
   if (tam) {                               // mở lại màn thì nút không còn ghi "Đang xoay theo máy" nữa
     const nut = tam.querySelector('.td-may');
     nut.classList.remove('bat'); nut.textContent = 'Xoay theo máy';
@@ -1404,6 +1442,7 @@ self.TDTD_TROIDEM = { mo, dong,
      bật được, mà đây lại đúng là đoạn mã từng sai. */
   _camBien: (e) => { if (!batTheoMay) ganCamBien(); const t = theoMay; theoMay = true; batTheoMay(e); theoMay = t; return mucMay && { ...mucMay }; },
   _mucMay: (h, c) => { theoMay = true; mucMay = { h, c }; },
+  _datLaiLoc: () => { loc = null; lechLaBan = null; },
   _htmlChu: () => tam.querySelector('.td-tin')._html,
   _quenNoi: () => { daChon = false; },
   _debug: () => ({ noi, daChon, huongNhin: Math.round(huongNhin), caoNhin: Math.round(caoNhin), goc, theoMay, W, H }),

@@ -1227,6 +1227,15 @@ nên không cách nào thử bằng tay. Giờ có móc `_camBien()` cho phép b
 vào bộ xử lý trong Node. Gài lại cách cũ thì bài kiểm báo đúng *"lệch 0°"* — nguyên văn triệu
 chứng người dùng gặp.
 
+## "Chỗ bầu trời xoay theo máy bị lag, không có mượt mà"
+
+Lần trước nghi vẽ chậm thì sai; lần này đo lại trước: một khung vẽ ở cỡ điện thoại tốn **0,3–1,1 ms** ở mọi hướng nhìn, kể cả lúc nửa đêm đầy sao — điện thoại có chậm hơn máy tính năm lần vẫn thừa sức 60 khung/giây. Không phải do vẽ. Hai chỗ trễ nằm ở đường đi của số đo cảm biến:
+
+- **Bộ làm mượt trễ cố định 100 ms.** Màn hình trôi về hướng cảm biến với hằng số 100 ms bất kể tay đứng yên hay đang xoay: xoay 90°/giây thì bầu trời luôn chậm sau tay chừng 9°, dừng tay còn trôi thêm ba phần mười giây. Thay bằng **bộ lọc 1€** (Casiez, Roussel, Vogel — CHI 2012, [trang của tác giả](https://cristal.univ-lille.fr/~casiez/1euro)): tần số cắt = 1 Hz + 0,06 × tốc độ xoay (độ/giây). Đứng yên thì lọc mạnh, hết rung; xoay nhanh thì gần như không lọc, hết trễ. Tốc độ xoay tính trên vector hướng, làm mượt có dấu ở 1 Hz — rung tay qua lại triệt tiêu nhau nên lúc đứng yên tốc độ gần 0.
+- **iPhone lấy hướng ngang từ la bàn** (`webkitCompassHeading`), mà la bàn iOS lọc rất nặng — chậm và nhảy bậc — trong khi ngửa lên cúi xuống lấy từ con quay nên mượt: xoay ngang giật hơn xoay dọc. Kỹ sư Apple (Dean Jackson, [W3C 2011](https://lists.w3.org/Archives/Public/public-geolocation/2011Jul/0014.html)) nói rõ iOS để app tự trộn: con quay cho nhạy, la bàn để chỉnh trôi. Giờ hướng = alpha của con quay (mốc tuỳ ý) + độ lệch; độ lệch kéo dần về (la bàn − alpha) với hằng số chừng 2 giây, chỉ khi la bàn báo độ chính xác ≤ 30° và máy chưa ngửa quá 80° (ngửa quá thẳng đứng thì hướng "đỉnh máy" lật ngược). Chưa có lúc nào đáng tin thì tạm dùng la bàn như cũ. Android dùng sự kiện `deviceorientationabsolute` (alpha tính từ hướng Bắc) khi có.
+
+Mô phỏng bàn tay thật trong `test-troidem.js` (60 lần đọc mỗi giây, rung ngẫu nhiên như tay người, cùng một chuỗi cho cả hai cách lọc; đứng yên 1 giây, xoay 90°/giây 1 giây, dừng): đang xoay **chậm sau tay 1,7° thay vì 8,2°**; đứng yên rung 0,060°/khung thay vì 0,076°; dừng tay 0,3 giây còn lệch 0,03° thay vì 0,52°. iPhone: la bàn còn chậm mà bầu trời đã đi theo con quay ngay; la bàn bắt kịp thì vẫn khớp; la bàn báo kém thì không kéo theo. Chưa thử được trên điện thoại thật (máy bàn không có cảm biến).
+
 ## Bấm vào Mặt Trăng thì không có gì xảy ra
 
 Người dùng nói tiếp: *"bấm vô xem mặt trăng mặt trời thì ko xem đc"*. Soát ra thì app **chưa hề
@@ -1648,7 +1657,11 @@ Kết quả lần chạy cuối (60 giây mỗi bài): **84 bài chứng minh đ
 
 Soát bằng mắt cả 100 bản đồ (ghép thành lưới ở cỡ điện thoại): bản đồ nào cũng rõ đường, rõ ô đích; riêng những bài có tháp cao (Tháp xoắn, Thang và sân, Xoắn ốc lên trời, Bậc thang đôi, các cầu thang chương lặp) thì khối cao nhất đứng ngay phía trước che mất các bậc thấp — giờ mỗi bài **tự chọn góc nhìn** trong bốn góc sao cho khối cao nằm phía sau (bản đồ phẳng giữ góc quen; trái phải tính theo hướng robot nên đổi góc không đổi lời giải). Soát chữ: chương Sửa lỗi còn dặn "bấm vào ô sai để bỏ" (cách cũ) — giờ là chạm rồi bấm ×; chương Nếu… thì… gọi tên ô chưa khớp nhãn mới.
 
-`scripts/test-laptrinh.js`, 49 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gợi ý từng bước (ô tiếp theo, ô sai, ô thừa, thiếu ô ngay trước ô nào, số lần lặp, thêm vào thân vòng lặp lồng, vào Hàm ★, vào phần "không thì"); âm thanh (chuông cao dần, nhạc mừng, tiếng vướng, tắt được, mở lúc bấm); chế độ thử mở tới bài 100, bình thường chỉ tới bài chưa xong đầu tiên; chấm sao (3 / 2 / 1 sao theo số ô, gọn nhất là đủ 3 sao ở mọi bài, số tối đa chừa chỗ cho 2 sao, chuỗi tiến độ cũ vẫn đọc được); gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
+#### "Bấm chạy mà còn dấu + xong đứng luôn"
+
+Bài 69, chương trình của người dùng: Đi, Đi, Rẽ phải, Thắp, rồi **Lặp 3 lần còn trống**; Hàm ★ có Đi, Đi, Thắp nhưng **chương trình không gọi**. Chạy thì robot làm bốn lệnh đầu, tới ô Lặp trống thì chẳng có gì làm — chương trình hết, robot đứng im; lời "chưa thắp hết" hiện vài giây rồi tắt nên dễ lỡ; dấu + vẫn nằm trên màn trông như kẹt ở đó. Giờ **kiểm trước khi chạy** (`kiemChuongTrinh`): ô Lặp, Lặp tới hết sao, Nếu (trống cả hai phần) còn trống thì không chạy, tô đỏ ô đó, đưa dấu + vào trong và nói "Ô Lặp đang trống nên robot không biết làm gì…"; Hàm ★ có lệnh mà chương trình chưa gọi, hay gọi Hàm ★ mà hàm trống, cũng báo và chỉ chỗ. Lời báo sau khi chạy **đứng yên** tới khi bé sửa chương trình, chạy lại hay chạm vào nó; đang chạy thì ẩn dấu +.
+
+`scripts/test-laptrinh.js`, 57 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gợi ý từng bước (ô tiếp theo, ô sai, ô thừa, thiếu ô ngay trước ô nào, số lần lặp, thêm vào thân vòng lặp lồng, vào Hàm ★, vào phần "không thì"); âm thanh (chuông cao dần, nhạc mừng, tiếng vướng, tắt được, mở lúc bấm); chế độ thử mở tới bài 100, bình thường chỉ tới bài chưa xong đầu tiên; chấm sao (3 / 2 / 1 sao theo số ô, gọn nhất là đủ 3 sao ở mọi bài, số tối đa chừa chỗ cho 2 sao, chuỗi tiến độ cũ vẫn đọc được); kiểm trước khi chạy (ô trống, hàm chưa gọi, hàm trống), lời báo đứng yên, ẩn dấu + khi chạy; gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
 
 ## Cấu trúc
 
@@ -1667,7 +1680,7 @@ scripts/test-pond.js       48 kiểm thử hồ nước, chạy hồ ngoài trì
 scripts/test-astro.js      73 kiểm thử thiên văn, đối chiếu số liệu ngoài (có giờ mọc lặn Trăng theo JPL Horizons)
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
-scripts/test-troidem.js    110 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
+scripts/test-troidem.js    117 kiểm thử bầu trời: chạm chọn, quay nhìn, xoay theo máy, đổi nơi, bẫy đơn vị, sao thật, Ngân Hà, nhìn từ vũ trụ
 assets/vutru.js            cảnh nhìn từ vũ trụ: Trái Đất – Mặt Trăng và Hệ Mặt Trời, phép chiếu tự viết
 assets/toancanh.js         hiệu ứng toàn cảnh: hành trình từ chỗ bạn đứng ra tới chấm xanh mờ, tia chiếu tự viết
 assets/traidat/            ba ảnh Trái Đất của NASA: đất 4096×2048, mây 2048×1024, đèn đêm 3600×1800, sinh bởi scripts/lam-traidat.py
@@ -1698,7 +1711,7 @@ assets/thienluanxa.js      giao diện ngôi sao thiền luân xa: hoa sen, nh�
 scripts/test-luanxa.js     101 kiểm thử thiền luân xa: nội dung, phổ chuông, đàn, lịch, thiền riêng, hình, trình phát
 assets/laptrinh.js         Robot thắp sao: chạy chương trình, dựng bản đồ từ lời giải, cảnh 3D nhìn nghiêng, xếp ô lệnh
 assets/baicode.js          100 bài, 10 chương của Robot thắp sao, viết bằng cú pháp gọn, mỗi bài có lời giải mẫu
-scripts/test-laptrinh.js   49 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy, gợi ý, chấm sao
+scripts/test-laptrinh.js   57 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy, gợi ý, chấm sao
 scripts/tim-loi-giai-gon.js  thử mọi chương trình ngắn hơn lời giải mẫu, báo bài nào có cách gọn hơn (chạy tay khi sửa bài)
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -1716,7 +1729,7 @@ python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 39 kiểm thử lõi (Node 18+)
 node scripts/test-pond.js        # chạy 48 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
-node scripts/test-troidem.js     # chạy 110 kiểm thử bầu trời đêm
+node scripts/test-troidem.js     # chạy 117 kiểm thử bầu trời đêm
 node scripts/test-toancanh.js    # chạy 83 kiểm thử hiệu ứng toàn cảnh
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
@@ -1726,7 +1739,7 @@ node scripts/test-caiapp.js      # chạy 38 kiểm thử cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
-node scripts/test-laptrinh.js    # chạy 49 kiểm thử Robot thắp sao (cả 100 bài)
+node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 192 kiểm thử trò luyện phát âm

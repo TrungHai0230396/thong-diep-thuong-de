@@ -243,6 +243,61 @@ console.log('\n— Trôi êm: cảm biến rung thì hình không rung theo, vu�
   T._quanTinh(null);
 }
 
+console.log('\n— Xoay theo máy hết trễ: mô phỏng bàn tay thật —');
+{
+  /* Người dùng: "xoay theo máy bị lag, không mượt". Đo một khung vẽ chỉ 0,3–1,1 ms (cả lúc nửa đêm đầy sao) — không
+     phải do vẽ. Là do bộ làm mượt trễ cố định 100 ms. Mô phỏng: 60 lần đọc cảm biến mỗi giây, tay rung ngẫu nhiên
+     (cùng một chuỗi cho cả hai cách lọc), đứng yên 1 giây, xoay ngang 90°/giây trong 1 giây, rồi dừng. */
+  let hat = 7;
+  const ngau = () => { hat = (hat * 1103515245 + 12345) % 2147483648; return hat / 2147483648; };
+  const gauss = () => Math.sqrt(-2 * Math.log(ngau() + 1e-12)) * Math.cos(2 * Math.PI * ngau());
+  const N = 180, dt = 1000 / 60, that = [], doc = [];
+  for (let i = 0; i < N; i++) {
+    const t = i / 60, h = 100 + (t < 1 ? 0 : t < 2 ? (t - 1) * 90 : 90);
+    that.push(h); doc.push({ h: h + gauss() * .35, c: 25 + gauss() * .35 });
+  }
+  const quanh = (x) => ((x % 360) + 540) % 360 - 180;
+  const vec = (h, c) => A.vecHuong(h, c);
+  const lechGoc = (h1, c1, h2, c2) => { const a = vec(h1, c1), b = vec(h2, c2); return Math.acos(Math.min(1, a.x * b.x + a.y * b.y + a.z * b.z)) * 180 / Math.PI; };
+  const doDac = (ra) => {
+    let rung = 0; for (let i = 13; i < 60; i++) rung += lechGoc(ra[i].h, ra[i].c, ra[i - 1].h, ra[i - 1].c) ** 2;
+    let tre = 0; for (let i = 90; i < 120; i++) tre += Math.abs(quanh(that[i] - ra[i].h));
+    return { rung: Math.sqrt(rung / 47), tre: tre / 30, sauDung: Math.abs(quanh(190 - ra[137].h)) };
+  };
+  /* cách cũ: trôi về hướng cảm biến với hằng số 100 ms */
+  const cu = []; let h = 100, c = 25;
+  for (let i = 0; i < N; i++) {
+    const k = 1 - Math.exp(-dt / 100), a = vec(h, c), b = vec(doc[i].h, doc[i].c);
+    const g = A.gocHuong({ x: a.x + (b.x - a.x) * k, y: a.y + (b.y - a.y) * k, z: a.z + (b.z - a.z) * k });
+    h = g.huong; c = g.cao; cu.push({ h, c });
+  }
+  /* cách mới: chạy đúng bộ lọc trong app */
+  T._nhin(100, 25); T._datLaiLoc();
+  const moi = [];
+  for (let i = 0; i < N; i++) { T._mucMay(doc[i].h, doc[i].c); const r = T._troiNhin(dt); moi.push({ h: r.huongNhin, c: r.caoNhin }); }
+  const C = doDac(cu), M = doDac(moi);
+  ok('đang xoay 90°/giây: bầu trời chậm sau tay ít hơn 3 lần so với trước', M.tre * 3 <= C.tre, `trước chậm ${C.tre.toFixed(1)}°, giờ ${M.tre.toFixed(1)}°`);
+  ok('đứng yên: rung không hơn trước', M.rung <= C.rung * 1.1, `trước ${C.rung.toFixed(3)}°/khung, giờ ${M.rung.toFixed(3)}°/khung`);
+  ok('dừng tay 0,3 giây: đã về sát hướng tay, không trôi lửng lơ', M.sauDung < C.sauDung && M.sauDung < 1, `trước còn lệch ${C.sauDung.toFixed(2)}°, giờ ${M.sauDung.toFixed(2)}°`);
+  T.dong(); T.mo();
+}
+{
+  /* iPhone: chuyển động lấy từ con quay (alpha, mốc tuỳ ý — ở đây lệch 123°), la bàn chỉ để chỉnh hướng Bắc. */
+  const lechH = (a, b) => { let d = Math.abs(a - b); return d > 180 ? 360 - d : d; };
+  T._datLaiLoc();
+  const ev = (alpha, heading, beta = 60, acc = 10) => T._camBien({ alpha, beta, gamma: 0, webkitCompassHeading: heading, webkitCompassAccuracy: acc });
+  const dau = ev(123, 40);
+  ok('iPhone: hướng Bắc lấy từ la bàn dù alpha của con quay tính từ mốc tuỳ ý', lechH(dau.h, 40) < 1, `${dau.h.toFixed(1)}°`);
+  /* xoay máy 20° sang phải: con quay báo ngay (alpha giảm 20), la bàn iOS chậm, còn đứng ở 40° */
+  const sau = ev(103, 40);
+  ok('iPhone: xoay máy là bầu trời đi theo con quay ngay, không chờ la bàn chậm', lechH(sau.h, 60) < 1.5, `${sau.h.toFixed(1)}° (đúng 60°)`);
+  let r = sau; for (let i = 0; i < 400; i++) r = ev(103, 60);
+  ok('la bàn bắt kịp rồi thì vẫn khớp, không lệch dần', lechH(r.h, 60) < .5, `${r.h.toFixed(1)}°`);
+  const vongQuay = ev(103, 200, 60, 90);
+  ok('la bàn báo độ chính xác kém (90°) thì không kéo hướng theo', lechH(vongQuay.h, 60) < .5, `${vongQuay.h.toFixed(1)}°`);
+  T._datLaiLoc();
+}
+
 console.log('\n— Xoay theo máy: cổ tay xoay thì bầu trời phải đi theo —');
 /* Người dùng báo "nhìn mặt trời lag". Không phải lag: đo được một khung vẽ chỉ tốn 0,18ms kể
    cả khi ngắm thẳng mặt trời. Lỗi là bộ bắt cảm biến lấy alpha làm hướng, beta làm độ cao và
