@@ -1,4 +1,4 @@
-/* Gợi ý cài app lên điện thoại — phần thuần (nhận dạng máy, khi nào tự gợi ý) và bắt hộp cài của
+/* Gợi ý cài app lên điện thoại — phần thuần (nhận dạng máy, các bước theo trình duyệt) và bắt hộp cài của
    trình duyệt. Giao diện nằm trong app.js (dùng chung bảng trượt). Chạy được trong Node để kiểm thử.
 
    Mỗi loại máy một cách cài, nên phải nhận ra đang ở đâu:
@@ -10,12 +10,11 @@
    - Mở link trong Zalo, Facebook, Messenger… (bạn bè gửi qua Zalo là gặp ngay): trình duyệt nhúng ở đó
      không cài được, phải mở bằng Safari hay Chrome trước.
 
-   Chỉ ghi xuống máy một mẩu nhỏ: đã tự gợi ý mấy lần, lần cuối lúc nào, đã cài chưa — để không làm phiền. */
+   Chỉ ghi xuống máy một mẩu nhỏ: đã cài chưa. Không có luật tự gợi ý nữa — bảng chỉ mở khi người dùng bấm nút. */
 (function (root) {
 'use strict';
 
 const KEY = 'tdtd.caiApp';
-const NGAY = 864e5;
 
 /* Ứng dụng mở link bằng trình duyệt riêng của nó — ở đó không cài được app. Đặt tên để lời nhắn nói đúng người
    dùng đang ở đâu. Chỉ dùng dấu hiệu riêng của từng hãng (FBAN, FB_IAB, Zalo…), không dùng chữ mà Safari hay
@@ -79,15 +78,6 @@ function cachChiaSe(ua = '', ipad = false) {
    và các bước bằng menu vẫn để trên màn (như Nhớ Nha). */
 const linkSafari = (url) => (/^https:\/\//.test(String(url)) ? 'x-safari-' + url : null);
 
-/* Có tự gợi ý không (người dùng tự mở từ nút "?" thì luôn được). Chỉ trên điện thoại; tối đa 3 lần,
-   cách nhau ít nhất 7 ngày; đã cài thì thôi. Lần gợi ý nào cũng tính, dù người dùng đóng hay không. */
-function nenTuHien(loai, tt, bayGio) {
-  if (['daCai', 'daCaiTrinhDuyet', 'mayTinh', 'trongApp'].includes(loai)) return false;
-  if (!tt) return true;
-  if (tt.daCai || (tt.lan || 0) >= 3) return false;
-  return !(tt.luc && bayGio - tt.luc < 7 * NGAY);
-}
-
 /* Link mở thẳng trang này bằng Chrome từ trình duyệt nhúng trên Android (Zalo, Facebook…); máy không
    có Chrome thì Android tự mở link thường. */
 function linkChrome(url) {
@@ -110,7 +100,7 @@ if (typeof addEventListener === 'function') {
   addEventListener('appinstalled', () => { nhacCai = null; ghiTT({ ...(docTT() || {}), daCai: true }); });
 }
 
-const API = { KEY, loaiMay, nenTuHien, linkChrome, linkSafari, cachChiaSe, tenTrongApp, laIpad, docTT, ghiTT,
+const API = { KEY, loaiMay, linkChrome, linkSafari, cachChiaSe, tenTrongApp, laIpad, docTT, ghiTT,
   nhacCai: () => nhacCai, xoaNhacCai: () => { nhacCai = null; } };
 if (typeof module !== 'undefined' && module.exports) module.exports = API; else root.TDTD_CAIAPP = API;
 })(typeof self !== 'undefined' ? self : this);

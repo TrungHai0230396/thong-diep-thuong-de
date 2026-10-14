@@ -14,7 +14,7 @@ const { ymd, cardFor, newSeed } = self.TDTD;
      hinh : 'sao5' | 'lap-lanh' | 'sao4' | 'hoa' | chuỗi path SVG riêng
      mo   : hàm chạy khi bấm vào
      tieuDe, trang (không bắt buộc): tên riêng của trò, và trang riêng mang tên đó để chia sẻ link — xem linkTro()
-     goiYCai (không bắt buộc): mở trò này 3 giây thì gợi ý cài app — xem moSao()
+     nutCai (không bắt buộc): trò có nút "Cài app" riêng — người vào thẳng từ link không thấy trang chính; xem themNutCaiApp()
    Bỏ một ngôi sao thì xoá dòng của nó, hoặc thêm bat: false.
    Các sao tự rải ngẫu nhiên, không bao giờ đè lên nhau, cũng không đè chữ.
    ───────────────────────────────────────────────────────────── */
@@ -45,7 +45,7 @@ const SAO = [
   { id: 'sao-troi', mau: '#aebff0', hinh: 'sao5',      nhan: 'Bầu trời thật đêm nay, ngay trên đầu bạn',
     duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM' },
   { id: 'sao-phatam', mau: '#e8c37a', hinh: 'tia',     nhan: 'Luyện phát âm, xem miệng đặt lưỡi ở đâu',
-    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'luyen-phat-am/', goiYCai: true },
+    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'luyen-phat-am/', nutCai: true },
   { id: 'sao-lich', mau: '#e58a7a', hinh: 'sao8',      nhan: 'Xem ngày tốt xấu, nên và không nên làm gì',
     duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY' },
   { id: 'sao-so',   mau: '#b99ae8', hinh: 'sao6',      nhan: 'Thần số học: con số chủ đạo, biểu đồ ngày sinh',
@@ -136,7 +136,6 @@ function reveal() {
     $('#after').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     datCacSao();                          // bố cục vừa đổi, tìm chỗ trống mới
   }, 950);
-  setTimeout(goiYCaiApp, 3200);           // đọc xong thông điệp rồi mới gợi ý cài, không chặn ngay cửa
 }
 
 function tick() {
@@ -224,8 +223,9 @@ function about() {
 }
 
 /* ---------- cài app lên điện thoại ----------
-   Nhận dạng máy và quy tắc gợi ý ở assets/caiapp.js; đây chỉ là bảng hướng dẫn. Tự gợi ý một lần sau khi
-   lật lá (tối đa ba lần, cách nhau một tuần), và lúc nào cũng mở được từ nút "?". */
+   Nhận dạng máy ở assets/caiapp.js; đây chỉ là bảng hướng dẫn. KHÔNG tự bật: bảng chỉ mở khi người dùng bấm —
+   nút cài app trên thanh trên cùng, nút "Cài app" trong trò phát âm, hay mục "?". Bản trước tự bật 3 giây sau khi
+   lật lá và 3 giây sau khi vào trò phát âm; người dùng thấy "đang sử dụng hiển thị cài app khó chịu lắm". */
 const CA = self.TDTD_CAIAPP;
 const loaiCai = () => (CA ? CA.loaiMay(navigator.userAgent, {
   standalone: !!navigator.standalone || matchMedia('(display-mode: standalone)').matches,
@@ -308,16 +308,6 @@ function moCaiApp() {
   };
 }
 
-/* Tự gợi ý: chỉ khi đang ở trang chính (không mở ngôi sao, không mở bảng nào) và quy tắc cho phép. */
-/* choSao: gợi ý ngay trong trò đó (trò khai goiYCai) — còn lại thì chỉ ở trang chính, không đè lên trò đang mở. */
-function goiYCaiApp(choSao) {
-  if (!CA || (saoDangMo && saoDangMo !== choSao) || !$('#sheet-wrap').hidden) return;
-  const loai = loaiCai(), tt = CA.docTT();
-  if (!CA.nenTuHien(loai, tt, Date.now())) return;
-  CA.ghiTT({ ...(tt || {}), lan: ((tt && tt.lan) || 0) + 1, luc: Date.now() });
-  moCaiApp();
-}
-
 /* Đặt ngôi sao vào một chỗ trống ngẫu nhiên trong màn hình.
    Ưu tiên tuyệt đối là không chạm chữ; lá bài chỉ nhường khi màn hình quá hẹp. */
 const VUNG_CHU = ['.topbar', '.today-date', '#cta', '#after', '#toast'];   // không bao giờ được đè
@@ -359,9 +349,6 @@ function moSao(s) {
   saoDangMo = s;
   m.mo();
   if (s.tieuDe) document.title = s.tieuDe;          // tên thẻ trình duyệt, và tên khi chia sẻ bằng nút của trình duyệt
-  /* Người đến từ link phát âm đi thẳng vào trò, không bao giờ thấy trang chính nên không bao giờ được gợi ý cài.
-     Người dùng chọn: vào trò 3 giây thì gợi ý (cùng luật: chỉ điện thoại, tối đa 3 lần, cách nhau 7 ngày). */
-  if (s.goiYCai) setTimeout(() => { if (saoDangMo === s) goiYCaiApp(s); }, 3000);
   if (location.hash.slice(1) !== s.duong) location.hash = s.duong;
   themNutChepLink(s);
   themNutCaiApp(s);
@@ -422,13 +409,11 @@ function linkTro(s) {
                  : location.origin + location.pathname + '#' + s.duong;
 }
 
-/* Nút "Cài app" trong trò có goiYCai (phát âm). Người vào từ link đi thẳng vào trò, không thấy nút ? ở trang chính;
-   bảng tự hiện chỉ tối đa 3 lần, cách nhau 7 ngày, và mỗi trình duyệt nhớ riêng — người dùng thử trong Zalo, đã thấy
-   một lần nên không hiện lại, mà không có chỗ nào mở lại được. Người dùng chọn thêm nút này. Máy đã cài, máy tính
-   thì không có nút. */
+/* Nút "Cài app" trong trò có nutCai (phát âm). Người vào từ link đi thẳng vào trò, không thấy thanh trên cùng của
+   trang chính, nên trò có nút riêng. Máy đã cài, máy tính thì không có nút. */
 function themNutCaiApp(s) {
   const k = $(s.khung);
-  if (!k || !s.goiYCai || !CA || $('#nut-cai-app')) return;
+  if (!k || !s.nutCai || !CA || $('#nut-cai-app')) return;
   if (['daCai', 'daCaiTrinhDuyet', 'mayTinh'].includes(loaiCai())) return;
   const b = document.createElement('button');
   b.id = 'nut-cai-app';
@@ -581,6 +566,14 @@ async function init() {
   $('#btn-anh').onclick = chiaSeAnh;
   $('#btn-tai').onclick = taiVe;
   $('#btn-about').onclick = about;
+  /* Nút cài app trên thanh trên cùng: thấy thì tự bấm, không bảng nào tự bật lên giữa lúc đang dùng.
+     Máy đã cài (hay đang mở từ màn hình chính), máy tính thì không có nút; vừa cài xong thì ẩn đi. */
+  const nutCai = $('#btn-cai');
+  if (nutCai) {
+    nutCai.hidden = ['daCai', 'daCaiTrinhDuyet', 'mayTinh'].includes(loaiCai());
+    nutCai.onclick = moCaiApp;
+    addEventListener('appinstalled', () => { nutCai.hidden = true; });
+  }
   $$('[data-close]').forEach(el => el.onclick = closeSheet);
   addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
 

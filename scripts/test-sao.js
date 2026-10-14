@@ -270,15 +270,19 @@ console.log('\n— Chia sẻ link một trò —');
   }
 }
 
-console.log('\n— Gợi ý cài app trong trò phát âm —');
+console.log('\n— Cài app: chỉ mở khi người dùng bấm —');
 {
   /* Người đến từ link phát âm đi thẳng vào trò, không thấy trang chính nên không được gợi ý cài. Người dùng chọn:
      vào trò 3 giây thì gợi ý. */
-  ok('trò phát âm khai goiYCai', /id: 'sao-phatam'[\s\S]*?goiYCai: true/.test(khoiSao));
-  ok('mở trò có goiYCai: 3 giây sau gợi ý, và chỉ khi vẫn đang ở đúng trò đó',
-     /if \(s\.goiYCai\) setTimeout\(\(\) => \{ if \(saoDangMo === s\) goiYCaiApp\(s\); \}, 3000\)/.test(nguon));
-  ok('gợi ý vẫn theo luật cũ (nenTuHien: điện thoại, tối đa 3 lần, cách 7 ngày), và không đè lên trò KHÁC',
-     /function goiYCaiApp\(choSao\) \{\s*if \(!CA \|\| \(saoDangMo && saoDangMo !== choSao\)[\s\S]{0,200}nenTuHien/.test(nguon));
+  /* "Đang sử dụng hiển thị cài app khó chịu lắm": không bảng nào tự bật, chỉ mở khi người dùng bấm nút */
+  ok('trò phát âm khai nutCai (có nút Cài app riêng)', /id: 'sao-phatam'[\s\S]*?nutCai: true/.test(khoiSao));
+  const goiCai = [...nguon.matchAll(/^.*moCaiApp.*$/gm)].map(m => m[0].trim()).filter(d => !d.startsWith('function moCaiApp'));
+  ok('bảng cài app không tự bật: chỉ mở từ nút bấm (không setTimeout, không goiYCaiApp)',
+     !/goiYCaiApp|nenTuHien/.test(nguon) && goiCai.length >= 3 && goiCai.every(d => /onclick = (\(\) => )?moCaiApp/.test(d)), goiCai.join(' | '));
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  ok('thanh trên cùng có nút cài app, ẩn sẵn cho tới khi biết máy cần', /<button class="icon-btn" id="btn-cai"[^>]*aria-label="Cài app vào điện thoại"[^>]*hidden>/.test(html));
+  ok('máy đã cài, máy tính thì không hiện nút; vừa cài xong thì ẩn',
+     /nutCai\.hidden = \['daCai', 'daCaiTrinhDuyet', 'mayTinh'\]\.includes\(loaiCai\(\)\)/.test(nguon) && /addEventListener\('appinstalled', \(\) => \{ nutCai\.hidden = true; \}\)/.test(nguon));
   const css = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.css'), 'utf8');
   const z = (lop) => +((css.match(new RegExp(`\\.${lop}\\{[^}]*z-index:(\\d+)`)) || [])[1] || 0);
   ok('bảng gợi ý nổi trên màn trò (nếu không sẽ hiện mà bị che mất), dưới dòng thông báo',
@@ -306,8 +310,8 @@ console.log('\n— Nút Cài app trong trò phát âm —');
 {
   /* Người dùng: trong Zalo đã thấy bảng một lần nên không hiện lại (luật 3 lần, cách 7 ngày), mà không có chỗ mở lại.
      Chọn thêm nút "Cài app" trong trò. */
-  ok('mở trò là gắn nút Cài app (chỉ trò có goiYCai)', /themNutChepLink\(s\);\s*themNutCaiApp\(s\);/.test(nguon) &&
-     /function themNutCaiApp\(s\) \{[\s\S]{0,200}!s\.goiYCai/.test(nguon));
+  ok('mở trò là gắn nút Cài app (chỉ trò có nutCai)', /themNutChepLink\(s\);\s*themNutCaiApp\(s\);/.test(nguon) &&
+     /function themNutCaiApp\(s\) \{[\s\S]{0,200}!s\.nutCai/.test(nguon));
   ok('nút mở thẳng bảng hướng dẫn, không qua luật 3 lần/7 ngày', /function themNutCaiApp[\s\S]{0,900}b\.onclick = moCaiApp;/.test(nguon));
   ok('máy đã cài, máy tính thì không có nút', /function themNutCaiApp[\s\S]{0,400}\['daCai', 'daCaiTrinhDuyet', 'mayTinh'\]\.includes\(loaiCai\(\)\)\) return;/.test(nguon));
   ok('đóng trò bằng đường nào cũng gỡ nút (✕ của trò, Back, mở trò khác)',

@@ -675,13 +675,13 @@ Người dùng muốn "một cái popup cài app, để mọi người dễ dùn
 - **Link đưa ra Safari, Chrome giữ đúng trò đang mở** (`linkCaiApp`). Người dùng báo: mở link phát âm trong Zalo, bấm *Mở bằng Safari* thì Safari ra trang chính — bản đầu lấy `origin + pathname`, bỏ mất trò. Giờ đang ở trò nào thì ba nút (Mở bằng Safari, Mở bằng Chrome, Chép link) dùng link của trò đó; trò có trang riêng dùng trang riêng `/luyen-phat-am/`, vì link `intent://…#Intent;…` của Chrome không mang được phần sau dấu `#`.
 - **Nhớ là đã cài**: Android đã cài mà mở bằng Chrome thì Chrome thôi đưa hộp cài; bày bước cài tay lúc đó là bắt đi tìm một mục menu không còn — nên báo "App đã cài trên máy này". Chrome lại đưa hộp cài (app bị gỡ) thì thôi nhớ.
 
-**Trong trò phát âm:** người đến từ link phát âm đi thẳng vào trò, không thấy trang chính nên trước đây không bao giờ được gợi ý cài. Người dùng chọn: vào trò **3 giây** thì gợi ý (trò khai `goiYCai: true` trong `SAO`), cùng luật bên dưới; rời trò trước 3 giây thì thôi. Bảng gợi ý nâng lên trên màn trò (z-index 35, trò là 30) — không thì nó hiện mà bị che mất.
+**Không tự bật nữa — chỉ có nút.** Người dùng: "không cần hiển thị popup cài app mà làm icon button cài app để người dùng thấy thì tự bấm cài, chứ đang sử dụng hiển thị cài app khó chịu lắm". Bản trước tự bật bảng 3,2 giây sau khi lật lá và 3 giây sau khi vào trò phát âm (tối đa 3 lần, cách nhau 7 ngày). Giờ bỏ hẳn luật tự gợi ý (`goiYCaiApp`, `nenTuHien`), bảng chỉ mở khi người dùng bấm: **nút hình điện thoại có mũi tên trên thanh trên cùng**, cạnh nút **?** (hình điện thoại để khỏi lẫn với nút "↓ Tải về" ảnh), nút **Cài app** trong trò phát âm (trò khai `nutCai: true` trong `SAO` — người vào thẳng từ link không thấy thanh trên cùng), hay **?** → *Cài app vào điện thoại*. Máy đã cài, đang mở từ màn hình chính, hay máy tính thì không có nút; vừa cài xong (`appinstalled`) thì nút ẩn. Thêm nút làm thanh trên cùng chật: ở màn 375 px tên app xuống dòng, nên trên màn tới 420 px chữ thưa bớt (khoảng cách chữ .16em → .1em) cho vừa một hàng; màn 320 px vốn đã hai dòng từ trước. Bảng nâng lên trên màn trò (z-index 35, trò là 30) — không thì mở trong trò sẽ bị che.
 
-**Nút "Cài app" trong trò phát âm.** Người dùng thử trong Zalo: đã thấy bảng một lần nên không hiện lại (luật 3 lần, cách 7 ngày, mỗi trình duyệt nhớ riêng), mà trong trò không có nút ? để mở lại. Người dùng chọn thêm nút: góc trên, cạnh nút 🔗, bấm lúc nào cũng mở bảng (không qua luật); máy đã cài và máy tính thì không có nút. Lúc làm phát hiện lỗi có sẵn: đóng trò bằng Back thì nút 🔗 không được gỡ khỏi trò cũ, mở trò khác thì `themNutChepLink` thấy "đã có" và trò mới mất nút — giờ `goNutTro()` gỡ cả hai nút ở mọi đường đóng trò.
+**Nút "Cài app" trong trò phát âm** có từ trước: người dùng thử trong Zalo, đã thấy bảng tự bật một lần nên không hiện lại, mà trong trò không có nút ? để mở lại — nên thêm nút ở góc trên, cạnh nút 🔗. Lúc làm phát hiện lỗi có sẵn: đóng trò bằng Back thì nút 🔗 không được gỡ khỏi trò cũ, mở trò khác thì `themNutChepLink` thấy "đã có" và trò mới mất nút — giờ `goNutTro()` gỡ cả hai nút ở mọi đường đóng trò.
 
-**Khi nào hiện:** không chặn ngay lúc vào. Tự gợi ý **3,2 giây sau khi lật lá hôm nay** — đọc xong thông điệp rồi — chỉ trên điện thoại, chỉ ở trang chính (không đang mở ngôi sao hay bảng khác), **tối đa 3 lần, cách nhau ít nhất 7 ngày**; đã cài (hoặc đang mở từ biểu tượng ngoài màn hình chính) thì thôi. Lúc nào cũng mở lại được từ nút **?** → *Cài app vào điện thoại*. Chỉ ghi một mẩu nhỏ `tdtd.caiApp`: số lần đã gợi ý, lần cuối, đã cài chưa.
+Chỉ ghi một mẩu nhỏ `tdtd.caiApp`: đã cài chưa.
 
-`scripts/test-caiapp.js`, 24 bài: nhận dạng 15 trường hợp theo chuỗi nhận dạng thật (iPhone Safari cả iOS 26, iPad tự xưng Mac mà không nhầm máy Mac thật, Chrome iPhone, Zalo, Facebook, Messenger trên cả hai hệ, Android có và chưa có hộp cài, máy tính, đã cài); quy tắc tự gợi ý; link mở bằng Chrome. Đã thử trên trình duyệt: nút Cài app gọi hộp cài đúng một lần, đóng bảng, ghi đã cài; lật lá xong 3 giây thì bảng tự hiện.
+`scripts/test-caiapp.js`: nhận dạng 15 trường hợp theo chuỗi nhận dạng thật (iPhone Safari cả iOS 26, iPad tự xưng Mac mà không nhầm máy Mac thật, Chrome iPhone, Zalo, Facebook, Messenger trên cả hai hệ, Android có và chưa có hộp cài, máy tính, đã cài); không còn luật tự gợi ý; link mở bằng Chrome. `scripts/test-sao.js`: mọi chỗ gọi bảng cài đều là nút bấm (`onclick`), không `setTimeout`; thanh trên cùng có nút, ẩn sẵn; máy đã cài, máy tính thì không hiện, vừa cài thì ẩn. Đã thử trên trình duyệt giả Android cỡ 375 px: lật lá chờ 4,5 giây không có bảng nào bật, vào trò phát âm cũng vậy; bấm nút thì mở bảng; tên app vẫn một hàng.
 
 ## Đếm lượt truy cập
 
@@ -1578,7 +1578,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        107 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        108 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -1588,7 +1588,7 @@ assets/sohoc.js            thần số học: hàm thuần, ngày sinh vào, cá
 assets/thanso.js           giao diện ngôi sao thần số học
 scripts/test-sohoc.js      48 kiểm thử thần số học, theo ví dụ có lời giải trong nguồn
 assets/caiapp.js           gợi ý cài app: nhận dạng máy, khi nào tự gợi ý, bắt hộp cài của trình duyệt
-scripts/test-caiapp.js     46 kiểm thử gợi ý cài app (có các trường hợp lấy từ Nhớ Nha)
+scripts/test-caiapp.js     38 kiểm thử cài app (có các trường hợp lấy từ Nhớ Nha)
 assets/thongke.js          đếm lượt truy cập bằng Vercel Web Analytics: mỗi lần mở một lượt, tách trình duyệt / app / cài mới
 scripts/test-thongke.js    20 kiểm thử đếm lượt truy cập
 assets/rungu.js            nhạc ngủ: tạo âm thành đoạn lặp liền mạch, tính hẹn giờ; chạy được làm Web Worker
@@ -1619,7 +1619,7 @@ node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự bá
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
-node scripts/test-caiapp.js      # chạy 46 kiểm thử gợi ý cài app
+node scripts/test-caiapp.js      # chạy 38 kiểm thử cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa

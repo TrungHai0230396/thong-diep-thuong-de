@@ -42,16 +42,8 @@ const CA = [
 ];
 for (const [ten, ua, o, mong] of CA) ok(ten, C.loaiMay(ua, o) === mong, C.loaiMay(ua, o));
 
-console.log('\n— Tự gợi ý đúng lúc, không làm phiền —');
-const NGAY = 864e5, nay = Date.UTC(2026, 9, 8);
-ok('lần đầu trên điện thoại: gợi ý', C.nenTuHien('iosSafari', null, nay));
-ok('vừa gợi ý 3 ngày trước: thôi', !C.nenTuHien('iosSafari', { lan: 1, luc: nay - 3 * NGAY }, nay));
-ok('gợi ý lần trước đã hơn 7 ngày: gợi ý lại', C.nenTuHien('nhacCai', { lan: 1, luc: nay - 8 * NGAY }, nay));
-ok('đã gợi ý 3 lần: thôi hẳn', !C.nenTuHien('nhacCai', { lan: 3, luc: nay - 60 * NGAY }, nay));
-ok('đã cài: không gợi ý nữa', !C.nenTuHien('iosSafari', { daCai: true }, nay));
-ok('đang mở từ màn hình chính, hay đang ở máy tính: không tự gợi ý', !C.nenTuHien('daCai', null, nay) && !C.nenTuHien('mayTinh', null, nay));
-ok('máy tính có hộp cài cũng không tự gợi ý', !C.nenTuHien(C.loaiMay(UA.macChrome, { coNhacCai: true }), null, nay));
-ok('mở trong Zalo: vẫn gợi ý (để hướng dẫn mở bằng trình duyệt)', C.nenTuHien('trongAppIos', null, nay) && C.nenTuHien('trongAppAndroid', null, nay));
+console.log('\n— Không tự bật —');
+ok('không còn luật tự gợi ý: bảng chỉ mở khi người dùng bấm nút', !('nenTuHien' in C));
 
 console.log('\n— Mở bằng Chrome từ Zalo, Facebook trên Android —');
 const l = C.linkChrome('https://thong-diep-thuong-de.vercel.app/#ho-sen');
@@ -102,6 +94,5 @@ console.log('\n— Nhớ là máy đã cài —');
 /* Đã cài thì Chrome thôi đưa hộp cài; bày các bước cài tay lúc đó là bắt đi tìm một mục menu không còn. */
 ok('Android đã cài mà mở bằng Chrome: báo đã cài, không bày bước cài tay', C.loaiMay(TA.chromeAndroid, { daCaiNho: true }) === 'daCaiTrinhDuyet');
 ok('Chrome lại đưa hộp cài (app đã bị gỡ): mời cài như thường', C.loaiMay(TA.chromeAndroid, { daCaiNho: true, coNhacCai: true }) === 'nhacCai');
-ok('đã cài thì không tự gợi ý cài nữa', !C.nenTuHien('daCaiTrinhDuyet', null, nay));
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

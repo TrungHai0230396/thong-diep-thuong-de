@@ -26,6 +26,12 @@ body{
 .icon-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:transparent;
   color:var(--gold);font-size:14px;cursor:pointer;line-height:1}
 .icon-btn:hover{background:rgba(232,195,122,.1)}
+.icon-btn[hidden]{display:none}
+.icon-btn svg{display:block;width:17px;height:17px;margin:auto}
+.nut-tren{display:flex;gap:8px;flex-shrink:0}
+.brand{min-width:0}
+/* thêm nút cài app: chữ thưa bớt cho vừa một hàng trên màn 375–420 px (màn 320 px vốn đã xuống hai dòng) */
+@media (max-width:420px){.brand{letter-spacing:.1em}}
 
 /* ---------- layout ---------- */
 main{position:relative;z-index:1;padding:0 18px calc(40px + var(--safe-b));max-width:560px;margin:0 auto;
