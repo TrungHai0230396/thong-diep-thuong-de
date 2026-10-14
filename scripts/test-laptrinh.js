@@ -87,6 +87,24 @@ console.log('\n— Luật chạy —');
   ok('đếm ô: mỗi ô một, kể cả ô chứa và ô bên trong', L.soO(L.docMa('3(d t) w(?d(d)(R))')) === 3 + 4);
 }
 
+console.log('\n— Gợi ý từng bước —');
+{
+  const b = (i) => L.BAI[i - 1], gy = (i, s, h = '') => L.goiYBuoc(L.docMa(s), L.docMa(h), b(i));
+  ok('chưa xếp gì: gợi ý ô đầu tiên của lời giải, vào Chương trình', (r => r.loai === 'them' && r.k === 'di' && r.ds === 'chinh')(gy(1, '')));
+  ok('đúng một nửa: gợi ý ô tiếp theo', (r => r.loai === 'them' && r.k === 'thap')(gy(1, 'd')));
+  ok('đã giống lời giải: bảo bấm Chạy', gy(1, 'd t').loai === 'xong');
+  ok('xếp sai ô: chỉ ra đúng ô sai', (r => r.loai === 'sai')(gy(1, 'L t')));
+  ok('thừa một ô: chỉ ra ô thừa', (r => r.loai === 'thua')(gy(1, 'd t t')) && (r => r.loai === 'thua')(gy(1, 'd d t')));
+  const s29 = L.docMa(b(29).san), r29 = L.goiYBuoc(s29, [], b(29));
+  ok('bài sửa lỗi "thiếu một bước": bảo chèn ô Đi ngay trước ô Thắp, không bảo ô Thắp sai', r29.loai === 'chen' && r29.k === 'di' && r29.truoc === s29[2].id);
+  const k54 = L.docMa('3(2(j))'), r54 = L.goiYBuoc(k54, [], b(54));
+  ok('vòng lặp lồng: thiếu ô Đi trong vòng ngoài → bảo thêm vào đúng thân vòng ngoài', r54.loai === 'them' && r54.k === 'di' && r54.ds === k54[0].id + '.than');
+  const k2 = L.docMa('2(2(j) d) t');
+  ok('sai số lần lặp: bảo đổi đúng con số', (r => r.loai === 'solan' && r.n === 3 && r.id === k2[0].id)(L.goiYBuoc(k2, [], b(54))));
+  ok('có hàm: chương trình chính đúng rồi thì gợi ý tiếp vào Hàm ★', (r => r.loai === 'them' && r.ds === 'ham' && r.k === 'di')(gy(59, 'F L F L F')));
+  ok('chương điều kiện: gợi ý ô nằm trong phần "không thì"', (r => r.loai === 'them' && r.k === 'neu-trai')(gy(83, 'w(?d(d)())')));
+}
+
 console.log('\n— Gắn vào app —');
 const app = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.js'), 'utf8');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');

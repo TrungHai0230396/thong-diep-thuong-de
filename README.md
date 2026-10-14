@@ -1603,11 +1603,23 @@ Người dùng chọn: **6–10 tuổi** (hình kèm chữ ngắn), **3D nhìn n
 
 **Hình minh hoạ kiểu 3D**, vẽ bằng canvas, không thư viện: khối đá nhìn nghiêng có mặt trên sáng, hai mặt bên tối theo ánh sáng từ phía tây bắc, viền sáng mảnh; càng cao khối càng sáng màu; ô đích có vòng tròn khắc, sao tắt mờ xám, sao thắp vàng rực có quầng sáng và nảy lên một nhịp. Robot thân tròn bóng (đổ bóng dưới chân), đầu có kính tối và hai mắt xanh nhìn theo hướng đi — quay lưng thì không thấy mắt — cùng một mũi tên trắng dưới chân chỉ hướng; ăng-ten sáng lên lúc thắp sao; đi thì bước, nhảy thì nảy theo vòng cung, khựng thì nhích tới rồi lùi lại. Bấm ⟲ ⟳ xoay cảnh từng góc 90°. Ô lệnh đang chạy được làm sáng viền trắng.
 
-**Xếp ô lệnh trên điện thoại** (bấm, không cần kéo): bấm ô ở bảng dưới là thêm vào chỗ đang chọn (dấu + nhấp nháy); thêm ô Lặp hay Nếu thì ô tiếp theo tự vào bên trong; bấm dấu + ở dòng khác để đổi chỗ; bấm con số của ô Lặp để đổi 2 → 9; bấm ô đã xếp để bỏ. Khung chương trình cao cố định, dài thì cuộn, để cảnh 3D không co giãn mỗi lần thêm ô.
+**Xếp ô lệnh trên điện thoại** (bấm, không cần kéo): bấm ô ở bảng dưới là chèn vào chỗ dấu + xanh; thêm ô Lặp hay Nếu thì ô tiếp theo tự vào bên trong; bấm dấu + ở dòng khác để đổi chỗ; bấm con số của ô Lặp để đổi 2 → 9. Khung chương trình cao cố định, dài thì cuộn, để cảnh 3D không co giãn mỗi lần thêm ô.
+
+#### "Làm UI/UX cho dễ thao tác"
+
+Nhìn lại bằng mắt một bé 6–10 tuổi cầm điện thoại, bản đầu có năm chỗ khó:
+
+- **Không chèn được vào giữa**: ô mới chỉ vào cuối, nên bài sửa lỗi "thiếu một bước ở giữa" phải xoá cả đoạn sau rồi xếp lại. Giờ **chạm một ô để chọn** (viền vàng): ô mới chèn ngay sau nó, dấu + xanh đứng đúng chỗ sẽ chèn.
+- **Chạm nhầm là mất ô** (chạm ô đã xếp là xoá luôn). Giờ chạm chỉ để chọn; ô đang chọn mới có **nút × đỏ** để bỏ; và có **↶ Hoàn tác** (nhớ 40 lần sửa gần nhất). "Xoá hết" cũng hoàn tác được.
+- **Không thấy robot sai ở lệnh nào**. Giờ có **⏭ Từng bước** — mỗi lần bấm robot làm một lệnh, nút Chạy thành "Chạy tiếp"; robot vướng thì hiện bong bóng "!" đỏ trên đầu; chạy xong, **ô làm robot vướng tô đỏ** (rung nhẹ), lời nhắc "ô tô đỏ là chỗ robot bị vướng"; ô đang chạy tự cuộn vào khung nhìn.
+- **Bí không biết làm gì**. Giờ có **💡 Gợi ý**, so chương trình của bé với lời giải mẫu (trải thành dãy, ô chứa thành mở … đóng) và chỉ đúng một bước: thêm ô gì (ô đó nảy lên ở bảng dưới, dấu + nhảy tới đúng chỗ — kể cả vào thân vòng lặp hay phần "không thì"), **thiếu một ô ngay trước ô nào** (bài sửa lỗi), ô nào chưa đúng hay thừa (tự chọn sẵn để bấm ×), đổi số lần lặp, hay "giống lời giải rồi, bấm Chạy". Hai bài đầu tự hướng dẫn: ô cần bấm cứ nhấp nháy cho tới khi bé bấm, rồi tới nút Chạy.
+- **Nhãn ô điều kiện quá dài**, chiếm ba hàng: rút còn "Nếu trước có đường", "Nếu trên sao", "Lặp tới hết sao". Chương trình dài thì robot tự chạy nhanh hơn (bỏ nút tua).
+
+Thanh nút dưới cùng: ▶ Chạy · ⏭ Từng bước · ↶ Hoàn tác · 💡 Gợi ý · 🗑 Xoá hết, mỗi nút có chữ nhỏ bên dưới. Đã thử trên trình duyệt cỡ điện thoại: bài 1 tự nhấp nháy Đi → Thắp → Chạy; bài 29 bấm Gợi ý thì dấu + về trước ô Thắp và ô Đi nhấp nháy, chèn vào giữa rồi hoàn tác; chọn ô thì hiện ×; Từng bước đi đúng từng ô rồi chạy tiếp tới thắng; bài 33 chạy chương trình sẵn thì hai ô Đi và ô Thắp tô đỏ.
 
 Ba chỗ sửa khi tự thử trên màn điện thoại: khung chương trình dài ra thì cảnh co lại mà tấm vẽ không co theo, lòi xuống như ô lệnh đè lên cảnh — giờ khung cao cố định và tấm vẽ tự đo lại khi đổi cỡ; nút 🔗 của app đè lên nút ? — chừa chỗ ở góc trên; lời báo "chưa thắp hết" của bài trước còn dính sang bài sau — mở bài mới là xoá, và góc xoay về lại góc quen.
 
-`scripts/test-laptrinh.js`, 28 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
+`scripts/test-laptrinh.js`, 38 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gợi ý từng bước (ô tiếp theo, ô sai, ô thừa, thiếu ô ngay trước ô nào, số lần lặp, thêm vào thân vòng lặp lồng, vào Hàm ★, vào phần "không thì"); gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
 
 ## Cấu trúc
 
@@ -1657,7 +1669,7 @@ assets/thienluanxa.js      giao diện ngôi sao thiền luân xa: hoa sen, nh�
 scripts/test-luanxa.js     101 kiểm thử thiền luân xa: nội dung, phổ chuông, đàn, lịch, thiền riêng, hình, trình phát
 assets/laptrinh.js         Robot thắp sao: chạy chương trình, dựng bản đồ từ lời giải, cảnh 3D nhìn nghiêng, xếp ô lệnh
 assets/baicode.js          100 bài, 10 chương của Robot thắp sao, viết bằng cú pháp gọn, mỗi bài có lời giải mẫu
-scripts/test-laptrinh.js   28 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy
+scripts/test-laptrinh.js   38 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy, gợi ý
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1684,7 +1696,7 @@ node scripts/test-caiapp.js      # chạy 38 kiểm thử cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
-node scripts/test-laptrinh.js    # chạy 28 kiểm thử Robot thắp sao (cả 100 bài)
+node scripts/test-laptrinh.js    # chạy 38 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 192 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

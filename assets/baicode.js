@@ -15,7 +15,7 @@ const CHUONG = [
   {
     ten: 'Đi và Thắp', du: 3, lenh: ['di', 'thap'], lenhMoi: ['di', 'thap'],
     gioiThieu: ['Robot chỉ làm đúng những gì em bảo, theo đúng thứ tự từ trái sang phải.',
-      'Bấm vào ô lệnh bên dưới để xếp vào Chương trình, rồi bấm ▶ Chạy. Bấm vào ô đã xếp để bỏ ra.'],
+      'Bấm vào ô lệnh bên dưới để xếp vào Chương trình, rồi bấm ▶ Chạy. Không biết bắt đầu từ đâu thì bấm 💡 Gợi ý.'],
     bai: [
       { ten: 'Bước đầu tiên', giai: 'd t', goiY: 'xếp ô Đi rồi ô Thắp, bấm Chạy.' },
       { ten: 'Ba bước', giai: 'd d d t' },
