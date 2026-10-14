@@ -1597,7 +1597,7 @@ Người dùng chọn: **6–10 tuổi** (hình kèm chữ ngắn), **3D nhìn n
 
 Đầu mỗi chương có một bảng giới thiệu ngắn (khái niệm mới, ô lệnh mới, gợi ý bài đầu); nút **?** mở lại bất cứ lúc nào. Làm xong bài này thì mở bài sau; chỉ nhớ một chuỗi 100 ký tự 0/1 (`tdtd.code`) là bài nào đã xong.
 
-**Luật chạy** (như Lightbot cho trẻ khỏi bị dừng phắt): Đi chỉ sang khối cùng độ cao; Nhảy lên khối cao hơn đúng một nấc hoặc xuống khối thấp hơn; không được thì robot khựng lại tại chỗ rồi chạy lệnh sau, trẻ thấy rõ chỗ sai. Thắp chỉ ô sao. Thắp xong ngôi sao cuối là thắng ngay. Vòng lặp không bao giờ xong (hay hàm tự gọi mãi) thì tự dừng sau 800 bước và báo "robot chạy mãi".
+**Luật chạy** (như Code.org): Đi chỉ sang khối cùng độ cao; Nhảy lên khối cao hơn đúng một nấc hoặc xuống khối thấp hơn; Thắp chỉ ô sao chưa thắp. Lệnh không làm được thì **robot dừng luôn**, hiện "!" đỏ, ô đó tô đỏ, và nói vì sao (không có đường / khối cao hơn phải Nhảy / chỉ nhảy lên được một nấc / ô này không có sao). Thắp xong ngôi sao cuối là thắng ngay. Vòng lặp không bao giờ xong (hay hàm tự gọi mãi) thì tự dừng sau 800 bước và báo "robot chạy mãi". (Bản đầu cho robot khựng rồi chạy tiếp như Lightbot — xem mục chấm sao bên dưới vì sao bỏ.)
 
 **Mỗi bài có lời giải mẫu, và bản đồ dựng từ chính đường đi đó** (`dungBan`): Đi thì đặt khối cùng độ cao phía trước, Nhảy thì đặt khối cao hơn hay thấp hơn, Thắp thì khối đó là sao — nên bản đồ nào cũng chắc chắn đi được. Chương điều kiện thì vẽ bản đồ bằng đường riêng (`duong`), vì lời giải là "tự nhìn đường". Số ô tối đa của mỗi bài = số ô của lời giải mẫu + vài ô dư (chương đầu dư 3, chương vòng lặp trở đi dư 1).
 
@@ -1634,7 +1634,21 @@ Ba chỗ sửa khi tự thử trên màn điện thoại: khung chương trình 
 
 Bài 69: lời giải mẫu đúng 6 ô (Lặp 4 lần [Hàm ★], hàm Đi Đi Thắp Rẽ trái), số ô tối đa là 6 + 1 ô dư = 7. Nhưng nhãn "6/7 ô" đọc lên thành "cần 7 ô". Giờ nhãn ghi **"6 ô · tối đa 7"**, và lúc thắng bảng khen so với lời giải mẫu: ít hơn thì "Còn gọn hơn cả lời giải mẫu", bằng thì "Gọn đúng bằng lời giải mẫu!", nhiều hơn thì "Lời giải mẫu chỉ cần X ô — thử gọn hơn xem?".
 
-`scripts/test-laptrinh.js`, 45 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gợi ý từng bước (ô tiếp theo, ô sai, ô thừa, thiếu ô ngay trước ô nào, số lần lặp, thêm vào thân vòng lặp lồng, vào Hàm ★, vào phần "không thì"); âm thanh (chuông cao dần, nhạc mừng, tiếng vướng, tắt được, mở lúc bấm); chế độ thử mở tới bài 100, bình thường chỉ tới bài chưa xong đầu tiên; gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
+#### Chấm sao theo số ô, và rà lại cả 100 bài
+
+Người dùng: "làm tối ưu nhất thì được nhiều sao, càng nhiều ô thì ít sao", rồi "review lại hết luôn". Giờ thắng bài nào cũng được chấm sao: **bằng hoặc gọn hơn lời giải gọn nhất → 3 sao, dư 1–2 ô → 2 sao, dư nhiều hơn → 1 sao**. Bảng khen nói cách gọn nhất cần mấy ô và nút "Làm lại cho được 3 sao"; app nhớ số sao cao nhất của từng bài (vẫn một chuỗi 100 ký tự, giờ là 0–3 thay vì 0/1 — chuỗi cũ vẫn đọc được); danh sách bài hiện sao dưới mỗi số và tổng "★ … / 300".
+
+Chấm như vậy chỉ công bằng khi lời giải mẫu thật sự là cách gọn nhất. Nên có thêm `scripts/tim-loi-giai-gon.js`: với mỗi bài, **thử mọi chương trình ngắn hơn lời giải mẫu** (tăng dần từng ô, chỉ dùng ô có trong bảng của bài, cả hàm, vòng lặp, điều kiện; bỏ bớt dạng thừa như rẽ trái rồi rẽ phải, lặp 2 (lặp 3 X) = lặp 6 X, hàm chỉ gọi một lần). Lần chạy đầu tìm ra **28 bài có cách gọn hơn**, và phần lớn là mẹo lợi dụng luật "khựng rồi chạy tiếp": quay đủ bốn hướng, Đi vướng cũng kệ (bài Chữ L dài: lặp 5 lần (Rẽ trái, lặp 4 lần Đi)); Đi, Nhảy xen kẽ, cái nào vướng thì kệ (Cầu thang có chiếu nghỉ: lặp 7 lần (Đi, Nhảy)); thắp cả chỗ không có sao. Chấm sao theo số ô thì mẹo được 3 sao. Nên **đổi luật: lệnh không làm được là dừng** (như Code.org). Chạy lại còn 25 bài, giờ là cách gọn hơn thật — sửa từng bài:
+
+- **Lấy cách gọn hơn làm lời giải mẫu** khi nó vẫn đúng tinh thần bài: Chữ S (đi tắt qua ô cuối); Gọi hàm, Gấp khúc, Chữ U (đưa luôn chỗ rẽ vào trong hàm, chương trình chỉ còn gọi hàm ba lần); Sao dọc đường gấp (Lặp tới hết sao (Đi, Thắp, Nếu phải có đường thì Rẽ phải)); Kim tự tháp (lặp 8 lần (Nếu trước có đường thì Đi, không thì Nhảy) — vẫn cho tới 8 ô để cách làm thẳng thắn bảy ô được 2 sao); Xoắn ốc lên trời, Hai tầng sao, Bậc thang đôi (vòng lặp lồng gọn hơn hàm).
+- **Vẽ lại bản đồ** khi cách gọn hơn né mất điều đang học: chương Vòng lặp bị giải bằng vòng lặp lồng (Chữ L dài, Hàng sao gãy — giờ hai đoạn dài khác nhau); Lên hai xuống một giải chỉ bằng Nhảy (giờ thành Lên, đi, xuống — có chỗ bằng phải Đi); chương Nếu… thì… bị giải bằng "Lặp 8 lần" thay cho "Lặp tới hết sao" (giờ đường dài hơn 9 bước, có nhiều sao — mà ô Lặp chỉ tới 9 lần); và **gần cả chương Hàm và vòng lặp** giải được chỉ bằng vòng lặp lồng — vì gọi hàm trong một vòng lặp không bao giờ gọn hơn đặt thẳng thân hàm vào vòng lặp. Mười bài chương này làm lại sao cho đoạn lặp lại nằm xen giữa những chỗ rẽ khác nhau (rẽ phải rồi rẽ trái, hay 1 lần rồi 2 lần rồi 3 lần) — vòng lặp không gói được, hàm mới là cách ngắn nhất (bài Hàm trong vòng lặp: gọi hàm, rẽ phải, lặp 3 lần gọi hàm).
+- **Bài sửa lỗi giữ nguyên** (Sửa hàm, Sửa điều kiện có cách viết lại gọn hơn): sao tính theo chương trình đã sửa.
+
+Kết quả lần chạy cuối (60 giây mỗi bài): **84 bài chứng minh được lời giải mẫu là gọn nhất**; 14 bài lớn (8–10 ô có hàm hoặc điều kiện: Sóng, chín bài chương Hàm và vòng lặp, Bên nào có đường?, Ba sao đường vòng, Nhìn bên phải trước, Mê cung, Thang lên sân thượng, Robot tự đi) chưa thử hết trong thời gian đó nhưng không thấy cách nào gọn hơn; 2 bài sửa lỗi như trên.
+
+Soát bằng mắt cả 100 bản đồ (ghép thành lưới ở cỡ điện thoại): bản đồ nào cũng rõ đường, rõ ô đích; riêng những bài có tháp cao (Tháp xoắn, Thang và sân, Xoắn ốc lên trời, Bậc thang đôi, các cầu thang chương lặp) thì khối cao nhất đứng ngay phía trước che mất các bậc thấp — giờ mỗi bài **tự chọn góc nhìn** trong bốn góc sao cho khối cao nằm phía sau (bản đồ phẳng giữ góc quen; trái phải tính theo hướng robot nên đổi góc không đổi lời giải). Soát chữ: chương Sửa lỗi còn dặn "bấm vào ô sai để bỏ" (cách cũ) — giờ là chạm rồi bấm ×; chương Nếu… thì… gọi tên ô chưa khớp nhãn mới.
+
+`scripts/test-laptrinh.js`, 49 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gợi ý từng bước (ô tiếp theo, ô sai, ô thừa, thiếu ô ngay trước ô nào, số lần lặp, thêm vào thân vòng lặp lồng, vào Hàm ★, vào phần "không thì"); âm thanh (chuông cao dần, nhạc mừng, tiếng vướng, tắt được, mở lúc bấm); chế độ thử mở tới bài 100, bình thường chỉ tới bài chưa xong đầu tiên; chấm sao (3 / 2 / 1 sao theo số ô, gọn nhất là đủ 3 sao ở mọi bài, số tối đa chừa chỗ cho 2 sao, chuỗi tiến độ cũ vẫn đọc được); gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
 
 ## Cấu trúc
 
@@ -1684,7 +1698,8 @@ assets/thienluanxa.js      giao diện ngôi sao thiền luân xa: hoa sen, nh�
 scripts/test-luanxa.js     101 kiểm thử thiền luân xa: nội dung, phổ chuông, đàn, lịch, thiền riêng, hình, trình phát
 assets/laptrinh.js         Robot thắp sao: chạy chương trình, dựng bản đồ từ lời giải, cảnh 3D nhìn nghiêng, xếp ô lệnh
 assets/baicode.js          100 bài, 10 chương của Robot thắp sao, viết bằng cú pháp gọn, mỗi bài có lời giải mẫu
-scripts/test-laptrinh.js   45 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy, gợi ý
+scripts/test-laptrinh.js   49 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy, gợi ý, chấm sao
+scripts/tim-loi-giai-gon.js  thử mọi chương trình ngắn hơn lời giải mẫu, báo bài nào có cách gọn hơn (chạy tay khi sửa bài)
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1711,7 +1726,8 @@ node scripts/test-caiapp.js      # chạy 38 kiểm thử cài app
 node scripts/test-thongke.js     # chạy 20 kiểm thử đếm lượt truy cập
 node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
-node scripts/test-laptrinh.js    # chạy 45 kiểm thử Robot thắp sao (cả 100 bài)
+node scripts/test-laptrinh.js    # chạy 49 kiểm thử Robot thắp sao (cả 100 bài)
+node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 192 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

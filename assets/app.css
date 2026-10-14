@@ -1117,7 +1117,10 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .lt-tin-o{display:flex;flex-wrap:wrap;justify-content:center;gap:7px;margin:4px 0 12px}
 .lt-tin-o .lt-chip{cursor:default}
 .lt-tin .lt-tin-goiy{padding:8px 10px;border-radius:10px;background:rgba(255,215,120,.1);color:#ffe6a6;font-size:14px}
-.lt-tin-sao{font-size:34px;color:#ffd35a;letter-spacing:6px;text-shadow:0 0 18px rgba(255,200,80,.7)}
+.lt-tin-sao{font-size:38px;letter-spacing:6px}
+.lt-tin-sao span{color:rgba(255,255,255,.14)}
+.lt-tin-sao span.lt-co{color:#ffd35a;text-shadow:0 0 18px rgba(255,200,80,.7)}
+.lt-ds-tong{margin:8px 0 0;font-size:15px;font-weight:600;color:#ffd77a}
 .lt-tin button,.lt-ds-dong{display:block;width:100%;margin-top:10px;height:48px;border:0;border-radius:14px;
   background:linear-gradient(#ffd77a,#e9a93a);color:#2a1a00;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
 .lt-tin button.lt-phu{background:rgba(255,255,255,.08);color:#eef1ff;font-weight:500}
@@ -1129,9 +1132,11 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .lt-ds-thu{margin:10px 0 0;padding:7px 10px;border-radius:10px;background:rgba(255,215,120,.12);color:#ffe6a6;font-size:13px}
 .lt-ds h3{margin:16px 0 8px;font-size:13.5px;font-weight:600;text-align:left;color:#cfe3ff}
 .lt-ds-luoi{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
-.lt-ds-luoi button{height:40px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eef1ff;
-  font:inherit;font-size:14px;cursor:pointer}
-.lt-ds-luoi button.lt-xong{background:linear-gradient(#ffd77a,#e9a93a);color:#2a1a00;border:0;font-weight:700}
+.lt-ds-luoi button{display:flex;flex-direction:column;align-items:center;justify-content:center;height:46px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eef1ff;font:inherit;font-size:14px;cursor:pointer}
+.lt-ds-luoi button i{font-style:normal;font-size:9px;letter-spacing:1px;line-height:1}
+.lt-ds-luoi button.lt-xong{background:rgba(255,215,120,.16);border-color:rgba(255,215,120,.45);color:#ffe6a6;font-weight:700}
+.lt-ds-luoi button.lt-du{background:linear-gradient(#ffd77a,#e9a93a);color:#2a1a00;border:0}
 .lt-ds-luoi button.lt-dang{outline:2px solid #8fd0ff;outline-offset:1px}
 .lt-ds-luoi button:disabled{opacity:.3;cursor:default}
 @media (prefers-reduced-motion:reduce){.lt-cho.lt-cho-dang,.lt-goiy-o,.lt-chip.lt-sai{animation:none}}

@@ -101,7 +101,7 @@ console.log('\n— Gợi ý từng bước —');
   ok('vòng lặp lồng: thiếu ô Đi trong vòng ngoài → bảo thêm vào đúng thân vòng ngoài', r54.loai === 'them' && r54.k === 'di' && r54.ds === k54[0].id + '.than');
   const k2 = L.docMa('2(2(j) d) t');
   ok('sai số lần lặp: bảo đổi đúng con số', (r => r.loai === 'solan' && r.n === 3 && r.id === k2[0].id)(L.goiYBuoc(k2, [], b(54))));
-  ok('có hàm: chương trình chính đúng rồi thì gợi ý tiếp vào Hàm ★', (r => r.loai === 'them' && r.ds === 'ham' && r.k === 'di')(gy(59, 'F L F L F')));
+  ok('có hàm: chương trình chính đúng rồi thì gợi ý tiếp vào Hàm ★', (r => r.loai === 'them' && r.ds === 'ham' && r.k === 'di')(gy(59, 'F F F')));
   ok('chương điều kiện: gợi ý ô nằm trong phần "không thì"', (r => r.loai === 'them' && r.k === 'neu-trai')(gy(83, 'w(?d(d)())')));
 }
 
@@ -122,7 +122,21 @@ console.log('\n— Âm thanh, mở hết để thử —');
 {
   const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8');
   ok('đếm ô ghi rõ "tối đa" (bản cũ "6/7 ô" bị đọc thành cần 7 ô)', /dem\.textContent = `\$\{n\} ô · tối đa \$\{b\.toiDa\}`/.test(src));
-  ok('thắng rồi thì so với lời giải mẫu: gọn hơn / bằng / dài hơn', /Còn gọn hơn cả lời giải mẫu/.test(src) && /Gọn đúng bằng lời giải mẫu/.test(src) && /Lời giải mẫu chỉ cần \$\{mau\} ô/.test(src));
+  ok('thắng rồi thì nói so với cách gọn nhất: gọn hơn / bằng (3 sao) / dài hơn bao nhiêu ô', /Còn gọn hơn cả lời giải gọn nhất/.test(src) && /Gọn nhất rồi — đủ 3 sao!/.test(src) && /Cách gọn nhất chỉ cần \$\{mau\} ô\. Bớt/.test(src));
+}
+
+console.log('\n— Chấm sao theo số ô —');
+{
+  ok('bằng hoặc gọn hơn lời giải gọn nhất: 3 sao; dư 1–2 ô: 2 sao; dư nhiều hơn: 1 sao',
+     L.soSao(6, 6) === 3 && L.soSao(5, 6) === 3 && L.soSao(7, 6) === 2 && L.soSao(8, 6) === 2 && L.soSao(9, 6) === 1);
+  ok('giải đúng bằng cách gọn nhất là đủ 3 sao, ở mọi bài (người dùng giải bài 69 bằng đúng số ô gọn nhất mà tưởng thiếu)', L.BAI.every(b => L.soSao(L.mauBai(b), L.mauBai(b)) === 3));
+  /* lời giải mẫu phải là cách gọn nhất (bài kiểm này không tìm kiếm — scripts/tim-loi-giai-gon.js mới tìm) — ít nhất
+     không dài hơn mọi cách giải từng bước, và không quá số ô tối đa */
+  ok('số ô tối đa chừa chỗ cho 2 sao: tối đa ≥ lời giải gọn nhất', L.BAI.every(b => b.toiDa >= L.mauBai(b)));
+  const kho = {};
+  global.localStorage = { getItem: (k) => (k in kho ? kho[k] : null), setItem: (k, v) => { kho[k] = String(v); } };
+  ok('chuỗi tiến độ cũ chỉ có 0/1 (trước khi có sao) vẫn đọc được: 1 = đã xong, 1 sao', (() => { kho['tdtd.code'] = '1' + '0'.repeat(99); return L._moToi() === 1; })());
+  delete global.localStorage;
 }
 
 console.log('\n— Gắn vào app —');

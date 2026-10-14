@@ -119,14 +119,16 @@ function dungBan(bai) {
 }
 
 /* ---------- chạy chương trình ----------
-   Đi: ô phía trước cùng độ cao. Nhảy: ô phía trước cao hơn đúng một nấc, hoặc thấp hơn. Không được thì robot khựng lại
-   tại chỗ và chạy tiếp lệnh sau (như Lightbot — trẻ thấy rõ chỗ sai mà không bị dừng phắt). Thắp: chỉ ô sao chưa thắp.
+   Đi: ô phía trước cùng độ cao. Nhảy: ô phía trước cao hơn đúng một nấc, hoặc thấp hơn. Thắp: chỉ ô sao chưa thắp.
+   Lệnh không làm được thì robot dừng luôn, báo vì sao (như Code.org). Bản đầu cho robot khựng rồi chạy tiếp lệnh sau
+   (như Lightbot), nhưng như thế mẹo "quay đủ bốn hướng, Đi vướng cũng kệ" hay "Đi, Nhảy xen kẽ, cái nào vướng thì kệ"
+   lại là lời giải gọn nhất — chấm sao theo số ô thì mẹo được ba sao (scripts/tim-loi-giai-gon.js tìm ra 28 bài như vậy).
    Thắp xong ngôi sao cuối là thắng ngay. Trả về từng bước để vẽ lại. */
 function chay(ban, ct, ham, toiBuoc = 800) {
   const o = new Map(ban.o.map(c => [c.x + ',' + c.y, c]));
   const sao = ban.o.filter(c => c.sao).map(c => c.x + ',' + c.y);
   const sang = new Set(), buoc = [];
-  let { x, y, huong } = ban.robot, thang = false, het = false, sau = 0;
+  let { x, y, huong } = ban.robot, thang = false, het = false, loi = null, sau = 0;
   const oTai = (a, b) => o.get(a + ',' + b);
   const xong = () => sao.length > 0 && sao.every(k => sang.has(k));
   const coDuong = (hg) => { const c = oTai(x + HUONG[hg][0], y + HUONG[hg][1]); return !!c && c.h === oTai(x, y).h; };
@@ -134,13 +136,14 @@ function chay(ban, ct, ham, toiBuoc = 800) {
     : dk === 'phai' ? coDuong((huong + 1) % 4) : (oTai(x, y).sao && !sang.has(x + ',' + y));
   function lam(ds) {
     for (const n of ds) {
-      if (thang || het) return;
+      if (thang || het || loi) return;
       if (buoc.length >= toiBuoc) { het = true; return; }
       if (n.k === 'di' || n.k === 'nhay') {
         const c0 = oTai(x, y), nx = x + HUONG[huong][0], ny = y + HUONG[huong][1], c1 = oTai(nx, ny);
         const duoc = !!c1 && (n.k === 'di' ? c1.h === c0.h : (c1.h === c0.h + 1 || c1.h < c0.h));
         buoc.push({ k: n.k, id: n.id, x0: x, y0: y, h0: c0.h, x1: duoc ? nx : x, y1: duoc ? ny : y, h1: duoc ? c1.h : c0.h, huong, ok: duoc });
         if (duoc) { x = nx; y = ny; }
+        else loi = { k: n.k, id: n.id, ly: !c1 ? 'trong' : n.k === 'di' ? (c1.h > c0.h ? 'cao' : 'thap') : 'caoqua' };
       } else if (n.k === 'trai' || n.k === 'phai') {
         const truoc = huong;
         huong = (huong + (n.k === 'trai' ? 3 : 1)) % 4;
@@ -150,14 +153,15 @@ function chay(ban, ct, ham, toiBuoc = 800) {
         if (duoc) sang.add(k);
         buoc.push({ k: 'thap', id: n.id, x0: x, y0: y, h0: c.h, huong, ok: duoc, sang: duoc ? k : null });
         if (duoc && xong()) thang = true;
+        if (!duoc) loi = { k: 'thap', id: n.id, ly: c.sao ? 'dathap' : 'khongsao' };
       } else if (n.k === 'lap') {
-        for (let i = 0; i < n.n && !thang && !het; i++) lam(n.than);
+        for (let i = 0; i < n.n && !thang && !het && !loi; i++) lam(n.than);
       } else if (n.k === 'ham') {
         if (sau >= 40) { het = true; return; }
         sau++; lam(ham || []); sau--;
       } else if (n.k === 'den') {
         let lan = 0;
-        while (!xong() && !thang && !het) {
+        while (!xong() && !thang && !het && !loi) {
           const truoc = buoc.length;
           lam(n.than);
           if (buoc.length === truoc || ++lan > 400) { het = true; break; }   // vòng lặp không làm gì: dừng, kẻo treo máy
@@ -168,7 +172,7 @@ function chay(ban, ct, ham, toiBuoc = 800) {
     }
   }
   lam(ct);
-  return { buoc, thang: thang || xong(), het, conLai: sao.filter(k => !sang.has(k)).length };
+  return { buoc, thang: thang || xong(), het, loi, conLai: sao.filter(k => !sang.has(k)).length };
 }
 
 /* số lệnh từng bước ít nhất để thắp hết sao (tìm theo chiều rộng) — để biết bài có buộc dùng vòng lặp, hàm, điều
@@ -221,7 +225,7 @@ const O = {
 const hinhO = (k) => `<svg viewBox="0 0 24 24" aria-hidden="true">${O[k].hinh}</svg>`;
 
 /* ---------- trạng thái ---------- */
-const KHOA = 'tdtd.code';                                               // chuỗi 100 ký tự 0/1: bài nào đã xong
+const KHOA = 'tdtd.code';                                               // chuỗi 100 ký tự 0–3: số sao cao nhất của từng bài (0: chưa xong)
 let tam = null, cv = null, ctx = null, W = 360, H = 300, DPR = 1, raf = 0;
 let bai = 0, ban = null, chinh = [], ham = [], dich = 'chinh';
 let goc = Math.PI / 4, gocDen = Math.PI / 4;                             // góc xoay cảnh (nhìn nghiêng 45°)
@@ -229,7 +233,12 @@ let ve = null;                                                           // tr�
 let dangChay = null;
 
 const docXong = () => { try { return (localStorage.getItem(KHOA) || '').padEnd(BAI.length, '0').slice(0, BAI.length); } catch (e) { return '0'.repeat(BAI.length); } };
-const ghiXong = (i) => { try { const s = docXong().split(''); s[i] = '1'; localStorage.setItem(KHOA, s.join('')); } catch (e) {} };
+const ghiXong = (i, sao = 1) => { try { const s = docXong().split(''); s[i] = String(Math.max(+s[i] || 0, sao)); localStorage.setItem(KHOA, s.join('')); } catch (e) {} };
+/* Chấm sao theo số ô (người dùng: "làm tối ưu nhất thì được nhiều sao, càng nhiều ô thì ít sao"): bằng hoặc gọn hơn lời
+   giải gọn nhất (lời giải mẫu — scripts/tim-loi-giai-gon.js kiểm là không có cách ngắn hơn) được 3 sao, dư 1–2 ô được
+   2 sao, dư nhiều hơn 1 sao. Bài sửa lỗi: lời giải mẫu là chương trình cho sẵn đã sửa. */
+const mauBai = (b) => soO(docMa(b.giai)) + soO(docMa(b.ham || ''));
+const soSao = (so, mau) => so <= mau ? 3 : so <= mau + 2 ? 2 : 1;
 const baiTiep = () => { const i = docXong().indexOf('0'); return i < 0 ? BAI.length - 1 : i; };          // bài chưa xong đầu tiên
 /* Mở hết 100 bài để người làm app thử (người dùng hỏi): thêm ?mohet vào link, hoặc chạm 7 lần liền vào chữ
    "Robot thắp sao" trong danh sách bài (dùng được cả trong app đã cài). Chỉ trong lần mở này, không ghi gì xuống máy,
@@ -246,6 +255,19 @@ function chieu(x, y, z) {
   const dx = x - toa.tx, dy = y - toa.ty, c = Math.cos(goc), s = Math.sin(goc);
   const X = dx * c - dy * s, Y = dx * s + dy * c;
   return { x: toa.cx + X * toa.s, y: toa.cy + Y * toa.s * 0.56 - z * toa.s * 0.86, d: Y };
+}
+/* Góc nhìn mặc định của mỗi bài: trong bốn góc, chọn góc mà khối cao nằm phía sau — tháp cao đứng phía trước che mất
+   đường đi (soát cả 100 bản đồ thì bài Tháp xoắn, Thang và sân, Xoắn ốc lên trời… bị như vậy). Bản đồ phẳng giữ góc
+   quen. Trái phải tính theo hướng robot nên đổi góc nhìn không đổi lời giải. */
+function gocTot(b) {
+  let tot = Math.PI / 4, it = Infinity;
+  for (let k = 0; k < 4; k++) {
+    const a = Math.PI / 4 + k * Math.PI / 2, c = Math.cos(a), sn = Math.sin(a);
+    const d = b.o.map(o => o.x * sn + o.y * c), dMin = Math.min(...d);   // càng lớn càng gần người xem
+    const diem = b.o.reduce((t, o, i) => t + o.h * (d[i] - dMin), 0) + k * 1e-3;
+    if (diem < it) { it = diem; tot = a; }
+  }
+  return tot;
 }
 function canhKhung() {
   if (!ban) return;
@@ -692,13 +714,13 @@ function moBai(i, hoi) {
   chinh = b.san ? docMa(b.san) : []; ham = b.sanHam ? docMa(b.sanHam) : [];
   dich = 'chinh'; viTri = null; chonId = null; lichSu = []; sai.clear();
   datLai();
-  goc = gocDen = Math.PI / 4;                                           // bài mới: về góc nhìn quen, khỏi lẫn trái phải
+  goc = gocDen = gocTot(ban);                                           // bài mới: góc nhìn khối cao nằm phía sau
   clearTimeout(bao.t); tam.querySelector('.lt-bao').hidden = true;      // lời báo của bài trước không dính sang
   tam.querySelector('.lt-ten').innerHTML = `<b>Bài ${bai + 1}</b> · Chương ${b.chuong + 1}<span>${esc(b.ten)}</span>`;
   const soSao = ban.o.filter(c => c.sao).length;
   tam.querySelector('.lt-muc').textContent = b.san ? `Chương trình có lỗi — sửa để thắp ${soSao} ngôi sao` : `Thắp sáng ${soSao} ngôi sao`;
   veBang(); veMa(); doCo();
-  if (hoi !== false && b.trongChuong === 0 && docXong()[bai] !== '1') moTin('chuong');
+  if (hoi !== false && b.trongChuong === 0 && docXong()[bai] === '0') moTin('chuong');
   if (bai < 2) goiY(true);
 }
 
@@ -712,12 +734,16 @@ function moTin(loai, them) {
       <p class="lt-tin-meo">Chạm một ô đã xếp để chọn nó: ô mới sẽ chèn ngay sau, bấm × để bỏ. Bí thì bấm 💡 Gợi ý.</p>
       <button type="button" class="lt-tin-dong">Bắt đầu</button>`;
   } else if (loai === 'thang') {
-    const mau = soO(docMa(b.giai)) + soO(docMa(b.ham || ''));
-    const nhanXet = them.so < mau ? 'Còn gọn hơn cả lời giải mẫu — giỏi quá!' : them.so === mau ? 'Gọn đúng bằng lời giải mẫu!' : `Lời giải mẫu chỉ cần ${mau} ô — thử gọn hơn xem?`;
-    html = `<div class="lt-tin-sao">${'<span>★</span>'.repeat(3)}</div><h2>Thắp sáng hết rồi!</h2>
+    const mau = mauBai(b), sao = them.sao;
+    const nhanXet = them.so < mau ? 'Còn gọn hơn cả lời giải gọn nhất mà robot biết — giỏi quá!'
+      : them.so === mau ? 'Gọn nhất rồi — đủ 3 sao!'
+      : `Cách gọn nhất chỉ cần ${mau} ô. Bớt ${them.so - mau} ô nữa là được 3 sao — thử lại xem?`;
+    html = `<div class="lt-tin-sao">${[0, 1, 2].map(k => `<span class="${k < sao ? 'lt-co' : ''}">★</span>`).join('')}</div>
+      <h2>${sao === 3 ? 'Tuyệt vời!' : 'Thắp sáng hết rồi!'}</h2>
       <p>Em dùng ${them.so} ô lệnh. ${nhanXet}</p>
+      ${them.cu > sao ? `<p class="lt-tin-meo">Kỷ lục của em ở bài này vẫn là ${them.cu} sao.</p>` : ''}
       ${bai + 1 < BAI.length ? '<button type="button" class="lt-tin-tiep">Bài tiếp →</button>' : '<p>Em đã làm xong cả 100 bài. Robot cảm ơn em!</p>'}
-      <button type="button" class="lt-tin-dong lt-phu">Xem lại bài này</button>`;
+      <button type="button" class="lt-tin-dong lt-phu">${sao < 3 ? 'Làm lại cho được 3 sao' : 'Xem lại bài này'}</button>`;
   }
   tam.querySelector('.lt-tin-trong').innerHTML = html;
   hop.hidden = false;
@@ -725,13 +751,15 @@ function moTin(loai, them) {
 
 function moDs() {
   const xong = docXong(), toi = moToi();
-  tam.querySelector('.lt-ds-trong').innerHTML = `<h2 data-bi="1">Robot thắp sao</h2><p class="lt-ds-phu">100 bài lập trình. Làm xong bài này thì mở bài sau.</p>
+  const tongSao = [...xong].reduce((s, c) => s + (+c || 0), 0);
+  tam.querySelector('.lt-ds-trong').innerHTML = `<h2 data-bi="1">Robot thắp sao</h2><p class="lt-ds-phu">100 bài lập trình. Làm xong bài này thì mở bài sau. Dùng càng ít ô càng được nhiều sao.</p>
+    <p class="lt-ds-tong">★ ${tongSao} / ${BAI.length * 3} sao</p>
     <button type="button" class="lt-ds-tieng" data-tieng="1">${coTieng ? '🔊 Âm thanh: bật' : '🔇 Âm thanh: tắt'}</button>
     ${moHet ? `<p class="lt-ds-thu">Chế độ thử: đã mở hết 100 bài (chỉ trong lần mở này).</p><button type="button" class="lt-ds-dien" data-dien="1">Điền lời giải mẫu cho bài ${bai + 1}</button>` : ''}` +
     CHUONG.map((ch, ci) => {
       const cacBai = BAI.map((b, i) => [b, i]).filter(([b]) => b.chuong === ci);
       return `<h3>Chương ${ci + 1} · ${esc(ch.ten)}</h3><div class="lt-ds-luoi">${cacBai.map(([b, i]) =>
-        `<button type="button" data-bai="${i}" class="${xong[i] === '1' ? 'lt-xong' : ''}${i === bai ? ' lt-dang' : ''}"${i > toi ? ' disabled' : ''}>${i + 1}</button>`).join('')}</div>`;
+        `<button type="button" data-bai="${i}" class="${xong[i] !== '0' ? 'lt-xong' : ''}${xong[i] === '3' ? ' lt-du' : ''}${i === bai ? ' lt-dang' : ''}"${i > toi ? ' disabled' : ''}>${i + 1}${xong[i] !== '0' ? `<i>${'★'.repeat(+xong[i])}${'☆'.repeat(3 - xong[i])}</i>` : ''}</button>`).join('')}</div>`;
     }).join('') + `<button type="button" class="lt-ds-dong">Đóng</button>`;
   tam.querySelector('.lt-ds').hidden = false;
 }
@@ -849,9 +877,20 @@ function ketThuc() {
   dungChay();
   danhDauSai();
   if (kq.thang) {
-    ghiXong(bai);
+    const so = tongO(), sao = soSao(so, mauBai(BAI[bai])), cu = +docXong()[bai] || 0;
+    ghiXong(bai, sao);
     setTimeout(nhacThang, 250);
-    setTimeout(() => moTin('thang', { so: tongO() }), 450);
+    setTimeout(() => moTin('thang', { so, sao, cu }), 450);
+  } else if (kq.loi) {
+    const LY = {
+      trong: 'Phía trước không có đường — robot dừng lại.',
+      cao: 'Khối phía trước cao hơn — phải dùng Nhảy chứ Đi không lên được.',
+      thap: 'Khối phía trước thấp hơn — phải dùng Nhảy để xuống.',
+      caoqua: 'Không nhảy được: chỉ nhảy lên được khối cao hơn đúng một nấc, và không nhảy sang chỗ bằng (chỗ bằng thì Đi).',
+      khongsao: 'Ô này không có sao để thắp — robot dừng lại.',
+      dathap: 'Ngôi sao này thắp rồi — robot dừng lại.',
+    };
+    bao(`${LY[kq.loi.ly]} Ô tô đỏ là lệnh robot không làm được.`, 4600);
   } else if (kq.het) bao('Robot chạy mãi không dừng. Xem lại vòng lặp nhé.', 3600);
   else bao(`Chưa thắp hết — còn ${kq.conLai} ngôi sao.${sai.size ? ' Ô tô đỏ là chỗ robot bị vướng.' : ' Xem robot đi lạc ở đâu rồi sửa nhé.'}`, 3800);
 }
@@ -874,5 +913,5 @@ function dong() {
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
 
 self.TDTD_LAPTRINH = { mo, dong, BAI, CHUONG, HUONG, docMa, soO, loaiO, dungBan, chay, itNhat, banBai, O,
-  goiYBuoc, _moToi: () => moToi(), _moHet: (b) => { moHet = !!b; }, _moBai: (i) => moBai(i, false), _themO: themO, _ct: () => ({ chinh, ham, dich, viTri, chonId }), _ve: () => ve, _chayNgay: batDauChay };
+  goiYBuoc, soSao, mauBai, gocTot, _moToi: () => moToi(), _moHet: (b) => { moHet = !!b; }, _moBai: (i) => moBai(i, false), _themO: themO, _ct: () => ({ chinh, ham, dich, viTri, chonId }), _ve: () => ve, _chayNgay: batDauChay };
 })();
