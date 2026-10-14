@@ -590,7 +590,8 @@ function veMa() {
   tam.querySelector('.lt-khung-ham').hidden = !b.lenh.includes('ham');
   tam.querySelectorAll('.lt-khung').forEach(k => k.classList.toggle('lt-dich', k.dataset.chon === dich));
   const dem = tam.querySelector('.lt-dem'), n = tongO();
-  dem.textContent = `${n}/${b.toiDa} ô`;
+  /* "6/7 ô" người dùng đọc thành "cần 7 ô" (giải 6 ô mà tưởng thiếu) — 7 là số ô TỐI ĐA được dùng */
+  dem.textContent = `${n} ô · tối đa ${b.toiDa}`;
   dem.classList.toggle('lt-day', n >= b.toiDa);
   tam.querySelector('.lt-hoan').disabled = !lichSu.length;
   const cho = tam.querySelector('.lt-cho-dang');
@@ -711,9 +712,10 @@ function moTin(loai, them) {
       <p class="lt-tin-meo">Chạm một ô đã xếp để chọn nó: ô mới sẽ chèn ngay sau, bấm × để bỏ. Bí thì bấm 💡 Gợi ý.</p>
       <button type="button" class="lt-tin-dong">Bắt đầu</button>`;
   } else if (loai === 'thang') {
-    const gon = them.so < soO(docMa(b.giai)) + soO(docMa(b.ham || ''));
+    const mau = soO(docMa(b.giai)) + soO(docMa(b.ham || ''));
+    const nhanXet = them.so < mau ? 'Còn gọn hơn cả lời giải mẫu — giỏi quá!' : them.so === mau ? 'Gọn đúng bằng lời giải mẫu!' : `Lời giải mẫu chỉ cần ${mau} ô — thử gọn hơn xem?`;
     html = `<div class="lt-tin-sao">${'<span>★</span>'.repeat(3)}</div><h2>Thắp sáng hết rồi!</h2>
-      <p>Em dùng ${them.so} ô lệnh.${gon ? ' Còn gọn hơn cả lời giải mẫu — giỏi quá!' : ''}</p>
+      <p>Em dùng ${them.so} ô lệnh. ${nhanXet}</p>
       ${bai + 1 < BAI.length ? '<button type="button" class="lt-tin-tiep">Bài tiếp →</button>' : '<p>Em đã làm xong cả 100 bài. Robot cảm ơn em!</p>'}
       <button type="button" class="lt-tin-dong lt-phu">Xem lại bài này</button>`;
   }

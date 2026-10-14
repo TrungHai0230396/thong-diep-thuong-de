@@ -119,6 +119,12 @@ console.log('\n— Âm thanh, mở hết để thử —');
   ok('mở hết bằng ?mohet trên link, hoặc chạm 7 lần vào tên trò — không ghi gì xuống máy', /\[\?&\]mohet/.test(src) && /bamBi\.n >= 7/.test(src));
 }
 
+{
+  const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8');
+  ok('đếm ô ghi rõ "tối đa" (bản cũ "6/7 ô" bị đọc thành cần 7 ô)', /dem\.textContent = `\$\{n\} ô · tối đa \$\{b\.toiDa\}`/.test(src));
+  ok('thắng rồi thì so với lời giải mẫu: gọn hơn / bằng / dài hơn', /Còn gọn hơn cả lời giải mẫu/.test(src) && /Gọn đúng bằng lời giải mẫu/.test(src) && /Lời giải mẫu chỉ cần \$\{mau\} ô/.test(src));
+}
+
 console.log('\n— Gắn vào app —');
 const app = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.js'), 'utf8');
 const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
