@@ -1860,6 +1860,34 @@ Người dùng: "cờ vua 3 người làm tạo phòng để chơi nhiều máy 
 
 Đã chơi thật trên database với ba thẻ trình duyệt khác địa chỉ (ba kho lưu riêng như ba điện thoại): An tạo phòng, Bình vào bằng link mời, An bấm Bắt đầu, Hổ chơi thay ghế Đỏ; An đi, Bình nhận và đi, Hổ do máy An nghĩ giùm — thế cờ hai máy giống hệt từng ô; thẻ thứ ba vào bằng link thành người xem, cùng thế cờ; Bình đóng thẻ, quá 60 giây An thấy "Cho máy đi thay Bình", Rùa đi thay; Bình mở lại thấy "Tự đi tiếp"; ván nữa thì Bình theo vào và tự ngồi lại ghế Đen. Trong lúc thử còn có một ván chơi trọn qua khung trình duyệt: 99 nước, máy đi thay An lúc An vắng, tới "Rùa thắng!", rồi Chơi ván nữa.
 
+### Tạo phòng, vào phòng: làm lại cho dễ dùng
+
+Người dùng: "chỗ tạo phòng vô phòng khó sài quá, xem lại UIUX đi". Trước khi sửa, đi lại từng bước ở khổ điện thoại 375 px, ghi ra các chỗ vướng:
+
+- Bảng ván mới dồn mọi thứ vào một bảng dài (luật, tên, màu, mức máy, Tạo phòng), ô nhập mã nằm tận cuối — người có mã phải kéo qua hết.
+- Ô nhập mã chỉ nhận 6 ký tự: dán link mời vào là bị cắt còn "http:/", không vào được.
+- Tạo phòng xong, nút nổi nhất là **Bắt đầu** — bấm nhầm là chơi một mình với hai máy; Gửi link mời chỉ là nút phụ. Mã phòng không có nút chép, bạn ngồi cạnh phải đọc rồi gõ tay.
+- Người mở link phải tìm ô tên rồi bấm "Ngồi đây" trên từng dòng ghế.
+- Bấm Rời phòng giữa ván là rời luôn, không hỏi.
+
+Giờ:
+
+- **Ván mới**: ba thẻ lớn có hình và một dòng giải thích — Đấu với 2 máy · Tạo phòng, mời bạn · Vào phòng của bạn; mỗi lối một màn ngắn có nút Quay lại, vừa một màn hình.
+- **Vào phòng**: ô nhập mã to; dán cả link hay nguyên tin nhắn mời cũng được, ô tự rút còn 6 ký tự; nút Vào phòng chỉ sáng khi mã đúng khuôn.
+- **Phòng chờ** đổi theo người đang xem:
+  - Chủ phòng, chưa ai vào: mã phòng to có nút **Chép mã**, ba ghế một hàng, **Gửi link mời** là nút chính, **Hiện mã QR** cho bạn ngồi cạnh quét; Bắt đầu là nút phụ ở dưới, ghi rõ "máy chơi thay 2 ghế trống".
+  - Có bạn vào rồi: Bắt đầu thành nút chính; đủ ba người thì thôi nút mời và mã QR.
+  - Người mở link: "An mời bạn chơi cờ ba người", mỗi ghế trống một nút **Vào chơi quân Đen / Vào chơi quân Đỏ** — một chạm là ngồi; ghế trống ghi "Chờ bạn".
+  - Người được mời đã ngồi: "Chờ An bấm Bắt đầu…", không có nút Bắt đầu. Chủ phòng vắng quá một phút — có khi chỉ đang ở Zalo gửi link — mới hiện Bắt đầu, mà là nút phụ, cho khỏi bấm nhầm lúc người thứ ba chưa kịp vào.
+- **Rời phòng giữa ván** thì hỏi lại; ghế đứng yên, mở lại link là ngồi lại đúng ghế. **Rời phòng chờ** cũng nhớ ghế: ghế đã giành thì máy chủ không cho xoá, trước đây không nhớ nên chính ghế cũ của mình chặn mình.
+- **Tải lại trang** thì báo "còn ở đây" ngay lượt kiểm đầu (≤5 giây) thay vì đợi 20 giây — trước đây trong lúc đó người khác thấy mình vắng, người được mời lại thấy nút Bắt đầu.
+
+**Mã QR tự vẽ** (`assets/maqr.js`, không thư viện, chạy cả khi mất mạng): theo ISO/IEC 18004 — kiểu byte UTF-8, mức sửa lỗi M (chịu chừng 15% ô hỏng), phiên bản 1–6; link mời trên trang thật 69 ký tự rơi vào phiên bản 5 (37×37 ô). Cách đặt chuỗi định dạng, mặt nạ và điểm phạt theo bản cài mẫu của Nayuki. `scripts/test-maqr.js`, 12 bài: chuỗi định dạng mức M đúng bảng trong chuẩn, đa thức sinh 10 mã sửa lỗi, mã sửa lỗi của ví dụ "HELLO WORLD" 1-M (bài hướng dẫn QR của Thonky), bảng khối mức M; rồi đọc ngược bằng một bộ đọc viết riêng theo định nghĩa trong chuẩn (hai bản chuỗi định dạng, công thức mặt nạ theo hàng i cột j, đọc zíc zắc, tách khối, soát mã sửa lỗi, giải kiểu byte): link mời, chữ có dấu, sát sức chứa từng phiên bản, 300 chữ ngẫu nhiên đi qua đủ 8 mặt nạ, SVG vẽ đúng từng ô. Thử phá 12 chỗ (mặt nạ đảo hàng cột, bỏ ô luôn đen, bản định dạng thứ hai lệch một ô, đa thức sinh sai gốc, zíc zắc sai chiều, ô căn chỉnh sai chỗ, mã sửa lỗi không xen kẽ, sức chứa tính sai, BCH sai đa thức, lề 3 ô, độ dài 9 bit, mặt nạ 1 theo cột): bắt cả 12. Trên trình duyệt quét bằng BarcodeDetector: phiên bản 1, 3, 5, 6 đọc đúng, mã trong phòng chờ ra đúng link mời.
+
+`scripts/test-phong.js` thêm 10 bài (giờ 48): chủ phòng chưa ai vào thì Gửi link mời là nút chính, Bắt đầu nút phụ nằm dưới; bấm hiện mã QR thì mã chính là link mời, bấm lần nữa thì ẩn; người mở link thấy mỗi ghế trống một nút theo đúng thứ tự đi; có bạn vào thì Bắt đầu lên nút chính; người được mời chờ chủ phòng, chủ phòng vắng thì Bắt đầu chỉ là nút phụ; đủ ba người thì thôi mời; rời phòng chờ rồi mở lại link thì ngồi lại đúng ghế; tải lại trang thì báo còn ở đây ngay; ô nhập mã nhận mã trần, link, nguyên tin nhắn mời, chặn mã sai khuôn. Thử phá 7 chỗ trong phòng chờ: bắt cả 7; bỏ hai chỗ sửa (nhớ ghế khi rời phòng chờ, báo ngay khi tải lại) thì đúng bài tương ứng hỏng.
+
+Đã thử trên trình duyệt khổ 375 px với hai địa chỉ khác nhau như hai máy, trên database thật: tạo phòng, hiện mã QR, mở link ở máy kia, một chạm vào ghế Đen, chủ phòng thấy Bắt đầu lên nút chính; rời phòng chờ, dán nguyên tin nhắn mời vào ô mã, vào lại đúng ghế. Lúc thử tìm ra và sửa thêm: ô nhập mã rộng hơn khung làm bảng lệch ngang khi gõ; chữ "Bắt đầu — máy chơi thay 1 ghế trống" gãy hai dòng trong nút cao cố định (giờ là "Bắt đầu" kèm dòng nhỏ bên dưới).
+
 ## Cấu trúc
 
 ```
@@ -1920,9 +1948,11 @@ scripts/tao-man-sokoban.js tạo màn theo Taylor & Parberry 2011 (17 mẫu phò
 assets/coba.js             Cờ vua ba người: bàn lục giác 96 ô (bằng sáng chế Zubrin), luật, máy nghĩ (Best-Reply Search, hoang tưởng) ở luồng riêng, giao diện
 scripts/test-coba.js       68 kiểm thử cờ ba người: hình học bàn, luật thường và Tam quốc, máy nghĩ, giao diện, mũi tên nước đi
 assets/phong.js            chơi qua mạng: đọc ghi Firebase Realtime Database bằng REST và luồng sự kiện, không thư viện
+assets/maqr.js             mã QR tự vẽ cho phòng chờ (ISO/IEC 18004, kiểu byte, mức M, phiên bản 1–6), không thư viện
+scripts/test-maqr.js       12 kiểm thử mã QR: số liệu chuẩn, đọc ngược bằng bộ đọc riêng, sát sức chứa, 300 chữ ngẫu nhiên
 firebase-rules.json        luật bảo vệ database (dán vào thẻ Rules của Firebase)
 scripts/fb-gia.js          máy chủ giả của Firebase cho bài kiểm thử
-scripts/test-phong.js      38 kiểm thử chơi qua mạng: ba máy chung một phòng trên máy chủ giả
+scripts/test-phong.js      48 kiểm thử chơi qua mạng: ba máy chung một phòng trên máy chủ giả, phòng chờ theo từng người xem
 scripts/test-sokoban.js    60 kiểm thử Đẩy thùng sao: luật, bộ giải đối chiếu dò từng bước, bộ tạo, cả 100 màn, giao diện
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -1955,7 +1985,8 @@ node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
 node scripts/test-coba.js        # chạy 68 kiểm thử Cờ vua ba người
-node scripts/test-phong.js       # chạy 38 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
+node scripts/test-phong.js       # chạy 48 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
+node scripts/test-maqr.js        # chạy 12 kiểm thử mã QR
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
 node scripts/tao-man-sokoban.js tao ung-vien.jsonl 7 [4,5]   # tạo màn liên tục, 7 luồng, ghi mỗi màn một dòng (tuỳ chọn: chỉ số thùng này)
 node scripts/tao-man-sokoban.js chon ung-vien.jsonl          # chọn 100 màn từ các ứng viên, ghi assets/mansoko.js

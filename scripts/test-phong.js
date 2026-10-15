@@ -13,6 +13,8 @@ const { taoMay } = require('./fb-gia.js');
 const goc = path.join(__dirname, '..');
 const NGUON_PHONG = fs.readFileSync(path.join(goc, 'assets', 'phong.js'), 'utf8');
 const NGUON_COBA = fs.readFileSync(path.join(goc, 'assets', 'coba.js'), 'utf8');
+const NGUON_MAQR = fs.readFileSync(path.join(goc, 'assets', 'maqr.js'), 'utf8');
+const QR = require(path.join(goc, 'assets', 'maqr.js'));
 
 let pass = 0, fail = 0;
 const ok = (n, c, them = '') => { c ? pass++ : fail++; console.log(`${c ? '  ✓' : '  ✗'} ${n}${them ? ' — ' + them : ''}`); };
@@ -79,11 +81,13 @@ function mayKhach(ten, url) {
   ctx.self = ctx; ctx.window = ctx;
   vm.createContext(ctx);
   vm.runInContext(NGUON_PHONG, ctx);
+  vm.runInContext(NGUON_MAQR, ctx);
   vm.runInContext(NGUON_COBA, ctx);
   Object.assign(m, { ctx, C: ctx.TDTD_COBA, PH: ctx.TDTD_PHONG, khung: () => ctx.document.body.children.find(c => c.className === 'coba') });
   m.tin = () => m.khung().querySelector('.cb-tin').querySelector('.cb-tin-trong').innerHTML;
   m.the = () => { const v = m.C._van(); return v ? Array.from(v.the.o).join(',') + '|' + v.the.luot + '|' + v.the.song.join('') : ''; };
   m.yen = () => !m.C._hoat() && m.C._van() && m.C._van().dangNghi < 0;
+  m.bam = (sel, ds = {}) => m.C._bam({ target: { closest: (s) => (s === sel ? { dataset: ds } : null) } });   // bấm nút trong bảng
   return m;
 }
 
@@ -102,6 +106,11 @@ function mayKhach(ten, url) {
     const PH = An.PH, r = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
     const ma = Array.from({ length: 300 }, () => PH.maMoi(r)), id = Array.from({ length: 50 }, () => PH.idMoi(r));
     ok('mã phòng 6 ký tự, không có I, O, 0, 1 cho khỏi đọc nhầm; mã người chơi đúng khuôn luật', ma.every(x => /^[A-HJ-NP-Z2-9]{6}$/.test(x) && PH.laMa(x)) && id.every(x => /^[a-z0-9]{8,16}$/.test(x)) && !PH.laMa('ABCDE0') && !PH.laMa('abcdef'));
+    const tm = An.C._trichMa;
+    ok('ô nhập mã nhận mã trần (chữ thường, có cách, có gạch), cả link mời, link #co-ba-nguoi/MÃ, cả tin nhắn mời dán nguyên; mã sai khuôn thì không',
+       ['ryxqqe', ' RYX-QQE ', 'https://thong-diep-thuong-de.vercel.app/co-vua-ba-nguoi/?phong=RYXQQE', 'http://localhost:5179/#co-ba-nguoi/RYXQQE',
+        'Vào phòng RYXQQE chơi cờ ba người https://thong-diep-thuong-de.vercel.app/co-vua-ba-nguoi/?phong=RYXQQE'].every(x => tm(x) === 'RYXQQE') &&
+       ['ABCDE0', 'RYXQQ', 'RYXQQEE', '', 'https://thong-diep-thuong-de.vercel.app/co-vua-ba-nguoi/?phong=RYXQ0E'].every(x => tm(x) === ''));
     ok('Firebase trả mảng (khoá số liền nhau, chỗ trống null): đổi về đối tượng', JSON.stringify(PH.chuan({ ghe: [{ id: 'a' }, null, { id: 'b' }], nuoc: [{ P: 0 }] })) === JSON.stringify({ ghe: { 0: { id: 'a' }, 2: { id: 'b' } }, nuoc: { 0: { P: 0 } } }));
     let c = PH.ap(null, 'put', '/', { tao: 1, ghe: [{ id: 'a' }] });
     c = PH.ap(c, 'patch', '/', { batDau: 5, 'may/1': 'ho' });
@@ -141,8 +150,19 @@ function mayKhach(ten, url) {
   await doi(() => An.C._phong().cay);
   ok('An tạo phòng: có mã, ngồi Trắng, địa chỉ mang mã phòng, máy nhớ ghế để mở lại', !!ma && An.C._phong().P === 0 && An.ctx.location.hash === '#co-ba-nguoi/' + ma &&
      JSON.parse(An.luu['tdtd.coba']).phong.ma === ma && /Phòng chờ/.test(An.tin()));
+  /* Người dùng: "chỗ tạo phòng vô phòng khó sài quá". Phòng chờ giờ đổi theo ai đang xem và đã có ai vào chưa */
+  ok('chủ phòng lúc chưa ai vào: Gửi link mời là nút chính, Bắt đầu là nút phụ nằm dưới, nói rõ máy chơi thay 2 ghế; có nút hiện mã QR',
+     /Chưa ai vào/.test(An.tin()) && /class="cb-moi-ban">Gửi link mời/.test(An.tin()) && /class="cb-phu cb-batdau-phong">Bắt đầu<small>máy chơi thay 2 ghế trống<\/small>/.test(An.tin()) &&
+     /cb-qr-bat">Hiện mã QR/.test(An.tin()) && An.tin().indexOf('cb-moi-ban') < An.tin().indexOf('cb-batdau-phong'));
+  An.bam('.cb-qr-bat');
+  const coQR = An.tin().includes(QR.svg(`http://an/co-vua-ba-nguoi/?phong=${ma}`)) && /cb-qr-bat">Ẩn mã QR/.test(An.tin());
+  An.bam('.cb-qr-bat');
+  ok('bấm hiện mã QR: mã trong phòng chờ chính là link mời …/co-vua-ba-nguoi/?phong=MÃ; bấm lần nữa thì ẩn', coQR && !/<svg/.test(An.tin()));
   Binh.C._vaoPhong(ma); Chi.C._vaoPhong(ma);
   await doi(() => Binh.C._phong().cay && Chi.C._phong().cay);
+  ok('người mở link: thấy An mời, mỗi ghế trống một nút "Vào chơi quân …" (Đen rồi Đỏ, đúng thứ tự đi), ghế trống ghi "Chờ bạn"',
+     /An mời bạn chơi cờ ba người/.test(Binh.tin()) && /data-ngoi="2"><i[^>]*><\/i>Vào chơi quân Đen<\/button><button[^>]*data-ngoi="1"><i[^>]*><\/i>Vào chơi quân Đỏ/.test(Binh.tin()) &&
+     (Binh.tin().match(/<b>Chờ bạn<\/b>/g) || []).length === 2);
   ok('Bình, Chi vào bằng mã: thấy phòng chờ, chưa có ghế, có nút Ngồi đây', Binh.C._phong().P === -1 && /data-ngoi="2"/.test(Binh.tin()) && /An/.test(Binh.tin()));
   for (const m of [Binh, Chi]) m.khung().querySelector('.cb-o-ten').value = m.ten;   // ô tên trong phòng chờ điền sẵn tên đã lưu
   await Promise.all([Binh.C._ngoiGhe(2), Chi.C._ngoiGhe(2)]);
@@ -150,6 +170,16 @@ function mayKhach(ten, url) {
   ok('hai người cùng bấm ghế Đen một lúc: đúng một người được, người kia vẫn đang xem', !!den && xem.C._phong().P === -1 && [Binh, Chi].filter(m => m.C._phong().P === 2).length === 1);
   await doi(() => /Bắt đầu/.test(An.tin()) && An.C._phong().cay.ghe[2]);
   ok('chỉ chủ phòng có nút Bắt đầu', /cb-batdau-phong/.test(An.tin()) && !/cb-batdau-phong/.test(den.tin()));
+  ok('chủ phòng thấy bạn đã vào: Bắt đầu thành nút chính (máy chơi thay 1 ghế), Gửi link mời lùi xuống nút phụ',
+     /1 bạn đã vào, còn 1 ghế trống/.test(An.tin()) && /class="cb-batdau-phong">Bắt đầu<small>máy chơi thay 1 ghế trống/.test(An.tin()) &&
+     /class="cb-phu cb-moi-ban">Gửi link mời/.test(An.tin()) && An.tin().indexOf('cb-batdau-phong') < An.tin().indexOf('cb-moi-ban'));
+  ok('người được mời đã ngồi: chờ An bấm Bắt đầu, có Mời thêm bạn (nút phụ), không có "1 bạn đã vào" như chủ phòng',
+     /Chờ An bấm Bắt đầu/.test(den.tin()) && /class="cb-phu cb-moi-ban">Mời thêm bạn/.test(den.tin()) && !/bạn đã vào/.test(den.tin()));
+  /* chủ phòng chuyển sang Zalo gửi link là thôi báo "còn ở đây"; quá một phút thì người được mời mới có Bắt đầu, nút phụ */
+  den.C._phong().lech += 70000; den.C._kiemPhong();
+  ok('chủ phòng vắng quá một phút: người được mời thấy An đang vắng, có Bắt đầu nhưng là nút phụ (khỏi bấm nhầm khi người thứ ba chưa vào)',
+     /An đang vắng/.test(den.tin()) && /class="cb-phu cb-batdau-phong">Bắt đầu/.test(den.tin()) && !/class="cb-batdau-phong"/.test(den.tin()));
+  den.C._phong().lech -= 70000; den.C._kiemPhong();
   await An.C._batDauPhong();
   await doi(() => ca.every(m => m.C._van() && m.C._van().cheDo === 'phong' && m.yen()));
   ok('An bấm Bắt đầu: cả ba máy vào ván; ghế Đỏ trống thì Hổ chơi thay; người thua ghế thành người xem',
@@ -252,9 +282,21 @@ function mayKhach(ten, url) {
     await doi(() => Binh.C._phong() && Binh.C._phong().cay);
     Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
     await Binh.C._ngoiGhe(2);
-    await doi(() => An.C._phong().cay.ghe && An.C._phong().cay.ghe[2]);
+    Chi.C._vaoPhong(ma3);
+    await doi(() => Chi.C._phong() && Chi.C._phong().cay);
+    Chi.khung().querySelector('.cb-o-ten').value = Chi.ten;
+    await Chi.C._ngoiGhe(1);
+    await doi(() => Chi.C._phong().cay.ghe && Chi.C._phong().cay.ghe[1]);
+    Chi.C._roiPhong();                                                 // rời phòng chờ, rồi mở lại link
+    Chi.C._vaoPhong(ma3);
+    await doi(() => Chi.C._phong() && Chi.C._phong().cay && /Phòng chờ/.test(Chi.tin()));
+    ok('rời phòng chờ rồi mở lại link: ngồi lại đúng ghế cũ (máy chủ không cho xoá ghế đã giành, không nhớ thì bị chính ghế mình chặn)',
+       Chi.C._phong().P === 1 && !/data-ngoi/.test(Chi.tin()));
+    await doi(() => An.C._phong().cay.ghe && An.C._phong().cay.ghe[2] && An.C._phong().cay.ghe[1] && /Đủ ba người/.test(An.tin()));
+    ok('đủ ba người: chủ phòng thấy "Đủ ba người rồi", Bắt đầu là nút chính, thôi nút mời và mã QR; phòng chờ ghi luật Tam quốc',
+       /Đủ ba người rồi/.test(An.tin()) && /class="cb-batdau-phong">Bắt đầu<\/button>/.test(An.tin()) && !/cb-moi-ban|cb-qr-bat/.test(An.tin()) && /Phòng chờ · Luật Tam quốc/.test(An.tin()));
     await An.C._batDauPhong();
-    await doi(() => [An, Binh].every(m => m.C._van() && m.C._van().cheDo === 'phong' && m.C._van().ma === ma3));
+    await doi(() => [An, Binh, Chi].every(m => m.C._van() && m.C._van().cheDo === 'phong' && m.C._van().ma === ma3));
     ok('phòng Tam quốc: máy chủ nhớ luat = tq; cả hai máy vào ván đúng luật Tam quốc', may.lay(`coba/${ma3}/luat`) === 'tq' && [An, Binh].every(m => m.C._van().the.tq === true && m.C._van().luat === 'tq'));
     const r = await fetch(`${url}/coba/${ma3}/luat.json`, { method: 'PUT', body: JSON.stringify('tq') });
     ok('không ai đổi được luật sau khi tạo phòng', r.status === 401);
@@ -264,7 +306,7 @@ function mayKhach(ten, url) {
     ok('nước phong tướng từ máy chủ được nhận; lúc đang chờ chọn tướng thì nước thường bị bỏ qua',
        !!An.C._timNuocMang(t, { P: 0, tu: o(1, 'b', 1), toi: o(1, 'b', 1), phong: 0, nhap: 0 }) && !An.C._timNuocMang(t, { P: 0, tu: o(0, 'e', 1), toi: o(0, 'd', 1), phong: 0, nhap: 0 }) &&
        !An.C._timNuocMang(t, { P: 0, tu: o(0, 'e', 1), toi: o(0, 'e', 1), phong: 0, nhap: 0 }));
-    for (const m of [An, Binh]) m.C._roiPhong();
+    for (const m of [An, Binh, Chi]) m.C._roiPhong();
   }
 
   console.log('\n— Phòng không có, phòng quá hạn —');
@@ -278,14 +320,34 @@ function mayKhach(ten, url) {
     ok('phòng quá một ngày: dọn luôn (luật cho xoá), báo phòng đã đóng', may.lay('coba/QQQQQQ') === null && /đã đóng/.test(xem.tin()));
   }
 
+  console.log('\n— Tải lại trang —');
+  {
+    await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An' });
+    const ma4 = An.C._phong().ma;
+    await doi(() => An.C._phong().cay);
+    An.C.dong();                                                       // trang cũ thôi chạy
+    const An2 = mayKhach('An', url);
+    An2.luu['tdtd.coba'] = An.luu['tdtd.coba'];                        // trang mới, cùng kho lưu
+    An2.C.mo();
+    await doi(() => An2.C._phong() && An2.C._phong().cay);
+    const truoc = may.lay(`coba/${ma4}/ghe/0/thay`);
+    await cho(5);
+    An2.C._kiemPhong();
+    await doi(() => may.lay(`coba/${ma4}/ghe/0/thay`) !== truoc, 2000);
+    ok('tải lại trang: vào lại đúng ghế, báo "còn ở đây" ngay lượt kiểm đầu, khỏi đợi 20 giây cho người khác thấy mình vắng',
+       An2.C._phong().P === 0 && may.lay(`coba/${ma4}/ghe/0/thay`) !== truoc && /Phòng chờ/.test(An2.tin()));
+    An2.C._roiPhong(); An2.C.dong();
+  }
+
   console.log('\n— Gắn vào app —');
   {
     const app = fs.readFileSync(path.join(goc, 'assets', 'app.js'), 'utf8'), sw = fs.readFileSync(path.join(goc, 'sw.js'), 'utf8');
     const html = fs.readFileSync(path.join(goc, 'index.html'), 'utf8'), trang = fs.readFileSync(path.join(goc, 'co-vua-ba-nguoi', 'index.html'), 'utf8');
     ok('địa chỉ #co-ba-nguoi/MÃ vẫn mở đúng trò (app.js chỉ xét phần trước dấu /)', /location\.hash\.slice\(1\)\.split\('\/'\)\[0\]/.test(app));
     ok('link mời …/co-vua-ba-nguoi/?phong=MÃ chuyển thẳng vào phòng', /\[\?&\]phong=\(\[A-HJ-NP-Z2-9\]\{6\}\)/.test(trang) && trang.includes("location.replace('../#co-ba-nguoi' + (m ? '/' + m[1] : ''))"));
-    ok('phong.js nạp trước coba.js, có trong bộ nhớ chạy offline; service worker không chen vào Firebase',
-       html.indexOf('assets/phong.js') > 0 && html.indexOf('assets/phong.js') < html.indexOf('assets/coba.js') && sw.includes("'assets/phong.js'") && /firebasedatabase\.app'\)\) return;/.test(sw));
+    ok('phong.js, maqr.js nạp trước coba.js, có trong bộ nhớ chạy offline; service worker không chen vào Firebase',
+       ['phong.js', 'maqr.js'].every(t => html.indexOf('assets/' + t) > 0 && html.indexOf('assets/' + t) < html.indexOf('assets/coba.js') && sw.includes(`'assets/${t}'`)) &&
+       /firebasedatabase\.app'\)\) return;/.test(sw));
   }
 
   for (const m of ca) { m.C._roiPhong(); m.C.dong(); }

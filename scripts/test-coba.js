@@ -303,7 +303,7 @@ async function choTaiNguoi() {                                       // chạy h
   ok('cầm Đen thì bàn xoay cho Đen nằm dưới, hai máy là Hổ và Rùa', giong(C._xoayDen(), C._GOC_NHIN[DEN]) && C._tenNha(DEN) === 'Bạn' && C._tenNha(DO) === 'Hổ' && C._tenNha(TRANG) === 'Rùa');
   await choTaiNguoi();
   const k = JSON.parse(luu['tdtd.coba'] || '{}');
-  ok('chỉ lưu cài đặt (cách chơi, màu, mức khó, tên, phòng đang ở, đã xem hướng dẫn), không lưu ván', Object.keys(k).every(x => ['che', 'mau', 'kho', 'h', 'ten', 'phong'].includes(x)));
+  ok('chỉ lưu cài đặt (cách chơi, màu, mức khó, tên, phòng đang ở, đã xem hướng dẫn), không lưu ván', Object.keys(k).every(x => ['che', 'mau', 'kho', 'h', 'ten', 'phong', 'luat', 'cu'].includes(x)));
   /* Người dùng: "giờ khó hình dung nước đi quá" — mỗi lượt của mình thì hai nhà kia đã đi hai nước, bản trước chỉ tô
      nhạt hai ô của nước cuối. Giờ mỗi nhà có mũi tên nước vừa đi, theo đúng đường; chọn quân thì vẽ đường nó đi được. */
   C._vanMoi({ mau: TRANG, kho: 0 });
