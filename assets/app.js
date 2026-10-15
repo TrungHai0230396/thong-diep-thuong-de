@@ -61,7 +61,7 @@ const SAO = [
     duong: 'lap-trinh', khung: '.laptrinh', mun: 'TDTD_LAPTRINH', tieuDe: 'Robot thắp sao — lập trình cho bé', trang: 'robot-thap-sao/', nutCai: true },
   { id: 'sao-sokoban', mau: '#f2c46b', hinh: 'thung', nhan: 'Đẩy thùng sao: Sokoban 100 màn, đẩy thùng vào ổ cho sáng lên',
     duong: 'day-thung', khung: '.sokoban', mun: 'TDTD_SOKOBAN', tieuDe: 'Đẩy thùng sao — Sokoban', trang: 'day-thung-sao/', nutCai: true },
-  { id: 'sao-coba', mau: '#e9b3a8', hinh: 'coba', nhan: 'Cờ vua ba người: Trắng, Đen, Đỏ trên bàn lục giác, đấu với 2 máy hay 3 người chung máy',
+  { id: 'sao-coba', mau: '#e9b3a8', hinh: 'coba', nhan: 'Cờ vua ba người: Trắng, Đen, Đỏ trên bàn lục giác, đấu với 2 máy hay mỗi người một máy qua mạng',
     duong: 'co-ba-nguoi', khung: '.coba', mun: 'TDTD_COBA', tieuDe: 'Cờ vua ba người', trang: 'co-vua-ba-nguoi/', nutCai: true },
 ];
 
@@ -236,6 +236,44 @@ const ICO_CHIA_SE = '<svg class="cai-ico" viewBox="0 0 24 24" aria-label="nút C
 const ICO_THEM = '<svg class="cai-ico" viewBox="0 0 24 24" aria-label="biểu tượng Thêm"><rect x="4" y="4" width="16" height="16" rx="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 8.5v7M8.5 12h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
 const ICO_BA_CHAM = '<b class="cai-cham">⋯</b>';
 
+/* ---------- mở app đã cài: vào thẳng trò đã cài ----------
+   Người dùng hỏi "tải app trong mỗi game là vô app có tự động vô game không hay bay ra trang chủ", rồi chọn: vào thẳng trò
+   đã cài. Trang mở đầu của app lấy theo manifest lúc cài — Chrome trên Android mở start_url, Safari trên iPhone lúc "Thêm
+   vào MH chính" cũng lấy start_url của manifest chứ không lấy trang đang xem — nên bản trước cài từ trò nào cũng mở ra
+   trang chủ. Giờ đang ở trò nào thì gắn manifest riêng của trò đó (<trang>app.webmanifest, scripts/lam-ke-khai.py viết):
+   start_url ?tro=<duong>, cùng id "/" — vẫn một app. iPhone: app trên màn hình chính có kho lưu riêng, tách hẳn Safari
+   (WebKit làm vậy có chủ ý), nên chỉ trang mở đầu mang được trò sang. Android: app dùng chung kho lưu với Chrome, nên lúc
+   cài (appinstalled) ghi thêm trò đang mở — phòng khi Chrome cài theo manifest đã đọc từ trước. App mở với ?tro thì nhớ trò
+   đó vào kho của app; lần mở app sau (không phải tải lại trang) vào thẳng trò, bấm ✕ là về trang chủ. Trong app luôn gắn
+   manifest của trò đã cài, kẻo Chrome kiểm bản cập nhật đúng lúc đang ở trò khác rồi đổi trang mở đầu theo trò đó. */
+const KHOA_TRO_CAI = 'tdtd.troCai';
+const coTro = (d) => !!d && SAO.some(s => s.duong === d && s.trang);
+const keKhaiCua = (d) => (coTro(d) ? SAO.find(s => s.duong === d).trang + 'app.webmanifest' : 'manifest.webmanifest');
+/* lúc mở trang: nho — trò của app (chỉ khi đang chạy như app đã cài); mo — trò mở ngay: ?tro, hay trò đã nhớ khi mở app.
+   Địa chỉ đã có #trò, hay đây là tải lại trang, thì để theo địa chỉ. */
+function troLucMo(o) {
+  const q = new URLSearchParams(o.search || '').get('tro'), hop = coTro(q) ? q : null;
+  const nho = o.laApp ? hop || (coTro(o.nho) ? o.nho : null) : null;
+  return { nho, mo: o.hash || o.taiLai ? null : hop || nho };
+}
+const laApp = () => !!navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+const docTroCai = () => { try { return localStorage.getItem(KHOA_TRO_CAI) || null; } catch (e) { return null; } };
+const ghiTroCai = (d) => { try { if (d) localStorage.setItem(KHOA_TRO_CAI, d); else localStorage.removeItem(KHOA_TRO_CAI); } catch (e) {} };
+function datKeKhai(dangMo) {
+  const l = document.querySelector('link[rel="manifest"]'), href = keKhaiCua(laApp() ? docTroCai() : dangMo);
+  if (l && l.getAttribute('href') !== href) l.setAttribute('href', href);
+}
+function vaoTroDaCai() {
+  let taiLai = false;
+  try { const n = performance.getEntriesByType('navigation')[0]; taiLai = !!n && n.type === 'reload'; } catch (e) {}
+  const app = laApp(), lucMo = troLucMo({ search: location.search, hash: location.hash, laApp: app, taiLai, nho: docTroCai() });
+  if (app && lucMo.nho !== docTroCai()) ghiTroCai(lucMo.nho);
+  datKeKhai(null);
+  if (lucMo.mo) history.replaceState(null, '', location.pathname + location.search + '#' + lucMo.mo);
+  /* Android: cài xong (bằng nút Cài app hay menu Chrome) thì ghi trò đang mở — app dùng chung kho lưu với Chrome */
+  addEventListener('appinstalled', () => ghiTroCai(saoDangMo ? saoDangMo.duong : ''));
+}
+
 /* Link đưa ra ngoài (Mở bằng Safari, Mở bằng Chrome, Chép link): đang ở trong trò nào thì là link của trò đó.
    Người dùng báo: mở link phát âm trong Zalo, bấm Mở bằng Safari để cài thì Safari ra trang chính — bản trước lấy
    origin + pathname, bỏ mất trò đang mở. Trò có trang riêng thì dùng trang riêng (/luyen-phat-am/), vì link mở
@@ -354,6 +392,7 @@ function moSao(s) {
   if (location.hash.slice(1).split('/')[0] !== s.duong) location.hash = s.duong;   // #co-ba-nguoi/MÃ: phần sau / là của trò
   themNutChepLink(s);
   themNutCaiApp(s);
+  datKeKhai(s.duong);                                // cài app lúc này thì mở app là vào thẳng trò này
   theoDoiDong(s);
 }
 
@@ -362,6 +401,7 @@ function moSao(s) {
 function goNutTro() {
   ['#nut-chep-link', '#nut-cai-app'].forEach(id => { const n = $(id); if (n) n.remove(); });
   $$('.co-nut-cai').forEach(k => k.classList.remove('co-nut-cai'));
+  datKeKhai(null);                                   // về trang chủ: cài lúc này thì mở app ra trang chủ (trong app: giữ trò đã cài)
 }
 
 function dongSao(imLang) {
@@ -565,6 +605,7 @@ async function init() {
   NUT_SAO = taoCacSao();
   datCacSao();
   addEventListener('hashchange', theoDiaChi);
+  vaoTroDaCai();                        // app đã cài từ một trò: mở là vào thẳng trò đó
   theoDiaChi();                         // mở thẳng vào trò nếu địa chỉ có sẵn
   addEventListener('resize', datLaiNgoiSao);
   addEventListener('orientationchange', datLaiNgoiSao);

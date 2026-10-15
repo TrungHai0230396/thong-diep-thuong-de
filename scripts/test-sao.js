@@ -352,6 +352,84 @@ console.log('\n— Nút Cài app trong mọi trò —');
      /@media \(max-width:479px\)\{[^@]*\.co-nut-cai \.td-phong\{top:calc\(env\(safe-area-inset-top,0px\) \+ (5[2-9]|6\d)px\)\}/.test(css));
 }
 
+console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò đó —');
+{
+  /* Người dùng hỏi "tải app trong mỗi game là vô app có tự động vô game không hay bay ra trang chủ", chọn: vào thẳng trò.
+     Trang mở đầu lấy theo manifest lúc cài (Chrome Android: start_url; Safari iPhone cũng lấy start_url của manifest),
+     nên mỗi trò có manifest riêng start_url ?tro=<duong>, cùng id "/"; app.js gắn manifest của trò đang mở. */
+  const goc = path.join(__dirname, '..'), mien = 'https://thong-diep-thuong-de.vercel.app/';
+  const mf = JSON.parse(fs.readFileSync(path.join(goc, 'manifest.webmanifest'), 'utf8'));
+  const tuyet = (u, ve) => new URL(u, ve).href;
+  const DS = [...khoiSao.matchAll(/duong:\s*'([^']+)'[^}]*?trang:\s*'([^']+)'/g)].map(m => ({ duong: m[1], trang: m[2] }));
+  const hong = [];
+  for (const t of DS) {
+    let m = null;
+    const tep = path.join(goc, t.trang, 'app.webmanifest'), ve = mien + t.trang + 'app.webmanifest';
+    try { m = JSON.parse(fs.readFileSync(tep, 'utf8')); } catch (e) { hong.push(`${t.trang}: không đọc được`); continue; }
+    if (m.id !== '/') hong.push(`${t.duong}: id ${m.id}`);
+    if (tuyet(m.start_url, ve) !== mien + '?tro=' + t.duong) hong.push(`${t.duong}: start_url ${m.start_url}`);
+    if (tuyet(m.scope, ve) !== mien) hong.push(`${t.duong}: scope ${m.scope}`);
+    if (JSON.stringify(m.icons.map(i => tuyet(i.src, ve))) !== JSON.stringify(mf.icons.map(i => tuyet(i.src, mien + 'manifest.webmanifest')))) hong.push(`${t.duong}: icons`);
+    for (const k of ['name', 'short_name', 'description', 'lang', 'display', 'orientation', 'background_color', 'theme_color']) if (m[k] !== mf[k]) hong.push(`${t.duong}: ${k}`);
+  }
+  ok(`manifest chính có id "/"; đủ ${DS.length} manifest riêng (mỗi trò một): cùng id "/" — vẫn một app —, start_url ?tro=<trò>, scope là cả trang, tên và biểu tượng như manifest chính`,
+     mf.id === '/' && DS.length >= 14 && !hong.length, hong.slice(0, 3).join('; '));
+  const vc = JSON.parse(fs.readFileSync(path.join(goc, 'vercel.json'), 'utf8'));
+  ok('Vercel trả manifest của trò đúng kiểu application/manifest+json, không cache lâu',
+     vc.headers.some(h => h.source === '/:trang/app.webmanifest' && h.headers.some(x => x.key === 'Content-Type' && /manifest\+json/.test(x.value)) &&
+       h.headers.some(x => x.key === 'Cache-Control' && /max-age=0/.test(x.value))));
+
+  /* chạy nguyên khối trong app.js trên một trình duyệt giả */
+  const khoi = nguon.slice(nguon.indexOf("const KHOA_TRO_CAI = 'tdtd.troCai';"), nguon.indexOf('/* Link đưa ra ngoài'));
+  function moTrang({ url = mien, app = false, taiLai = false, kho = {}, dangMo = null } = {}) {
+    const u = new URL(url), kq = { kho, link: 'manifest.webmanifest', diaChi: null, nghe: {} };
+    const link = { getAttribute: () => kq.link, setAttribute: (k, v) => { kq.link = v; } };
+    const moiTruong = {
+      SAO: DS, navigator: { standalone: false }, matchMedia: () => ({ matches: app }),
+      localStorage: { getItem: (k) => (k in kho ? kho[k] : null), setItem: (k, v) => { kho[k] = String(v); }, removeItem: (k) => { delete kho[k]; } },
+      document: { querySelector: (q) => (q === 'link[rel="manifest"]' ? link : null) },
+      location: { search: u.search, hash: u.hash, pathname: u.pathname },
+      history: { replaceState: (a, b, d) => { kq.diaChi = d; } },
+      performance: { getEntriesByType: () => [{ type: taiLai ? 'reload' : 'navigate' }] },
+      addEventListener: (ten, f) => { kq.nghe[ten] = f; },
+    };
+    const f = new Function(...Object.keys(moiTruong), 'saoDangMo',
+      khoi + '\nvaoTroDaCai(); return { datKeKhai, troLucMo, keKhaiCua, datSao: (s) => { saoDangMo = s; } };');
+    Object.assign(kq, f(...Object.values(moiTruong), dangMo));
+    return kq;
+  }
+  const co = moTrang({ url: mien + '?tro=co-ba-nguoi', app: true });
+  ok('app mở lần đầu với ?tro=co-ba-nguoi: nhớ trò vào kho của app, gắn manifest của cờ, vào thẳng cờ (#co-ba-nguoi)',
+     co.kho['tdtd.troCai'] === 'co-ba-nguoi' && co.link === 'co-vua-ba-nguoi/app.webmanifest' && co.diaChi === '/?tro=co-ba-nguoi#co-ba-nguoi', JSON.stringify(co.diaChi));
+  const lan2 = moTrang({ url: mien, app: true, kho: { 'tdtd.troCai': 'co-ba-nguoi' } });
+  ok('mở app lần sau (Chrome mở trang chủ, hay kho đã nhớ): vẫn vào thẳng cờ', lan2.diaChi === '/#co-ba-nguoi' && lan2.link === 'co-vua-ba-nguoi/app.webmanifest');
+  const taiLai = moTrang({ url: mien, app: true, taiLai: true, kho: { 'tdtd.troCai': 'co-ba-nguoi' } });
+  ok('tải lại trang lúc đang ở trang chủ của app (đã bấm ✕ đóng trò): không tự mở lại trò', taiLai.diaChi === null);
+  const coDau = moTrang({ url: mien + '#ho-sen', app: true, kho: { 'tdtd.troCai': 'co-ba-nguoi' } });
+  ok('địa chỉ đã có #trò khác: để theo địa chỉ', coDau.diaChi === null);
+  coDau.datKeKhai('ho-sen');
+  ok('trong app đang ở trò khác: manifest vẫn là của trò đã cài (Chrome kiểm bản cập nhật lúc đó cũng không đổi trang mở đầu)', coDau.link === 'co-vua-ba-nguoi/app.webmanifest');
+  const web = moTrang({ url: mien });
+  web.datKeKhai('ho-sen');
+  const khiMo = web.link;
+  web.datKeKhai(null);
+  ok('trong trình duyệt: mở trò nào thì gắn manifest của trò đó (cài lúc này thì app mở vào trò này), về trang chủ thì manifest chính',
+     khiMo === 'ho-sen/app.webmanifest' && web.link === 'manifest.webmanifest' && web.diaChi === null && !('tdtd.troCai' in web.kho));
+  web.datSao({ duong: 'thien-luan-xa' }); web.nghe.appinstalled();
+  const sauCai = web.kho['tdtd.troCai'];
+  web.datSao(null); web.nghe.appinstalled();
+  ok('Android: cài xong lúc đang ở trò nào thì ghi trò đó vào kho (app dùng chung kho với Chrome); cài từ trang chủ thì xoá',
+     sauCai === 'thien-luan-xa' && !('tdtd.troCai' in web.kho));
+  const la = moTrang({ url: mien + '?tro=khong-co', app: true, kho: { 'tdtd.troCai': 'cung-khong-co' } });
+  ok('trò lạ (?tro sai, hay trò đã bỏ): không mở gì, xoá trò lạ khỏi kho, dùng manifest chính',
+     la.diaChi === null && !('tdtd.troCai' in la.kho) && la.link === 'manifest.webmanifest');
+  const linkLe = moTrang({ url: mien + '?tro=phat-am' });
+  ok('ngoài app mà mở link ?tro=: vào thẳng trò đó nhưng không nhớ gì', linkLe.diaChi === '/?tro=phat-am#phat-am' && !('tdtd.troCai' in linkLe.kho));
+  ok('gắn vào app: mở trò gọi datKeKhai(s.duong), mọi đường đóng trò (goNutTro) gọi datKeKhai(null), vaoTroDaCai chạy trước theoDiaChi',
+     /themNutCaiApp\(s\);\s*datKeKhai\(s\.duong\);/.test(nguon) && /function goNutTro\(\) \{[\s\S]{0,300}datKeKhai\(null\);/.test(nguon) &&
+     /vaoTroDaCai\(\);[^\n]*\n\s*theoDiaChi\(\);/.test(nguon));
+}
+
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
 {
   /* Ngày 9/9 khung bảng trượt bị xoá nhầm khỏi index.html; app.js vẫn gọi $('#sheet-title') nên nút "?"

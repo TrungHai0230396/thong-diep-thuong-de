@@ -1927,6 +1927,20 @@ Người dùng: "làm UIUX quân cờ đẹp hơn được không". Tìm hiểu 
 
 Đo trên trình duyệt: vẽ cả bàn 48 quân chừng 0,85 ms một khung hình. `scripts/test-coba.js` thêm 3 bài (giờ 93): thứ tự cao thấp đúng FIDE, đổi ra mm thì quân nào cũng trong khoảng ± 10%, vẽ đủ bảy loại × ba màu và quân đá × vành đạo gốc × nhấc lên vào một khung ghi lại không ra số hỏng và save/restore cân nhau. Thử phá 4 chỗ (tốt cao như cũ, mã cao quá khoảng, quên trả save, thiếu bán kính đế tướng): bắt 3; chỗ còn lại không đổi gì vì đã có giá trị dự phòng.
 
+### Cài app từ trò nào thì mở app là vào thẳng trò đó
+
+Người dùng hỏi: "khi tải app trong mỗi game là vô app có tự động vô game không hay bay ra trang chủ". Bản trước: ra trang chủ, cài từ trò nào cũng vậy. Tìm hiểu: trang mở đầu của app lấy theo manifest lúc cài — Chrome trên Android mở `start_url` ([web.dev: WebAPK](https://web.dev/webapks/)); Safari trên iPhone lúc "Thêm vào MH chính" cũng lấy `start_url` của manifest chứ không lấy trang đang xem ([một báo lỗi của GitLab](https://gitlab.com/gitlab-org/gitlab/-/issues/427560) gặp đúng chuyện này). Manifest có `start_url: "."` nên app mở trang chủ. Người dùng chọn: vào thẳng trò đã cài (vẫn một app Thông Điệp; các lựa chọn khác là mỗi trò một app riêng có biểu tượng riêng, hay mở lại chỗ dùng lần trước).
+
+- **Mỗi trò một manifest** (`<trò>/app.webmanifest`, 14 tệp, viết bằng `scripts/lam-ke-khai.py` từ danh sách trò trong `assets/app.js`): giống hệt `manifest.webmanifest`, chỉ khác `start_url` = `/?tro=<trò>`. Cùng `id: "/"` (thêm vào manifest chính, trùng id ngầm định cũ nên app đã cài không bị coi là app khác), nên vẫn là một app — Chrome nhận ra là đã cài, không mời cài lần nữa. Vercel trả đúng kiểu `application/manifest+json`.
+- **Đang ở trò nào thì trang gắn manifest của trò đó**, về trang chủ thì manifest chính — cài lúc đang chơi cờ thì trang mở đầu của app là cờ.
+- **iPhone**: app trên màn hình chính có kho lưu riêng, tách hẳn Safari ([WebKit làm vậy có chủ ý](https://bugs.webkit.org/show_bug.cgi?id=181849)), nên chỉ trang mở đầu mang được trò sang. **Android**: app dùng chung kho lưu với Chrome, nên lúc cài xong (sự kiện `appinstalled`, cài bằng nút Cài app hay menu Chrome) ghi thêm trò đang mở — phòng khi Chrome cài theo manifest đã đọc từ trước.
+- **App mở với `?tro=`** thì nhớ trò vào kho của app; lần mở app sau vào thẳng trò; bấm ✕ là về trang chủ. Tải lại trang (app tự cập nhật bản mới) thì giữ chỗ đang đứng, không tự mở lại trò. Trong app luôn gắn manifest của trò đã cài, kẻo Chrome kiểm bản cập nhật đúng lúc đang ở trò khác rồi đổi trang mở đầu theo trò đó. Link `?tro=<trò>` mở ngoài app cũng vào thẳng trò, nhưng không nhớ gì.
+- Ai đã cài trước bản này thì app vẫn mở trang chủ như cũ; gỡ biểu tượng rồi cài lại từ trong trò là được.
+
+`scripts/test-sao.js` thêm 12 bài (giờ 209): 14 manifest riêng đúng id, start_url, scope, tên, biểu tượng; Vercel trả đúng kiểu; chạy nguyên khối trong app.js trên trình duyệt giả — app mở lần đầu với ?tro thì nhớ trò, gắn manifest của trò, vào thẳng trò; mở lần sau vẫn vào; tải lại thì không tự mở lại; địa chỉ có #trò khác thì theo địa chỉ; trong app ở trò khác vẫn giữ manifest của trò đã cài; trong trình duyệt manifest đổi theo trò; cài xong ghi trò (Android); trò lạ thì bỏ; link ?tro ngoài app; gắn đúng chỗ vào moSao, goNutTro, init. Thử phá 6 chỗ: bắt cả 6. Đã thử trên trình duyệt: mở cờ thì manifest thành `co-vua-ba-nguoi/app.webmanifest` (trang mở đầu `/?tro=co-ba-nguoi`), đóng thì về manifest chính; link `?tro=co-ba-nguoi` vào thẳng cờ. Chưa thử được trên iPhone, Android thật (khung trình duyệt không giả được chế độ app đã cài) — cần cài thử.
+
+Sửa kèm: dòng chữ của ngôi sao cờ ba người còn ghi "3 người chung máy" (đã bỏ từ khi có chơi qua mạng), giờ ghi "mỗi người một máy qua mạng".
+
 ## Cấu trúc
 
 ```
@@ -1941,6 +1955,8 @@ sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên m�
 icons/og-*.jpg             ảnh xem trước 1200×630 của trang chia sẻ từng trò
 <trò>/index.html           trang chia sẻ riêng của từng trò (mua-chin/, ho-sen/, co-vua-ba-nguoi/…), sinh bởi scripts/lam-trang-chia-se.py
 scripts/lam-trang-chia-se.py  tạo trang chia sẻ và ảnh xem trước cho mọi trò, từ một bảng tên, mô tả, hình
+<trò>/app.webmanifest      manifest riêng của từng trò (start_url ?tro=<trò>): cài từ trò nào thì mở app vào thẳng trò đó
+scripts/lam-ke-khai.py     viết các <trò>/app.webmanifest từ manifest.webmanifest và danh sách trò trong assets/app.js
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       39 kiểm thử lõi
 scripts/test-pond.js       48 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
@@ -1958,7 +1974,7 @@ scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlie
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-chomsao.js    10 kiểm thử Nối sao thành chòm: tự nối đúng thứ tự nét, chạm để xong ngay, giảm chuyển động, xoay sau khi xong
-scripts/test-sao.js        197 kiểm thử vòng đời MỌI ngôi sao, trang chia sẻ từng trò, nút Cài app, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        209 kiểm thử vòng đời MỌI ngôi sao, trang chia sẻ từng trò, nút Cài app, mở app vào thẳng trò đã cài, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -2015,6 +2031,7 @@ node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự bá
 node scripts/test-chomsao.js     # chạy 10 kiểm thử Nối sao thành chòm
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao, trang chia sẻ, nút Cài app
 python3 scripts/lam-trang-chia-se.py   # tạo lại trang chia sẻ và ảnh xem trước của mọi trò (ảnh đã có thì giữ)
+python3 scripts/lam-ke-khai.py         # viết lại manifest riêng của từng trò (thêm trò mới, hay sửa manifest.webmanifest)
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
 node scripts/test-caiapp.js      # chạy 38 kiểm thử cài app
