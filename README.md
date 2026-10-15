@@ -74,9 +74,32 @@ Nút 🔗 trong mỗi trò mở bảng chia sẻ của máy (không có thì ch�
 
 - **Vẫn hiện "Thông Điệp Của Thượng Đế".** Người dùng gửi ảnh Telegram: bản xem trước của `/phat-am/` mang đúng dòng mô tả của trang chủ — tức trình đọc link đã đi theo thẻ `<meta http-equiv="refresh">` của trang riêng về trang chủ. Giờ trang riêng chỉ chuyển bằng JavaScript (trình đọc link không chạy JS nên dừng ở trang có tên riêng; người thật vẫn được chuyển), tắt JS thì còn link bấm tay. Telegram đã lưu bản xem trước sai của `/phat-am/`, nên nút chia sẻ đổi sang địa chỉ mới `/luyen-phat-am/`; `/phat-am/` vẫn giữ (đã sửa) cho link đã gửi — muốn Telegram cập nhật link cũ thì gửi link đó cho @WebpageBot.
 
-- **Zalo không hiện khung xem trước.** Zalo không công bố cách đọc link; trang chia sẻ có tiêu đề, mô tả mà chưa có ảnh, và nhiều ứng dụng chat không có ảnh thì không hiện khung. Thêm ảnh 1200×630 (`icons/og-phat-am-1.jpg`, 64 KB, vẽ bằng `scripts/lam-anh-chia-se.py`) với `og:image`, kích thước, `twitter:card` cỡ lớn. `icons/` được cache một năm, nên đổi ảnh thì đổi số trong tên.
+- **Zalo không hiện khung xem trước.** Zalo không công bố cách đọc link; trang chia sẻ có tiêu đề, mô tả mà chưa có ảnh, và nhiều ứng dụng chat không có ảnh thì không hiện khung. Thêm ảnh 1200×630 (`icons/og-phat-am-1.jpg`, 64 KB, vẽ bằng `scripts/lam-trang-chia-se.py`) với `og:image`, kích thước, `twitter:card` cỡ lớn. `icons/` được cache một năm, nên đổi ảnh thì đổi số trong tên.
 
-`scripts/test-sao.js` chạy thẳng `linkTro`, `chepLink` cắt ra từ `app.js` cho mọi trò: chữ đi kèm không chứa link, phát âm gửi `/luyen-phat-am/`, trò khác vẫn `#trò`; cả hai trang riêng có tiêu đề trùng `tieuDe`, không nhắc tên app, chuyển đúng chỗ bằng JS và không có thẻ refresh, `og:url` trỏ đúng chính nó, ảnh xem trước có thật, đúng 1200×630 như khai, dưới 300 KB.
+- **Trò nào cũng có trang riêng và nút Cài app, như phần phát âm.** Người dùng: "mỗi game làm cài app như chỗ luyện âm á, có chú thích khác luôn". Giờ cả 14 trò khai `tieuDe`, `trang`, `nutCai: true` trong `SAO`; mỗi trò một trang chia sẻ mang tên riêng, **một đoạn mô tả riêng** (thẻ `description`, `og:description` — dòng chữ hiện dưới tiêu đề trong khung xem trước của Zalo, Facebook) và một ảnh xem trước riêng:
+
+  | Trò | Trang chia sẻ | Ảnh xem trước |
+  |---|---|---|
+  | Mùa Chín | `/mua-chin/` | vệt nắng xẻ đôi trái dưa hấu, cam, xoài, măng cụt, bông hoa phải né |
+  | Thả đèn hoa đăng | `/tha-den-hoa-dang/` | đèn giấy bay lên, chiếc lớn có chữ "nhẹ lòng" |
+  | Hồ sen | `/ho-sen/` | lá sen, ếch, hoa sen, sóng lan, con cá |
+  | Hộp thở | `/hop-tho/` | vòng tròn đếm nhịp "Hít vào 3", thở vuông 4 · 4 · 4 · 4 |
+  | Nối sao thành chòm | `/noi-sao-thanh-chom/` | Bắc Đẩu theo toạ độ thật trong `constellation.js` |
+  | Bầu trời đêm nay | `/bau-troi-dem-nay/` | trăng khuyết, sao, dải Ngân Hà trên chân trời |
+  | Luyện phát âm | `/luyen-phat-am/` (viết tay, có từ trước) | lưới ô âm |
+  | Xem ngày tốt xấu | `/xem-ngay-tot-xau/` | vòng mười hai giờ, sáu giờ hoàng đạo của ngày Tý đúng như `lich.js` tính |
+  | Thần số học | `/than-so-hoc/` | biểu đồ ngày sinh 15/9/1987 như `sohoc.js` tính: số chủ đạo 4, mũi tên Quyết tâm và Hoạt động |
+  | Nhạc ngủ | `/nhac-ngu/` | trăng lưỡi liềm, sóng âm nhỏ dần |
+  | Thiền bảy luân xa | `/thien-luan-xa/` | người ngồi thiền, bảy chấm đúng màu trong `luanxa.js` |
+  | Robot thắp sao | `/robot-thap-sao/` | robot trên khối đá có bậc phải Nhảy, bốn ô lệnh đúng hình và màu trong trò |
+  | Đẩy thùng sao | `/day-thung-sao/` | màn 38 thật trong `mansoko.js` |
+  | Cờ vua ba người | `/co-vua-ba-nguoi/` | bàn 96 ô chia đúng cách của `coba.js`, quân xếp như lúc bắt đầu ván |
+
+  Trang và ảnh sinh từ một bảng trong `scripts/lam-trang-chia-se.py` (thay `lam-anh-chia-se.py`, vốn chỉ vẽ ảnh phát âm): sửa chữ hay hình ở đó rồi chạy lại. Ảnh đã có thì script không ghi đè vì `icons/` được cache một năm; đổi hình thì tăng số trong tên. Ảnh vẽ gấp đôi rồi thu nhỏ cho nét mịn, mỗi ảnh 47–78 KB. Số liệu trong ảnh lấy từ chính các trò chứ không vẽ bừa.
+
+- **Nút Cài app đè lên đồ của trò.** Nút rộng chừng 94 px, nằm ở hàng trên cùng cạnh 🔗 và ✕. Mở từng trò trên trình duyệt giả điện thoại 375 px rồi đo khung từng phần tử, thấy nút đè lên tim của Mùa Chín, số ếch trong hồ, nút "Phóng ×…" của Trời đêm, cùng tiêu đề và nút ? của Robot thắp sao, Đẩy thùng sao, Cờ ba người. Có nút thì khung trò mang lớp `co-nut-cai`, các thứ đó nhường chỗ: tim và số ếch dời sang trái nút, nút phóng xuống dưới hàng nút; ba trò có thanh tiêu đề thì chừa thêm chỗ bên phải, còn trên điện thoại (hẹp dưới 480 px) không đủ chỗ cho cả tiêu đề lẫn ba nút thì thanh tiêu đề lùi xuống dưới hàng nút, như trò phát âm. Đo lại: không trò nào còn bị đè. Cũng lúc này thấy một lỗi có từ trước: thanh điểm của Mùa Chín chỉ chừa 58 px bên phải, nên hai trên ba trái tim nằm dưới nút 🔗 từ hồi có nút đó; giờ chừa 104 px.
+
+`scripts/test-sao.js` chạy thẳng `linkTro`, `chepLink` cắt ra từ `app.js` cho mọi trò: chữ đi kèm không chứa link, trò nào cũng gửi trang riêng của nó với tên riêng, trò chưa có trang thì vẫn `#trò`; mọi trang riêng có tiêu đề trùng `tieuDe`, không nhắc tên app, chuyển đúng chỗ bằng JS và không có thẻ refresh, `og:url` trỏ đúng chính nó, có mô tả và chữ thay ảnh, không trang nào chép mô tả của trang khác, ảnh xem trước có thật, đúng 1200×630 như khai, dưới 300 KB. Thêm các bài cho nút Cài app ở mọi trò và chỗ nhường của lớp `co-nut-cai`. Đã thử phá cố ý năm chỗ (bỏ lớp `co-nut-cai`, trả thanh điểm về 58 px, chép mô tả trò khác, một trò quên `nutCai`, trang trỏ tới ảnh không có): bài kiểm bắt được cả năm.
 
 ## Bầu trời sao
 
@@ -677,7 +700,7 @@ Người dùng muốn "một cái popup cài app, để mọi người dễ dùn
 
 **Không tự bật nữa — chỉ có nút.** Người dùng: "không cần hiển thị popup cài app mà làm icon button cài app để người dùng thấy thì tự bấm cài, chứ đang sử dụng hiển thị cài app khó chịu lắm". Bản trước tự bật bảng 3,2 giây sau khi lật lá và 3 giây sau khi vào trò phát âm (tối đa 3 lần, cách nhau 7 ngày). Giờ bỏ hẳn luật tự gợi ý (`goiYCaiApp`, `nenTuHien`), bảng chỉ mở khi người dùng bấm: **nút hình điện thoại có mũi tên trên thanh trên cùng**, cạnh nút **?** (hình điện thoại để khỏi lẫn với nút "↓ Tải về" ảnh), nút **Cài app** trong trò phát âm (trò khai `nutCai: true` trong `SAO` — người vào thẳng từ link không thấy thanh trên cùng), hay **?** → *Cài app vào điện thoại*. Máy đã cài, đang mở từ màn hình chính, hay máy tính thì không có nút; vừa cài xong (`appinstalled`) thì nút ẩn. Thêm nút làm thanh trên cùng chật: ở màn 375 px tên app xuống dòng, nên trên màn tới 420 px chữ thưa bớt (khoảng cách chữ .16em → .1em) cho vừa một hàng; màn 320 px vốn đã hai dòng từ trước. Bảng nâng lên trên màn trò (z-index 35, trò là 30) — không thì mở trong trò sẽ bị che.
 
-**Nút "Cài app" trong trò phát âm** có từ trước: người dùng thử trong Zalo, đã thấy bảng tự bật một lần nên không hiện lại, mà trong trò không có nút ? để mở lại — nên thêm nút ở góc trên, cạnh nút 🔗. Lúc làm phát hiện lỗi có sẵn: đóng trò bằng Back thì nút 🔗 không được gỡ khỏi trò cũ, mở trò khác thì `themNutChepLink` thấy "đã có" và trò mới mất nút — giờ `goNutTro()` gỡ cả hai nút ở mọi đường đóng trò.
+**Nút "Cài app" trong trò** — có ở trò phát âm từ trước, giờ ở mọi trò (xem mục "Chia sẻ link một trò"): người dùng thử trong Zalo, đã thấy bảng tự bật một lần nên không hiện lại, mà trong trò không có nút ? để mở lại — nên thêm nút ở góc trên, cạnh nút 🔗. Lúc làm phát hiện lỗi có sẵn: đóng trò bằng Back thì nút 🔗 không được gỡ khỏi trò cũ, mở trò khác thì `themNutChepLink` thấy "đã có" và trò mới mất nút — giờ `goNutTro()` gỡ cả hai nút ở mọi đường đóng trò.
 
 Chỉ ghi một mẩu nhỏ `tdtd.caiApp`: đã cài chưa.
 
@@ -1804,6 +1827,9 @@ assets/app.js              điều khiển giao diện
 assets/app.css             giao diện
 data/cards.json            209 lá dùng trong app (49 KB)
 sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên màn hình chính được
+icons/og-*.jpg             ảnh xem trước 1200×630 của trang chia sẻ từng trò
+<trò>/index.html           trang chia sẻ riêng của từng trò (mua-chin/, ho-sen/, co-vua-ba-nguoi/…), sinh bởi scripts/lam-trang-chia-se.py
+scripts/lam-trang-chia-se.py  tạo trang chia sẻ và ảnh xem trước cho mọi trò, từ một bảng tên, mô tả, hình
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       39 kiểm thử lõi
 scripts/test-pond.js       48 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
@@ -1821,7 +1847,7 @@ scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlie
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-chomsao.js    10 kiểm thử Nối sao thành chòm: tự nối đúng thứ tự nét, chạm để xong ngay, giảm chuyển động, xoay sau khi xong
-scripts/test-sao.js        123 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        197 kiểm thử vòng đời MỌI ngôi sao, trang chia sẻ từng trò, nút Cài app, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -1870,7 +1896,8 @@ node scripts/test-troidem.js     # chạy 117 kiểm thử bầu trời đêm
 node scripts/test-toancanh.js    # chạy 83 kiểm thử hiệu ứng toàn cảnh
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
 node scripts/test-chomsao.js     # chạy 10 kiểm thử Nối sao thành chòm
-node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
+node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao, trang chia sẻ, nút Cài app
+python3 scripts/lam-trang-chia-se.py   # tạo lại trang chia sẻ và ảnh xem trước của mọi trò (ảnh đã có thì giữ)
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
 node scripts/test-caiapp.js      # chạy 38 kiểm thử cài app

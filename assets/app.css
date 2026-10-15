@@ -124,7 +124,7 @@ body.khoa-cuon{overflow:hidden}
 .game-cv{position:absolute;inset:0;display:block;touch-action:none;cursor:crosshair}
 .game-hud{position:absolute;top:0;left:0;right:0;z-index:2;pointer-events:none;
   display:flex;align-items:center;gap:12px;
-  padding:calc(env(safe-area-inset-top,0px) + 14px) 58px 0 16px}
+  padding:calc(env(safe-area-inset-top,0px) + 14px) 104px 0 16px}
 .g-diem{font-family:"Cormorant Garamond",Georgia,serif;font-size:30px;font-weight:600;color:var(--gold);
   display:flex;align-items:baseline;gap:8px;text-shadow:0 2px 12px rgba(0,0,0,.6)}
 .g-nhan{font-family:"Be Vietnam Pro",sans-serif;font-size:14px;font-weight:600;color:#8fd6c2}
@@ -310,6 +310,17 @@ textarea:focus{outline:1px solid var(--gold-deep)}
   -webkit-tap-highlight-color:transparent}
 .nut-cai svg{width:16px;height:16px}
 .nut-cai:hover{background:rgba(232,195,122,.12)}
+/* Có nút Cài app thì khung trò mang lớp co-nut-cai (app.js, themNutCaiApp). Nút rộng chừng 94 px, nằm từ 100 tới
+   194 px tính từ mép phải, nên thứ vốn ở hàng đó phải nhường: tim của Mùa Chín, số ếch, nút phóng của Trời đêm.
+   Ba trò có thanh tiêu đề riêng (Robot thắp sao, Đẩy thùng sao, Cờ ba người) chừa thêm chỗ bên phải; điện thoại
+   không đủ chỗ cho cả tiêu đề lẫn ba nút thì thanh tiêu đề lùi xuống dưới hàng nút, như trò phát âm. */
+.co-nut-cai .game-hud{padding-right:204px}
+.co-nut-cai .ho-dem{right:200px}
+.co-nut-cai .lt-dau,.co-nut-cai .sk-dau,.co-nut-cai .cb-dau{padding-right:204px}
+@media (max-width:479px){
+  .co-nut-cai .td-phong{top:calc(env(safe-area-inset-top,0px) + 60px)}
+  .co-nut-cai .lt-dau,.co-nut-cai .sk-dau,.co-nut-cai .cb-dau{padding-top:calc(env(safe-area-inset-top,0px) + 54px);padding-right:14px}
+}
 
 /* số ếch trong hồ — xếp cùng hàng với nút chép link và dấu x, bên trái hai nút đó */
 .ho-dem{position:absolute;z-index:8;margin:0;pointer-events:none;

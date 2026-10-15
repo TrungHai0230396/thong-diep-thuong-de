@@ -36,33 +36,33 @@ const HINH_SAO = {
 
 const SAO = [
   { id: 'sao-game', mau: '#8fd6c2', hinh: 'lap-lanh',  nhan: 'Mùa chín, đưa nắng qua cho trái chín',
-    duong: 'mua-chin',  khung: '.game',    mun: 'TDTD_GAME' },
+    duong: 'mua-chin',  khung: '.game',    mun: 'TDTD_GAME', tieuDe: 'Mùa Chín — đưa nắng cho trái chín', trang: 'mua-chin/', nutCai: true },
   { id: 'sao-hoadang', mau: '#f0a860', hinh: 'hoa',    nhan: 'Thả đèn hoa đăng, buông điều nặng lòng',
-    duong: 'tha-den',  khung: '.hoadang', mun: 'TDTD_HOADANG' },
+    duong: 'tha-den',  khung: '.hoadang', mun: 'TDTD_HOADANG', tieuDe: 'Thả đèn hoa đăng', trang: 'tha-den-hoa-dang/', nutCai: true },
   { id: 'sao-ho',   mau: '#7ec8e3', hinh: 'giot',      nhan: 'Hồ nước, có đàn ếch',
-    duong: 'ho-sen',   khung: '.ho',      mun: 'TDTD_HO' },
+    duong: 'ho-sen',   khung: '.ho',      mun: 'TDTD_HO', tieuDe: 'Hồ sen và đàn ếch', trang: 'ho-sen/', nutCai: true },
   { id: 'sao-tho',  mau: '#b8a8e8', hinh: 'tia',       nhan: 'Hộp thở, thở theo nhịp bốn',
-    duong: 'hoi-tho',   khung: '.hopho',   mun: 'TDTD_THO' },
+    duong: 'hoi-tho',   khung: '.hopho',   mun: 'TDTD_THO', tieuDe: 'Hộp thở — thở cho dịu lại', trang: 'hop-tho/', nutCai: true },
   { id: 'sao-chom', mau: '#f2ead0', hinh: 'sao4',      nhan: 'Nối sao thành chòm',
-    duong: 'noi-sao',  khung: '.chomsao', mun: 'TDTD_CHOMSAO' },
+    duong: 'noi-sao',  khung: '.chomsao', mun: 'TDTD_CHOMSAO', tieuDe: 'Nối sao thành chòm', trang: 'noi-sao-thanh-chom/', nutCai: true },
   { id: 'sao-troi', mau: '#aebff0', hinh: 'sao5',      nhan: 'Bầu trời thật đêm nay, ngay trên đầu bạn',
-    duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM' },
+    duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM', tieuDe: 'Bầu trời đêm nay', trang: 'bau-troi-dem-nay/', nutCai: true },
   { id: 'sao-phatam', mau: '#e8c37a', hinh: 'tia',     nhan: 'Luyện phát âm, xem miệng đặt lưỡi ở đâu',
     duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'luyen-phat-am/', nutCai: true },
   { id: 'sao-lich', mau: '#e58a7a', hinh: 'sao8',      nhan: 'Xem ngày tốt xấu, nên và không nên làm gì',
-    duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY' },
+    duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY', tieuDe: 'Xem ngày tốt xấu', trang: 'xem-ngay-tot-xau/', nutCai: true },
   { id: 'sao-so',   mau: '#b99ae8', hinh: 'sao6',      nhan: 'Thần số học: con số chủ đạo, biểu đồ ngày sinh',
-    duong: 'than-so',  khung: '.thanso',  mun: 'TDTD_THANSO' },
+    duong: 'than-so',  khung: '.thanso',  mun: 'TDTD_THANSO', tieuDe: 'Thần số học', trang: 'than-so-hoc/', nutCai: true },
   { id: 'sao-ngu',  mau: '#f3dfa0', hinh: 'trang',     nhan: 'Nhạc ngủ: âm thanh và tần số ru ngủ, hẹn giờ tự tắt',
-    duong: 'nhac-ngu', khung: '.nhacngu', mun: 'TDTD_NGU' },
+    duong: 'nhac-ngu', khung: '.nhacngu', mun: 'TDTD_NGU', tieuDe: 'Nhạc ngủ — hẹn giờ tự tắt', trang: 'nhac-ngu/', nutCai: true },
   { id: 'sao-luanxa', mau: '#f2a7c3', hinh: 'sen',     nhan: 'Thiền luân xa: tụng chủng tử theo đàn tanpura và chuông xoay, qua bảy luân xa',
-    duong: 'thien-luan-xa', khung: '.luanxa', mun: 'TDTD_LUANXA' },
+    duong: 'thien-luan-xa', khung: '.luanxa', mun: 'TDTD_LUANXA', tieuDe: 'Thiền bảy luân xa', trang: 'thien-luan-xa/', nutCai: true },
   { id: 'sao-laptrinh', mau: '#8fd0ff', hinh: 'khoi',  nhan: 'Robot thắp sao: 100 bài lập trình cho bé 6–10 tuổi',
-    duong: 'lap-trinh', khung: '.laptrinh', mun: 'TDTD_LAPTRINH', tieuDe: 'Robot thắp sao — lập trình cho bé' },
+    duong: 'lap-trinh', khung: '.laptrinh', mun: 'TDTD_LAPTRINH', tieuDe: 'Robot thắp sao — lập trình cho bé', trang: 'robot-thap-sao/', nutCai: true },
   { id: 'sao-sokoban', mau: '#f2c46b', hinh: 'thung', nhan: 'Đẩy thùng sao: Sokoban 100 màn, đẩy thùng vào ổ cho sáng lên',
-    duong: 'day-thung', khung: '.sokoban', mun: 'TDTD_SOKOBAN', tieuDe: 'Đẩy thùng sao — Sokoban' },
+    duong: 'day-thung', khung: '.sokoban', mun: 'TDTD_SOKOBAN', tieuDe: 'Đẩy thùng sao — Sokoban', trang: 'day-thung-sao/', nutCai: true },
   { id: 'sao-coba', mau: '#e9b3a8', hinh: 'coba', nhan: 'Cờ vua ba người: Trắng, Đen, Đỏ trên bàn lục giác, đấu với 2 máy hay 3 người chung máy',
-    duong: 'co-ba-nguoi', khung: '.coba', mun: 'TDTD_COBA', tieuDe: 'Cờ vua ba người' },
+    duong: 'co-ba-nguoi', khung: '.coba', mun: 'TDTD_COBA', tieuDe: 'Cờ vua ba người', trang: 'co-vua-ba-nguoi/', nutCai: true },
 ];
 
 
@@ -361,6 +361,7 @@ function moSao(s) {
    bằng nút Back rồi mở trò khác thì nút 🔗 vẫn nằm trong trò cũ, themNutChepLink thấy "đã có" và trò mới không có nút. */
 function goNutTro() {
   ['#nut-chep-link', '#nut-cai-app'].forEach(id => { const n = $(id); if (n) n.remove(); });
+  $$('.co-nut-cai').forEach(k => k.classList.remove('co-nut-cai'));
 }
 
 function dongSao(imLang) {
@@ -411,8 +412,9 @@ function linkTro(s) {
                  : location.origin + location.pathname + '#' + s.duong;
 }
 
-/* Nút "Cài app" trong trò có nutCai (phát âm). Người vào từ link đi thẳng vào trò, không thấy thanh trên cùng của
-   trang chính, nên trò có nút riêng. Máy đã cài, máy tính thì không có nút. */
+/* Nút "Cài app" trong trò có nutCai (mọi trò). Người vào từ link đi thẳng vào trò, không thấy thanh trên cùng của
+   trang chính, nên trò có nút riêng. Máy đã cài, máy tính thì không có nút. Lúc có nút, khung trò mang lớp
+   co-nut-cai để thanh tiêu đề của trò chừa chỗ (app.css). */
 function themNutCaiApp(s) {
   const k = $(s.khung);
   if (!k || !s.nutCai || !CA || $('#nut-cai-app')) return;
@@ -424,6 +426,7 @@ function themNutCaiApp(s) {
   b.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>Cài app';
   b.onclick = moCaiApp;
   k.appendChild(b);
+  k.classList.add('co-nut-cai');
 }
 
 function chepLink(s) {

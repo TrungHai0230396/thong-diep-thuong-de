@@ -240,7 +240,13 @@ console.log('\n— Chia sẻ link một trò —');
      goi.filter(o => /https?:/.test(o.text || '')).map(o => o.url).join(', '));
   const pa = dsSao.find(x => x.id === 'sao-phatam'), oPa = goi[dsSao.indexOf(pa)];
   ok('phát âm: chia sẻ trang riêng /luyen-phat-am/, tiêu đề "Luyện phát âm tiếng Anh"', oPa.url === 'https://x.vercel.app/luyen-phat-am/' && oPa.title === 'Luyện phát âm tiếng Anh', oPa.url);
-  ok('trò khác vẫn chia sẻ link #trò như cũ', goi[dsSao.findIndex(x => x.id === 'sao-hoadang')].url === 'https://x.vercel.app/#tha-den');
+  /* Người dùng: "mỗi game làm cài app như chỗ luyện âm, có chú thích khác luôn" — giờ trò nào cũng có trang riêng */
+  const lechTrang = dsSao.filter((x, i) => !x.trang || !x.tieuDe || goi[i].url !== 'https://x.vercel.app/' + x.trang || goi[i].title !== x.tieuDe);
+  ok(`cả ${dsSao.length} trò đều chia sẻ trang riêng của nó, tiêu đề là tên riêng của trò`, !lechTrang.length, lechTrang.map(x => x.id).join(', '));
+  ok('trang riêng không trùng nhau, không trùng thư mục của app', new Set(dsSao.map(x => x.trang)).size === dsSao.length &&
+     dsSao.every(x => /^[a-z0-9-]+\/$/.test(x.trang) && !['assets/', 'icons/', 'data/', 'scripts/', 'content/', 'phat-am/'].includes(x.trang)));
+  ok('trò chưa có trang riêng thì vẫn chia sẻ link #trò', chay.linkTro({ duong: 'tro-moi' }) === 'https://x.vercel.app/#tro-moi');
+  const moTaDa = new Map();
   /* Trang chia sẻ đang dùng, và trang cũ /phat-am/ (link đã gửi đi vẫn phải mở được; đã sửa) */
   for (const sao of dsSao.filter(x => x.trang).concat([{ ...pa, trang: 'phat-am/' }])) {
     const f = path.join(__dirname, '..', sao.trang, 'index.html');
@@ -253,6 +259,12 @@ console.log('\n— Chia sẻ link một trò —');
     ok(`${sao.trang}: người mở được chuyển vào #${sao.duong} bằng JavaScript; không có thẻ refresh cho trình đọc link đi theo`,
        html.includes(`location.replace('../#${sao.duong}')`) && !/http-equiv/i.test(html) && html.includes(`href="../#${sao.duong}"`));
     ok(`${sao.trang}: og:url trỏ đúng chính trang này`, html.includes(`property="og:url" content="https://thong-diep-thuong-de.vercel.app/${sao.trang}"`));
+    const moTa = (html.match(/name="description" content="([^"]*)"/) || [])[1] || '';
+    const ogMoTa = (html.match(/property="og:description" content="([^"]*)"/) || [])[1];
+    const chuAnh = (html.match(/property="og:image:alt" content="([^"]*)"/) || [])[1] || '';
+    ok(`${sao.trang}: có chú thích riêng (description và og:description trùng nhau), ảnh có chữ thay thế`,
+       moTa.length >= 60 && moTa.length <= 230 && ogMoTa === moTa && chuAnh.length >= 10, `${moTa.length} ký tự`);
+    if (sao.trang !== 'phat-am/') moTaDa.set(moTa, (moTaDa.get(moTa) || []).concat(sao.trang));
     /* Zalo không hiện khung xem trước khi trang chưa có ảnh (người dùng báo). Ảnh phải là địa chỉ đầy đủ, có thật,
        đúng 1200×630 như thẻ khai, và nhẹ (WhatsApp chỉ nhận ảnh nhỏ, cỡ 300 KB). */
     const anh = (html.match(/property="og:image" content="https:\/\/thong-diep-thuong-de\.vercel\.app\/([^"]+)"/) || [])[1];
@@ -268,6 +280,8 @@ console.log('\n— Chia sẻ link một trò —');
        html.includes('og:image:width" content="1200"') && html.includes('og:image:height" content="630"') && b.length < 300 * 1024,
        b ? `${Math.round(b.length / 1024)} KB` : 'không có ảnh');
   }
+  const trungMoTa = [...moTaDa.values()].filter(ds => ds.length > 1);
+  ok('mỗi trò một chú thích khác nhau, không chép của nhau', !trungMoTa.length, trungMoTa.map(ds => ds.join(' = ')).join('; '));
 }
 
 console.log('\n— Cài app: chỉ mở khi người dùng bấm —');
@@ -275,7 +289,8 @@ console.log('\n— Cài app: chỉ mở khi người dùng bấm —');
   /* Người đến từ link phát âm đi thẳng vào trò, không thấy trang chính nên không được gợi ý cài. Người dùng chọn:
      vào trò 3 giây thì gợi ý. */
   /* "Đang sử dụng hiển thị cài app khó chịu lắm": không bảng nào tự bật, chỉ mở khi người dùng bấm nút */
-  ok('trò phát âm khai nutCai (có nút Cài app riêng)', /id: 'sao-phatam'[\s\S]*?nutCai: true/.test(khoiSao));
+  const soTro = [...khoiSao.matchAll(/\{ id: '/g)].length, soNut = [...khoiSao.matchAll(/nutCai: true/g)].length;
+  ok('mọi trò khai nutCai (có nút Cài app riêng, như phát âm)', soTro >= 14 && soNut === soTro, `${soNut}/${soTro} trò`);
   const goiCai = [...nguon.matchAll(/^.*moCaiApp.*$/gm)].map(m => m[0].trim()).filter(d => !d.startsWith('function moCaiApp'));
   ok('bảng cài app không tự bật: chỉ mở từ nút bấm (không setTimeout, không goiYCaiApp)',
      !/goiYCaiApp|nenTuHien/.test(nguon) && goiCai.length >= 3 && goiCai.every(d => /onclick = (\(\) => )?moCaiApp/.test(d)), goiCai.join(' | '));
@@ -306,7 +321,7 @@ console.log('\n— Bảng cài app: link đưa ra Safari, Chrome giữ đúng tr
      /CA\.linkSafari\(link\)/.test(nguon) && /CA\.linkChrome\(link\)/.test(nguon) && /writeText\(link\)/.test(nguon));
 }
 
-console.log('\n— Nút Cài app trong trò phát âm —');
+console.log('\n— Nút Cài app trong mọi trò —');
 {
   /* Người dùng: trong Zalo đã thấy bảng một lần nên không hiện lại (luật 3 lần, cách 7 ngày), mà không có chỗ mở lại.
      Chọn thêm nút "Cài app" trong trò. */
@@ -320,6 +335,21 @@ console.log('\n— Nút Cài app trong trò phát âm —');
   const css = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.css'), 'utf8');
   const phai = (lop) => +((css.match(new RegExp(`\\.${lop}\\{[^}]*right:(\\d+)px`)) || [])[1] || 0);
   ok('nút Cài app nằm bên trái nút 🔗, không đè lên nhau (🔗 rộng 34px từ right:58px)', phai('nut-cai') >= phai('nut-link') + 34 + 6, `Cài app right:${phai('nut-cai')}px, 🔗 right:${phai('nut-link')}px`);
+  /* Nút rộng chừng 94 px (đo trên trình duyệt giả điện thoại 375 px): nằm từ right:100 tới right:194. Đo bằng trình
+     duyệt thấy đè lên tim của Mùa Chín, số ếch, nút phóng của Trời đêm, và tiêu đề cùng nút ? của Robot thắp sao,
+     Đẩy thùng sao, Cờ ba người. Có nút thì khung trò mang lớp co-nut-cai, các thứ đó nhường chỗ. */
+  ok('có nút thì khung trò mang lớp co-nut-cai; đóng trò thì gỡ lớp cùng với nút',
+     /function themNutCaiApp[\s\S]{0,900}k\.appendChild\(b\);\s*k\.classList\.add\('co-nut-cai'\);/.test(nguon) &&
+     /function goNutTro\(\) \{[^}]*\}\);\s*\$\$\('\.co-nut-cai'\)\.forEach\(k => k\.classList\.remove\('co-nut-cai'\)\);/.test(nguon));
+  const so = (re) => +((css.match(re) || [])[1] || 0);
+  const tim = so(/\.game-hud\{[^}]*padding:calc\(env\(safe-area-inset-top,0px\) \+ 14px\) (\d+)px/);
+  ok('tim của Mùa Chín không nằm dưới nút 🔗 (lỗi có từ trước: thanh điểm chỉ chừa 58 px)', tim >= phai('nut-link') + 34 + 6, `chừa ${tim}px`);
+  ok('có nút Cài app: tim của Mùa Chín và số ếch dời sang trái nút',
+     so(/\.co-nut-cai \.game-hud\{padding-right:(\d+)px\}/) >= 198 && so(/\.co-nut-cai \.ho-dem\{right:(\d+)px\}/) >= 198);
+  ok('có nút Cài app: thanh tiêu đề của Robot, Đẩy thùng, Cờ ba người chừa chỗ; điện thoại hẹp thì lùi xuống dưới hàng nút',
+     /\.co-nut-cai \.lt-dau,\.co-nut-cai \.sk-dau,\.co-nut-cai \.cb-dau\{padding-right:(19[8-9]|2\d\d)px\}/.test(css) &&
+     /@media \(max-width:479px\)\{[^@]*\.co-nut-cai \.lt-dau,\.co-nut-cai \.sk-dau,\.co-nut-cai \.cb-dau\{padding-top:calc\(env\(safe-area-inset-top,0px\) \+ (5[2-9]|6\d)px\)/.test(css) &&
+     /@media \(max-width:479px\)\{[^@]*\.co-nut-cai \.td-phong\{top:calc\(env\(safe-area-inset-top,0px\) \+ (5[2-9]|6\d)px\)\}/.test(css));
 }
 
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
