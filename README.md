@@ -1888,6 +1888,34 @@ Giờ:
 
 Đã thử trên trình duyệt khổ 375 px với hai địa chỉ khác nhau như hai máy, trên database thật: tạo phòng, hiện mã QR, mở link ở máy kia, một chạm vào ghế Đen, chủ phòng thấy Bắt đầu lên nút chính; rời phòng chờ, dán nguyên tin nhắn mời vào ô mã, vào lại đúng ghế. Lúc thử tìm ra và sửa thêm: ô nhập mã rộng hơn khung làm bảng lệch ngang khi gõ; chữ "Bắt đầu — máy chơi thay 1 ghế trống" gãy hai dòng trong nút cao cố định (giờ là "Bắt đầu" kèm dòng nhỏ bên dưới).
 
+### Xem nước đi từng quân, quân đã mất
+
+Người dùng: "trong lúc chờ cho nhấn để xem nước đi từng con (option trước khi vô phòng), cho biết quân mình bị mất con nào nữa". Làm cả hai cách hiểu chữ "lúc chờ": chờ trong phòng chờ trước khi vào ván, và chờ tới lượt mình trong ván.
+
+- **Xem cách đi từng quân** (nút ở phòng chờ — cả lúc chưa vào ghế — và ở bảng Cách chơi): bàn trống, một quân của nhà mình; hàng nút Vua, Hậu, Xe, Tượng, Mã, Tốt, luật Tam quốc thêm Tướng. Mỗi quân đặt sẵn ở ô cho thấy rõ cái lạ của bàn ba người: xe ở e1 (cột e qua tâm uốn sang nhà Đỏ, 14 ô), tượng ở a1 (tới ô sát tâm rẽ hai nhánh), mã ở d4 (10 ô), tốt ở e2 (tô đỏ hai ô ăn chéo), vua, hậu, tướng ở d4. Vẽ mọi đường đi theo đúng đường uốn; chạm chấm thì quân trượt tới theo đường, chạm ô khác thì đặt quân vào đó; dòng dưới ghi quân đang ở ô nào, đi được mấy ô, và cách đi. Đang xem mà phòng đổi thì bảng phòng chờ không bật lại — chỉ báo "Chi vừa vào chơi quân Đỏ", dòng dưới tên trò ghi "Phòng … · 3/3 người · chờ An bắt đầu"; chủ phòng bấm Bắt đầu thì bảng xem tự đóng, vào ván luôn. Mở từ Cách chơi giữa ván thì ván vẫn chạy phía sau: nước mới áp ngay, không kẹt chờ hình động.
+- **Trong ván, lúc chưa tới lượt mình** (hay chạm quân nhà khác lúc tới lượt): chạm quân nào cũng thấy quân đó đi được đâu theo thế cờ lúc này — đường màu tím (xanh là quân mình đang đi), kèm lời báo kiểu "Mã đen của Hổ: 3 nước đi được (chỉ xem)". Chạm chấm không đi; có nước mới thì thôi xem.
+- **Quân đã mất**: thẻ mỗi nhà có một hàng hình quân nhỏ, vẽ bằng chính nét quân trên bàn, quân quý trước, cùng loại xếp chồng. Quân mất ghi cho nhà đang cầm quân lúc bị ăn — luật Tam quốc thì quân cướp được bị ăn tính cho người đang cầm, bị chiếu hết thì vua bị bắt khỏi bàn cũng ghi là mất vua. Quân mình bị ăn thì báo "Hổ ăn mã của bạn."; chạm thẻ thì báo bằng chữ, như "Bạn (Trắng) đã mất: hậu, 2 tốt."; hoàn tác thì quân mất cũng lùi về.
+
+**Sửa kèm**, tìm ra lúc làm:
+
+- Luật Tam quốc: tới lượt mình mà chạm quân của đạo quân vừa chiếm thì không chọn được — giao diện chỉ cho chạm quân đạo gốc, dù luật cho đi mọi đạo quân mình giữ.
+- Nước phong tướng (ô đi trùng ô đến) bị tính như ăn chính quân vừa phong, nên "ăn N điểm" cộng sai — lộ ra khi thẻ người phong tướng hiện mất một quân.
+- Mở Cách chơi từ phòng chờ rồi bấm Chơi thì về bảng Ván mới thay vì về phòng chờ.
+- Lời báo và câu nói của máy cùng hiện trên đầu bàn nên che nhau ("Xin nhé!" che mất "Hổ ăn mã của bạn"): giờ có lời báo thì bong bóng tắt, câu nói tới lúc đang báo thì đợi báo tắt.
+- `scripts/test-phong.js` lâu lâu hỏng bài "Rùa chơi thay ghế Đen" (2/10 lần ở bản đang chạy): bài chỉ chờ hai máy rảnh rồi so thế cờ, có lúc người xem chưa nhận nước cuối (luồng sự kiện tới sau vài mili giây). Không phải lỗi app; sửa cho chờ tới khi hai máy khớp, chạy lại 25 lần không hỏng.
+
+`scripts/test-coba.js` thêm 22 bài (giờ 90): xem cách đi — xe e1 đủ 14 ô dù ván đang có quân chắn, luật thường không có Tướng, mã d4 đủ 10 ô, chạm chấm thì trượt rồi đứng ở ô mới, chạm ô khác thì đặt quân, tốt e2 đếm cả ô ăn chéo, bấm Xong về lại Cách chơi và nút của ván hiện lại, đang xem mà hai máy đi thì nước áp ngay; chạm xem — mã Đen ra đúng các nước của nó, chạm chấm không đi, quân mình lúc tới lượt vẫn chọn để đi, lúc máy đang nghĩ thì chỉ xem, máy đi xong thì thôi xem, Tam quốc chọn được quân vừa chiếm; quân đã mất — Hổ ăn mã thì thẻ bạn ghi mã và có lời báo, bong bóng không che lời báo, chạm thẻ báo bằng chữ, hoàn tác lùi về, ăn vua ghi đúng nhà mà phong tướng không tính điểm, chiếu hết Tam quốc ghi mất vua, ván Tam quốc có Tướng. `scripts/test-phong.js` thêm 4 bài: mở Cách chơi từ phòng chờ rồi bấm Chơi thì về phòng chờ, bấm xem thì bảng phòng chờ ẩn, Chi vào lúc đang xem thì chỉ báo, chủ phòng bắt đầu thì bảng xem tự đóng. Thử phá 19 chỗ (không ghi quân mất, ghi cho người ăn, quên vua bị bắt, hoàn tác không lùi, phong tướng lại tính là ăn, không báo, chọn quân theo đạo gốc, chạm chấm của quân đang xem cũng đi, tính nước theo nhà tới lượt, chưa tới lượt thì chạm không làm gì, bàn xem lấy thế cờ của ván, trượt xong không đổi ô, nước máy kẹt chờ hình động, Xong không trả nút, phòng đổi thì bật lại bảng, bắt đầu không đóng bảng xem, Chơi về Ván mới như cũ, báo mà không tắt bong bóng, bong bóng không đợi): bắt cả 19.
+
+Đã thử trên trình duyệt khổ 375 px: xem xe, mã, tốt, chạm cho mã trượt sang nhà Đỏ, Xong về lại Cách chơi; mở từ phòng chờ trên database thật thì dòng dưới tên trò ghi tình hình phòng, Về phòng chờ thì bảng hiện lại; trong ván với hai máy, chạm mã của Hổ lúc tới lượt mình thì hiện đường tím, Hổ ăn mã thì thẻ bạn có hình mã và lời báo hiện rõ. Lúc thử rút gọn chữ trên nút (bản đầu "Trong lúc chờ: xem cách đi từng quân" gãy hai dòng) và chữ tình hình phòng (bị cắt), tăng cỡ hình quân mất từ 15 lên 17 px.
+
+### Chép link mời
+
+Người dùng: "gửi link mời cho sao chép link nữa". Trên điện thoại, "Gửi link mời" mở bảng chia sẻ của máy; muốn dán link vào chỗ khác (nhóm chat, ghi chú) thì phải tìm nút sao chép trong bảng đó. Giờ cạnh "Gửi link mời" có nút **Chép link**; máy không có bảng chia sẻ (trình duyệt trong Zalo, Messenger, máy tính) thì chỉ một nút **Chép link mời**. Chép bằng clipboard; không được thì bằng cách cũ (textarea + execCommand — trình duyệt trong app chat có lúc chỉ chạy cách này); cả hai đều không được thì hiện link trong ô cho chạm giữ mà chép. Bấm xong nút đổi thành "Đã chép ✓". Bảng phòng giữa ván cũng có "Chép link xem ván".
+
+**Sửa kèm**: lời báo nằm dưới bảng, nên lúc bảng phòng chờ đang mở thì không thấy — bấm Chép mã, vào ghế bị người khác giành trước, mất mạng lúc bắt đầu đều không thấy báo gì. Giờ đang có bảng thì lời báo dời xuống cuối màn hình, nằm trên bảng.
+
+`scripts/test-phong.js` thêm 5 bài (giờ 57): điện thoại có hai nút; bấm Chép link thì chép đúng link mời, nút đổi chữ, lời báo nằm trên bảng; máy không có bảng chia sẻ thì một nút Chép link mời; chép không được thì hiện ô link; bấm Xong về lại phòng chờ. Đã thử trên trình duyệt khổ 375 px với database thật: hai nút cạnh nhau, bấm Chép link thì nút thành "Đã chép ✓" và lời báo hiện rõ ở cuối màn hình.
+
 ## Cấu trúc
 
 ```
@@ -1946,13 +1974,13 @@ assets/sokoban.js          Đẩy thùng sao (Sokoban): luật đi đẩy, bộ 
 assets/mansoko.js          100 màn của Đẩy thùng sao (ký hiệu XSB), mỗi màn có số lần đẩy ít nhất và một lời giải, sinh bởi scripts/tao-man-sokoban.js
 scripts/tao-man-sokoban.js tạo màn theo Taylor & Parberry 2011 (17 mẫu phòng, đặt ổ, chơi ngược), chạy song song nhiều luồng, chọn 100 màn
 assets/coba.js             Cờ vua ba người: bàn lục giác 96 ô (bằng sáng chế Zubrin), luật, máy nghĩ (Best-Reply Search, hoang tưởng) ở luồng riêng, giao diện
-scripts/test-coba.js       68 kiểm thử cờ ba người: hình học bàn, luật thường và Tam quốc, máy nghĩ, giao diện, mũi tên nước đi
+scripts/test-coba.js       90 kiểm thử cờ ba người: hình học bàn, luật thường và Tam quốc, máy nghĩ, giao diện, mũi tên nước đi, xem cách đi từng quân, quân đã mất
 assets/phong.js            chơi qua mạng: đọc ghi Firebase Realtime Database bằng REST và luồng sự kiện, không thư viện
 assets/maqr.js             mã QR tự vẽ cho phòng chờ (ISO/IEC 18004, kiểu byte, mức M, phiên bản 1–6), không thư viện
 scripts/test-maqr.js       12 kiểm thử mã QR: số liệu chuẩn, đọc ngược bằng bộ đọc riêng, sát sức chứa, 300 chữ ngẫu nhiên
 firebase-rules.json        luật bảo vệ database (dán vào thẻ Rules của Firebase)
 scripts/fb-gia.js          máy chủ giả của Firebase cho bài kiểm thử
-scripts/test-phong.js      48 kiểm thử chơi qua mạng: ba máy chung một phòng trên máy chủ giả, phòng chờ theo từng người xem
+scripts/test-phong.js      57 kiểm thử chơi qua mạng: ba máy chung một phòng trên máy chủ giả, phòng chờ theo từng người xem
 scripts/test-sokoban.js    60 kiểm thử Đẩy thùng sao: luật, bộ giải đối chiếu dò từng bước, bộ tạo, cả 100 màn, giao diện
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -1984,8 +2012,8 @@ node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
-node scripts/test-coba.js        # chạy 68 kiểm thử Cờ vua ba người
-node scripts/test-phong.js       # chạy 48 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
+node scripts/test-coba.js        # chạy 90 kiểm thử Cờ vua ba người
+node scripts/test-phong.js       # chạy 57 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
 node scripts/test-maqr.js        # chạy 12 kiểm thử mã QR
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
 node scripts/tao-man-sokoban.js tao ung-vien.jsonl 7 [4,5]   # tạo màn liên tục, 7 luồng, ghi mỗi màn một dòng (tuỳ chọn: chỉ số thùng này)

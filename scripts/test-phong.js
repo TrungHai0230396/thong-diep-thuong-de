@@ -68,7 +68,8 @@ function mayKhach(ten, url) {
   const m = { ten, luu, es: null };
   const ctx = {
     console, setTimeout, clearTimeout, setInterval, clearInterval, performance, URL, fetch, TDTD_FB_THU: url,
-    devicePixelRatio: 1, innerWidth: 375, innerHeight: 812, navigator: {},
+    devicePixelRatio: 1, innerWidth: 375, innerHeight: 812,
+    navigator: { share: () => Promise.resolve(), clipboard: { writeText: (chu) => { m.chep = chu; return Promise.resolve(); } } },   // như điện thoại
     localStorage: { getItem: (k) => (k in luu ? luu[k] : null), setItem: (k, v) => { luu[k] = String(v); }, removeItem: (k) => { delete luu[k]; } },
     location: { origin: 'http://' + ten.toLowerCase(), pathname: '/', search: '', hash: '' },
     EventSource: class extends ES { constructor(u) { super(u); m.es = this; } },
@@ -158,6 +159,24 @@ function mayKhach(ten, url) {
   const coQR = An.tin().includes(QR.svg(`http://an/co-vua-ba-nguoi/?phong=${ma}`)) && /cb-qr-bat">Ẩn mã QR/.test(An.tin());
   An.bam('.cb-qr-bat');
   ok('bấm hiện mã QR: mã trong phòng chờ chính là link mời …/co-vua-ba-nguoi/?phong=MÃ; bấm lần nữa thì ẩn', coQR && !/<svg/.test(An.tin()));
+  /* Người dùng: "gửi link mời cho sao chép link nữa" */
+  ok('điện thoại có bảng chia sẻ: cạnh "Gửi link mời" có nút "Chép link"',
+     /class="cb-moi-ban">Gửi link mời<\/button><button type="button" class="cb-phu cb-chep-link">Chép link<\/button>/.test(An.tin()));
+  An.bam('.cb-chep-link'); await cho(20);
+  ok('bấm Chép link: chép đúng link mời …/co-vua-ba-nguoi/?phong=MÃ; nút đổi thành "Đã chép ✓", có lời báo; đang có bảng thì lời báo dời xuống dưới, nằm trên bảng',
+     An.chep === `http://an/co-vua-ba-nguoi/?phong=${ma}` && An.khung().querySelector('.cb-tin .cb-chep-link').textContent === 'Đã chép ✓' &&
+     /Đã chép link mời phòng/.test(An.khung().querySelector('.cb-bao').textContent) && An.khung().classList.contains('cb-co-tin'), An.chep);
+  {
+    const chiaSe = An.ctx.navigator.share, boNho = An.ctx.navigator.clipboard;
+    delete An.ctx.navigator.share; An.C._kiemPhong();
+    ok('máy không có bảng chia sẻ (trình duyệt trong Zalo, máy tính): một nút "Chép link mời" làm nút chính', /class="cb-chep-link">Chép link mời/.test(An.tin()) && !/cb-moi-ban/.test(An.tin()));
+    An.ctx.navigator.clipboard = { writeText: () => Promise.reject(new Error('không cho')) };
+    An.bam('.cb-chep-link'); await cho(20);
+    ok('chép tự động không được (cả cách cũ): hiện link trong ô để chạm giữ mà chép', /cb-o-link[^>]*value="http:\/\/an\/co-vua-ba-nguoi\/\?phong=/.test(An.tin()));
+    An.ctx.navigator.share = chiaSe; An.ctx.navigator.clipboard = boNho;
+    An.bam('.cb-dongtin');
+    ok('bấm Xong: về lại phòng chờ, lại có Gửi link mời và Chép link', /Phòng chờ/.test(An.tin()) && /cb-moi-ban">Gửi link mời/.test(An.tin()) && /cb-chep-link">Chép link</.test(An.tin()));
+  }
   Binh.C._vaoPhong(ma); Chi.C._vaoPhong(ma);
   await doi(() => Binh.C._phong().cay && Chi.C._phong().cay);
   ok('người mở link: thấy An mời, mỗi ghế trống một nút "Vào chơi quân …" (Đen rồi Đỏ, đúng thứ tự đi), ghế trống ghi "Chờ bạn"',
@@ -225,15 +244,19 @@ function mayKhach(ten, url) {
     await doi(() => ca.every(m => m.yen()) && An.C._van().the.luot === 2);
     den.C.dong();                                                      // Đen tắt app: thôi nghe, thôi báo "còn ở đây"
     ok('chưa quá 60 giây: chưa có nút cho máy đi thay', An.C._viecPhong() === '');
+    const lechThat = An.C._phong().lech;
     An.C._phong().lech += 70000;                                       // vặn đồng hồ máy An: Đen đã im lặng hơn 60 giây
     An.C._kiemPhong();
     ok('quá 60 giây mà tới lượt Đen chưa đi: An thấy nút "Cho máy đi thay"', An.C._viecPhong() === 'thay');
     An.C._choMayThay();
     await doi(() => An.C._phong().cay.may && An.C._phong().cay.may[2] === 'rua');
-    await doi(() => [An, xem].every(m => m.yen()) && An.C._van().the.luot === 0, 8000);
+    /* chờ cả người xem nhận xong nước cuối (luồng sự kiện tới sau vài mili giây) — bản trước chỉ chờ hai máy rảnh nên lâu lâu
+       so lúc người xem còn thiếu một nước */
+    await doi(() => [An, xem].every(m => m.yen()) && An.C._van().the.luot === 0 && khop([An, xem]), 8000);
     ok('An bấm: Rùa chơi thay ghế Đen (Hổ đã ở ghế Đỏ), máy An nghĩ giùm và ghi nước; người xem vẫn khớp',
-       An.C._tenNha(2) === 'Rùa' && khop([An, xem]) && An.C._van().the.luot === 0);
-    An.C._phong().lech -= 70000;
+       An.C._tenNha(2) === 'Rùa' && khop([An, xem]) && An.C._van().the.luot === 0,
+       `tên ${An.C._tenNha(2)} · khớp ${khop([An, xem])} · lượt ${An.C._van().the.luot} · yên ${An.yen()}/${xem.yen()} · nghĩ ${An.C._van().dangNghi} · ke ${An.C._phong().ke}/${xem.C._phong().ke} · máy ${JSON.stringify(An.C._phong().cay.may)} · lệch ${An.C._phong().lech}`);
+    An.C._phong().lech = lechThat;                                     // trả đồng hồ (máy An báo "còn ở đây" có thể đã đo lại lệch)
     den.C.mo();                                                        // Đen mở lại app
     await doi(() => den.C._viecPhong() === 'tudi' && den.yen() && khop([An, den]), 6000);
     ok('Đen quay lại: đuổi kịp các nước đã đi, thấy nút "Tự đi tiếp"', den.C._viecPhong() === 'tudi' && khop([An, den, xem]));
@@ -282,6 +305,16 @@ function mayKhach(ten, url) {
     await doi(() => Binh.C._phong() && Binh.C._phong().cay);
     Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
     await Binh.C._ngoiGhe(2);
+    await doi(() => /Phòng chờ/.test(Binh.tin()));
+    Binh.bam('.cb-hoi'); Binh.bam('.cb-dongtin');
+    ok('mở Cách chơi từ phòng chờ rồi bấm Chơi: về lại phòng chờ (bản trước về bảng Ván mới); phòng chờ có nút xem cách đi từng quân',
+       /Phòng chờ/.test(Binh.tin()) && !Binh.khung().querySelector('.cb-tin').hidden && /cb-xemquan/.test(Binh.tin()));
+    /* Người dùng: "trong lúc chờ cho nhấn để xem nước đi từng con". Bình xem trong lúc chờ: phòng đổi thì không bật lại
+       bảng phòng chờ, chỉ báo; chủ phòng bấm Bắt đầu thì tự đóng */
+    Binh.bam('.cb-xemquan', { tu: 'sanh' });
+    ok('bấm xem cách đi từng quân: bảng phòng chờ ẩn, nút dưới thành "Về phòng chờ", luật Tam quốc có thêm Tướng',
+       !!Binh.C._xem() && Binh.khung().querySelector('.cb-tin').hidden && Binh.khung().querySelector('.cb-xong').textContent === 'Về phòng chờ' &&
+       Binh.khung().querySelector('.cb-xem').innerHTML.includes('data-xq="7"'));
     Chi.C._vaoPhong(ma3);
     await doi(() => Chi.C._phong() && Chi.C._phong().cay);
     Chi.khung().querySelector('.cb-o-ten').value = Chi.ten;
@@ -293,10 +326,16 @@ function mayKhach(ten, url) {
     ok('rời phòng chờ rồi mở lại link: ngồi lại đúng ghế cũ (máy chủ không cho xoá ghế đã giành, không nhớ thì bị chính ghế mình chặn)',
        Chi.C._phong().P === 1 && !/data-ngoi/.test(Chi.tin()));
     await doi(() => An.C._phong().cay.ghe && An.C._phong().cay.ghe[2] && An.C._phong().cay.ghe[1] && /Đủ ba người/.test(An.tin()));
+    await doi(() => Binh.C._phong().cay.ghe && Binh.C._phong().cay.ghe[1]);
+    ok('Chi vào lúc Bình đang xem: bảng phòng chờ không bật lại, chỉ báo "Chi vừa vào", dòng dưới tên trò ghi 3/3 người',
+       !!Binh.C._xem() && Binh.khung().querySelector('.cb-tin').hidden && /Chi vừa vào chơi quân Đỏ/.test(Binh.khung().querySelector('.cb-bao').textContent) &&
+       /3\/3 người · chờ An bắt đầu/.test(Binh.khung().querySelector('.cb-ten span').textContent), Binh.khung().querySelector('.cb-ten span').textContent);
     ok('đủ ba người: chủ phòng thấy "Đủ ba người rồi", Bắt đầu là nút chính, thôi nút mời và mã QR; phòng chờ ghi luật Tam quốc',
-       /Đủ ba người rồi/.test(An.tin()) && /class="cb-batdau-phong">Bắt đầu<\/button>/.test(An.tin()) && !/cb-moi-ban|cb-qr-bat/.test(An.tin()) && /Phòng chờ · Luật Tam quốc/.test(An.tin()));
+       /Đủ ba người rồi/.test(An.tin()) && /class="cb-batdau-phong">Bắt đầu<\/button>/.test(An.tin()) && !/cb-moi-ban|cb-chep-link|cb-qr-bat/.test(An.tin()) && /Phòng chờ · Luật Tam quốc/.test(An.tin()));
     await An.C._batDauPhong();
     await doi(() => [An, Binh, Chi].every(m => m.C._van() && m.C._van().cheDo === 'phong' && m.C._van().ma === ma3));
+    ok('An bấm Bắt đầu lúc Bình còn đang xem: bảng xem tự đóng, Bình vào ván, có lời báo',
+       !Binh.C._xem() && Binh.khung().querySelector('.cb-xong').hidden && /Ván bắt đầu rồi/.test(Binh.khung().querySelector('.cb-bao').textContent));
     ok('phòng Tam quốc: máy chủ nhớ luat = tq; cả hai máy vào ván đúng luật Tam quốc', may.lay(`coba/${ma3}/luat`) === 'tq' && [An, Binh].every(m => m.C._van().the.tq === true && m.C._van().luat === 'tq'));
     const r = await fetch(`${url}/coba/${ma3}/luat.json`, { method: 'PUT', body: JSON.stringify('tq') });
     ok('không ai đổi được luật sau khi tạo phòng', r.status === 401);

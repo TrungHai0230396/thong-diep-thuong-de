@@ -343,7 +343,15 @@ async function choTaiNguoi() {                                       // chạy h
      !C._van().the.cho.length && C._van().vet[TRANG].duong.slice(-1)[0] === o(DO, 'e', 1));
   C._veCanh(1e6);
   ok('vẽ bàn có quân đổi chủ và tướng không lỗi', true);
+  ok('quân đã mất ghi đúng nhà: bạn ăn vua Đỏ thì Đỏ mất vua; phong tướng không tính là ăn quân (bản trước cộng điểm cho nước phong)',
+     JSON.stringify(C._van().mat) === JSON.stringify([[], [DO * 8 + LO.VUA], []]) && C._van().an[TRANG] === 0, JSON.stringify(C._van().mat) + ' điểm ' + C._van().an[TRANG]);
   await choTaiNguoi();
+  /* Tam quốc: tới lượt mình thì chạm chọn được cả quân của đạo quân vừa chiếm (bản trước chỉ cho chạm quân đạo gốc) */
+  if (C._van().the.luot === TRANG && C._van().the.o[o(DO, 'a', 2)] === DO * 8 + LO.TOT) {
+    C._canhBan(); C._datXoay(C._GOC_NHIN[TRANG]);
+    const [xa, ya] = C._tamO(o(DO, 'a', 2)); C._chamBan(xa, ya);
+    ok('Tam quốc: chạm tốt Đỏ vừa chiếm là chọn để đi (không phải chỉ xem), có đường đi', C._chon() === o(DO, 'a', 2) && !C._chonXem() && C._nuocCuaChon().length > 0);
+  } else ok('Tam quốc: dựng được thế để chạm quân vừa chiếm', false, `lượt ${C._van().the.luot}`);
   /* hình động hướng dẫn */
   C._batDemo();
   const dau = C._demo() ? C._demo().buoc : -1;
@@ -351,6 +359,123 @@ async function choTaiNguoi() {                                       // chạy h
   const cuoi = C._demo() ? C._demo().buoc : -1;
   C._tiepDemo();
   ok('hình động hướng dẫn: bốn cảnh lần lượt rồi tự tắt', dau === 0 && cuoi === 3 && C._demo() === null);
+  C.dong();
+}
+
+console.log('\n— Xem nước đi từng quân, chạm xem lúc chưa tới lượt, quân đã mất —');
+{
+  C.mo();
+  const tam = global.document.body.children.find(c => c.className === 'coba');
+  const chuBao = () => tam.querySelector('.cb-bao').textContent, luot = () => tam.querySelector('.cb-luot').textContent;
+  const bam = (sel, ds = {}) => C._bam({ target: { closest: (s) => (s === sel ? { dataset: ds } : null) } });
+  const tq2 = (dat, l) => Object.assign(theTrong(dat, l), { tq: true });
+  /* Người dùng: "trong lúc chờ cho nhấn để xem nước đi từng con (option trước khi vô phòng)". Bàn trống một quân: chọn
+     loại quân, chạm chấm thì quân trượt tới, chạm ô khác thì đặt quân vào đó */
+  C._vanMoi({ mau: TRANG, kho: 0 });
+  await choTaiNguoi();
+  bam('.cb-xemquan', { tu: 'huongdan' });
+  const e1 = o(TRANG, 'e', 1), tiaXe = B.TRUC[e1].reduce((n, t) => n + t.length, 0);
+  ok('mở "Xem cách đi từng quân" từ bảng Cách chơi: xe Trắng ở e1 trên bàn trống, đủ 14 ô dù ván đang có quân chắn; nút Xong thay chỗ Ván mới',
+     !!C._xem() && C._xem().loai === LO.XE && C._xem().c === e1 && tam.querySelector('.cb-tin').hidden && tiaXe === 14 && luot().includes('đi được 14 ô') &&
+     !tam.querySelector('.cb-xong').hidden && tam.querySelector('.cb-moi').hidden && tam.querySelector('.cb-hoan').hidden, luot());
+  ok('luật thường: hàng chọn quân có sáu loại, không có Tướng', (tam.querySelector('.cb-xem').innerHTML.match(/data-xq/g) || []).length === 6 && !tam.querySelector('.cb-xem').innerHTML.includes('data-xq="7"'));
+  C._chonXemQuan(LO.MA);
+  const d4 = o(TRANG, 'd', 4);
+  ok('chọn Mã: đặt ở d4 sát tâm, thấy đủ 10 ô', C._xem().c === d4 && B.MA[d4].length === 10 && luot().includes('đi được 10 ô'), luot());
+  C._canhBan(); C._datXoay(C._GOC_NHIN[TRANG]);
+  const toi = B.MA[d4].find(c => L.nhaO(c) !== TRANG), [xd, yd] = C._tamO(toi);
+  C._chamXem(xd, yd);
+  const dangTruot = !!C._xem().truot && C._xem().c === d4;
+  C._veCanh(1e12);
+  ok('chạm chấm: mã trượt tới, trượt xong thì đứng ở ô mới (sang nhà khác), lời giải thích theo ô mới', dangTruot && !C._xem().truot && C._xem().c === toi && luot().includes(ten(toi).split(' ')[1]), ten(toi));
+  const khac = [...Array(96).keys()].find(c => c !== toi && !B.MA[toi].includes(c)), [xk, yk] = C._tamO(khac);
+  C._chamXem(xk, yk);
+  ok('chạm ô không có chấm: đặt quân vào đó luôn', C._xem().c === khac && !C._xem().truot);
+  C._chonXemQuan(LO.TOT);
+  const e2 = o(TRANG, 'e', 2);
+  ok('chọn Tốt: ở e2, tiến được 2 ô, kể cả ô ăn chéo (tô đỏ)', C._xem().c === e2 && luot().includes(`tiến được 2 ô, ăn chéo ${L.TOT_AN[TRANG][e2].length} ô`), luot());
+  C._veCanh(1e12);
+  ok('vẽ bàn lúc đang xem không lỗi', true);
+  bam('.cb-xong');
+  ok('bấm Xong: về lại bảng Cách chơi, nút của ván hiện lại', !C._xem() && !tam.querySelector('.cb-tin').hidden && /Cách chơi/.test(tam.querySelector('.cb-tin').querySelector('.cb-tin-trong').innerHTML) &&
+     tam.querySelector('.cb-xong').hidden && !tam.querySelector('.cb-moi').hidden && tam.querySelector('.cb-xem').hidden);
+  /* ván vẫn chạy phía sau lúc đang xem: nước máy đi tới là áp ngay, khỏi kẹt chờ hình động */
+  {
+    const v = C._van(), truoc = v.soNuoc;
+    C._thucHien(L.nuocHopLe(v.the, TRANG)[0], TRANG); C._xongHoat();
+    bam('.cb-xemquan', { tu: 'huongdan' });
+    for (let i = 0; i < 120 && !(v.the.luot === TRANG && v.dangNghi < 0 && !C._hoat()); i++) { await cho(50); C._veCanh(performance.now()); }
+    ok('đang xem cách đi mà hai máy đi: nước máy áp ngay, tới lượt bạn như thường', v.soNuoc === truoc + 3 && v.the.luot === TRANG && !C._hoat() && !!C._xem(), `${v.soNuoc - truoc} nước`);
+    bam('.cb-xong'); bam('.cb-dongtin');
+  }
+  /* trong ván: chưa tới lượt, hay chạm quân nhà khác — chỉ xem quân đó đi được đâu, chạm chấm không đi */
+  {
+    C._canhBan(); C._datXoay(C._GOC_NHIN[TRANG]);
+    const v = C._van(), maDen = [...Array(96).keys()].find(c => v.the.o[c] === DEN * 8 + LO.MA), [xq, yq] = C._tamO(maDen);
+    C._chamBan(xq, yq);
+    const mong = L.nuocHopLe(v.the, DEN).filter(n => n.tu === maDen).map(n => n.toi).sort().join();
+    ok('tới lượt mình mà chạm mã Đen: chỉ xem — đúng các nước mã đó đi được, có báo "chỉ xem"',
+       C._chon() === maDen && C._chonXem() && !!mong && C._nuocCuaChon().map(n => n.toi).sort().join() === mong && /Mã đen của Hổ: \d+ nước đi được \(chỉ xem\)/.test(chuBao()), chuBao());
+    const truocThe = Array.from(v.the.o).join(), oTrong = C._nuocCuaChon().find(n => !v.the.o[n.toi]);
+    if (oTrong) { const [xx, yy] = C._tamO(oTrong.toi); C._chamBan(xx, yy); }
+    ok('chạm chấm của quân đang xem: không đi, thế cờ giữ nguyên, thôi chọn', !!oTrong && !C._hoat() && Array.from(v.the.o).join() === truocThe && C._chon() === -1);
+    const maTrang = [...Array(96).keys()].find(c => v.the.o[c] === TRANG * 8 + LO.MA && L.nuocHopLe(v.the, TRANG).some(n => n.tu === c)), [xw, yw] = C._tamO(maTrang);
+    C._chamBan(xw, yw);
+    ok('chạm quân mình lúc tới lượt: chọn để đi như cũ', C._chon() === maTrang && !C._chonXem() && C._nuocCuaChon().length > 0);
+    const di = C._nuocCuaChon()[0];
+    C._thucHien(di, TRANG); C._xongHoat();
+    const [xw2, yw2] = C._tamO(di.toi);
+    C._chamBan(xw2, yw2);
+    ok('chưa tới lượt (máy đang nghĩ): chạm quân mình thì chỉ xem, báo chưa tới lượt bạn', C._chon() === di.toi && C._chonXem() && /chưa tới lượt bạn/.test(chuBao()), chuBao());
+    await choTaiNguoi();
+    ok('máy đi xong thì thôi xem (thế cờ đã đổi)', C._chon() === -1 && !C._chonXem());
+  }
+  /* quân đã mất: ghi cho nhà đang cầm quân lúc bị ăn; quân mình bị ăn thì có lời báo; chạm thẻ thì báo bằng chữ */
+  C._vanMoi({ mau: TRANG, kho: 0 });
+  await choTaiNguoi();
+  Object.assign(C._van().the, theTrong([[o(TRANG, 'e', 1), TRANG, LO.VUA], [o(DO, 'e', 1), DO, LO.VUA], [o(DEN, 'e', 1), DEN, LO.VUA],
+    [o(TRANG, 'a', 3), TRANG, LO.MA], [o(TRANG, 'a', 1), DEN, LO.XE]], DEN));
+  C._thucHien(L.nuocHopLe(C._van().the, DEN).find(m => m.tu === o(TRANG, 'a', 1) && m.toi === o(TRANG, 'a', 3)), DEN); C._xongHoat();
+  ok('Hổ ăn mã của bạn: thẻ của bạn ghi mất một mã, có lời báo', JSON.stringify(C._van().mat) === JSON.stringify([[TRANG * 8 + LO.MA], [], []]) && chuBao() === 'Hổ ăn mã của bạn.', chuBao());
+  /* lời báo và câu nói của máy cùng nằm trên đầu bàn: có lời báo thì bong bóng tắt, và câu nói tới sau thì đợi báo tắt */
+  {
+    const noi = tam.querySelector('.cb-noi');
+    noi.hidden = false; C._bam({ target: { closest: (s) => (s === '.cb-the' ? { dataset: { p: '0' } } : null) } });
+    const tatKhiBao = noi.hidden;
+    const r0 = Math.random; Math.random = () => 0;
+    C._noi(DEN, 'an');
+    Math.random = r0;
+    await cho(40);
+    const doiBao = noi.hidden;
+    tam.querySelector('.cb-bao').hidden = true;
+    await cho(400);
+    ok('có lời báo thì bong bóng lời nói của máy tắt; câu nói tới lúc đang báo thì đợi báo tắt mới hiện', tatKhiBao && doiBao && !noi.hidden);
+  }
+  bam('.cb-the', { p: String(TRANG) });
+  const baoTrang = chuBao();
+  bam('.cb-the', { p: String(DO) });
+  ok('chạm thẻ: báo bằng chữ quân đã mất; nhà chưa mất gì thì nói chưa mất', baoTrang === 'Bạn (Trắng) đã mất: mã.' && chuBao() === 'Rùa (Đỏ) chưa mất quân nào.', `${baoTrang} | ${chuBao()}`);
+  C._vanMoi({ mau: TRANG, kho: 0 });
+  await choTaiNguoi();
+  Object.assign(C._van().the, theTrong([[o(TRANG, 'e', 1), TRANG, LO.VUA], [o(DO, 'e', 1), DO, LO.VUA], [o(DEN, 'e', 1), DEN, LO.VUA],
+    [o(TRANG, 'd', 1), TRANG, LO.HAU], [o(TRANG, 'd', 3), DEN, LO.TOT]], TRANG));
+  C._thucHien(L.nuocHopLe(C._van().the, TRANG).find(m => m.tu === o(TRANG, 'd', 1) && m.toi === o(TRANG, 'd', 3)), TRANG); C._xongHoat();
+  const sauAn = JSON.stringify(C._van().mat[DEN]);
+  await choTaiNguoi();
+  C._hoanTac(); await choTaiNguoi();
+  ok('bạn ăn tốt Đen rồi hoàn tác: quân đã mất cũng lùi về', sauAn === JSON.stringify([DEN * 8 + LO.TOT]) && C._van().mat.every(a => !a.length), JSON.stringify(C._van().mat));
+  /* Tam quốc: bị chiếu hết thì vua bị bắt khỏi bàn — cũng là mất vua; hàng chọn quân có thêm Tướng */
+  C._vanMoi({ mau: TRANG, kho: 0, luat: 'tq' });
+  await choTaiNguoi();
+  Object.assign(C._van().the, tq2([[o(TRANG, 'e', 1), TRANG, LO.VUA], [o(DO, 'e', 1), DO, LO.VUA], [o(DEN, 'h', 1), DEN, LO.VUA], [o(DEN, 'a', 2), DEN, LO.TOT],
+    [o(DEN, 'h', 4), DO, LO.XE], [o(DEN, 'h', 2), TRANG, LO.MA], [o(DEN, 'g', 3), TRANG, LO.XE]], TRANG));
+  C._thucHien(L.nuocHopLe(C._van().the, TRANG).find(m => m.tu === o(DEN, 'h', 2)), TRANG); C._xongHoat();
+  ok('Tam quốc: Đen bị chiếu hết, vua bị bắt khỏi bàn — Đen ghi mất vua', C._van().mat[DEN].includes(DEN * 8 + LO.VUA) && !C._van().the.o[o(DEN, 'h', 1)], JSON.stringify(C._van().mat));
+  bam('.cb-xemquan', { tu: 'huongdan' });
+  const coTuong = tam.querySelector('.cb-xem').innerHTML.includes('data-xq="7"');
+  C._chonXemQuan(LO.TG);
+  ok('ván Tam quốc: hàng chọn quân có Tướng, tướng ở d4 đi như vua', coTuong && C._xem().loai === LO.TG && luot().includes(`đi được ${B.VUA[o(TRANG, 'd', 4)].length} ô`), luot());
+  bam('.cb-xong'); bam('.cb-dongtin');
   C.dong();
 }
 

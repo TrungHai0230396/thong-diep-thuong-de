@@ -1307,9 +1307,10 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .cb-the.cb-loai{opacity:.45}
 .cb-canh{position:relative;flex:1 1 0;min-height:200px;overflow:hidden}
 .cb-cv{position:absolute;inset:0;display:block;touch-action:none}
-.cb-bao{position:absolute;left:50%;top:8px;z-index:3;transform:translateX(-50%);width:max-content;max-width:88%;margin:0;padding:8px 14px;border-radius:12px;
+.cb-bao{position:absolute;left:50%;top:8px;z-index:10;transform:translateX(-50%);width:max-content;max-width:88%;margin:0;padding:8px 14px;border-radius:12px;
   background:rgba(20,18,50,.92);border:1px solid rgba(255,214,120,.4);font-size:13.5px;line-height:1.45;text-align:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.45)}
 .cb-bao[hidden]{display:none}
+.coba.cb-co-tin .cb-bao{position:fixed;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}
 /* lời nói của máy: bong bóng dưới thẻ tên */
 .cb-noi{position:absolute;z-index:6;width:140px;margin:0;padding:7px 10px;border-radius:12px;background:#fff8e6;color:#3b2a12;font-size:13px;line-height:1.35;
   text-align:center;box-shadow:0 6px 16px rgba(0,0,0,.4);cursor:pointer}
@@ -1322,6 +1323,16 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
   font:inherit;font-size:15px;cursor:pointer}
 .cb-nut button[hidden]{display:none}
 .cb-nut button:disabled{opacity:.35}
+/* quân đã mất: một hàng hình quân nhỏ trong thẻ mỗi nhà; chạm thẻ thì báo bằng chữ */
+.cb-the{cursor:pointer}
+.cb-mat{grid-column:1/-1;display:block;width:100%;height:17px;margin-top:3px}
+.cb-mat[hidden]{display:none}
+/* xem cách đi từng quân: hàng chọn loại quân ở thanh dưới */
+.cb-xem{display:flex;gap:6px;margin:0 0 10px}
+.cb-xem[hidden]{display:none}
+.cb-xem button{flex:1;min-width:0;height:40px;padding:0 2px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
+  color:#eef1ff;font:inherit;font-size:13.5px;cursor:pointer}
+.cb-xem button.cb-bat{border-color:#ffd77a;background:rgba(255,215,120,.18);color:#ffe6a6;font-weight:600}
 .cb-tin{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,5,18,.72)}
 .cb-tin[hidden]{display:none}
 .cb-tin-trong{width:100%;max-width:420px;max-height:88vh;overflow:auto;padding:22px 20px;border-radius:20px;background:linear-gradient(#22204a,#17153a);
@@ -1385,6 +1396,11 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .cb-batdau-phong small{display:block;font-size:12.5px;font-weight:500;opacity:.78}
 .cb-tin button + .cb-meo{margin-top:12px}
 .cb-tin button.cb-vaochoi{display:flex;align-items:center;justify-content:center;gap:10px}
+/* Gửi link mời cạnh Chép link */
+.cb-hai{display:flex;gap:8px;margin-top:10px}
+.cb-tin .cb-hai button{flex:1;min-width:0;margin-top:0}
+.cb-tin .cb-hai button.cb-chep-link{flex:0 0 38%}
+.cb-o-link{margin:4px 0 2px;font-size:13px;-webkit-user-select:text;user-select:text}
 .cb-vaochoi i{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
 .cb-o-ma-to{width:100%;height:56px;font-size:24px;text-align:center;letter-spacing:.22em}
 @media (max-height:600px){
@@ -1393,4 +1409,5 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
   .cb-the{padding:4px 8px}
   .cb-duoi{padding:4px 14px 8px}
   .cb-nut button{height:38px}
+  .cb-xem button{height:34px}
 }

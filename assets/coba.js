@@ -594,6 +594,8 @@ const ghiLuu = (them) => { try { localStorage.setItem(KHOA, JSON.stringify(Objec
 let tam = null, cv = null, ctx = null, W = 360, H = 420, DPR = 1, raf = 0;
 let van = null;                                                       // ván đang chơi
 let chon = -1, nuocCuaChon = [], hoat = null, cho = [], xoay = 0, xoayDen = 0, demo = null, phongCho = null;
+let chonXem = false;                                                  // quân đang chọn chỉ để xem (chưa tới lượt mình, hay quân nhà khác)
+let xem = null;                                                       // đang xem cách đi từng quân trên bàn trống
 let coTieng = true, am = null;
 
 /* ---------- hình bàn ----------
@@ -672,7 +674,7 @@ function veBan(t) {
   for (let P = 0; P < 3; P++) {
     const a = DINH[2 * P], b = DINH[2 * P + 1];
     duongDa([[a[0] * 1.065, a[1] * 1.065], [b[0] * 1.065, b[1] * 1.065], [b[0] * 1.012, b[1] * 1.012], [a[0] * 1.012, a[1] * 1.012]]);
-    ctx.fillStyle = van && !van.the.song[P] ? '#6d6a64' : MAU[P].giua; ctx.fill();
+    ctx.fillStyle = van && !xem && !van.the.song[P] ? '#6d6a64' : MAU[P].giua; ctx.fill();
   }
   for (let c = 0; c < 96; c++) {
     const toi = (L.cotO(c) + L.hangO(c)) & 1;
@@ -746,7 +748,7 @@ function vePhan(loai, x, y, s, m, da, goc) {
   ctx.restore();
 }
 function veQuan(x, c, toa, tiLe = 1, mo = 1) {
-  const D = x >> 3, loai = x & 7, P = !demo && van ? van.the.chu[D] : D, da = !demo && van && !van.the.song[P];
+  const D = x >> 3, loai = x & 7, thuc = !demo && !xem && van, P = thuc ? van.the.chu[D] : D, da = thuc && !van.the.song[P];
   const s = Math.max(15, Math.min(54, coO(c) * 2.15)) * tiLe;
   ctx.globalAlpha = mo;
   vePhan(loai, toa[0], toa[1] + s * .38, s, da ? DA : MAU[P], da, !da && P !== D ? MAU[D] : null);
@@ -766,6 +768,10 @@ function veCanh(t) {
   veNen();
   canhBan();
   veBan(t);
+  if (xem) {
+    if (hoat) { const f = hoat.xong; hoat = null; f(); }              // ván vẫn chạy phía sau: nước mới áp ngay, khỏi chờ hình động
+    veXem(t); return;
+  }
   if (demo) { veDemo(t); return; }
   if (!van) return;
   const the = van.the;
@@ -775,7 +781,7 @@ function veCanh(t) {
     const moi = i === vet.length - 1, m = MUI[v.P].o;
     toO(v.duong[0], `rgba(${m},${moi ? .28 : .15})`); toO(v.duong[v.duong.length - 1], `rgba(${m},${moi ? .46 : .26})`);
   });
-  if (chon >= 0) toO(chon, 'rgba(120,200,255,.45)');
+  if (chon >= 0) toO(chon, chonXem ? 'rgba(205,150,255,.42)' : 'rgba(120,200,255,.45)');
   const nguoiXem = nhaNhin();
   const bao = nguoiXem >= 0 && the.song[nguoiXem] && the.thang < 0 ? L.aiChieu(the, nguoiXem) : [];
   if (bao.length) {
@@ -808,16 +814,7 @@ function veCanh(t) {
   }
   for (const d of bao) veDuongDo(d.duong, t);
   if (chon >= 0 && nuocCuaChon.length) veDuongChon(the);
-  for (const m of nuocCuaChon) {                                     // chỗ đi được: chấm trắng viền xanh, ăn quân thì vòng đỏ
-    const [x, y] = tamO(m.toi), r = coO(m.toi);
-    if (the.o[m.toi]) {
-      ctx.lineWidth = Math.max(3, r * .2) + 3; ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.beginPath(); ctx.arc(x, y, r * .82, 0, 6.2832); ctx.stroke();
-      ctx.lineWidth = Math.max(3, r * .2); ctx.strokeStyle = 'rgba(215,40,30,.95)'; ctx.stroke();
-    } else {
-      ctx.beginPath(); ctx.arc(x, y, Math.max(4.5, r * .3), 0, 6.2832);
-      ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(20,120,175,.95)'; ctx.stroke();
-    }
-  }
+  veCham(the, nuocCuaChon, chonXem ? 'xem' : 'di');
   if (hoat) veHoat(t);
 }
 /* màu mũi tên từng nhà (ruột, viền) và màu tô ô: chọn cho nổi trên gỗ sáng lẫn gỗ tối */
@@ -856,18 +853,36 @@ function veMuiTen(v, mo) {
   ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], w * .9, 0, 6.2832); ctx.fillStyle = c.ruot; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = c.vien; ctx.stroke();
   ctx.restore();
 }
-/* quân đang chọn: vẽ mọi đường nó đi được, uốn đúng theo bàn (đi qua tâm thì rẽ nhánh) — khỏi phải tự hình dung */
+/* quân đang chọn: vẽ mọi đường nó đi được, uốn đúng theo bàn (đi qua tâm thì rẽ nhánh) — khỏi phải tự hình dung. Xanh là
+   quân mình đang đi; tím là chỉ xem (chưa tới lượt mình, hay quân nhà khác) */
+const MAU_DUONG = { di: ['rgba(10,35,60,.45)', 'rgba(110,215,255,.9)', 'rgba(20,120,175,.95)'], xem: ['rgba(45,20,70,.5)', 'rgba(215,165,255,.92)', 'rgba(130,70,190,.95)'] };
 let duongChon = { c: -1, n: null, ds: [] };
 function veDuongChon(the) {
   if (duongChon.c !== chon || duongChon.n !== nuocCuaChon) duongChon = { c: chon, n: nuocCuaChon, ds: nuocCuaChon.map(m => L.duongDi(the, m)) };
-  const w = Math.max(2.5, ban.R * .016);
+  veDuong(duongChon.ds, chonXem ? 'xem' : 'di');
+}
+function veDuong(ds, kieu) {
+  const w = Math.max(2.5, ban.R * .016), m = MAU_DUONG[kieu];
   ctx.save();
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  for (const [nen, rong] of [['rgba(10,35,60,.45)', w + 3], ['rgba(110,215,255,.9)', w]]) {
+  for (const [nen, rong] of [[m[0], w + 3], [m[1], w]]) {
     ctx.strokeStyle = nen; ctx.lineWidth = rong;
-    for (const d of duongChon.ds) { const pts = d.map(tamO); ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); }
+    for (const d of ds) { const pts = d.map(tamO); ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); }
   }
   ctx.restore();
+}
+/* chỗ đi được: chấm trắng viền xanh (tím nếu chỉ xem), ăn quân thì vòng đỏ */
+function veCham(the, ds, kieu) {
+  for (const m of ds) {
+    const [x, y] = tamO(m.toi), r = coO(m.toi);
+    if (the.o[m.toi]) {
+      ctx.lineWidth = Math.max(3, r * .2) + 3; ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.beginPath(); ctx.arc(x, y, r * .82, 0, 6.2832); ctx.stroke();
+      ctx.lineWidth = Math.max(3, r * .2); ctx.strokeStyle = 'rgba(215,40,30,.95)'; ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(x, y, Math.max(4.5, r * .3), 0, 6.2832);
+      ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = MAU_DUONG[kieu][2]; ctx.stroke();
+    }
+  }
 }
 function nhaNhin() {                                                  // nhà đang được nhìn từ phía dưới bàn
   if (!van) return 0;
@@ -875,18 +890,21 @@ function nhaNhin() {                                                  // nhà đ
 }
 
 /* ---------- trượt quân theo đường đi (cong qua tâm) ---------- */
+/* chỗ quân tới khi đã đi được phần e của cả đường: toạ độ màn hình, và ô đang đi qua (để lấy cỡ quân) */
+function diemTrenDuong(duong, e) {
+  const pts = duong.map(tamO);
+  let tong = 0; const doan = [];
+  for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); doan.push(d); tong += d; }
+  let can = e * tong, i = 0;
+  while (i < doan.length - 1 && can > doan[i]) { can -= doan[i]; i++; }
+  const k = doan.length ? Math.min(1, can / (doan[i] || 1)) : 1, a = pts[i] || pts[0], b = pts[i + 1] || pts[0];
+  return [tron(a[0], b[0], k), tron(a[1], b[1], k), duong[Math.min(duong.length - 1, Math.round(e * (duong.length - 1)))]];
+}
 function veHoat(t) {
   const h = hoat, p = Math.min(1, (t - h.t0) / h.lau), e = p * p * (3 - 2 * p);
   for (const q of h.quan) {
-    const pts = q.duong.map(tamO);
-    let tong = 0; const doan = [];
-    for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); doan.push(d); tong += d; }
-    let can = e * tong, i = 0;
-    while (i < doan.length - 1 && can > doan[i]) { can -= doan[i]; i++; }
-    const k = doan.length ? Math.min(1, can / (doan[i] || 1)) : 1, a = pts[i] || pts[0], b = pts[i + 1] || pts[0];
-    const x = tron(a[0], b[0], k), y = tron(a[1], b[1], k) - (q.nhay ? Math.sin(e * Math.PI) * coO(q.duong[0]) * 1.2 : 0);
-    const c = q.duong[Math.min(q.duong.length - 1, Math.round(e * (q.duong.length - 1)))];
-    veQuan(q.x, c, [x, y], q.nhay ? 1 + Math.sin(e * Math.PI) * .12 : 1);
+    const [x, y, c] = diemTrenDuong(q.duong, e), nhay = q.nhay ? Math.sin(e * Math.PI) : 0;
+    veQuan(q.x, c, [x, y - nhay * coO(q.duong[0]) * 1.2], 1 + nhay * .12);
   }
   if (h.anX) veQuan(h.anX, h.an, tamO(h.an), 1, 1 - e);
   if (p >= 1) { const f = h.xong; hoat = null; f(); }
@@ -895,6 +913,7 @@ function veHoat(t) {
 /* ---------- ván cờ ---------- */
 function vanMoi(ch) {
   ch = Object.assign({ mau: 0, kho: 1, luat: 'thuong' }, ch || {});
+  tatXem();
   roiPhong();                                                         // đấu với máy thì rời phòng đang ở (nếu có)
   boViec();
   const nguoi = [0, 1, 2].map(P => (P === ch.mau ? 'nguoi' : 'may'));
@@ -902,8 +921,8 @@ function vanMoi(ch) {
   const tinh = [null, null, null];
   const sauNguoi = (P) => { const i = L.THU_TU.indexOf(P); return [1, 2].map(k => L.THU_TU[(i + k) % 3]); };
   const [a, b] = sauNguoi(ch.mau); tinh[a] = 'ho'; tinh[b] = 'rua';
-  van = { the: L.theMoi(ch.luat), luat: ch.luat === 'tq' ? 'tq' : 'thuong', cheDo: 'may', nguoi, tinh, kho: ch.kho, nguoiChoi: ch.mau, lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: false };
-  chon = -1; nuocCuaChon = []; hoat = null; phongCho = null;
+  van = { the: L.theMoi(ch.luat), luat: ch.luat === 'tq' ? 'tq' : 'thuong', cheDo: 'may', nguoi, tinh, kho: ch.kho, nguoiChoi: ch.mau, lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], mat: [[], [], []], soNuoc: 0, xemTiep: false };
+  boChon(); hoat = null; phongCho = null;
   xoay = xoayDen = GOC_NHIN[nhaNhin()];
   tatTin(); capNhatChu();
   for (const P of may) noi(P, 'batDau', 1, 400 + 900 * may.indexOf(P));
@@ -939,7 +958,7 @@ function denLuot() {
     if (!laNguoi(P) && van.dangNghi < 0 && phong && phong.nghiO !== phong.ke && toiChayMay()) { phong.nghiO = phong.ke; nhoMayNghi(P); }
     return;
   }
-  if (laNguoi(P)) { van.lichSu.push({ the: L.chepThe(the), nuocCuoi: van.nuocCuoi, vet: (van.vet || []).slice(), an: van.an.slice() }); capNhatChu(); return; }
+  if (laNguoi(P)) { van.lichSu.push({ the: L.chepThe(the), nuocCuoi: van.nuocCuoi, vet: (van.vet || []).slice(), an: van.an.slice(), mat: van.mat.map(a => a.slice()) }); capNhatChu(); return; }
   if (!the.song[van.nguoiChoi] && !van.xemTiep) return;               // bạn bị loại: chờ chọn xem tiếp hay ván mới
   nhoMayNghi(P);
 }
@@ -949,7 +968,7 @@ function thucHien(m, P) {
   const the = van.the;
   if (the.luot !== P || the.thang >= 0 || the.hoa) return;
   if (m.tu === m.toi) {                                              // phong tướng: không trượt, sáng lên một nhịp
-    chon = -1; nuocCuaChon = [];
+    boChon();
     const ev = apDung(m, P);
     van.loe = { c: m.tu, t0: bay() };
     tiengPhong(); baoSuKien(ev);
@@ -960,12 +979,13 @@ function thucHien(m, P) {
   const x = the.o[m.tu], an = the.o[m.toi], chuAn = an ? the.chu[an >> 3] : -1, duong = L.duongDi(the, m);
   const quan = [{ x, duong, nhay: (x & 7) === 2 }];
   if (m.nhap) { const r = the.o[L.oCua(P, m.nhap === 1 ? 7 : 0, 1)]; quan.push({ x: r, duong: [L.oCua(P, m.nhap === 1 ? 7 : 0, 1), L.oCua(P, m.nhap === 1 ? 5 : 3, 1)] }); }
-  chon = -1; nuocCuaChon = [];
+  boChon();
   const lau = Math.min(900, 180 + duong.length * 70);
   hoat = { quan, dau: quan.map(q => q.duong[0]), an: an ? m.toi : -1, anX: an, t0: bay(), lau, xong: () => {
     const ev = apDung(m, P);
     tiengDi(!!an);
     noiVeNuoc(P, an, ev, chuAn);
+    if (an && chuAn === van.nguoiChoi && chuAn !== P && (an & 7) !== L.LOAI.VUA && (an & 7) !== L.LOAI.TG) bao(`${tenNha(P)} ăn ${TEN_LOAI[an & 7].toLowerCase()} của bạn.`);
     baoSuKien(ev);
     denLuot();
   } };
@@ -973,13 +993,19 @@ function thucHien(m, P) {
 }
 /* phần còn lại của một nước, lúc quân tới nơi — hay áp ngay không trượt, khi đuổi kịp ván qua mạng */
 function apDung(m, P) {
-  const the = van.the, an = the.o[m.toi], duong = L.duongDi(the, m), ma = (the.o[m.tu] & 7) === L.LOAI.MA;
+  /* phong tướng (ô đi = ô đến) không ăn quân nào — bản trước tính nhầm thành ăn chính quân vừa phong, cộng điểm sai */
+  const the = van.the, an = m.tu !== m.toi ? the.o[m.toi] : 0, chuAn = an ? the.chu[an >> 3] : -1, duong = L.duongDi(the, m), ma = (the.o[m.tu] & 7) === L.LOAI.MA;
   const lui = L.diNuoc(the, m);
   van.nuocCuoi = { tu: m.tu, toi: m.toi }; van.soNuoc++;
   if (!van.vet) van.vet = [null, null, null];
+  if (!van.mat) van.mat = [[], [], []];
   if (m.tu !== m.toi) van.vet[P] = { duong, ma, thu: van.soNuoc };      // mũi tên nước vừa đi của nhà này (phong tướng thì không)
-  if (an) van.an[P] += L.GIA[an & 7] || 0;
-  return L.sauNuoc(the, lui);
+  if (an) { van.an[P] += L.GIA[an & 7] || 0; van.mat[chuAn].push(an); } // quân mất ghi cho nhà đang cầm quân đó
+  const vuaCu = the.vua.slice(), ev = L.sauNuoc(the, lui);
+  /* Tam quốc: bị chiếu hết thì vua bị bắt khỏi bàn — cũng là mất vua */
+  for (const e of ev) if (e.loai === 'chieuhet' && vuaCu[e.bi] >= 0 && the.o[vuaCu[e.bi]] !== e.bi * 8 + L.LOAI.VUA) van.mat[e.bi].push(e.bi * 8 + L.LOAI.VUA);
+  if (chonXem) boChon();                                              // thế cờ đã đổi: thôi xem nước của quân vừa chọn
+  return ev;
 }
 const bay = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 
@@ -1002,10 +1028,12 @@ function noiVeNuoc(P, an, ev, chuAn = an ? an >> 3 : -1) {
     if (e.loai === 'thang' && van.tinh[e.ai]) noi(e.ai, 'thang', 1, 500);
   }
 }
-function hienNoi(P, cau) {
+function hienNoi(P, cau, doi = 0) {
   if (!tam) return;
-  const the_ = tam.querySelector(`.cb-the[data-p="${P}"]`), b = tam.querySelector('.cb-noi');
+  const the_ = tam.querySelector(`.cb-the[data-p="${P}"]`), b = tam.querySelector('.cb-noi'), bao_ = tam.querySelector('.cb-bao');
   if (!the_ || !b) return;
+  /* đang có lời báo (cùng chỗ trên đầu bàn, như "Hổ ăn mã của bạn"): đợi báo tắt rồi mới nói, khỏi che mất lời báo */
+  if (bao_ && !bao_.hidden && doi < 12) { setTimeout(() => hienNoi(P, cau, doi + 1), 300); return; }
   const r = the_.getBoundingClientRect(), g = tam.getBoundingClientRect();
   b.textContent = cau; b.hidden = false;
   b.style.left = Math.max(8, Math.min(g.width - 180, r.left - g.left + r.width / 2 - 70)) + 'px';
@@ -1034,8 +1062,9 @@ function baoSuKien(ev) {
   }
 }
 function bao(chu) {
-  const p = tam && tam.querySelector('.cb-bao');
+  const p = tam && tam.querySelector('.cb-bao'), n = tam && tam.querySelector('.cb-noi');
   if (!p) return;
+  if (n) n.hidden = true;                                             // lời báo cần đọc hơn câu nói của máy: tắt bong bóng cho khỏi che
   p.textContent = chu; p.hidden = false;
   clearTimeout(bao.t); bao.t = setTimeout(() => { p.hidden = true; }, 3200);
 }
@@ -1060,6 +1089,8 @@ function capNhatChu() {
     n.classList.toggle('cb-loai', !the.song[P]);
     n.classList.toggle('cb-chieu', the.song[P] && L.biChieu(the, P));
   }
+  veMat();
+  if (xem) return;                                                    // đang xem cách đi từng quân: thanh dưới là của bảng xem
   const l = tam.querySelector('.cb-luot'), P = the.luot;
   if (the.thang >= 0) l.textContent = `${tenNha(the.thang)} thắng!`;
   else if (the.hoa) l.textContent = 'Hoà.';
@@ -1081,6 +1112,41 @@ function capNhatChu() {
     ? `Phòng ${van.ma} · ${van.nguoiChoi >= 0 ? `bạn cầm ${TEN_MAU[van.nguoiChoi]}` : 'đang xem'} · máy ${KHO[van.kho].ten.toLowerCase()}`
     : `Bạn cầm ${TEN_MAU[van.nguoiChoi]} · máy ${KHO[van.kho].ten.toLowerCase()}`) + (the.tq ? ' · Tam quốc' : '');
 }
+/* quân đã mất của từng nhà (người dùng: "cho biết quân mình bị mất con nào nữa"): ghi lúc bị ăn, cho nhà đang cầm quân
+   đó; thẻ mỗi nhà vẽ một hàng hình quân nhỏ, quân quý trước, cùng loại thì xếp chồng. Chạm thẻ thì báo bằng chữ. */
+const THU_MAT = [6, 7, 5, 4, 3, 2, 1];
+const xepMat = (ds) => ds.slice().sort((a, b) => THU_MAT.indexOf(a & 7) - THU_MAT.indexOf(b & 7) || (a >> 3) - (b >> 3));
+function veMat() {
+  if (!tam) return;
+  for (const P of L.THU_TU) {
+    const k = tam.querySelector(`.cb-the[data-p="${P}"] .cb-mat`);
+    if (!k) continue;
+    const ds = van && van.mat ? xepMat(van.mat[P]) : null;
+    k.hidden = !ds;
+    const w = ds ? k.clientWidth || 0 : 0, h = ds ? k.clientHeight || 0 : 0;
+    if (!w || !h || !k.getContext) continue;
+    if (k.width !== Math.round(w * DPR)) k.width = Math.round(w * DPR);
+    if (k.height !== Math.round(h * DPR)) k.height = Math.round(h * DPR);
+    const c2 = k.getContext('2d');
+    c2.setTransform(DPR, 0, 0, DPR, 0, 0); c2.clearRect(0, 0, w, h);
+    if (!ds.length) continue;
+    const s = h - 1, xs = [];
+    let x = s * .42;
+    ds.forEach((q, i) => { if (i) x += ((q & 7) === (ds[i - 1] & 7) ? .4 : .72) * s; xs.push(x); });
+    const ep = xs.length > 1 && xs[xs.length - 1] + s * .42 > w ? (w - s * .84) / (xs[xs.length - 1] - xs[0]) : 1;
+    const cu = ctx;
+    ctx = c2;
+    ds.forEach((q, i) => vePhan(q & 7, xs[0] + (xs[i] - xs[0]) * ep, h - 1.5, s, MAU[P], false, (q >> 3) !== P ? MAU[q >> 3] : null));
+    ctx = cu;
+  }
+}
+function baoMat(P) {
+  if (!van || !van.mat) return;
+  const ds = xepMat(van.mat[P]), dem = {};
+  for (const x of ds) dem[x & 7] = (dem[x & 7] || 0) + 1;
+  const chu = THU_MAT.filter(l => dem[l]).map(l => `${dem[l] > 1 ? dem[l] + ' ' : ''}${TEN_LOAI[l].toLowerCase()}`).join(', ');
+  bao(`${tenNha(P)} (${TEN_MAU[P]}) ${chu ? 'đã mất: ' + chu : 'chưa mất quân nào'}.`);
+}
 /* hoàn tác: về đầu lượt trước của bạn (bỏ luôn hai nước máy đi sau đó) */
 /* ảnh chụp ở đầu mỗi lượt của bạn: tới lượt bạn thì cái cuối là lượt hiện tại, cần thêm một cái trước đó mới hoàn tác được */
 const coTheHoan = () => !!van && van.cheDo === 'may' && van.lichSu.length >= (laNguoi(van.the.luot) && van.dangNghi < 0 ? 2 : 1);
@@ -1091,43 +1157,60 @@ function hoanTac() {
   const s = van.lichSu.pop();
   if (!s) return;
   van.the = L.chepThe(s.the); van.nuocCuoi = s.nuocCuoi; van.vet = (s.vet || [null, null, null]).slice(); van.an = s.an.slice(); van.soNuoc = Math.max(0, van.soNuoc - 3); van.hetVan = false;
-  chon = -1; nuocCuaChon = [];
+  van.mat = (s.mat || [[], [], []]).map(a => a.slice());
+  boChon();
   tatTin();
   denLuot();
 }
 
-/* ---------- chạm vào bàn ---------- */
+/* ---------- chạm vào bàn ----------
+   Tới lượt mình: chạm quân mình để chọn — mọi đạo quân mình đang giữ, cả đạo quân vừa chiếm ở luật Tam quốc — rồi chạm
+   chấm để đi. Chưa tới lượt, hay chạm quân nhà khác: chỉ xem quân đó đi được đâu (người dùng: "trong lúc chờ cho nhấn để
+   xem nước đi từng con") — vẽ màu tím, chạm chấm không đi. */
+function boChon() { chon = -1; nuocCuaChon = []; chonXem = false; }
 function chamBan(px, py) {
   if (!van || hoat || demo) return;
   const the = van.the, P = the.luot;
-  if (the.thang >= 0 || the.hoa || !laMinh(P) || van.dangNghi >= 0) return;
-  if (the.cho && the.cho.length) {                                   // Tam quốc: chạm một quân của đạo quân vừa chiếm để phong tướng
+  const toiMinh = the.thang < 0 && !the.hoa && laMinh(P) && van.dangNghi < 0;
+  if (toiMinh && the.cho && the.cho.length) {                         // Tam quốc: chạm một quân của đạo quân vừa chiếm để phong tướng
     const c = oTai(px, py), x = c >= 0 ? the.o[c] : 0;
     if (x && (x >> 3) === the.cho[0].dao) diNuoc({ tu: c, toi: c, phong: 0, nhap: 0 }, P);
     else bao(`Chạm một quân ${TEN_MAU[the.cho[0].dao].toLowerCase()} (vòng vàng) để phong làm tướng.`);
     return;
   }
+  const cuaMinh = (o) => o >= 0 && !!the.o[o] && the.chu[the.o[o] >> 3] === P;
   let c = oTai(px, py);
   /* chạm hơi lệch ô đích (ô rìa nhỏ): bắt vào chấm gần nhất trong tầm */
-  if (chon >= 0 && (c < 0 || !nuocCuaChon.some(m => m.toi === c))) {
+  if (toiMinh && chon >= 0 && !chonXem && (c < 0 || !nuocCuaChon.some(m => m.toi === c))) {
     let tot = -1, gan = Infinity;
     for (const m of nuocCuaChon) { const [x, y] = tamO(m.toi), d = Math.hypot(x - px, y - py); if (d < gan && d < coO(m.toi) * 1.6) { gan = d; tot = m.toi; } }
-    if (tot >= 0 && !(c >= 0 && the.o[c] && (the.o[c] >> 3) === P)) c = tot;
+    if (tot >= 0 && !cuaMinh(c)) c = tot;
   }
-  if (c < 0) { chon = -1; nuocCuaChon = []; return; }
-  const m = nuocCuaChon.find(n => n.toi === c);
-  if (chon >= 0 && m) {
+  if (c < 0) { boChon(); return; }
+  const m = toiMinh && chon >= 0 && !chonXem ? nuocCuaChon.find(n => n.toi === c) : null;
+  if (m) {
     if (m.phong) { hoiPhong(m, P); return; }
     diNuoc(m, P);
     return;
   }
-  if (the.o[c] && (the.o[c] >> 3) === P) {
-    chon = c; nuocCuaChon = L.nuocHopLe(the, P).filter(n => n.tu === c);
+  if (toiMinh && cuaMinh(c)) {
+    chon = c; chonXem = false; nuocCuaChon = L.nuocHopLe(the, P).filter(n => n.tu === c);
     tiengCham();
     if (!nuocCuaChon.length) bao(L.biChieu(the, P) ? 'Quân này không đi được — vua đang bị chiếu, phải chặn hay tránh.' : 'Quân này chưa có đường đi.');
     return;
   }
-  chon = -1; nuocCuaChon = [];
+  if (the.o[c] && !(chonXem && chon === c)) { xemNuocQuan(c); return; }   // chạm lại quân đang xem thì thôi xem
+  boChon();
+}
+/* chỉ xem một quân đi được đâu theo thế cờ lúc này — tới lượt nhà đó thì đi được đúng chừng ấy */
+function xemNuocQuan(c) {
+  const the = van.the, x = the.o[c], Q = the.chu[x >> 3], ten = `${TEN_LOAI[x & 7]} ${TEN_MAU[x >> 3].toLowerCase()}`;
+  const t = the.cho && the.cho.length ? Object.assign(L.chepThe(the), { cho: [] }) : the;
+  chon = c; chonXem = true;
+  nuocCuaChon = the.song[Q] ? L.nuocHopLe(t, Q).filter(n => n.tu === c) : [];
+  tiengCham();
+  if (!the.song[Q]) bao(`${ten} đã hoá đá — nhà ${TEN_MAU[Q]} bị loại, quân này không đi nữa.`);
+  else bao(`${ten} ${Q === van.nguoiChoi ? 'của bạn' : `của ${tenNha(Q)}`}: ${nuocCuaChon.length ? `${nuocCuaChon.length} nước đi được` : 'chưa có đường đi'} (chỉ xem${Q === van.nguoiChoi ? ', chưa tới lượt bạn' : ''}).`);
 }
 function hoiPhong(m, P) {
   phongCho = m;
@@ -1180,7 +1263,8 @@ function vaoPhong(ma, minh, muonNgoi = -1, tuMo = false) {
   const cu = docLuu().cu;
   if (!minh && cu && cu.ma === ma) minh = { id: cu.id, P: cu.P };     // vừa rời phòng (giữa ván, hay phòng chờ) rồi mở lại link: vào lại đúng ghế
   dungLuong();
-  if (van && van.cheDo === 'phong') { boViec(); van = null; hoat = null; }
+  tatXem();
+  if (van && van.cheDo === 'phong') { boViec(); van = null; hoat = null; veMat(); }
   /* nhipCuoi = 0: có ghế sẵn (tải lại trang, mở lại link) thì báo "còn ở đây" ngay lượt kiểm kế (≤5 giây) — dấu giờ trên
      máy chủ có khi đã cũ, đợi đủ 20 giây thì người khác thấy mình vắng, người được mời lại thấy nút Bắt đầu */
   phong = { ma, id: minh ? minh.id : MANG.idMoi(), P: minh ? minh.P : -1, cay: undefined, ke: 0, nhat: [], daGui: null, lech: 0,
@@ -1202,6 +1286,7 @@ function dungLuong() {                               // tạm ngưng nghe (đón
 }
 function roiPhong() {                                // rời hẳn
   if (!phong) return;
+  tatXem();
   const cay = phong.cay, ma = phong.ma;
   dungLuong();
   /* hết ván đủ 5 phút thì dọn phòng (luật chỉ cho xoá lúc đó, hay khi phòng đã quá một ngày) */
@@ -1211,7 +1296,7 @@ function roiPhong() {                                // rời hẳn
   const cu = cay && !cay.xong && phong.P >= 0 ? { ma, id: phong.id, P: phong.P } : undefined;
   phong = null;
   ghiLuu({ phong: undefined, cu });
-  if (van && van.cheDo === 'phong') { boViec(); van = null; hoat = null; chon = -1; nuocCuaChon = []; }
+  if (van && van.cheDo === 'phong') { boViec(); van = null; hoat = null; boChon(); veMat(); }
   if (tam) { tam.querySelector('.cb-moi').textContent = 'Ván mới'; tam.querySelector('.cb-thay').hidden = true; }
   datDiaChi('');
 }
@@ -1266,6 +1351,7 @@ const nutQR = () => (self.TDTD_MAQR ? `<button type="button" class="cb-phu cb-qr
 function veSanh() {
   const cay = phong.cay, minh = phong.P, chu = cay.chu;
   if (minh < 0 && phong.muonNgoi >= 0 && !gheCua(phong.muonNgoi)) { const P = phong.muonNgoi; phong.muonNgoi = -1; ngoiGhe(P); }
+  if (xem) { veSanhKhiXem(); return; }
   const trong = L.THU_TU.filter(P => !gheCua(P)), ban = L.THU_TU.filter(P => gheCua(P) && P !== minh).length;
   const tenChu = gheCua(chu) ? esc(gheCua(chu).ten || TEN_MAU[chu]) : 'Bạn bè';
   let html;
@@ -1274,6 +1360,7 @@ function veSanh() {
       ${trong.length ? `<p class="cb-nhan">Tên của bạn</p><input class="cb-o-ten" maxlength="20" value="${esc(tenMinh())}" placeholder="Để trống thì gọi theo màu quân" autocomplete="nickname">
       <p class="cb-nhan">Chọn quân để vào chơi</p>${trong.map(P => `<button type="button" class="cb-vaochoi" data-ngoi="${P}"><i style="background:${MAU[P].cham}"></i>Vào chơi quân ${TEN_MAU[P]}</button>`).join('')}`
       : '<p class="cb-meo">Phòng đã đủ ba người. Bạn vẫn ở đây xem ván khi bắt đầu.</p>'}
+      ${NUT_XEM_QUAN}
       <p class="cb-meo">Phòng ${phong.ma}</p>
       <button type="button" class="cb-chu cb-roi">Không vào nữa</button>`;
   } else {
@@ -1282,16 +1369,26 @@ function veSanh() {
        lúc người thứ ba chưa kịp vào. Đủ ba người thì thôi nút mời và mã QR. */
     const laChu = minh === chu, chuVang = !laChu && !conO(chu), batDauChinh = laChu && ban > 0;
     const nutBatDau = laChu || chuVang ? `<button type="button" class="${batDauChinh ? '' : 'cb-phu '}cb-batdau-phong">Bắt đầu${trong.length ? `<small>máy chơi thay ${trong.length} ghế trống</small>` : ''}</button>` : '';
-    const nutMoi = trong.length ? `<button type="button" class="${laChu && !ban ? '' : 'cb-phu '}cb-moi-ban">${laChu ? 'Gửi link mời' : 'Mời thêm bạn'}</button>${nutQR()}${khungQR()}` : '';
+    const nutMoi = trong.length ? nutMoiBan(laChu ? 'Gửi link mời' : 'Mời thêm bạn', 'Chép link mời', laChu && !ban) + nutQR() + khungQR() : '';
     const loi = !laChu ? (chuVang ? `${tenChu} đang vắng. Muốn chơi luôn thì bấm Bắt đầu, khỏi chờ.` : `Chờ ${tenChu} bấm Bắt đầu…`)
       : !trong.length ? 'Đủ ba người rồi.'
       : `${ban ? `${ban} bạn đã vào, còn ${trong.length} ghế trống. ` : 'Chưa ai vào. '}Bạn bè mở link, quét mã QR, hay nhập mã ở mục "Vào phòng của bạn".`;
     html = `<p class="cb-tin-nho">Phòng chờ · ${luatChu(cay)}</p>${dongMa()}${hangGhe(cay, minh)}
       <p class="cb-meo">${loi}</p>
       ${batDauChinh ? nutBatDau + nutMoi : nutMoi + nutBatDau}
+      ${NUT_XEM_QUAN}
       <button type="button" class="cb-chu cb-roi">Rời phòng</button>`;
   }
   if (html !== phong.sanhCu || tam.querySelector('.cb-tin').hidden) { phong.sanhCu = html; moTin(html); }
+}
+/* đang xem cách đi từng quân lúc ở phòng chờ: khỏi bật lại bảng mỗi lần phòng đổi — chỉ báo ai vừa vào, và ghi tình hình
+   phòng dưới tên trò */
+const NUT_XEM_QUAN = '<button type="button" class="cb-phu cb-xemquan" data-tu="sanh">Xem cách đi từng quân</button>';
+function veSanhKhiXem() {
+  const cay = phong.cay, co = L.THU_TU.filter(P => gheCua(P)), g = gheCua(cay.chu), tenChu = g ? g.ten || TEN_MAU[cay.chu] : 'chủ phòng';
+  if (xem.ghe) for (const P of co) if (!xem.ghe.includes(P) && P !== phong.P) bao(`${gheCua(P).ten || TEN_MAU[P]} vừa vào chơi quân ${TEN_MAU[P]}.`);
+  xem.ghe = co;
+  tam.querySelector('.cb-ten span').textContent = `Phòng ${phong.ma} · ${co.length}/3 người · ${phong.P === cay.chu ? 'chưa bắt đầu' : phong.P < 0 ? 'bạn chưa vào ghế' : `chờ ${tenChu} bắt đầu`}`;
 }
 async function ngoiGhe(P) {
   if (!phong || phong.P >= 0) return;
@@ -1314,12 +1411,13 @@ async function batDauPhong() {
   if (!r.ok && r.ma !== 401) bao('Mất mạng, chưa bắt đầu được.');
 }
 function batDauVanPhong() {
+  if (xem) { tatXem(); bao('Ván bắt đầu rồi!'); }
   boViec();
   van = { the: L.theMoi(phong.cay.luat), luat: phong.cay.luat === 'tq' ? 'tq' : 'thuong', cheDo: 'phong', ma: phong.ma, nguoi: ['nguoi', 'nguoi', 'nguoi'], tinh: [null, null, null], kho: 0, nguoiChoi: phong.P,
-    lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: true };
+    lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], mat: [[], [], []], soNuoc: 0, xemTiep: true };
   capNhatNguoi();
   Object.assign(phong, { ke: 0, nhat: [], daGui: null, song: false, nghiO: -1, baoLuot: -1 });
-  chon = -1; nuocCuaChon = []; hoat = null; phongCho = null;
+  boChon(); hoat = null; phongCho = null;
   xoay = xoayDen = GOC_NHIN[nhaNhin()];
   tatTin();
   chayPhong();
@@ -1356,8 +1454,9 @@ function chayPhong() {
     phong.ke++;
     if (!m) continue;                                // nước sai luật: máy nào cũng bỏ qua như nhau
     if (van.dangNghi >= 0) boViec();                 // máy khác đã đi giùm trước
-    /* trang đang ẩn (chuyển sang app khác) thì trình duyệt không chạy hình động: áp ngay cho khỏi dồn lại */
-    if (!phong.song || ds[phong.ke] || (typeof document !== 'undefined' && document.hidden)) { apDung(m, mv.P); continue; }
+    /* trang đang ẩn (chuyển sang app khác) thì trình duyệt không chạy hình động, đang xem cách đi từng quân thì bàn không vẽ
+       ván: áp ngay cho khỏi dồn lại */
+    if (!phong.song || ds[phong.ke] || xem || (typeof document !== 'undefined' && document.hidden)) { apDung(m, mv.P); continue; }
     thucHien(m, mv.P);
     return;
   }
@@ -1392,8 +1491,8 @@ function kiemNhat() {
 function dungLaiPhong() {
   if (!van || !phong) return;
   boViec();
-  hoat = null; chon = -1; nuocCuaChon = []; phongCho = null;
-  Object.assign(van, { the: L.theMoi(phong.cay && phong.cay.luat), nuocCuoi: null, vet: [null, null, null], an: [0, 0, 0], soNuoc: 0, hetVan: false });
+  hoat = null; boChon(); phongCho = null;
+  Object.assign(van, { the: L.theMoi(phong.cay && phong.cay.luat), nuocCuoi: null, vet: [null, null, null], an: [0, 0, 0], mat: [[], [], []], soNuoc: 0, hetVan: false });
   Object.assign(phong, { ke: 0, nhat: [], daGui: null, song: false, nghiO: -1 });
   chayPhong();
 }
@@ -1429,22 +1528,66 @@ function kiemPhong() {
   if (!phong.cay.batDau) veSanh();
   else if (van && van.cheDo === 'phong' && !hoat) denLuot();
 }
+/* nút mời. Người dùng: "gửi link mời cho sao chép link nữa". Máy có bảng chia sẻ (điện thoại) thì "Gửi link mời" mở bảng
+   chia sẻ, cạnh đó "Chép link" để dán vào đâu cũng được; máy không có (trình duyệt trong Zalo, máy tính) thì một nút chép */
+const coChiaSe = () => typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+function nutMoiBan(nhanGui, nhanChep, chinh) {
+  return coChiaSe()
+    ? `<div class="cb-hai"><button type="button" class="${chinh ? '' : 'cb-phu '}cb-moi-ban">${nhanGui}</button><button type="button" class="cb-phu cb-chep-link">Chép link</button></div>`
+    : `<button type="button" class="${chinh ? '' : 'cb-phu '}cb-chep-link">${nhanChep}</button>`;
+}
+/* chép chữ: clipboard (cần https), không được thì cách cũ textarea + execCommand — trình duyệt trong app chat có lúc chỉ
+   chạy cách cũ. Trả Promise<true/false> */
+function chepChu(chu) {
+  const cachCu = () => {
+    try {
+      const o = document.createElement('textarea');
+      o.value = chu; o.setAttribute('readonly', ''); o.style.position = 'fixed'; o.style.opacity = '0';
+      document.body.appendChild(o); o.select();
+      const ok = document.execCommand('copy');
+      o.remove();
+      return !!ok;
+    } catch (e) { return false; }
+  };
+  if (typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(chu).then(() => true, () => cachCu());
+  return Promise.resolve(cachCu());
+}
+/* nút vừa bấm đổi chữ một lúc cho biết đã xong, ngay chỗ ngón tay */
+function nutXong(sel, chu) {
+  const b = tam && tam.querySelector(`.cb-tin ${sel}`);
+  if (!b) return;
+  const cu = b.textContent;
+  b.textContent = chu;
+  setTimeout(() => { if (b.textContent === chu) b.textContent = cu; }, 1800);
+}
 function chepMa() {
   if (!phong) return;
-  const ma = phong.ma, xong = () => bao(`Đã chép mã phòng ${ma}`);
-  if (navigator.clipboard) navigator.clipboard.writeText(ma).then(xong, () => bao(`Mã phòng: ${ma}`)); else bao(`Mã phòng: ${ma}`);
+  const ma = phong.ma;
+  chepChu(ma).then(ok => { nutXong('.cb-chep-ma', ok ? 'Đã chép ✓' : 'Chưa chép được'); bao(ok ? `Đã chép mã phòng ${ma}` : `Mã phòng: ${ma}`); });
+}
+/* chép không được thì hiện link trong ô cho chạm giữ mà chép */
+function chepLink() {
+  if (!phong) return;
+  const ma = phong.ma, url = linkMoi(ma);
+  chepChu(url).then(ok => {
+    if (ok) { nutXong('.cb-chep-link', 'Đã chép ✓'); bao(`Đã chép link mời phòng ${ma} — dán vào Zalo, Messenger để gửi.`); return; }
+    moTin(`<p class="cb-tin-nho">Phòng ${ma}</p><h2>Chép link mời</h2><p>Máy chưa cho chép tự động. Chạm giữ vào link rồi chọn Sao chép:</p>
+      <input class="cb-o-ten cb-o-link" readonly value="${esc(url)}"><button type="button" class="cb-dongtin">Xong</button>`);
+    const o = tam && tam.querySelector('.cb-o-link');
+    if (o && o.select) setTimeout(() => { try { o.focus(); o.select(); } catch (e) {} }, 60);
+  });
 }
 function moiBan() {
   if (!phong) return;
-  const url = linkMoi(phong.ma), xong = () => bao(`Đã chép link mời. Mã phòng: ${phong ? phong.ma : ''}`);
-  if (navigator.share) { navigator.share({ title: 'Cờ vua ba người', text: `Vào phòng ${phong.ma} chơi cờ ba người`, url }).catch(() => {}); return; }
-  if (navigator.clipboard) navigator.clipboard.writeText(url).then(xong, () => bao(`Mã phòng: ${phong.ma}`)); else bao(`Mã phòng: ${phong.ma}`);
+  const url = linkMoi(phong.ma);
+  if (coChiaSe()) { navigator.share({ title: 'Cờ vua ba người', text: `Vào phòng ${phong.ma} chơi cờ ba người`, url }).catch(() => {}); return; }
+  chepLink();
 }
 function moPhongTT() {
   moTin(`<p class="cb-tin-nho">Đang chơi qua mạng · ${luatChu(phong.cay)}</p>${dongMa()}${hangGhe(phong.cay, phong.P, true)}
     <p class="cb-meo">Ai có link cũng vào xem được. Tới lượt người vắng quá một phút thì người khác bấm được "Cho máy đi thay".</p>
     <button type="button" class="cb-dongtin">Chơi tiếp</button>
-    <button type="button" class="cb-phu cb-moi-ban">Gửi link xem ván</button>
+    ${nutMoiBan('Gửi link xem ván', 'Chép link xem ván', false)}
     ${nutQR()}${khungQR()}
     <button type="button" class="cb-chu cb-roi">Rời phòng</button>`);
 }
@@ -1499,7 +1642,7 @@ const DEMO = [
   { chu: 'Mã đi chữ L (hai ô thẳng, một ô ngang). Gần tâm đường uốn nên mã tới được nhiều ô hơn — ở đây là 10 ô.',
     quan: [[L.oCua(0, 3, 4), 2]], an: L.BANG.MA[L.oCua(0, 3, 4)] },
 ];
-function batDemo() { tatTin(); demo = { buoc: 0, t0: bay() }; xoay = xoayDen = 0; capNhatDemo(); }
+function batDemo() { tatXem(); tatTin(); demo = { buoc: 0, t0: bay() }; xoay = xoayDen = 0; capNhatDemo(); }
 function capNhatDemo() { const p = tam.querySelector('.cb-luot'); if (demo) p.textContent = `${demo.buoc + 1}/${DEMO.length} · ${DEMO[demo.buoc].chu} (chạm để xem tiếp)`; }
 function veDemo(t) {
   const d = DEMO[demo.buoc], p = Math.min(1, (t - demo.t0) / 2400);
@@ -1529,6 +1672,107 @@ function tiepDemo() {
     return;
   }
   capNhatDemo();
+}
+
+/* ---------- xem cách đi từng quân ----------
+   Người dùng: "trong lúc chờ cho nhấn để xem nước đi từng con (option trước khi vô phòng)". Bàn trống, một quân của nhà
+   mình; chọn loại quân ở thanh dưới, vẽ mọi đường nó đi được. Chạm chấm thì quân trượt tới theo đúng đường (qua tâm thì
+   uốn), chạm ô khác thì đặt quân vào đó. Mở từ phòng chờ (cả lúc chưa vào ghế) và bảng Cách chơi; ván qua mạng bắt đầu
+   thì tự đóng. Mỗi loại quân đặt sẵn ở một ô cho thấy rõ cái lạ của bàn ba người. */
+const XEM_QUAN = {                                                    // loại: [cột, hàng ô đặt sẵn trong nhà mình, lời giải thích]
+  6: [3, 4, 'Vua đi một ô mọi hướng; quanh tâm thì chạm cả ô nhà khác.'],
+  5: [3, 4, 'Hậu đi thẳng hay chéo bao xa cũng được; qua tâm thì rẽ sang nhà khác.'],
+  4: [4, 1, 'Xe đi thẳng theo hàng, theo cột; cột qua tâm thì uốn sang nhà bên cạnh.'],
+  3: [0, 1, 'Tượng đi chéo, giữ màu ô; tới ô sát tâm thì rẽ hai nhánh.'],
+  2: [3, 4, 'Mã đi chữ L: hai ô thẳng, một ô ngang; gần tâm tới được nhiều ô hơn.'],
+  1: [4, 2, 'Tốt tiến một ô (lần đầu được hai ô), ăn chéo ô đỏ phía trước; tới hàng 1 nhà khác thì phong cấp.'],
+  7: [3, 4, 'Tướng (Tam quốc) đi một ô như vua, không nhập thành; mất tướng là mất cả đạo quân.'],
+};
+const XEM_THU_TU = [6, 5, 4, 3, 2, 1, 7];
+const tenO = (c) => `${'abcdefgh'[L.cotO(c)]}${L.hangO(c)} nhà ${TEN_MAU[L.nhaO(c)]}`;
+function theXem() {
+  const t = L.theMoi(xem.tq ? 'tq' : 'thuong');
+  t.o.fill(0); t.nhap = 0; t.vua = [-1, -1, -1]; t.luot = xem.P;
+  t.o[xem.c] = xem.P * 8 + xem.loai;
+  if (xem.loai === L.LOAI.VUA) t.vua[xem.P] = xem.c;
+  return t;
+}
+const nuocXem = (t) => L.nuocGia(t, xem.P, false, []);
+function batXem(tu) {
+  if (!tam) return;
+  tatTin(); demo = null; boChon();
+  const tq = !!((phong && phong.cay && phong.cay.luat === 'tq') || (van && van.the.tq) || (!phong && !van && docLuu().luat === 'tq'));
+  const P = phong && phong.P >= 0 ? phong.P : van && van.nguoiChoi >= 0 ? van.nguoiChoi : 0, an = {};
+  for (const s of ['.cb-hoan', '.cb-thay', '.cb-moi']) { const b = tam.querySelector(s); an[s] = !!b.hidden; b.hidden = true; }
+  xem = { tu, P, tq, loai: L.LOAI.XE, c: L.oCua(P, 4, 1), truot: null, daCham: false, an, ghe: phong && phong.cay ? L.THU_TU.filter(Q => gheCua(Q)) : null };
+  xoay = xoayDen = GOC_NHIN[P];
+  const k = tam.querySelector('.cb-xem');
+  k.innerHTML = XEM_THU_TU.filter(l => l !== L.LOAI.TG || tq).map(l => `<button type="button" data-xq="${l}">${TEN_LOAI[l]}</button>`).join('');
+  k.hidden = false;
+  const x = tam.querySelector('.cb-xong');
+  x.textContent = tu === 'sanh' ? 'Về phòng chờ' : 'Xong';
+  x.hidden = false;
+  capNhatXem();
+  if (tu === 'sanh' && phong && phong.cay && !phong.cay.batDau) veSanhKhiXem();
+  if (!raf) raf = requestAnimationFrame(vong);
+}
+function chonXemQuan(loai) {
+  if (!xem || !XEM_QUAN[loai]) return;
+  xem.loai = loai; xem.c = L.oCua(xem.P, XEM_QUAN[loai][0], XEM_QUAN[loai][1]); xem.truot = null;
+  tiengCham();
+  capNhatXem();
+}
+function chamXem(px, py) {
+  if (!xem || xem.truot) return;
+  const c = oTai(px, py);
+  if (c < 0) return;
+  xem.daCham = true;
+  const t = theXem(), m = nuocXem(t).find(n => n.toi === c);
+  if (m) { const duong = L.duongDi(t, m); xem.truot = { duong, toi: c, t0: bay(), lau: Math.min(900, 180 + duong.length * 70) }; tiengDi(false); }
+  else if (c !== xem.c) { xem.c = c; tiengCham(); }
+  capNhatXem();
+}
+function capNhatXem() {
+  if (!xem || !tam) return;
+  const n = nuocXem(theXem()).length, q = XEM_QUAN[xem.loai];
+  const dem = xem.loai === L.LOAI.TOT ? `tiến được ${n} ô, ăn chéo ${L.TOT_AN[xem.P][xem.c].length} ô (tô đỏ)` : `đi được ${n} ô`;
+  tam.querySelector('.cb-luot').textContent = `${TEN_LOAI[xem.loai]} ở ${tenO(xem.c)}: ${dem}. ${q[2]}${xem.daCham ? '' : ' Chạm chấm để quân đi tới đó, chạm ô khác để đặt quân vào đó.'}`;
+  for (const b of tam.querySelectorAll('.cb-xem [data-xq]')) b.classList.toggle('cb-bat', +b.dataset.xq === xem.loai);
+}
+function veXem(t) {
+  const h = xem.truot, x = xem.P * 8 + xem.loai;
+  if (h) {                                                            // quân đang trượt tới chỗ vừa chạm
+    const p = Math.min(1, (t - h.t0) / h.lau), e = p * p * (3 - 2 * p), [px, py, c] = diemTrenDuong(h.duong, e);
+    toO(h.toi, 'rgba(120,200,255,.3)');
+    veQuan(x, c, [px, py - (xem.loai === L.LOAI.MA ? Math.sin(e * Math.PI) * coO(h.duong[0]) * 1.2 : 0)]);
+    if (p >= 1) { xem.c = h.toi; xem.truot = null; capNhatXem(); }
+    return;
+  }
+  const th = theXem(), ds = nuocXem(th);
+  if (xem.loai === L.LOAI.TOT) for (const y of L.TOT_AN[xem.P][xem.c]) toO(y, 'rgba(255,90,70,.42)');
+  toO(xem.c, 'rgba(120,200,255,.45)');
+  veDuong(ds.map(m => L.duongDi(th, m)), 'di');
+  veCham(th, ds, 'di');
+  veQuan(x, xem.c, tamO(xem.c));
+}
+function tatXem() {
+  if (!xem) return;
+  const an = xem.an;
+  xem = null;
+  if (!tam) return;
+  tam.querySelector('.cb-xem').hidden = true;
+  tam.querySelector('.cb-xong').hidden = true;
+  for (const s in an) tam.querySelector(s).hidden = an[s];
+  tam.querySelector('.cb-luot').textContent = '';
+  tam.querySelector('.cb-ten span').textContent = '';
+  if (van) { xoay = xoayDen = GOC_NHIN[nhaNhin()]; capNhatChu(); }
+}
+function thoatXem() {
+  const tu = xem && xem.tu;
+  tatXem();
+  if (tu === 'sanh' && phong && phong.cay && !phong.cay.batDau) veSanh();
+  else if (tu === 'huongdan') moHuongDan();
+  else if (!van) moCaiDat();
 }
 
 /* ---------- âm thanh (Web Audio, không tải tệp) ---------- */
@@ -1566,11 +1810,12 @@ function dungKhung() {
       <p class="cb-ten"><b>Cờ vua ba người</b><span></span></p>
       <button class="cb-hoi" type="button" aria-label="Cách chơi">?</button>
     </div>
-    <div class="cb-nha">${L.THU_TU.map(P => `<div class="cb-the" data-p="${P}"><i style="background:${MAU[P].cham}"></i><b></b><span></span></div>`).join('')}</div>
+    <div class="cb-nha">${L.THU_TU.map(P => `<div class="cb-the" data-p="${P}"><i style="background:${MAU[P].cham}"></i><b></b><span></span><canvas class="cb-mat" hidden></canvas></div>`).join('')}</div>
     <div class="cb-canh"><canvas class="cb-cv"></canvas><p class="cb-bao" hidden></p></div>
     <div class="cb-duoi">
       <p class="cb-luot" aria-live="polite"></p>
-      <div class="cb-nut"><button class="cb-hoan" type="button">↶ Hoàn tác</button><button class="cb-thay" type="button" hidden></button><button class="cb-moi" type="button">Ván mới</button></div>
+      <div class="cb-xem" hidden></div>
+      <div class="cb-nut"><button class="cb-hoan" type="button">↶ Hoàn tác</button><button class="cb-thay" type="button" hidden></button><button class="cb-moi" type="button">Ván mới</button><button class="cb-xong" type="button" hidden>Xong</button></div>
     </div>
     <p class="cb-noi" hidden></p>
     <div class="cb-tin" hidden><div class="cb-tin-trong"></div></div>`;
@@ -1596,7 +1841,8 @@ function dungKhung() {
     amThanh();
     if (demo) { tiepDemo(); return; }
     const r = cv.getBoundingClientRect();
-    chamBan(e.clientX - r.left, e.clientY - r.top);
+    if (xem) chamXem(e.clientX - r.left, e.clientY - r.top);
+    else chamBan(e.clientX - r.left, e.clientY - r.top);
   });
   addEventListener('resize', doCo);
   if (typeof ResizeObserver === 'function') new ResizeObserver(doCo).observe(tam.querySelector('.cb-canh'));
@@ -1606,9 +1852,12 @@ function doCo() {
   const k = tam.querySelector('.cb-canh').getBoundingClientRect();
   DPR = Math.min(self.devicePixelRatio || 1, 2); W = Math.max(220, k.width || 360); H = Math.max(200, k.height || 420);
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cv.style.width = W + 'px'; cv.style.height = H + 'px';
+  veMat();
 }
-function moTin(html) { const h = tam.querySelector('.cb-tin'); h.querySelector('.cb-tin-trong').innerHTML = html; h.hidden = false; }
-function tatTin() { if (tam) tam.querySelector('.cb-tin').hidden = true; }
+/* lớp cb-co-tin: đang có bảng — lời báo dời xuống cuối màn hình, nằm trên bảng (trước đây nằm dưới bảng, bấm Chép mã hay vào
+   ghế không được ở phòng chờ mà không thấy báo gì) */
+function moTin(html) { const h = tam.querySelector('.cb-tin'); h.querySelector('.cb-tin-trong').innerHTML = html; h.hidden = false; tam.classList.add('cb-co-tin'); }
+function tatTin() { if (tam) { tam.querySelector('.cb-tin').hidden = true; tam.classList.remove('cb-co-tin'); } }
 /* Ván mới: ba lối — đấu với máy, tạo phòng, vào phòng — mỗi lối một màn ngắn có nút quay lại. Bản trước gộp hết vào một
    bảng dài (luật, tên, màu, mức máy, tạo phòng, rồi tới ô nhập mã nằm tận cuối), người có mã phải kéo qua mọi thứ. */
 const HINH_LOI = {
@@ -1665,6 +1914,7 @@ function moHuongDan() {
     <p><b>Luật Tam quốc</b> (chọn ở bảng ván mới): giết vua một nhà — ăn vua hay chiếu hết — là chiếm cả đạo quân nhà đó, quân đổi sang màu mình, giữ vành màu cũ. Người giết chạm một quân của đạo quân đó để phong <b>tướng</b>: tướng đi từng ô như vua, cầm cờ hiệu màu đạo quân. Nhà khác giết được tướng thì cướp luôn đạo quân, lại phong tướng mới — chiếm qua chiếm lại. Mất vua của chính mình thì mọi đạo quân mình giữ về tay người giết.</p>
     <p class="cb-meo">Đường đỏ là báo nguy: quân nào đang chiếu vua mình.</p>
     <button type="button" class="cb-demo">Xem hình động đường đi qua tâm</button>
+    <button type="button" class="cb-phu cb-xemquan" data-tu="huongdan">Xem cách đi từng quân</button>
     <button type="button" class="cb-phu cb-dongtin">Chơi</button>`);
 }
 function ketThucVan(capNhat) {
@@ -1696,12 +1946,16 @@ function bam(e) {
   let n;
   if (q('.xn-dong')) { dong(); return; }
   if (q('.cb-noi') || q('.cb-bao')) { t.hidden = true; return; }
+  if ((n = q('.cb-xemquan'))) { batXem(n.dataset.tu || 'huongdan'); return; }
+  if ((n = q('[data-xq]'))) { chonXemQuan(+n.dataset.xq); return; }
+  if (q('.cb-xong')) { thoatXem(); return; }
+  if ((n = q('.cb-the'))) { baoMat(+n.dataset.p); return; }
   if (q('.cb-hoi')) { moHuongDan(); return; }
   if (q('.cb-moi')) { if (van && van.cheDo === 'phong' && phong) moPhongTT(); else moCaiDat(); return; }
   if ((n = q('[data-man]'))) { moMan(n.dataset.man); return; }
   if (q('.cb-hoan')) { hoanTac(); return; }
   if (q('.cb-demo')) { batDemo(); return; }
-  if (q('.cb-dongtin')) { tatTin(); if (!van) moCaiDat(); return; }
+  if (q('.cb-dongtin')) { tatTin(); if (!van) { if (phong && phong.cay && !phong.cay.batDau) veSanh(); else moCaiDat(); } return; }
   if ((n = q('[data-mau]'))) { ghiLuu({ mau: +n.dataset.mau }); moMan(manDang); return; }
   if ((n = q('[data-kho]'))) { ghiLuu({ kho: +n.dataset.kho }); moMan(manDang); return; }
   if ((n = q('[data-luat]'))) { ghiLuu({ luat: n.dataset.luat }); moMan(manDang); return; }
@@ -1713,6 +1967,7 @@ function bam(e) {
   if (q('.cb-roi')) { if (van && van.cheDo === 'phong' && !van.hetVan && phong) xacNhanRoi(); else { roiPhong(); moCaiDat(); } return; }
   if (q('.cb-roi-that')) { roiPhong(); moCaiDat(); return; }
   if (q('.cb-chep-ma')) { chepMa(); return; }
+  if (q('.cb-chep-link')) { chepLink(); return; }
   if (q('.cb-qr-bat')) { if (phong) { phong.qr = !phong.qr; if (phong.cay && !phong.cay.batDau) veSanh(); else moPhongTT(); } return; }
   if (q('.cb-vannua')) { vanNua(); return; }
   if (q('.cb-vaotiep')) { if (phong && phong.cay && phong.cay.tiep) theoTiep(phong.cay.tiep); return; }
@@ -1755,6 +2010,7 @@ function mo() {
   if (!raf) raf = requestAnimationFrame(vong);
 }
 function dong() {
+  tatXem();
   dungLuong();
   if (raf) { cancelAnimationFrame(raf); raf = 0; }
   if (am && am.state === 'running') am.suspend();
@@ -1763,6 +2019,7 @@ function dong() {
 }
 if (typeof addEventListener === 'function') addEventListener('keydown', (e) => {
   if (e.key !== 'Escape' || !tam || !tam.classList.contains('hien')) return;
+  if (xem) { thoatXem(); return; }
   if (!tam.querySelector('.cb-tin').hidden && van) tatTin(); else dong();
 });
 
@@ -1777,6 +2034,7 @@ self.TDTD_COBA = {
   _batDauPhong: () => batDauPhong(), _diNuoc: (m, P) => diNuoc(m, P), _roiPhong: () => roiPhong(), _vanNua: () => vanNua(), _theoTiep: (ma) => theoTiep(ma),
   _kiemPhong: () => kiemPhong(), _toiChayMay: () => toiChayMay(), _viecPhong: () => viecPhong(), _choMayThay: () => choMayThay(), _tuDiTiep: () => tuDiTiep(),
   _timNuocMang: (the, mv) => timNuocMang(the, mv), _moCaiDat: () => moCaiDat(), _laMinh: (P) => laMinh(P), _duongChon: () => duongChon,
-  _bam: (e) => bam(e), _trichMa: (s) => trichMa(s),
+  _bam: (e) => bam(e), _trichMa: (s) => trichMa(s), _chonXem: () => chonXem, _xem: () => xem, _batXem: (tu) => batXem(tu), _chonXemQuan: (l) => chonXemQuan(l),
+  _chamXem: (x, y) => chamXem(x, y), _thoatXem: () => thoatXem(), _baoMat: (P) => baoMat(P), _noi: (P, loai) => noi(P, loai),
 };
 })();
