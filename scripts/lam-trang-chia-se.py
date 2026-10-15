@@ -825,12 +825,14 @@ TRO = [
          moTa='Sokoban 100 màn do máy tự tạo, màn nào cũng giải được: chú robot đẩy thùng sao vào ổ, mọi thùng sáng là '
               'xong màn. Từ một tới năm thùng, đẩy càng ít lần càng được nhiều sao. Miễn phí, không cần tài khoản.',
          alt='Đẩy thùng sao: một màn Sokoban với thùng sao và ổ', mo='Mở Đẩy thùng sao'),
-    dict(duong='co-ba-nguoi', trang='co-vua-ba-nguoi/', so=1, mau='#e9b3a8', ve=ve_co_ba,
+    dict(duong='co-ba-nguoi', trang='co-vua-ba-nguoi/', so=2, mau='#e9b3a8', ve=ve_co_ba,
          tieuDe='Cờ vua ba người', tieu=('Cờ vua', 'ba người'),
-         dong=['Trắng, Đen, Đỏ trên bàn lục giác', 'Đấu với hai máy, hoặc ba người', 'Còn vua cuối cùng thì thắng'],
-         moTa='Trắng, Đen, Đỏ trên bàn lục giác 96 ô. Đấu với hai máy có tính cách riêng, hoặc ba người chung một máy. '
-              'Còn vua cuối cùng thì thắng. Có hình động chỉ đường đi qua tâm bàn cờ. Miễn phí, không cần tài khoản.',
-         alt='Cờ vua ba người: bàn lục giác với quân Trắng, Đen, Đỏ', mo='Mở Cờ vua ba người'),
+         dong=['Trắng, Đen, Đỏ trên bàn lục giác', 'Tạo phòng, mỗi người một máy', 'Còn vua cuối cùng thì thắng'],
+         moTa='Trắng, Đen, Đỏ trên bàn lục giác 96 ô. Tạo phòng mời bạn bè, mỗi người một máy, ghế trống thì máy chơi '
+              'thay; hoặc đấu với hai máy có tính cách riêng. Còn vua cuối cùng thì thắng. Miễn phí, không cần tài khoản.',
+         alt='Cờ vua ba người: bàn lục giác với quân Trắng, Đen, Đỏ', mo='Mở Cờ vua ba người',
+         # link mời vào phòng (…/co-vua-ba-nguoi/?phong=MÃ) thì chuyển thẳng vào phòng đó
+         chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#co-ba-nguoi' + (m ? '/' + m[1] : ''));"),
 ]
 
 
@@ -885,7 +887,7 @@ TRANG = '''<!doctype html>
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="{anh}">
 <meta name="theme-color" content="#0d0b1a">
-<script>location.replace('../#{duong}');</script>
+<script>{chuyen}</script>
 <style>body{{margin:0;min-height:100vh;display:grid;place-items:center;background:#0d0b1a;color:#f4efe6;font:16px system-ui,sans-serif}}a{{color:{mau}}}</style>
 </head>
 <body>
@@ -901,7 +903,8 @@ def ten_anh(tro):
 
 def viet_trang(tro):
     e = lambda s: html.escape(s, quote=True)
-    noi_dung = TRANG.format(tieuDe=e(tro['tieuDe']), moTa=e(tro['moTa']), alt=e(tro['alt']), mo=e(tro['mo']),
+    chuyen = tro.get('chuyen', "location.replace('../#%s');" % tro['duong'])
+    noi_dung = TRANG.format(tieuDe=e(tro['tieuDe']), moTa=e(tro['moTa']), alt=e(tro['alt']), mo=e(tro['mo']), chuyen=chuyen,
                             mien=TEN_MIEN, trang=tro['trang'], duong=tro['duong'], mau=tro['mau'],
                             anh=TEN_MIEN + 'icons/' + ten_anh(tro))
     thu_muc = os.path.join(GOC, tro['trang'])

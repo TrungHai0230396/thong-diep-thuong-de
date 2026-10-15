@@ -351,7 +351,7 @@ function moSao(s) {
   saoDangMo = s;
   m.mo();
   if (s.tieuDe) document.title = s.tieuDe;          // tên thẻ trình duyệt, và tên khi chia sẻ bằng nút của trình duyệt
-  if (location.hash.slice(1) !== s.duong) location.hash = s.duong;
+  if (location.hash.slice(1).split('/')[0] !== s.duong) location.hash = s.duong;   // #co-ba-nguoi/MÃ: phần sau / là của trò
   themNutChepLink(s);
   themNutCaiApp(s);
   theoDoiDong(s);
@@ -449,7 +449,7 @@ function chepTay(chu, xong) {
 
 /* Địa chỉ đổi: do người dùng bấm Back, dán link mới, hay mở từ link gửi tới. */
 function theoDiaChi() {
-  const d = location.hash.slice(1);
+  const d = location.hash.slice(1).split('/')[0];          // phần sau dấu / (mã phòng cờ) để trò tự đọc
   const s = SAO.find(x => x.duong === d);
   if (s) { if (saoDangMo !== s) moSao(s); }
   else if (saoDangMo) dongSao(true);

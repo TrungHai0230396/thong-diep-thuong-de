@@ -1336,12 +1336,24 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .cb-chon{flex:1;min-width:0;height:42px;padding:0 8px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
   color:#eef1ff;font:inherit;font-size:14px;cursor:pointer}
 .cb-chon.cb-bat{border-color:#ffd77a;background:rgba(255,215,120,.18);color:#ffe6a6;font-weight:600}
-.cb-may[hidden],.cb-ba[hidden]{display:none}
 .cb-tin button:not(.cb-chon){display:block;width:100%;margin-top:10px;height:48px;border:0;border-radius:14px;background:linear-gradient(#ffd77a,#e9a93a);
   color:#2a1a00;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
 .cb-tin button.cb-phu{background:rgba(255,255,255,.08);color:#eef1ff;font-weight:500}
 .cb-phong{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .cb-tin .cb-phong button{margin-top:0}
+/* chơi qua mạng: phòng chờ, mã phòng, ô nhập tên và mã */
+.cb-tin .cb-ma{font-family:ui-monospace,Menlo,monospace;font-size:24px;letter-spacing:.14em;color:#fff4d0}
+.cb-ghe-ds{display:flex;flex-direction:column;gap:6px;margin:4px 0 10px}
+.cb-ghe{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.cb-ghe i{flex:none;width:14px;height:14px;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+.cb-ghe span{flex:1;min-width:0;text-align:left;font-size:14px;color:rgba(238,241,255,.85);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cb-ghe span b{color:#ffe6a6;font-weight:600;margin-right:4px}
+.cb-ghe .cb-chon{flex:none;height:34px;padding:0 12px}
+.cb-o-ten,.cb-o-ma{box-sizing:border-box;width:100%;height:44px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);
+  color:#eef1ff;font:inherit;font-size:16px}
+.cb-o-ma{flex:1;min-width:0;width:auto;text-transform:uppercase;letter-spacing:.12em;font-family:ui-monospace,Menlo,monospace}
+.cb-o-ten:focus,.cb-o-ma:focus{outline:none;border-color:#ffd77a}
+.cb-hang .cb-vao{flex:none;width:76px}
 @media (max-height:600px){
   .cb-dau{min-height:44px;padding-top:calc(env(safe-area-inset-top,0px) + 6px)}
   .cb-nha{padding:2px 12px 4px}

@@ -2,7 +2,7 @@
    Hình học bàn 96 ô (đối chiếu các điều đã biết của bàn Zubrin/Yalta: cột uốn sang nhà bên cạnh, chéo qua tâm rẽ hai
    nhánh cùng màu, tốt ở d4 có ba ô ăn, mã luôn sang ô khác màu); luật (nhập thành, phong cấp, không tự để vua bị chiếu,
    ăn vua, chiếu hết thì loại và quân hoá đá, đá không chiếu ai, hết nước thì bỏ lượt, còn vua cuối cùng thì thắng);
-   máy nghĩ (nhanh, đúng luật, ăn quân bỏ không); giao diện (đi quân, hai máy đáp, hoàn tác, ba người thì bàn xoay,
+   máy nghĩ (nhanh, đúng luật, ăn quân bỏ không); giao diện (đi quân, hai máy đáp, hoàn tác, bàn xoay về phía mình,
    chạm đúng ô ở mọi góc xoay, chỉ lưu cài đặt). */
 'use strict';
 const fs = require('fs');
@@ -218,15 +218,15 @@ async function choTaiNguoi() {                                       // chạy h
   let lech = 0;
   for (const g of C._GOC_NHIN) { C._datXoay(g); for (let c = 0; c < 96; c++) { const [x, y] = C._tamO(c); if (C._oTai(x, y) !== c) lech++; } }
   ok('chạm giữa ô nào cũng ra đúng ô đó, ở cả ba góc nhìn', lech === 0);
-  /* ba người chung máy: đi xong thì bàn xoay về phía người tới lượt */
-  C._vanMoi({ che: 'ba' });
-  v = C._van();
+  /* Người dùng: "đừng làm đánh trên 1 máy" — bỏ kiểu ba người chung máy, thay bằng chơi qua mạng (scripts/test-phong.js) */
+  const nguon = fs.readFileSync(path.join(goc, 'assets', 'coba.js'), 'utf8');
+  ok('không còn kiểu ba người chung máy', !/chung máy'|che === 'ba'|cheDo === 'ba'/.test(nguon) && !/3 người chung máy/.test(nguon));
+  C._vanMoi({ mau: DEN, kho: 1 });
   const giong = (a, b) => Math.abs(Math.cos(a) - Math.cos(b)) < 1e-9 && Math.abs(Math.sin(a) - Math.sin(b)) < 1e-9;
-  const truoc = giong(C._xoayDen(), C._GOC_NHIN[TRANG]);
-  C._thucHien(L.nuocHopLe(v.the, TRANG)[0], TRANG); C._xongHoat();
-  ok('ba người chung máy: Trắng đi xong, bàn xoay cho Đen nằm dưới', truoc && C._van().the.luot === DEN && giong(C._xoayDen(), C._GOC_NHIN[DEN]) && C._tenNha(DEN) === 'Đen');
+  ok('cầm Đen thì bàn xoay cho Đen nằm dưới, hai máy là Hổ và Rùa', giong(C._xoayDen(), C._GOC_NHIN[DEN]) && C._tenNha(DEN) === 'Bạn' && C._tenNha(DO) === 'Hổ' && C._tenNha(TRANG) === 'Rùa');
+  await choTaiNguoi();
   const k = JSON.parse(luu['tdtd.coba'] || '{}');
-  ok('chỉ lưu cài đặt (cách chơi, màu, mức khó, đã xem hướng dẫn), không lưu ván', Object.keys(k).every(x => ['che', 'mau', 'kho', 'h'].includes(x)));
+  ok('chỉ lưu cài đặt (cách chơi, màu, mức khó, tên, phòng đang ở, đã xem hướng dẫn), không lưu ván', Object.keys(k).every(x => ['che', 'mau', 'kho', 'h', 'ten', 'phong'].includes(x)));
   /* hình động hướng dẫn */
   C._batDemo();
   const dau = C._demo() ? C._demo().buoc : -1;

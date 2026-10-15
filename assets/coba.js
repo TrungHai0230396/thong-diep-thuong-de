@@ -464,7 +464,7 @@ function apDungNuocMay(so, P, kq) {
   if (so !== viec || !van || van.dangNghi !== P) return;              // việc cũ (đã hoàn tác, ván mới)
   van.dangNghi = -1;
   if (!kq || !kq.nuoc) return;
-  thucHien(kq.nuoc, P);
+  diNuoc(kq.nuoc, P);
 }
 
 /* ======================================================================================================
@@ -681,7 +681,7 @@ function veCanh(t) {
 }
 function nhaNhin() {                                                  // nhà đang được nhìn từ phía dưới bàn
   if (!van) return 0;
-  return van.cheDo === 'ba' ? van.the.luot : van.nguoiChoi;
+  return van.nguoiChoi >= 0 ? van.nguoiChoi : 0;
 }
 
 /* ---------- trượt quân theo đường đi (cong qua tâm) ---------- */
@@ -704,14 +704,15 @@ function veHoat(t) {
 
 /* ---------- ván cờ ---------- */
 function vanMoi(ch) {
-  ch = Object.assign({ che: 'may', mau: 0, kho: 1 }, ch || {});
+  ch = Object.assign({ mau: 0, kho: 1 }, ch || {});
+  roiPhong();                                                         // đấu với máy thì rời phòng đang ở (nếu có)
   boViec();
-  const nguoi = [0, 1, 2].map(P => (ch.che === 'ba' || P === ch.mau ? 'nguoi' : 'may'));
+  const nguoi = [0, 1, 2].map(P => (P === ch.mau ? 'nguoi' : 'may'));
   const may = L.THU_TU.filter(P => nguoi[P] === 'may');
   const tinh = [null, null, null];
   const sauNguoi = (P) => { const i = L.THU_TU.indexOf(P); return [1, 2].map(k => L.THU_TU[(i + k) % 3]); };
-  if (ch.che === 'may') { const [a, b] = sauNguoi(ch.mau); tinh[a] = 'ho'; tinh[b] = 'rua'; }
-  van = { the: L.theMoi(), cheDo: ch.che, nguoi, tinh, kho: ch.kho, nguoiChoi: ch.che === 'ba' ? 0 : ch.mau, lichSu: [], nuocCuoi: null, dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: false };
+  const [a, b] = sauNguoi(ch.mau); tinh[a] = 'ho'; tinh[b] = 'rua';
+  van = { the: L.theMoi(), cheDo: 'may', nguoi, tinh, kho: ch.kho, nguoiChoi: ch.mau, lichSu: [], nuocCuoi: null, dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: false };
   chon = -1; nuocCuaChon = []; hoat = null; phongCho = null;
   xoay = xoayDen = GOC_NHIN[nhaNhin()];
   tatTin(); capNhatChu();
@@ -719,28 +720,37 @@ function vanMoi(ch) {
   denLuot();
 }
 function laNguoi(P) { return van.nguoi[P] === 'nguoi'; }
+/* nhà P có phải người cầm máy này không (ván qua mạng: ghế của mình, lúc máy không đi thay) */
+function laMinh(P) { return !!van && P === van.nguoiChoi && laNguoi(P); }
 function tenNha(P) {
   if (!van) return TEN_MAU[P];
-  if (van.cheDo === 'ba') return TEN_MAU[P];
-  if (laNguoi(P)) return 'Bạn';
-  return TINH_CACH[van.tinh[P]].ten;
+  if (P === van.nguoiChoi && (van.cheDo === 'phong' || laNguoi(P))) return 'Bạn';
+  if (van.tinh[P]) return TINH_CACH[van.tinh[P]].ten;
+  const g = gheCua(P);
+  return (g && g.ten) || TEN_MAU[P];
 }
 function cauHinhMay(P) {
   const k = KHO[van.kho], tc = TINH_CACH[van.tinh[P]] || TINH_CACH.rua;
   return { kieu: tc.kieu, sau: k.sau, ms: k.ms, nhieu: k.nhieu, tinhCach: { hang: !!tc.hang, chac: !!tc.chac } };
 }
-/* tới lượt ai: người thì chờ chạm, máy thì nhờ nghĩ; ba người chung máy thì xoay bàn về phía người tới lượt */
+/* tới lượt ai: người thì chờ chạm, máy thì nhờ nghĩ. Ván qua mạng: nước người khác tới từ máy chủ (chayPhong); ghế máy
+   chơi thay thì máy của người chạy máy nghĩ giùm (toiChayMay) */
 function denLuot() {
   const the = van.the;
   capNhatChu();
-  if (the.thang >= 0 || the.hoa) { setTimeout(() => ketThucVan(), 700); return; }
-  const P = the.luot;
-  if (van.cheDo === 'ba') xoayDen = gocGan(GOC_NHIN[P]);
-  if (laNguoi(P)) {
-    if (van.cheDo === 'may') { van.lichSu.push({ the: L.chepThe(the), nuocCuoi: van.nuocCuoi, an: van.an.slice() }); capNhatChu(); }
+  if (the.thang >= 0 || the.hoa) {
+    if (!van.hetVan) { van.hetVan = true; setTimeout(() => ketThucVan(), 700); }
     return;
   }
-  if (van.cheDo === 'may' && !the.song[van.nguoiChoi] && !van.xemTiep) return;   // bạn bị loại: chờ chọn xem tiếp hay ván mới
+  const P = the.luot;
+  if (van.cheDo === 'phong') {
+    if (phong && phong.cay && phong.cay.nuoc && phong.cay.nuoc[phong.ke]) { chayPhong(); return; }
+    if (laMinh(P)) { if (phong && phong.song && phong.baoLuot !== phong.ke) { phong.baoLuot = phong.ke; tiengToiLuot(); } return; }
+    if (!laNguoi(P) && van.dangNghi < 0 && phong && phong.nghiO !== phong.ke && toiChayMay()) { phong.nghiO = phong.ke; nhoMayNghi(P); }
+    return;
+  }
+  if (laNguoi(P)) { van.lichSu.push({ the: L.chepThe(the), nuocCuoi: van.nuocCuoi, an: van.an.slice() }); capNhatChu(); return; }
+  if (!the.song[van.nguoiChoi] && !van.xemTiep) return;               // bạn bị loại: chờ chọn xem tiếp hay ván mới
   nhoMayNghi(P);
 }
 function gocGan(g) { while (g - xoay > Math.PI) g -= 2 * Math.PI; while (xoay - g > Math.PI) g += 2 * Math.PI; return g; }
@@ -754,10 +764,7 @@ function thucHien(m, P) {
   chon = -1; nuocCuaChon = [];
   const lau = Math.min(900, 180 + duong.length * 70);
   hoat = { quan, dau: quan.map(q => q.duong[0]), an: an ? m.toi : -1, anX: an, t0: bay(), lau, xong: () => {
-    const lui = L.diNuoc(the, m);
-    van.nuocCuoi = { tu: m.tu, toi: m.toi }; van.soNuoc++;
-    if (an) van.an[P] += L.GIA[an & 7] || 0;
-    const ev = L.sauNuoc(the, lui);
+    const ev = apDung(m, P);
     tiengDi(!!an);
     noiVeNuoc(P, an, ev);
     baoSuKien(ev);
@@ -765,11 +772,19 @@ function thucHien(m, P) {
   } };
   if (!raf) raf = requestAnimationFrame(vong);
 }
+/* phần còn lại của một nước, lúc quân tới nơi — hay áp ngay không trượt, khi đuổi kịp ván qua mạng */
+function apDung(m, P) {
+  const the = van.the, an = the.o[m.toi];
+  const lui = L.diNuoc(the, m);
+  van.nuocCuoi = { tu: m.tu, toi: m.toi }; van.soNuoc++;
+  if (an) van.an[P] += L.GIA[an & 7] || 0;
+  return L.sauNuoc(the, lui);
+}
 const bay = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
 
 /* ---------- lời nói của hai máy, lời báo ---------- */
 function noi(P, loai, xacSuat = 1, cho = 0) {
-  if (!van || van.cheDo !== 'may' || !van.tinh[P] || Math.random() > xacSuat) return;
+  if (!van || !van.tinh[P] || Math.random() > xacSuat) return;
   const ds = TINH_CACH[van.tinh[P]].noi[loai];
   if (!ds) return;
   const cau = ds[Math.floor(Math.random() * ds.length)];
@@ -800,7 +815,7 @@ function baoSuKien(ev) {
     else if (e.loai === 'chieuhet') { bao(`${tenNha(e.bi)} bị chiếu hết — bị loại, quân hoá đá.`); tiengLoai(); }
     else if (e.loai === 'boluot') bao(`${tenNha(e.ai)} hết nước đi mà không bị chiếu: bỏ lượt.`);
     else if (e.loai === 'chieu') {
-      if (e.bi === nhaNhin() && laNguoi(e.bi)) { bao('Vua đang bị chiếu! Đường đỏ là quân đang nhắm vào vua.'); tiengChieu(); }
+      if (laMinh(e.bi)) { bao('Vua đang bị chiếu! Đường đỏ là quân đang nhắm vào vua.'); tiengChieu(); }
       else if (e.bi === van.the.luot) tiengChieu();
     }
   }
@@ -824,6 +839,7 @@ function capNhatChu() {
     else if (van.dangNghi === P) tt = 'đang nghĩ…';
     else if (the.luot === P && the.thang < 0 && !the.hoa) tt = L.biChieu(the, P) ? 'bị chiếu!' : 'đang đi';
     else tt = van.an[P] ? `ăn ${Math.round(van.an[P] / 100)} điểm` : '';
+    if (van.cheDo === 'phong' && laNguoi(P) && P !== van.nguoiChoi && the.song[P] && !conO(P)) tt = tt ? tt + ' · vắng' : 'vắng';
     n.querySelector('span').textContent = tt;
     n.classList.toggle('cb-dang', the.luot === P && the.thang < 0 && !the.hoa);
     n.classList.toggle('cb-loai', !the.song[P]);
@@ -832,14 +848,22 @@ function capNhatChu() {
   const l = tam.querySelector('.cb-luot'), P = the.luot;
   if (the.thang >= 0) l.textContent = `${tenNha(the.thang)} thắng!`;
   else if (the.hoa) l.textContent = 'Hoà.';
+  else if (van.cheDo === 'phong' && phong && phong.rot) l.textContent = 'Mất mạng — đang nối lại…';
   else if (van.dangNghi >= 0) l.textContent = `${tenNha(van.dangNghi)} (${TEN_MAU[van.dangNghi]}) đang nghĩ…`;
-  else if (laNguoi(P)) l.textContent = van.cheDo === 'ba' ? `Lượt ${TEN_MAU[P]} — chạm quân ${TEN_MAU[P].toLowerCase()} để đi` : 'Lượt của bạn — chạm một quân để đi';
+  else if (laMinh(P)) l.textContent = 'Lượt của bạn — chạm một quân để đi';
+  else if (van.cheDo === 'phong') l.textContent = laNguoi(P) ? `Chờ ${tenNha(P)} (${TEN_MAU[P]}) đi…${conO(P) ? '' : ' — đang vắng'}` : `Lượt ${tenNha(P)} (${TEN_MAU[P]}, máy chơi thay)`;
   else l.textContent = `Lượt ${tenNha(P)}`;
   const h = tam.querySelector('.cb-hoan');
   h.hidden = van.cheDo !== 'may';
   h.disabled = !coTheHoan() || !!hoat;
+  const t = tam.querySelector('.cb-thay'), viec = viecPhong();
+  t.hidden = !viec; t.dataset.viec = viec;
+  t.textContent = viec === 'tudi' ? 'Tự đi tiếp' : viec === 'thay' ? `Cho máy đi thay ${tenNha(P)}` : '';
+  tam.querySelector('.cb-moi').textContent = van.cheDo === 'phong' ? 'Phòng' : 'Ván mới';
   const ten = tam.querySelector('.cb-ten span');
-  ten.textContent = van.cheDo === 'ba' ? 'Ba người chung máy' : `Bạn cầm ${TEN_MAU[van.nguoiChoi]} · máy ${KHO[van.kho].ten.toLowerCase()}`;
+  ten.textContent = van.cheDo === 'phong'
+    ? `Phòng ${van.ma} · ${van.nguoiChoi >= 0 ? `bạn cầm ${TEN_MAU[van.nguoiChoi]}` : 'đang xem'} · máy ${KHO[van.kho].ten.toLowerCase()}`
+    : `Bạn cầm ${TEN_MAU[van.nguoiChoi]} · máy ${KHO[van.kho].ten.toLowerCase()}`;
 }
 /* hoàn tác: về đầu lượt trước của bạn (bỏ luôn hai nước máy đi sau đó) */
 /* ảnh chụp ở đầu mỗi lượt của bạn: tới lượt bạn thì cái cuối là lượt hiện tại, cần thêm một cái trước đó mới hoàn tác được */
@@ -850,7 +874,7 @@ function hoanTac() {
   boViec();
   const s = van.lichSu.pop();
   if (!s) return;
-  van.the = L.chepThe(s.the); van.nuocCuoi = s.nuocCuoi; van.an = s.an.slice(); van.soNuoc = Math.max(0, van.soNuoc - 3);
+  van.the = L.chepThe(s.the); van.nuocCuoi = s.nuocCuoi; van.an = s.an.slice(); van.soNuoc = Math.max(0, van.soNuoc - 3); van.hetVan = false;
   chon = -1; nuocCuaChon = [];
   tatTin();
   denLuot();
@@ -860,7 +884,7 @@ function hoanTac() {
 function chamBan(px, py) {
   if (!van || hoat || demo) return;
   const the = van.the, P = the.luot;
-  if (the.thang >= 0 || the.hoa || !laNguoi(P) || van.dangNghi >= 0) return;
+  if (the.thang >= 0 || the.hoa || !laMinh(P) || van.dangNghi >= 0) return;
   let c = oTai(px, py);
   /* chạm hơi lệch ô đích (ô rìa nhỏ): bắt vào chấm gần nhất trong tầm */
   if (chon >= 0 && (c < 0 || !nuocCuaChon.some(m => m.toi === c))) {
@@ -872,7 +896,7 @@ function chamBan(px, py) {
   const m = nuocCuaChon.find(n => n.toi === c);
   if (chon >= 0 && m) {
     if (m.phong) { hoiPhong(m, P); return; }
-    thucHien(m, P);
+    diNuoc(m, P);
     return;
   }
   if (the.o[c] && (the.o[c] >> 3) === P) {
@@ -887,6 +911,307 @@ function hoiPhong(m, P) {
   phongCho = m;
   const ten = { 5: 'Hậu', 4: 'Xe', 3: 'Tượng', 2: 'Mã' };
   moTin(`<p class="cb-tin-nho">Phong cấp</p><h2>Tốt hoá thành…</h2><div class="cb-phong">${[5, 4, 3, 2].map(l => `<button type="button" data-phong="${l}">${ten[l]}</button>`).join('')}</div>`);
+}
+
+/* ======================================================================================================
+   CHƠI QUA MẠNG — mỗi người một máy, vào cùng một phòng bằng link hay mã 6 ký tự (assets/phong.js nói chuyện với
+   Firebase). Người dùng: "làm tạo phòng để chơi nhiều máy đi, đừng làm đánh trên 1 máy" — bỏ kiểu ba người chung máy.
+   Máy chủ chỉ giữ danh sách nước đi; máy nào cũng đọc lần lượt từ đầu và tự tính thế cờ bằng chính lõi luật, nên máy
+   chủ không cần hiểu cờ. Luật Firebase chỉ cho thêm nước vào cuối, ai ghi trước vào ô số n thì nước đó được; nước sai
+   luật thì máy nào cũng bỏ qua như nhau, nên mọi máy luôn ra cùng một thế cờ. Ghế trống lúc bắt đầu thì máy chơi thay
+   (người dùng chọn): máy của người ngồi ghế số nhỏ nhất còn ở đây nghĩ giùm rồi ghi nước lên.
+   ====================================================================================================== */
+const MANG = self.TDTD_PHONG;
+let phong = null;
+const VANG = 60000, NHIP = 20000;                   // im lặng quá 60 giây là coi như đã rời; 20 giây báo "còn ở đây" một lần
+const gheCua = (P) => phong && phong.cay && phong.cay.ghe ? phong.cay.ghe[P] : null;
+const mayCua = (P) => phong && phong.cay && phong.cay.may ? phong.cay.may[P] : null;
+const gioMay = () => Date.now() + (phong ? phong.lech : 0);   // giờ máy chủ, đo lệch qua dấu giờ của chính mình
+function conO(P) { const g = gheCua(P); return !!g && (P === phong.P || (!!g.thay && gioMay() - g.thay < VANG)); }
+const khoaNuoc = (n) => `${n.P}.${n.tu}.${n.toi}.${n.phong || 0}.${n.nhap || 0}`;
+const tenMinh = () => String(docLuu().ten || '').trim().slice(0, 20);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+/* link mời đi qua trang chia sẻ riêng (co-vua-ba-nguoi/), để Zalo, Messenger hiện tên và ảnh của trò */
+const linkMoi = (ma) => location.origin + location.pathname.replace(/[^/]*$/, '') + 'co-vua-ba-nguoi/?phong=' + ma;
+const MA_DIA_CHI = /^#co-ba-nguoi\/([A-HJ-NP-Z2-9]{6})$/;
+const dauThang = () => (typeof location !== 'undefined' && location.hash) || '';
+function datDiaChi(ma) {
+  try { history.replaceState(null, '', location.pathname + location.search + '#co-ba-nguoi' + (ma ? '/' + ma : '')); } catch (e) {}
+}
+
+async function taoPhong(ch) {
+  if (!MANG) return false;
+  const id = MANG.idMoi(), ten = ch.ten || TEN_MAU[ch.mau];
+  moTin('<p class="cb-tin-nho">Chơi qua mạng</p><h2>Đang tạo phòng…</h2>');
+  for (let lan = 0; lan < 4; lan++) {
+    const ma = ch.ma || MANG.maMoi();
+    const r = await MANG.goi(`coba/${ma}`, 'PUT', { tao: MANG.GIO, chu: ch.mau, kho: ch.kho, ghe: { [ch.mau]: { id, ten, thay: MANG.GIO } } });
+    if (r.ok) { vaoPhong(ma, { id, P: ch.mau }); return true; }
+    if (r.ma !== 401 || ch.ma) break;               // mất mạng, hay mã định sẵn (ván nữa) đã có người dùng
+  }
+  moTin('<p class="cb-tin-nho">Chơi qua mạng</p><h2>Chưa tạo được phòng</h2><p>Kiểm tra mạng rồi thử lại.</p><button type="button" class="cb-moi">Quay lại</button>');
+  return false;
+}
+/* vào phòng: minh = { id, P } khi đã có ghế (người tạo phòng, hay mở lại); muonNgoi: ghế muốn ngồi khi theo ván nữa */
+function vaoPhong(ma, minh, muonNgoi = -1, tuMo = false) {
+  if (!MANG || !MANG.laMa(ma)) return;
+  dungLuong();
+  if (van && van.cheDo === 'phong') { boViec(); van = null; hoat = null; }
+  phong = { ma, id: minh ? minh.id : MANG.idMoi(), P: minh ? minh.P : -1, cay: undefined, ke: 0, nhat: [], daGui: null, lech: 0,
+    song: false, nhipCuoi: minh ? Date.now() : 0, muonNgoi, nghiO: -1, baoLuot: -1, tuMo, choTiep: 0, sanhCu: '' };
+  if (phong.P >= 0) ghiLuu({ phong: { ma, id: phong.id, P: phong.P } });
+  datDiaChi(ma);
+  noiPhong();
+  if (!tuMo) moTin(`<p class="cb-tin-nho">Phòng ${ma}</p><h2>Đang vào phòng…</h2>`);
+}
+function noiPhong() {
+  if (!phong || phong.luong) return;
+  phong.luong = MANG.nghe(`coba/${phong.ma}`, khiPhongDoi, () => { if (phong) { phong.rot = true; if (van) capNhatChu(); } });
+  phong.kiem = setInterval(kiemPhong, 5000);
+}
+function dungLuong() {                               // tạm ngưng nghe (đóng trò), vẫn giữ chỗ trong phòng
+  if (!phong) return;
+  if (phong.luong) { phong.luong.dung(); phong.luong = null; }
+  if (phong.kiem) { clearInterval(phong.kiem); phong.kiem = 0; }
+}
+function roiPhong() {                                // rời hẳn
+  if (!phong) return;
+  const cay = phong.cay, ma = phong.ma;
+  dungLuong();
+  /* hết ván đủ 5 phút thì dọn phòng (luật chỉ cho xoá lúc đó, hay khi phòng đã quá một ngày) */
+  if (cay && cay.xong && gioMay() - cay.xong > 300000) MANG.goi(`coba/${ma}`, 'DELETE');
+  phong = null;
+  ghiLuu({ phong: undefined });
+  if (van && van.cheDo === 'phong') { boViec(); van = null; hoat = null; chon = -1; nuocCuaChon = []; }
+  if (tam) { tam.querySelector('.cb-moi').textContent = 'Ván mới'; tam.querySelector('.cb-thay').hidden = true; }
+  datDiaChi('');
+}
+function khiPhongDoi(cay) {
+  if (!phong) return;
+  const truoc = phong.cay;
+  phong.cay = cay; phong.rot = false;
+  if (cay == null) {
+    if (phong.choTiep && Date.now() - phong.choTiep < 20000) return;   // vừa theo "ván nữa": phòng mới đang được tạo
+    const ma = phong.ma, tuMo = phong.tuMo;
+    roiPhong();
+    if (tuMo) moCaiDat();
+    else moTin(`<p class="cb-tin-nho">Phòng ${ma}</p><h2>Không thấy phòng này</h2><p>Mã sai, hoặc phòng đã đóng sau khi chơi xong.</p><button type="button" class="cb-moi">Quay lại</button>`);
+    return;
+  }
+  phong.choTiep = 0;
+  const g = gheCua(phong.P), gCu = truoc && truoc.ghe && truoc.ghe[phong.P];
+  if (phong.P >= 0 && g && g.id === phong.id && g.thay && !(gCu && gCu.thay === g.thay)) phong.lech = g.thay - Date.now();
+  if (phong.P >= 0 && g && g.id !== phong.id) { phong.P = -1; ghiLuu({ phong: undefined }); bao('Ghế đó vừa có người khác ngồi trước.'); }
+  if ((cay.tao && gioMay() - cay.tao > 86400000) || (phong.tuMo && cay.xong)) {      // phòng đã cũ: dọn luôn, khỏi mở lại
+    const tuMo = phong.tuMo;
+    if (cay.tao && gioMay() - cay.tao > 86400000) MANG.goi(`coba/${phong.ma}`, 'DELETE');
+    roiPhong();
+    if (tuMo) moCaiDat(); else moTin('<p class="cb-tin-nho">Chơi qua mạng</p><h2>Phòng này đã đóng</h2><p>Phòng chỉ giữ trong một ngày.</p><button type="button" class="cb-moi">Quay lại</button>');
+    return;
+  }
+  phong.tuMo = false;
+  if (!cay.batDau) { veSanh(); return; }
+  if (!van || van.cheDo !== 'phong' || van.ma !== phong.ma) { batDauVanPhong(); return; }
+  capNhatNguoi();
+  kiemNhat();
+  chayPhong();
+  capNhatChu();
+  if (van && van.hetVan && tam.querySelector('.cb-tin .cb-vannua, .cb-tin .cb-vaotiep')) ketThucVan(true);   // có lời mời ván nữa
+}
+/* phòng chờ: ba ghế, link mời, Bắt đầu (chủ phòng; chủ phòng vắng thì người khác bấm được) */
+function veSanh() {
+  const cay = phong.cay, minh = phong.P;
+  if (minh < 0 && phong.muonNgoi >= 0 && !gheCua(phong.muonNgoi)) { const P = phong.muonNgoi; phong.muonNgoi = -1; ngoiGhe(P); }
+  const dong = L.THU_TU.map(P => {
+    const g = gheCua(P);
+    const ai = g ? `${esc(g.ten || TEN_MAU[P])}${P === minh ? ' (bạn)' : ''}${P === cay.chu ? ' · chủ phòng' : ''}${conO(P) ? '' : ' · vắng'}` : 'còn trống';
+    const nut = !g && minh < 0 ? `<button type="button" class="cb-chon" data-ngoi="${P}">Ngồi đây</button>` : '';
+    return `<div class="cb-ghe"><i style="background:${MAU[P].cham}"></i><span><b>${TEN_MAU[P]}</b> ${ai}</span>${nut}</div>`;
+  }).join('');
+  const batDauDuoc = minh >= 0 && (minh === cay.chu || !conO(cay.chu));
+  const loi = batDauDuoc ? 'Bấm Bắt đầu lúc nào cũng được — ghế còn trống thì máy chơi thay.' : minh >= 0 ? 'Chờ chủ phòng bấm Bắt đầu.' : 'Chọn một ghế còn trống để vào chơi.';
+  const html = `<p class="cb-tin-nho">Phòng chờ</p><h2>Phòng <span class="cb-ma">${phong.ma}</span></h2>
+    <div class="cb-ghe-ds">${dong}</div>
+    ${minh < 0 ? `<p class="cb-nhan">Tên của bạn</p><input class="cb-o-ten" maxlength="20" value="${esc(tenMinh())}" placeholder="Để trống thì gọi theo màu quân">` : ''}
+    <p class="cb-meo">Gửi link hay mã phòng cho bạn bè. ${loi}</p>
+    ${batDauDuoc ? '<button type="button" class="cb-batdau-phong">Bắt đầu</button>' : ''}
+    <button type="button" class="cb-phu cb-moi-ban">Gửi link mời</button>
+    <button type="button" class="cb-phu cb-roi">Rời phòng</button>`;
+  if (html !== phong.sanhCu || tam.querySelector('.cb-tin').hidden) { phong.sanhCu = html; moTin(html); }
+}
+async function ngoiGhe(P) {
+  if (!phong || phong.P >= 0) return;
+  const o = tam && tam.querySelector('.cb-o-ten');
+  if (o) ghiLuu({ ten: o.value.trim().slice(0, 20) });
+  const r = await MANG.goi(`coba/${phong.ma}/ghe/${P}`, 'PATCH', { id: phong.id, ten: tenMinh() || TEN_MAU[P], thay: MANG.GIO });
+  if (!phong) return;
+  if (r.ok) {
+    phong.P = P; phong.nhipCuoi = Date.now();
+    ghiLuu({ phong: { ma: phong.ma, id: phong.id, P } });
+    if (phong.cay) khiPhongDoi(phong.cay);
+  } else bao(r.ma === 401 ? (phong.cay && phong.cay.batDau ? 'Ván đã bắt đầu, không vào ghế được nữa.' : 'Ghế này vừa có người ngồi.') : 'Mất mạng, chưa vào được ghế.');
+}
+async function batDauPhong() {
+  if (!phong || !phong.cay || phong.cay.batDau) return;
+  const them = { batDau: MANG.GIO }, tc = ['ho', 'rua'];
+  let k = 0;
+  for (const P of L.THU_TU) if (!gheCua(P)) them['may/' + P] = tc[k++];
+  const r = await MANG.goi(`coba/${phong.ma}`, 'PATCH', them);
+  if (!r.ok && r.ma !== 401) bao('Mất mạng, chưa bắt đầu được.');
+}
+function batDauVanPhong() {
+  boViec();
+  van = { the: L.theMoi(), cheDo: 'phong', ma: phong.ma, nguoi: ['nguoi', 'nguoi', 'nguoi'], tinh: [null, null, null], kho: 0, nguoiChoi: phong.P,
+    lichSu: [], nuocCuoi: null, dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: true };
+  capNhatNguoi();
+  Object.assign(phong, { ke: 0, nhat: [], daGui: null, song: false, nghiO: -1, baoLuot: -1 });
+  chon = -1; nuocCuaChon = []; hoat = null; phongCho = null;
+  xoay = xoayDen = GOC_NHIN[nhaNhin()];
+  tatTin();
+  chayPhong();
+  if (van && van.soNuoc === 0) L.THU_TU.forEach((P, i) => noi(P, 'batDau', .7, 500 + 900 * i));
+}
+/* ai là người, ai do máy chơi thay (ghế trống lúc bắt đầu, hay người vắng đã được cho máy đi thay) */
+function capNhatNguoi() {
+  for (const P of [0, 1, 2]) {
+    const may = mayCua(P), g = gheCua(P);
+    van.nguoi[P] = may || !g ? 'may' : 'nguoi';
+    van.tinh[P] = may || (g ? null : 'rua');
+  }
+  van.nguoiChoi = phong.P;
+  van.kho = [0, 1, 2].includes(phong.cay.kho) ? phong.cay.kho : 0;
+}
+/* tìm nước hợp lệ đúng như nước trên máy chủ; tốt phong cấp thì chọn được Hậu, Xe, Tượng, Mã */
+function timNuocMang(the, mv) {
+  if (the.thang >= 0 || the.hoa || mv.P !== the.luot) return null;
+  const n = L.nuocHopLe(the, mv.P).find(x => x.tu === mv.tu && x.toi === mv.toi && (x.nhap || 0) === (mv.nhap || 0));
+  if (!n) return null;
+  if (n.phong) return [2, 3, 4, 5].includes(mv.phong) ? Object.assign({}, n, { phong: mv.phong }) : null;
+  return mv.phong ? null : n;
+}
+/* áp các nước mới tới từ máy chủ, theo đúng thứ tự. Lúc vào phòng (hay dựng lại) thì áp ngay hết cho kịp; đang chơi thì
+   nước mới nhất trượt quân như thường, xong lại gọi tiếp (denLuot → chayPhong). */
+function chayPhong() {
+  if (!phong || !van || van.cheDo !== 'phong' || hoat) return;
+  const ds = (phong.cay && phong.cay.nuoc) || {};
+  for (;;) {
+    const mv = ds[phong.ke];
+    if (!mv) break;
+    const m = timNuocMang(van.the, mv);
+    phong.nhat.push(khoaNuoc(mv));
+    phong.ke++;
+    if (!m) continue;                                // nước sai luật: máy nào cũng bỏ qua như nhau
+    if (van.dangNghi >= 0) boViec();                 // máy khác đã đi giùm trước
+    /* trang đang ẩn (chuyển sang app khác) thì trình duyệt không chạy hình động: áp ngay cho khỏi dồn lại */
+    if (!phong.song || ds[phong.ke] || (typeof document !== 'undefined' && document.hidden)) { apDung(m, mv.P); continue; }
+    thucHien(m, mv.P);
+    return;
+  }
+  phong.song = true;
+  denLuot();
+}
+/* đi một nước của mình (hay của máy chơi thay mà mình chạy): ván qua mạng thì áp liền rồi ghi lên máy chủ */
+function diNuoc(m, P) {
+  if (!van || van.cheDo !== 'phong') { thucHien(m, P); return; }
+  if (!phong || van.the.luot !== P || hoat) return;
+  const n = phong.ke, mv = { P, tu: m.tu, toi: m.toi, phong: m.phong || 0, nhap: m.nhap || 0 };
+  phong.ke++; phong.nhat.push(khoaNuoc(mv)); phong.daGui = { n };
+  thucHien(m, P);
+  const ma = phong.ma;
+  MANG.goi(`coba/${ma}/nuoc/${n}`, 'PUT', mv).then((r) => {
+    if (!phong || phong.ma !== ma || !phong.daGui || phong.daGui.n !== n || r.ok) return;
+    phong.daGui = null;
+    bao(r.ma === 401 ? 'Nước vừa rồi không được tính — máy khác đã ghi trước.' : 'Mất mạng, nước vừa rồi chưa gửi được.');
+    dungLaiPhong();
+  });
+}
+/* các nước đã áp phải khớp danh sách trên máy chủ; lệch (hiếm: hai máy cùng ghi một ô) thì dựng lại từ đầu */
+function kiemNhat() {
+  const ds = (phong.cay && phong.cay.nuoc) || {};
+  for (let i = 0; i < phong.nhat.length; i++) {
+    const mv = ds[i];
+    if (!mv) { if (phong.daGui && phong.daGui.n === i) continue; dungLaiPhong(); return; }
+    if (khoaNuoc(mv) !== phong.nhat[i]) { dungLaiPhong(); return; }
+  }
+  if (phong.daGui && ds[phong.daGui.n]) phong.daGui = null;
+}
+function dungLaiPhong() {
+  if (!van || !phong) return;
+  boViec();
+  hoat = null; chon = -1; nuocCuaChon = []; phongCho = null;
+  Object.assign(van, { the: L.theMoi(), nuocCuoi: null, an: [0, 0, 0], soNuoc: 0, hetVan: false });
+  Object.assign(phong, { ke: 0, nhat: [], daGui: null, song: false, nghiO: -1 });
+  chayPhong();
+}
+/* máy chơi thay do ai chạy: người ngồi ghế số nhỏ nhất còn ở đây (không ai thì người còn ở đây bất kỳ) */
+function toiChayMay() {
+  if (!phong || phong.P < 0) return false;
+  let ds = [0, 1, 2].filter(P => gheCua(P) && !mayCua(P) && conO(P));
+  if (!ds.length) ds = [0, 1, 2].filter(P => gheCua(P) && conO(P));
+  return ds.length > 0 && ds[0] === phong.P;
+}
+function viecPhong() {
+  if (!van || van.cheDo !== 'phong' || !phong || phong.P < 0 || van.the.thang >= 0 || van.the.hoa) return '';
+  if (mayCua(phong.P)) return 'tudi';
+  const P = van.the.luot;
+  return laNguoi(P) && P !== phong.P && van.the.song[P] && !conO(P) ? 'thay' : '';
+}
+function choMayThay() {
+  const P = van && van.the.luot;
+  if (viecPhong() !== 'thay') return;
+  const dang = [0, 1, 2].map(mayCua);
+  MANG.goi(`coba/${phong.ma}/may/${P}`, 'PUT', dang.includes('ho') ? 'rua' : 'ho');
+}
+function tuDiTiep() { if (viecPhong() === 'tudi') MANG.goi(`coba/${phong.ma}/may/${phong.P}`, 'DELETE'); }
+/* mỗi 5 giây: báo mình còn ở đây, nối lại luồng nếu đã đóng, xem có phải nhận chạy máy (người trước đã rời) */
+function kiemPhong() {
+  if (!phong) return;
+  if (phong.P >= 0 && Date.now() - phong.nhipCuoi > NHIP && !document.hidden) {
+    phong.nhipCuoi = Date.now();
+    MANG.goi(`coba/${phong.ma}/ghe/${phong.P}/thay`, 'PUT', MANG.GIO);
+  }
+  if (phong.luong) phong.luong.noiLai();
+  if (!phong.cay) return;
+  if (!phong.cay.batDau) veSanh();
+  else if (van && van.cheDo === 'phong' && !hoat) denLuot();
+}
+function moiBan() {
+  if (!phong) return;
+  const url = linkMoi(phong.ma), xong = () => bao(`Đã chép link mời. Mã phòng: ${phong ? phong.ma : ''}`);
+  if (navigator.share) { navigator.share({ title: 'Cờ vua ba người', text: `Vào phòng ${phong.ma} chơi cờ ba người`, url }).catch(() => {}); return; }
+  if (navigator.clipboard) navigator.clipboard.writeText(url).then(xong, () => bao(`Mã phòng: ${phong.ma}`)); else bao(`Mã phòng: ${phong.ma}`);
+}
+function moPhongTT() {
+  const dong = L.THU_TU.map(P => `<div class="cb-ghe"><i style="background:${MAU[P].cham}"></i><span><b>${TEN_MAU[P]}</b> ${esc(tenNha(P))}${!laNguoi(P) ? ' · máy chơi thay' : conO(P) ? '' : ' · vắng'}</span></div>`).join('');
+  moTin(`<p class="cb-tin-nho">Đang chơi qua mạng</p><h2>Phòng <span class="cb-ma">${phong.ma}</span></h2><div class="cb-ghe-ds">${dong}</div>
+    <p class="cb-meo">Ai có link cũng vào xem được. Tới lượt người vắng quá một phút thì người khác bấm được "Cho máy đi thay".</p>
+    <button type="button" class="cb-dongtin">Chơi tiếp</button><button type="button" class="cb-phu cb-moi-ban">Gửi link</button><button type="button" class="cb-phu cb-roi">Rời phòng</button>`);
+}
+/* ván nữa: ai bấm trước thì giữ chỗ mã phòng mới trong phòng cũ (tiep, ghi một lần), rồi tạo phòng đó */
+async function vanNua() {
+  if (!phong || !phong.cay) return;
+  if (phong.cay.tiep) { theoTiep(phong.cay.tiep); return; }
+  const cu = phong.ma, P = phong.P >= 0 ? phong.P : 0, kho = phong.cay.kho || 0, ma = MANG.maMoi();
+  const r = await MANG.goi(`coba/${cu}/tiep`, 'PUT', ma);
+  if (!phong || phong.ma !== cu) return;
+  if (!r.ok) { bao(r.ma === 401 ? 'Có người vừa mời ván nữa — bấm Vào ván mới.' : 'Mất mạng, thử lại nhé.'); return; }
+  await taoPhong({ mau: P, kho, ten: tenMinh() || TEN_MAU[P], ma });
+}
+function theoTiep(ma) {
+  const P = phong && phong.P >= 0 ? phong.P : -1;
+  vaoPhong(ma, null, P);
+  if (phong) phong.choTiep = Date.now();
+}
+function vaoBangMa() {
+  const o = tam && tam.querySelector('.cb-o-ma'), t = tam && tam.querySelector('.cb-o-ten');
+  if (t) ghiLuu({ ten: t.value.trim().slice(0, 20) });
+  const ma = String(o ? o.value : '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if (MANG && MANG.laMa(ma)) vaoPhong(ma); else bao('Mã phòng gồm 6 chữ và số, như trong link mời.');
+}
+function theoMaTrenDiaChi() {
+  if (!tam || !tam.classList.contains('hien') || !MANG) return;
+  const m = MA_DIA_CHI.exec(dauThang());
+  if (m && (!phong || phong.ma !== m[1])) { const l = docLuu().phong; vaoPhong(m[1], l && l.ma === m[1] ? { id: l.id, P: l.P } : null); }
 }
 
 /* ---------- hình động hướng dẫn: đường uốn qua tâm ---------- */
@@ -952,6 +1277,7 @@ function tiengDi(an) {
 function tiengCham() { if (amThanh()) not(880, am.currentTime + .01, .05, .03); }
 function tiengChieu() { if (!amThanh()) return; const t = am.currentTime + .02; not(988, t, .22, .08); not(784, t + .14, .3, .08); }
 function tiengLoai() { if (!amThanh()) return; const t = am.currentTime + .02; not(196, t, 1.2, .14); not(196 * 2.76, t, .5, .03); }
+function tiengToiLuot() { if (!amThanh()) return; const t = am.currentTime + .02; not(659.25, t, .16, .05); not(987.77, t + .13, .26, .05); if (navigator.vibrate) navigator.vibrate(40); }
 function tiengThang() { if (!amThanh()) return; const t = am.currentTime + .02; [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => not(f, t + i * .11, .5, .12, 'triangle')); }
 
 /* ---------- khung, bảng ---------- */
@@ -969,7 +1295,7 @@ function dungKhung() {
     <div class="cb-canh"><canvas class="cb-cv"></canvas><p class="cb-bao" hidden></p></div>
     <div class="cb-duoi">
       <p class="cb-luot" aria-live="polite"></p>
-      <div class="cb-nut"><button class="cb-hoan" type="button">↶ Hoàn tác</button><button class="cb-moi" type="button">Ván mới</button></div>
+      <div class="cb-nut"><button class="cb-hoan" type="button">↶ Hoàn tác</button><button class="cb-thay" type="button" hidden></button><button class="cb-moi" type="button">Ván mới</button></div>
     </div>
     <p class="cb-noi" hidden></p>
     <div class="cb-tin" hidden><div class="cb-tin-trong"></div></div>`;
@@ -978,6 +1304,10 @@ function dungKhung() {
   tam.querySelector('.cb-hoan').hidden = true;
   cv = tam.querySelector('.cb-cv'); ctx = cv.getContext && cv.getContext('2d');
   tam.addEventListener('click', bam);
+  tam.addEventListener('input', (e) => { if (e.target && e.target.classList && e.target.classList.contains('cb-o-ten')) ghiLuu({ ten: e.target.value.trim().slice(0, 20) }); });
+  tam.addEventListener('keydown', (e) => { if (e.key === 'Enter' && e.target && e.target.classList && e.target.classList.contains('cb-o-ma')) vaoBangMa(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && phong) { phong.nhipCuoi = 0; kiemPhong(); } });
+  addEventListener('hashchange', theoMaTrenDiaChi);
   cv.addEventListener('pointerdown', (e) => {
     amThanh();
     if (demo) { tiepDemo(); return; }
@@ -996,17 +1326,24 @@ function doCo() {
 function moTin(html) { const h = tam.querySelector('.cb-tin'); h.querySelector('.cb-tin-trong').innerHTML = html; h.hidden = false; }
 function tatTin() { if (tam) tam.querySelector('.cb-tin').hidden = true; }
 function moCaiDat() {
-  const l = docLuu(), che = l.che === 'ba' ? 'ba' : 'may', mau = [0, 1, 2].includes(l.mau) ? l.mau : 0, kho = [0, 1, 2].includes(l.kho) ? l.kho : 1;
+  const l = docLuu(), che = l.che === 'phong' && MANG ? 'phong' : 'may', mau = [0, 1, 2].includes(l.mau) ? l.mau : 0, kho = [0, 1, 2].includes(l.kho) ? l.kho : 1;
   const nut = (ten, gt, chon_, nhom) => `<button type="button" class="cb-chon${chon_ ? ' cb-bat' : ''}" data-${nhom}="${gt}">${ten}</button>`;
+  const quan = [0, 2, 1].map(P => nut(TEN_MAU[P] + (P === 0 ? ' (đi trước)' : ''), P, P === mau, 'mau')).join('');
+  const muc = KHO.map((k, i) => nut(k.ten, i, i === kho, 'kho')).join('');
+  const phan = che === 'phong' ? `
+    <p class="cb-nhan">Tên của bạn</p><input class="cb-o-ten" maxlength="20" value="${esc(l.ten || '')}" placeholder="Để trống thì gọi theo màu quân">
+    <p class="cb-nhan">Bạn cầm quân</p><div class="cb-hang">${quan}</div>
+    <p class="cb-nhan">Ghế trống thì máy chơi</p><div class="cb-hang">${muc}</div>
+    <button type="button" class="cb-tao">Tạo phòng</button>
+    <p class="cb-nhan">Có mã phòng của bạn bè?</p>
+    <div class="cb-hang"><input class="cb-o-ma" maxlength="6" placeholder="Mã 6 ký tự" autocapitalize="characters" autocomplete="off" spellcheck="false"><button type="button" class="cb-chon cb-vao">Vào</button></div>
+    <p class="cb-meo">Mỗi người một máy. Nước đi và tên bạn gửi qua máy chủ Firebase của Google để các máy thấy nhau; ai có mã phòng thì xem được.</p>` : `
+    <p class="cb-nhan">Bạn cầm quân</p><div class="cb-hang">${quan}</div>
+    <p class="cb-nhan">Máy chơi</p><div class="cb-hang">${muc}</div>
+    <p class="cb-meo">Hai máy có tính cách riêng: <b>Hổ</b> hăng, dám đánh; <b>Rùa</b> chậm mà chắc.</p>
+    <button type="button" class="cb-batdau">Bắt đầu</button>`;
   moTin(`<p class="cb-tin-nho">Ván mới</p><h2>Cờ vua ba người</h2>
-    <p class="cb-nhan">Cách chơi</p><div class="cb-hang">${nut('Đấu với 2 máy', 'may', che === 'may', 'che')}${nut('3 người chung máy', 'ba', che === 'ba', 'che')}</div>
-    <div class="cb-may"${che === 'ba' ? ' hidden' : ''}>
-      <p class="cb-nhan">Bạn cầm quân</p><div class="cb-hang">${[0, 2, 1].map(P => nut(TEN_MAU[P] + (P === 0 ? ' (đi trước)' : ''), P, P === mau, 'mau')).join('')}</div>
-      <p class="cb-nhan">Máy chơi</p><div class="cb-hang">${KHO.map((k, i) => nut(k.ten, i, i === kho, 'kho')).join('')}</div>
-      <p class="cb-meo">Hai máy có tính cách riêng: <b>Hổ</b> hăng, dám đánh; <b>Rùa</b> chậm mà chắc.</p>
-    </div>
-    <p class="cb-meo cb-ba"${che === 'ba' ? '' : ' hidden'}>Chuyền tay nhau một máy. Đi xong, bàn tự xoay về phía người tới lượt.</p>
-    <button type="button" class="cb-batdau">Bắt đầu</button>
+    <p class="cb-nhan">Cách chơi</p><div class="cb-hang">${nut('Đấu với 2 máy', 'may', che === 'may', 'che')}${MANG ? nut('Chơi qua mạng', 'phong', che === 'phong', 'che') : ''}</div>${phan}
     <button type="button" class="cb-phu cb-tieng">${coTieng ? '🔊 Âm thanh: bật' : '🔇 Âm thanh: tắt'}</button>`);
   moCaiDat.ch = { che, mau, kho };
 }
@@ -1020,9 +1357,23 @@ function moHuongDan() {
     <button type="button" class="cb-demo">Xem hình động đường đi qua tâm</button>
     <button type="button" class="cb-phu cb-dongtin">Chơi</button>`);
 }
-function ketThucVan() {
+function ketThucVan(capNhat) {
   if (!van) return;
-  const the = van.the, ban_ = van.cheDo === 'may' ? van.nguoiChoi : -1;
+  const the = van.the, ban_ = van.nguoiChoi;
+  if (van.cheDo === 'phong') {
+    if (!capNhat) {
+      if (the.thang >= 0) tiengThang();
+      if (phong && phong.cay && !phong.cay.xong) MANG.goi(`coba/${phong.ma}/xong`, 'PUT', MANG.GIO);   // mốc để dọn phòng sau 5 phút
+    }
+    const tieuDe = the.thang >= 0 ? (the.thang === ban_ ? 'Bạn thắng!' : `${tenNha(the.thang)} thắng!`) : 'Hoà';
+    const loi = the.thang >= 0 ? `${tenNha(the.thang)} (${TEN_MAU[the.thang]}) là vua cuối cùng còn đứng.` : 'Không ai còn cách chiếu hết người kia.';
+    const tiep = phong && phong.cay && phong.cay.tiep;
+    moTin(`<p class="cb-tin-nho">Hết ván · ${van.soNuoc} nước · phòng ${van.ma}</p><h2>${tieuDe}</h2><p>${loi}</p>
+      <p class="cb-meo">${L.THU_TU.map(P => `${esc(tenNha(P))}: ăn ${Math.round(van.an[P] / 100)} điểm`).join(' · ')}</p>
+      ${tiep ? '<p class="cb-meo">Có người mời chơi ván nữa.</p><button type="button" class="cb-vaotiep">Vào ván mới</button>' : '<button type="button" class="cb-vannua">Chơi ván nữa</button>'}
+      <button type="button" class="cb-phu cb-roi">Rời phòng</button>`);
+    return;
+  }
   if (the.thang >= 0) tiengThang();
   const tieuDe = the.thang >= 0 ? (the.thang === ban_ ? 'Bạn thắng!' : `${tenNha(the.thang)} thắng!`) : 'Hoà';
   const loi = the.thang >= 0 ? `${tenNha(the.thang)} (${TEN_MAU[the.thang]}) là vua cuối cùng còn đứng.` : 'Không ai còn cách chiếu hết người kia.';
@@ -1036,18 +1387,27 @@ function bam(e) {
   if (q('.xn-dong')) { dong(); return; }
   if (q('.cb-noi') || q('.cb-bao')) { t.hidden = true; return; }
   if (q('.cb-hoi')) { moHuongDan(); return; }
-  if (q('.cb-moi')) { moCaiDat(); return; }
+  if (q('.cb-moi')) { if (van && van.cheDo === 'phong' && phong) moPhongTT(); else moCaiDat(); return; }
   if (q('.cb-hoan')) { hoanTac(); return; }
   if (q('.cb-demo')) { batDemo(); return; }
   if (q('.cb-dongtin')) { tatTin(); if (!van) moCaiDat(); return; }
   if ((n = q('[data-che]'))) { moCaiDat.ch.che = n.dataset.che; ghiLuu({ che: n.dataset.che }); moCaiDat(); return; }
   if ((n = q('[data-mau]'))) { ghiLuu({ mau: +n.dataset.mau }); moCaiDat(); return; }
   if ((n = q('[data-kho]'))) { ghiLuu({ kho: +n.dataset.kho }); moCaiDat(); return; }
+  if ((n = q('[data-ngoi]'))) { ngoiGhe(+n.dataset.ngoi); return; }
+  if (q('.cb-tao')) { amThanh(); const c = moCaiDat.ch; taoPhong({ mau: c.mau, kho: c.kho, ten: tenMinh() }); return; }
+  if (q('.cb-vao')) { amThanh(); vaoBangMa(); return; }
+  if (q('.cb-batdau-phong')) { amThanh(); batDauPhong(); return; }
+  if (q('.cb-moi-ban')) { moiBan(); return; }
+  if (q('.cb-roi')) { roiPhong(); moCaiDat(); return; }
+  if (q('.cb-vannua')) { vanNua(); return; }
+  if (q('.cb-vaotiep')) { if (phong && phong.cay && phong.cay.tiep) theoTiep(phong.cay.tiep); return; }
+  if ((n = q('.cb-thay'))) { if (n.dataset.viec === 'tudi') tuDiTiep(); else choMayThay(); return; }
   if (q('.cb-tieng')) { coTieng = !coTieng; if (!coTieng && am) am.suspend(); moCaiDat(); return; }
   if (q('.cb-batdau')) { amThanh(); vanMoi(moCaiDat.ch); return; }
   if (q('.cb-lai')) { vanMoi({ che: van.cheDo, mau: van.nguoiChoi, kho: van.kho }); return; }
   if (q('.cb-xemtiep')) { van.xemTiep = true; tatTin(); denLuot(); return; }
-  if ((n = q('[data-phong]'))) { const m = Object.assign({}, phongCho, { phong: +n.dataset.phong }); phongCho = null; tatTin(); thucHien(m, van.the.luot); return; }
+  if ((n = q('[data-phong]'))) { const m = Object.assign({}, phongCho, { phong: +n.dataset.phong }); phongCho = null; tatTin(); diNuoc(m, van.the.luot); return; }
 }
 function vong(t) {
   raf = 0;
@@ -1068,13 +1428,20 @@ function mo() {
   tam.classList.add('hien');
   doCo();
   taoTho();
-  if (!van) {
+  const m = MANG && MA_DIA_CHI.exec(dauThang()), luu = docLuu().phong;
+  if (m) {
+    if (!phong || phong.ma !== m[1]) vaoPhong(m[1], luu && luu.ma === m[1] ? { id: luu.id, P: luu.P } : null);
+    else noiPhong();
+  } else if (phong) { noiPhong(); datDiaChi(phong.ma); }
+  else if (!van && MANG && luu && MANG.laMa(luu.ma)) vaoPhong(luu.ma, { id: luu.id, P: luu.P }, -1, true);   // mở lại sau khi tải lại trang
+  else if (!van) {
     if (!docLuu().h) { ghiLuu({ h: 1 }); moHuongDan(); }
     else moCaiDat();
   }
   if (!raf) raf = requestAnimationFrame(vong);
 }
 function dong() {
+  dungLuong();
   if (raf) { cancelAnimationFrame(raf); raf = 0; }
   if (am && am.state === 'running') am.suspend();
   if (tam) tam.classList.remove('hien');
@@ -1092,5 +1459,9 @@ self.TDTD_COBA = {
   _chon: () => chon, _nuocCuaChon: () => nuocCuaChon, _hoat: () => hoat, _xongHoat: () => { if (hoat) { const f = hoat.xong; hoat = null; f(); } },
   _apDungNuocMay: (so, P, kq) => apDungNuocMay(so, P, kq), _viec: () => viec, _coTheHoan: () => coTheHoan(), _demo: () => demo, _batDemo: () => batDemo(), _tiepDemo: () => tiepDemo(),
   _veCanh: (t) => veCanh(t), _GOC_NHIN: GOC_NHIN, _CO_O: CO_O, _cauHinhMay: (P) => cauHinhMay(P), _tenNha: (P) => tenNha(P),
+  _phong: () => phong, _taoPhong: (ch) => taoPhong(ch), _vaoPhong: (ma, minh, muon) => vaoPhong(ma, minh, muon), _ngoiGhe: (P) => ngoiGhe(P),
+  _batDauPhong: () => batDauPhong(), _diNuoc: (m, P) => diNuoc(m, P), _roiPhong: () => roiPhong(), _vanNua: () => vanNua(), _theoTiep: (ma) => theoTiep(ma),
+  _kiemPhong: () => kiemPhong(), _toiChayMay: () => toiChayMay(), _viecPhong: () => viecPhong(), _choMayThay: () => choMayThay(), _tuDiTiep: () => tuDiTiep(),
+  _timNuocMang: (the, mv) => timNuocMang(the, mv), _moCaiDat: () => moCaiDat(), _laMinh: (P) => laMinh(P),
 };
 })();
