@@ -105,23 +105,24 @@ console.log('\n— Gợi ý từng bước —');
   ok('chương điều kiện: gợi ý ô nằm trong phần "không thì"', (r => r.loai === 'them' && r.k === 'neu-trai')(gy(83, 'w(?d(d)())')));
 }
 
-console.log('\n— Âm thanh, mở hết để thử —');
+console.log('\n— Âm thanh; bài nào cũng mở —');
 {
   const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8');
   ok('thắp sao có tiếng chuông, sao sau cao hơn sao trước', /ve\.sang\.add\(b\.sang\);[^\n]*tingSao\(ve\.sang\.size - 1\)/.test(src) && /const BAC = \[523\.25, 659\.25, 783\.99/.test(src));
   ok('thắng có nhạc mừng, vướng có tiếng bộp nhỏ', /setTimeout\(nhacThang, 250\)/.test(src) && /if \(!b\.ok\) \{[^}]*tiengVuong\(\)/.test(src));
   ok('tắt được âm thanh; mở âm thanh ngay lúc bấm Chạy (iPhone đòi), đóng trò thì ngắt', /coTieng = !coTieng/.test(src) && /function batDauChay\(tungBuoc\) \{\s*amThanh\(\);/.test(src) && /am\.suspend\(\)/.test(src));
-  L._moHet(false);
-  const thuong = L._moToi();
-  L._moHet(true);
-  ok('chế độ thử mở tới bài 100; bình thường chỉ tới bài chưa xong đầu tiên', thuong === 0 && L._moToi() === 99, `${thuong} → ${L._moToi()}`);
-  L._moHet(false);
-  ok('mở hết bằng ?mohet trên link, hoặc chạm 7 lần vào tên trò — không ghi gì xuống máy', /\[\?&\]mohet/.test(src) && /bamBi\.n >= 7/.test(src));
+  /* Người dùng: "mở full hết đi, ai muốn chơi màn nào thì chơi" — không còn khoá bài nào */
+  ok('danh sách bài không khoá bài nào (bản trước: chỉ mở tới bài chưa xong đầu tiên)', !/disabled/.test(src.slice(src.indexOf('function moDs'), src.indexOf('function themO'))) && !/moToi/.test(src));
+  ok('chế độ thử (?mohet, hay chạm 7 lần vào tên trò) giờ chỉ thêm nút điền lời giải mẫu', /\[\?&\]mohet/.test(src) && /bamBi\.n >= 7/.test(src) && /cheDoThu \? `[^`]*data-dien/.test(src));
+  ok('có nút chuyển sang bài trước, bài sau ngay trên cảnh', /data-chuyen="-1"/.test(src) && /data-chuyen="1"/.test(src) && /moBai\(bai \+ \(\+n\.dataset\.chuyen\)\)/.test(src));
+  ok('danh sách bài: có nút "Làm tiếp bài chưa xong", đóng bằng ✕ hay chạm ra ngoài, tự cuộn tới bài đang chơi',
+     /Làm tiếp bài chưa xong/.test(src) && /lt-ds-x/.test(src) && /t === tam\.querySelector\('\.lt-ds'\)/.test(src) && /\.lt-ds-luoi \.lt-dang/.test(src));
 }
 
 {
   const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8');
-  ok('đếm ô ghi rõ "tối đa" (bản cũ "6/7 ô" bị đọc thành cần 7 ô)', /dem\.textContent = `\$\{n\} ô · tối đa \$\{b\.toiDa\}`/.test(src));
+  ok('đếm ô ghi rõ "tối đa" (bản cũ "6/7 ô" bị đọc thành cần 7 ô), và có Hàm ★ thì nói là tính cả hàm',
+     /`\$\{n\} ô \(cả Hàm ★\) · tối đa \$\{b\.toiDa\}` : `\$\{n\} ô · tối đa \$\{b\.toiDa\}`/.test(src));
   ok('thắng rồi thì nói so với cách gọn nhất: gọn hơn / bằng (3 sao) / dài hơn bao nhiêu ô', /Còn gọn hơn cả lời giải gọn nhất/.test(src) && /Gọn nhất rồi — đủ 3 sao!/.test(src) && /Cách gọn nhất chỉ cần \$\{mau\} ô\. Bớt/.test(src));
 }
 
@@ -135,7 +136,18 @@ console.log('\n— Chấm sao theo số ô —');
   ok('số ô tối đa chừa chỗ cho 2 sao: tối đa ≥ lời giải gọn nhất', L.BAI.every(b => b.toiDa >= L.mauBai(b)));
   const kho = {};
   global.localStorage = { getItem: (k) => (k in kho ? kho[k] : null), setItem: (k, v) => { kho[k] = String(v); } };
-  ok('chuỗi tiến độ cũ chỉ có 0/1 (trước khi có sao) vẫn đọc được: 1 = đã xong, 1 sao', (() => { kho['tdtd.code'] = '1' + '0'.repeat(99); return L._moToi() === 1; })());
+  ok('chuỗi tiến độ cũ chỉ có 0/1 (trước khi có sao) vẫn đọc được: 1 = đã xong, 1 sao', (() => { kho['tdtd.code'] = '1' + '0'.repeat(99); return L._baiTiep() === 1; })());
+  /* Mở trò: về bài đang chơi dở lần trước (kể cả bài nhảy cóc tới), không thì bài chưa xong đầu tiên */
+  ok('chưa nhớ bài nào thì mở bài chưa xong đầu tiên', L._baiMo() === 1);
+  kho['tdtd.code.nho'] = JSON.stringify({ bai: 57 });
+  ok('mở lại trò thì về đúng bài đang chơi dở (bài 58), không bị kéo về bài chưa xong đầu tiên', L._baiMo() === 57);
+  kho['tdtd.code.nho'] = JSON.stringify({ bai: 500 }); const a1 = L._baiMo();
+  kho['tdtd.code.nho'] = '{hỏng'; const a2 = L._baiMo();
+  ok('chỗ nhớ hỏng hay sai thì lùi về bài chưa xong đầu tiên, không nổ lỗi', a1 === 1 && a2 === 1);
+  /* Bảng giới thiệu chương: lần đầu vào chương, dù nhảy vào giữa chương */
+  kho['tdtd.code.nho'] = JSON.stringify({ chuong: '0000001000' });
+  ok('chương đã xem giới thiệu thì không hiện lại; chương có bài đã xong (người chơi từ bản cũ) cũng coi như đã xem',
+     L._daXemChuong(6) && L._daXemChuong(0) && !L._daXemChuong(8));
   delete global.localStorage;
 }
 
@@ -167,7 +179,30 @@ ok('nạp bài học trước, rồi tới trò, rồi app', vt('baicode.js') > 
 ok('chạy được khi mất mạng: hai tệp có trong bộ nhớ đệm cài sẵn', /'assets\/baicode\.js'/.test(sw) && /'assets\/laptrinh\.js'/.test(sw));
 const z = (lop) => +((css.match(new RegExp(`\\.${lop}\\{[^}]*z-index:(\\d+)`)) || [])[1] || 0);
 ok('màn trò phủ lên trang chính', z('laptrinh') >= 30);
-ok('chỉ nhớ một chuỗi nhỏ: bài nào đã xong', (fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8').match(/localStorage\.setItem/g) || []).length === 1);
+{
+  const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8');
+  ok('chỉ nhớ hai chuỗi nhỏ: sao từng bài, và bài đang chơi + chương đã xem giới thiệu', (src.match(/localStorage\.setItem/g) || []).length === 2
+     && /localStorage\.setItem\(KHOA,/.test(src) && /localStorage\.setItem\(KHOA_NHO,/.test(src));
+}
+console.log('\n— Dễ dùng trên điện thoại —');
+{
+  /* Người dùng: "trên ipad hay điện thoại bấm nhanh button đi 2 lần là bị phóng to màn hình" */
+  ok('chạm nhanh hai lần vào nút không làm Safari phóng to trang (touch-action: manipulation cho mọi phần tử)', /^\*\{touch-action:manipulation\}/m.test(css));
+  ok('…mà các tấm vẽ tự lo việc chạm vẫn giữ touch-action: none (class thắng quy tắc chung)', /\.lt-cv\{[^}]*touch-action:none/.test(css) && /\.td-cv\{[^}]*touch-action:none/.test(css));
+  ok('bấm liên tục vào ô lệnh không bôi đen chữ, giữ lâu không bật bảng sao chép', /\.laptrinh\{[^}]*user-select:none[^}]*-webkit-touch-callout:none/.test(css));
+  ok('cảnh 3D co được để nút ▶ Chạy luôn nằm trong màn (bản trước giữ tối thiểu 34% chiều cao — màn thấp thì nút Chạy bị đẩy ra ngoài)',
+     /\.lt-canh\{[^}]*flex:1 1 0;min-height:120px/.test(css) && !/\.lt-canh\{[^}]*34vh/.test(css));
+  ok('bảng ô lệnh xếp lưới đều, ô hẹp, chữ tối đa hai dòng (chương Nếu… thì… vừa hai hàng)', /\.lt-bang\{[^}]*display:grid;grid-template-columns:repeat\(auto-fill,minmax\(54px,1fr\)\)/.test(css));
+  /* Chương trình gọn: phần "không thì" trống thu thành nút nhỏ; khung không phải chỗ đang xếp mà đã có ô thì không thêm dấu + */
+  const ds = L.docMa('w(?d(d)() ?s(t))'), h = L._htmlDs(ds, 'thu');
+  ok('phần "không thì" còn trống thu lại thành một nút "+ không thì"', (h.match(/lt-khac-gon/g) || []).length === 2 && !/không thì<\/span><div class="lt-than/.test(h));
+  ok('khung đã có ô mà không phải chỗ đang xếp thì không chừa dấu + thừa; khung trống thì vẫn có', !/data-chon="thu">\+/.test(h) && /data-chon="thu">\+/.test(L._htmlDs([], 'thu')));
+  /* Đang chạy: sáng ô đang làm và cả các ô chứa nó (Lặp, Nếu, ô gọi Hàm ★) */
+  const phang = L.dungBan({ giai: 'd d d d' });
+  const ct = L.docMa('F 2(F)'), hm = L.docMa('d'), kq = L.chay(phang, ct, hm);
+  ok('mỗi bước chạy biết mình đang nằm trong ô gọi hàm nào, vòng lặp nào',
+     kq.buoc[0].ngan.join() === String(ct[0].id) && kq.buoc[1].ngan.join() === [ct[1].id, ct[1].than[0].id].join() && kq.buoc[2].ngan.join() === [ct[1].id, ct[1].than[0].id].join());
+}
 
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

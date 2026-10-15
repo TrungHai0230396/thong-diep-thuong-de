@@ -1622,7 +1622,7 @@ Người dùng chọn: **6–10 tuổi** (hình kèm chữ ngắn), **3D nhìn n
 | 9. Nếu… thì… | 79–90 | Lặp đến khi hết sao; Nếu có đường phía trước / bên trái / bên phải, Nếu đứng trên sao — robot tự tìm đường |
 | 10. Thử thách | 91–100 | tổng hợp, có bài sửa vòng lặp, sửa hàm, sửa điều kiện |
 
-Đầu mỗi chương có một bảng giới thiệu ngắn (khái niệm mới, ô lệnh mới, gợi ý bài đầu); nút **?** mở lại bất cứ lúc nào. Làm xong bài này thì mở bài sau; chỉ nhớ một chuỗi 100 ký tự 0/1 (`tdtd.code`) là bài nào đã xong.
+Đầu mỗi chương có một bảng giới thiệu ngắn (khái niệm mới, ô lệnh mới, gợi ý bài đầu); nút **?** mở lại bất cứ lúc nào. Bài nào cũng mở sẵn (xem mục "Mở full hết" bên dưới); app nhớ một chuỗi 100 ký tự (`tdtd.code`) là số sao từng bài, và một chỗ nhỏ (`tdtd.code.nho`) là bài đang chơi và chương nào đã xem giới thiệu.
 
 **Luật chạy** (như Code.org): Đi chỉ sang khối cùng độ cao; Nhảy lên khối cao hơn đúng một nấc hoặc xuống khối thấp hơn; Thắp chỉ ô sao chưa thắp. Lệnh không làm được thì **robot dừng luôn**, hiện "!" đỏ, ô đó tô đỏ, và nói vì sao (không có đường / khối cao hơn phải Nhảy / chỉ nhảy lên được một nấc / ô này không có sao). Thắp xong ngôi sao cuối là thắng ngay. Vòng lặp không bao giờ xong (hay hàm tự gọi mãi) thì tự dừng sau 800 bước và báo "robot chạy mãi". (Bản đầu cho robot khựng rồi chạy tiếp như Lightbot — xem mục chấm sao bên dưới vì sao bỏ.)
 
@@ -1655,7 +1655,7 @@ Ba chỗ sửa khi tự thử trên màn điện thoại: khung chương trình 
 - thêm `?mohet` vào link: `https://thong-diep-thuong-de.vercel.app/?mohet#lap-trinh`;
 - hoặc trong app (cả bản đã cài ra màn hình chính): bấm ☰, **chạm 7 lần liền vào chữ "Robot thắp sao"**.
 
-Ở chế độ thử, danh sách bài có thêm nút **Điền lời giải mẫu** cho bài đang mở, để kiểm bài nhanh.
+Ở chế độ thử, danh sách bài có thêm nút **Điền lời giải mẫu** cho bài đang mở, để kiểm bài nhanh. (Từ khi bài nào cũng mở sẵn, chế độ thử chỉ còn thêm nút này.)
 
 #### "Màn này tôi giải có 6 ô mà đề ghi 7 ô"
 
@@ -1680,6 +1680,25 @@ Soát bằng mắt cả 100 bản đồ (ghép thành lưới ở cỡ điện t
 Bài 69, chương trình của người dùng: Đi, Đi, Rẽ phải, Thắp, rồi **Lặp 3 lần còn trống**; Hàm ★ có Đi, Đi, Thắp nhưng **chương trình không gọi**. Chạy thì robot làm bốn lệnh đầu, tới ô Lặp trống thì chẳng có gì làm — chương trình hết, robot đứng im; lời "chưa thắp hết" hiện vài giây rồi tắt nên dễ lỡ; dấu + vẫn nằm trên màn trông như kẹt ở đó. Giờ **kiểm trước khi chạy** (`kiemChuongTrinh`): ô Lặp, Lặp tới hết sao, Nếu (trống cả hai phần) còn trống thì không chạy, tô đỏ ô đó, đưa dấu + vào trong và nói "Ô Lặp đang trống nên robot không biết làm gì…"; Hàm ★ có lệnh mà chương trình chưa gọi, hay gọi Hàm ★ mà hàm trống, cũng báo và chỉ chỗ. Lời báo sau khi chạy **đứng yên** tới khi bé sửa chương trình, chạy lại hay chạm vào nó; đang chạy thì ẩn dấu +.
 
 `scripts/test-laptrinh.js`, 57 bài: đủ 100 bài, 10 chương; bản đồ bài nào cũng dựng được, vừa 10 × 10 ô, có sao; **lời giải mẫu của cả 100 bài đều thắp hết sao**, chỉ dùng ô có trong bảng của bài, không quá số ô tối đa; **chương vòng lặp, hàm, điều kiện, thử thách: xếp từng bước không đủ chỗ** — tìm theo chiều rộng số lệnh từng bước ít nhất, phải lớn hơn số ô tối đa, tức bài buộc dùng đúng điều đang học; 11 bài sửa lỗi có chương trình cho sẵn sai thật; luật khựng, nhảy, thắp, vòng lặp vô tận, hàm tự gọi mãi, điều kiện; gợi ý từng bước (ô tiếp theo, ô sai, ô thừa, thiếu ô ngay trước ô nào, số lần lặp, thêm vào thân vòng lặp lồng, vào Hàm ★, vào phần "không thì"); âm thanh (chuông cao dần, nhạc mừng, tiếng vướng, tắt được, mở lúc bấm); chế độ thử mở tới bài 100, bình thường chỉ tới bài chưa xong đầu tiên; chấm sao (3 / 2 / 1 sao theo số ô, gọn nhất là đủ 3 sao ở mọi bài, số tối đa chừa chỗ cho 2 sao, chuỗi tiến độ cũ vẫn đọc được); kiểm trước khi chạy (ô trống, hàm chưa gọi, hàm trống), lời báo đứng yên, ẩn dấu + khi chạy; gắn vào app, có trong bộ nhớ đệm khi mất mạng. Đã chơi thử trên trình duyệt cỡ điện thoại: bài 1 (thắng, lưu tiến độ), bài 54 (vòng lặp lồng, robot leo cầu thang), bài 83 (robot tự tìm đường bằng Lặp đến khi + Nếu), bài 29 (sửa lỗi, báo còn 1 ngôi sao), bài 59 (khung Hàm ★), danh sách bài, xoay cảnh.
+
+#### "Mở full hết đi, ai muốn chơi màn nào thì chơi", "UI/UX dễ sử dụng", "bấm nhanh nút Đi hai lần là bị phóng to"
+
+**Bài nào cũng mở.** Danh sách không khoá bài nào nữa; dòng đầu ghi "bài nào cũng mở, thích bài nào chơi bài đó. Chương đầu dễ nhất, càng về sau càng khó". Vì bé có thể nhảy cóc, app nhớ thêm hai thứ nhỏ: **bài đang chơi** (mở lại trò là về đúng bài đó, không bị kéo về bài chưa xong đầu tiên) và **chương nào đã xem bảng giới thiệu** — lần đầu vào một chương, dù vào giữa chương (vd nhảy thẳng tới bài 85), vẫn được giới thiệu ô Nếu, ô Lặp tới hết sao, mà chỉ một lần (người chơi từ bản cũ: chương có bài đã xong coi như đã xem).
+
+Chơi thử cả trò bằng mắt một bé cầm điện thoại, trên màn 375×812, 375×667 (iPhone SE) và iPad. Những chỗ khó dùng đã sửa:
+
+- **Màn thấp thì nút ▶ Chạy bị đẩy ra ngoài màn hình.** Cảnh 3D giữ tối thiểu 34% chiều cao, khung chương trình cao cố định, cộng bảng ô lệnh ba hàng (chương Nếu… thì…) là quá chiều cao iPhone SE. Giờ cảnh 3D lấy phần còn lại và co được (tối thiểu 120px), khung chương trình co theo màn (110–260px): nút Chạy luôn nằm trong màn.
+- **Bảng ô lệnh ba hàng** (10 ô, ô điều kiện rộng gấp đôi): giờ xếp lưới đều, ô hẹp, chữ tối đa hai dòng — vừa hai hàng trên điện thoại, một hàng trên iPad (ô to hơn cho dễ bấm).
+- **Chương trình có ô Nếu dài cả mấy màn**: bài 90 (8 ô, ba tầng lồng nhau) cao 827px trong khung 173px. Phần "không thì" còn trống giờ chỉ là một nút nhỏ "+ không thì" (bấm là mở ra); khung đã có ô mà không phải chỗ đang xếp thì không chừa thêm dấu + một hàng riêng (bấm vào khung là chọn được rồi). Còn 647px.
+- **Không có đường chuyển bài nhanh**: thêm hai nút "‹ Bài 89" "Bài 91 ›" ở góc dưới cảnh; bản đồ tự chừa mép trên dưới để nút không đè lên khối đá.
+- **Danh sách bài**: mở ra là cuộn tới bài đang chơi; có nút "Làm tiếp bài chưa xong: Bài X — tên bài"; đóng bằng ✕ ở góc (đi theo khi cuộn) hay chạm ra ngoài — bản trước phải cuộn qua 100 bài xuống tận đáy mới có nút Đóng.
+- **Số ô ghi cạnh chữ "Chương trình"** ("4 ô · tối đa 8") trong khi chương trình còn trống — số đó là của cả hai khung. Có Hàm ★ thì ghi "4 ô (cả Hàm ★) · tối đa 8".
+- **Đang chạy không biết robot ở lần gọi hàm nào, vòng lặp nào**: giờ ngoài ô đang chạy (sáng đậm), các ô chứa nó — ô gọi Hàm ★ trong Chương trình, ô Lặp, ô Nếu — có viền sáng nhạt.
+- Nút "■ Dừng" bị xuống hai dòng; bấm liên tục vào ô lệnh thì bôi đen chữ, giữ lâu bật bảng sao chép — đã chặn trong trò.
+
+**Chạm nhanh hai lần là bị phóng to** (iPhone, iPad): Safari hiểu hai lần chạm liền vào cùng một nút — bấm ô "Đi" hai lần — là "chạm đúp để phóng to". Thêm `touch-action: manipulation` cho **mọi phần tử của app** (không riêng trò này): bỏ đúng cử chỉ chạm đúp, vẫn cuộn và vẫn chụm hai ngón để phóng to như thường — không chặn hẳn phóng to, vì người cần chữ to vẫn phải phóng được. Đặt cho mọi phần tử vì thuộc tính này không truyền từ cha xuống con, và trong khung cuộn trình duyệt chỉ xét tới khung cuộn gần nhất; các tấm vẽ tự lo việc chạm (`touch-action: none`) đặt bằng class nên vẫn thắng.
+
+`scripts/test-laptrinh.js` từ 57 lên 71 bài: không bài nào bị khoá, nút chuyển bài, danh sách (làm tiếp, ✕, chạm ra ngoài, cuộn tới bài đang chơi), mở lại về bài đang chơi (kể cả chỗ nhớ hỏng), giới thiệu chương lần đầu, chặn chạm đúp phóng to mà tấm vẽ vẫn giữ `none`, cảnh co được, bảng ô lưới, "+ không thì", bỏ dấu + thừa, mỗi bước chạy biết mình nằm trong ô gọi hàm và vòng lặp nào. Thử phá code ở 8 chỗ, bài kiểm bắt cả 8.
 
 ## Cấu trúc
 
