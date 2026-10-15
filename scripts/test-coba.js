@@ -157,6 +157,83 @@ console.log('\n— Luật —');
   ok('báo nguy: lấy quân đang chiếu và đường đi tới vua (uốn qua tâm)', bn.length === 0 && bn2.length === 1 && bn2[0].o === o(DO, 'd', 2) && bn2[0].duong.map(ten).join(',') === 'Đỏ d2,Đỏ d3,Đỏ d4,Trắng e4,Trắng e3,Trắng e2,Trắng e1');
 }
 
+console.log('\n— Luật Tam quốc: giết vua là chiếm cả đạo quân —');
+{
+  /* Người dùng: "giết vua thì được bầu 1 quân bên chết làm tướng, tướng đi yếu như vua, các quân còn sống bên chết thuộc
+     về quân giết — như đánh trận lúc xưa, chiếm qua chiếm lại". Người giết tự chọn tướng (người dùng chọn). */
+  const tq = (dat, luot = TRANG) => { const t = theTrong(dat, luot); t.tq = true; return t; };
+  const vuaDo = o(DO, 'e', 1);
+  const t = tq([[o(TRANG, 'e', 1), TRANG, LO.VUA], [vuaDo, DO, LO.VUA], [o(DO, 'a', 2), DO, LO.TOT], [o(DO, 'b', 1), DO, LO.MA], [o(DEN, 'e', 1), DEN, LO.VUA], [o(DO, 'e', 3), TRANG, LO.HAU]]);
+  const ev = L.sauNuoc(t, L.diNuoc(t, L.nuocHopLe(t, TRANG).find(m => m.toi === vuaDo)));
+  ok('Trắng ăn vua Đỏ: Đỏ bị loại, cả đạo quân Đỏ về tay Trắng, Trắng được chọn tướng (chưa tới lượt Đen)',
+     t.song[DO] === 0 && t.chu.join() === '0,0,2' && t.cho.length === 1 && t.cho[0].ai === TRANG && t.cho[0].dao === DO && t.luot === TRANG &&
+     ev.map(e => e.loai).join() === 'anvua,chiemquan,chontuong', ev.map(e => e.loai).join());
+  const bau = L.nuocHopLe(t, TRANG);
+  ok('lúc chờ chọn tướng: chỉ có nước phong tướng (ô đi = ô đến), đúng các quân Đỏ còn sống; nhà khác không đi được',
+     bau.length === 2 && bau.every(m => m.tu === m.toi && (t.o[m.tu] >> 3) === DO) && !L.nuocHopLe(t, DEN).length);
+  L.sauNuoc(t, L.diNuoc(t, bau.find(m => m.tu === o(DO, 'a', 2))));
+  ok('phong tốt a2 làm tướng: quân đó thành tướng, rồi tới lượt Đen (nhà kế sau Trắng)', t.o[o(DO, 'a', 2)] === DO * 8 + LO.TG && !t.cho.length && t.luot === DEN);
+  const t2 = L.chepThe(t); t2.luot = TRANG;
+  const n2 = L.nuocHopLe(t2, TRANG), diTuong = n2.filter(m => m.tu === o(DO, 'a', 2)).map(m => m.toi).sort((x, y) => x - y);
+  ok('Trắng đi được quân Đỏ vừa chiếm; tướng đi từng ô như vua (đúng các ô kề), không nhập thành',
+     n2.some(m => m.tu === o(DO, 'b', 1)) && diTuong.join() === B.VUA[o(DO, 'a', 2)].filter(y => !t2.o[y] || t2.chu[t2.o[y] >> 3] !== TRANG).sort((x, y) => x - y).join());
+  ok('quân cướp được vẫn mang đạo gốc: tốt Đỏ (giờ của Trắng) tiến theo hướng tốt Đỏ', L.TOT_TIEN[DO][o(DO, 'c', 2)] >= 0 &&
+     (() => { const t3 = tq([[o(TRANG, 'e', 1), TRANG, LO.VUA], [o(DEN, 'e', 1), DEN, LO.VUA], [o(DO, 'c', 2), DO, LO.TOT], [o(DO, 'g', 1), DO, LO.TG]]); t3.song[DO] = 0; t3.vua[DO] = -1; t3.chu = [0, 0, 2];
+       return L.nuocHopLe(t3, TRANG).some(m => m.tu === o(DO, 'c', 2) && m.toi === L.TOT_TIEN[DO][o(DO, 'c', 2)]); })());
+  /* nhà thứ ba giết tướng: cướp luôn đạo quân, chọn tướng mới */
+  t.o[o(DO, 'a', 4)] = DEN * 8 + LO.XE;
+  const ev3 = L.sauNuoc(t, L.diNuoc(t, L.nuocHopLe(t, DEN).find(m => m.toi === o(DO, 'a', 2))));
+  ok('Đen giết tướng: đạo quân Đỏ về tay Đen, Đen chọn tướng mới', t.chu.join() === '0,2,2' && t.cho[0].ai === DEN && t.luot === DEN &&
+     ev3.some(e => e.loai === 'antuong' && e.cu === TRANG) && ev3.some(e => e.loai === 'chiemquan' && e.ai === DEN));
+  L.sauNuoc(t, L.diNuoc(t, L.nuocHopLe(t, DEN)[0]));
+  ok('Đen phong tướng xong: tới lượt Trắng (Đỏ đã bị loại thì bỏ qua)', L.coTuong(t, DO) && t.luot === TRANG);
+  /* chiếu hết cũng là giết vua: vua bị bắt khỏi bàn, đạo quân về tay nhà đang chiếu; chọn tướng xong thì đi tiếp đúng thứ tự */
+  const t4 = tq([[o(TRANG, 'e', 1), TRANG, LO.VUA], [o(DEN, 'h', 1), DEN, LO.VUA], [o(DEN, 'a', 2), DEN, LO.TOT], [o(DO, 'e', 1), DO, LO.VUA],
+                 [o(DEN, 'h', 3), TRANG, LO.XE], [o(DEN, 'g', 3), TRANG, LO.XE]], TRANG);
+  const chet = L.nuocHopLe(t4, TRANG).find(m => { const t5 = L.chepThe(t4); L.diNuoc(t5, m); return L.biChieu(t5, DEN) && !L.nuocHopLe(t5, DEN).length; });
+  if (chet) {
+    const ev4 = L.sauNuoc(t4, L.diNuoc(t4, chet));
+    ok('chiếu hết Đen: vua Đen bị bắt khỏi bàn, đạo quân Đen về tay Trắng (nhà vừa chiếu), Trắng chọn tướng',
+       t4.song[DEN] === 0 && t4.o[o(DEN, 'h', 1)] === 0 && t4.chu[DEN] === TRANG && t4.cho[0] && t4.cho[0].ai === TRANG && ev4.some(e => e.loai === 'chieuhet'));
+    L.sauNuoc(t4, L.diNuoc(t4, L.nuocHopLe(t4, TRANG)[0]));
+    ok('Trắng phong tướng xong: tới lượt Đỏ (nhà kế sau Đen vừa bị loại), không mất lượt của ai', t4.luot === DO);
+  } else ok('dựng được thế chiếu hết Đen', false);
+  /* người vừa đi không phải người chiếu: Trắng rời mã cho xe Đỏ chiếu hết Đen — Đỏ được đạo quân, chọn tướng, rồi vẫn
+     được đi lượt của mình (không bị nhảy sang Trắng) */
+  const t8 = tq([[o(TRANG, 'e', 1), TRANG, LO.VUA], [o(DO, 'e', 1), DO, LO.VUA], [o(DEN, 'h', 1), DEN, LO.VUA], [o(DEN, 'a', 2), DEN, LO.TOT],
+                 [o(DEN, 'h', 4), DO, LO.XE], [o(DEN, 'h', 2), TRANG, LO.MA], [o(DEN, 'g', 3), TRANG, LO.XE]], TRANG);
+  const moDuong = L.nuocHopLe(t8, TRANG).find(m => m.tu === o(DEN, 'h', 2));
+  L.sauNuoc(t8, L.diNuoc(t8, moDuong));
+  const doChon = t8.chu[DEN] === DO && t8.cho[0] && t8.cho[0].ai === DO && t8.luot === DO;
+  L.sauNuoc(t8, L.diNuoc(t8, L.nuocHopLe(t8, DO)[0]));
+  ok('Trắng mở đường cho xe Đỏ chiếu hết Đen: đạo quân Đen về tay Đỏ (nhà đang chiếu), Đỏ chọn tướng xong vẫn tới lượt Đỏ', doChon && t8.luot === DO, `lượt ${t8.luot}`);
+  /* luật thường không đổi: ăn vua thì quân hoá đá, không đổi chủ */
+  const t6 = theTrong([[o(TRANG, 'e', 1), TRANG, LO.VUA], [vuaDo, DO, LO.VUA], [o(DO, 'a', 2), DO, LO.TOT], [o(DEN, 'e', 1), DEN, LO.VUA], [o(DO, 'e', 3), TRANG, LO.HAU]]);
+  L.sauNuoc(t6, L.diNuoc(t6, L.nuocHopLe(t6, TRANG).find(m => m.toi === vuaDo)));
+  ok('luật thường: ăn vua thì quân Đỏ thành đá, không về tay ai, không có chọn tướng', t6.chu.join() === '0,1,2' && !t6.cho.length && t6.luot === DEN && t6.o[o(DO, 'a', 2)] === DO * 8 + LO.TOT);
+  /* máy chọn tướng: quân rẻ không bị nhắm */
+  const t7 = tq([[o(TRANG, 'e', 1), TRANG, LO.VUA], [vuaDo, DO, LO.VUA], [o(DO, 'a', 2), DO, LO.TOT], [o(DO, 'b', 1), DO, LO.HAU], [o(DO, 'd', 3), DO, LO.TOT],
+                 [o(DEN, 'e', 1), DEN, LO.VUA], [o(DO, 'c', 3), DEN, LO.XE], [o(DO, 'e', 3), TRANG, LO.HAU]]);
+  L.sauNuoc(t7, L.diNuoc(t7, L.nuocHopLe(t7, TRANG).find(m => m.toi === vuaDo)));
+  const kq7 = L.timNuoc(t7, TRANG, { sau: 2, ms: 300 });
+  ok('máy chọn tướng: tốt a2 không bị nhắm — không lấy tốt d3 gần tâm đang bị xe Đen nhắm, cũng không lấy hậu quá quý',
+     kq7.nuoc && kq7.nuoc.tu === kq7.nuoc.toi && kq7.nuoc.tu === o(DO, 'a', 2) && L.XA_TAM[o(DO, 'd', 3)] < L.XA_TAM[o(DO, 'a', 2)], kq7.nuoc && ten(kq7.nuoc.tu));
+  /* đi rồi hoàn lại phải trả đúng thế cờ — kể cả lúc máy nghĩ thử tự phong tướng; máy tự đánh cả ván không lỗi */
+  const chup = (x) => JSON.stringify([Array.from(x.o), x.chu, x.song, x.vua, x.cho, x.nhap, x.dem50]);
+  let lech = 0, nuocLa = 0, phong = 0, cuop = 0;
+  const v = L.theMoi('tq');
+  for (let n = 0; n < 160 && v.thang < 0 && !v.hoa; n++) {
+    const ds = L.nuocHopLe(v, v.luot);
+    for (const m of ds.slice(0, 12)) { const truoc = chup(v); const lui = L.diNuoc(v, m, n % 2 === 0); L.hoanNuoc(v, lui); if (chup(v) !== truoc) lech++; }
+    const kq = L.timNuoc(v, v.luot, { kieu: v.luot === DEN ? 'brs' : 'hoangtuong', sau: 2, ms: 120, nhieu: 60 });
+    if (!kq.nuoc || !ds.some(m => m.tu === kq.nuoc.tu && m.toi === kq.nuoc.toi)) { nuocLa++; break; }
+    if (kq.nuoc.tu === kq.nuoc.toi) phong++;
+    const ev = L.sauNuoc(v, L.diNuoc(v, kq.nuoc));
+    if (ev.some(e => e.loai === 'chiemquan')) cuop++;
+  }
+  ok('đi rồi hoàn lại (cả lúc tự phong tướng) luôn trả đúng thế cờ; máy tự đánh Tam quốc toàn nước hợp lệ', lech === 0 && nuocLa === 0, `${lech} lần lệch, ${cuop} lần cướp quân, ${phong} lần phong tướng`);
+}
+
 console.log('\n— Máy nghĩ —');
 {
   for (const kieu of ['hoangtuong', 'brs']) {
@@ -253,6 +330,20 @@ async function choTaiNguoi() {                                       // chạy h
   const dc = C._duongChon();
   ok('chạm chọn quân: vẽ đường đi cho từng chỗ đi được, mỗi đường bắt đầu ở quân, kết thúc ở chỗ đến',
      C._chon() === vua && dc.ds.length === C._nuocCuaChon().length && dc.ds.length > 0 && dc.ds.every((d, i) => d[0] === vua && d[d.length - 1] === C._nuocCuaChon()[i].toi));
+  /* Tam quốc trên giao diện: chạm quân có vòng vàng để phong tướng */
+  C._vanMoi({ mau: TRANG, kho: 0, luat: 'tq' });
+  ok('ván mới chọn luật Tam quốc', C._van().the.tq === true && C._van().luat === 'tq');
+  Object.assign(C._van().the, (() => { const t = theTrong([[o(TRANG, 'e', 1), TRANG, LO.VUA], [o(DO, 'e', 1), DO, LO.VUA], [o(DO, 'a', 2), DO, LO.TOT], [o(DO, 'b', 1), DO, LO.MA],
+    [o(DEN, 'e', 1), DEN, LO.VUA], [o(DO, 'e', 3), TRANG, LO.HAU]]); t.tq = true; return t; })());
+  C._thucHien(L.nuocHopLe(C._van().the, TRANG).find(m => m.toi === o(DO, 'e', 1)), TRANG); C._xongHoat();
+  ok('bạn ăn vua Đỏ: tới lượt bạn chọn tướng', C._van().the.cho.length === 1 && C._van().the.luot === TRANG && C._laMinh(TRANG));
+  C._canhBan(); C._datXoay(C._GOC_NHIN[TRANG]);
+  const [xm, ym] = C._tamO(o(DO, 'b', 1)); C._chamBan(xm, ym);
+  ok('chạm mã Đỏ: mã thành tướng đạo quân Đỏ, cầm bởi bạn; mũi tên vẫn là nước ăn vua', C._van().the.o[o(DO, 'b', 1)] === DO * 8 + LO.TG && C._van().the.chu[DO] === TRANG &&
+     !C._van().the.cho.length && C._van().vet[TRANG].duong.slice(-1)[0] === o(DO, 'e', 1));
+  C._veCanh(1e6);
+  ok('vẽ bàn có quân đổi chủ và tướng không lỗi', true);
+  await choTaiNguoi();
   /* hình động hướng dẫn */
   C._batDemo();
   const dau = C._demo() ? C._demo().buoc : -1;

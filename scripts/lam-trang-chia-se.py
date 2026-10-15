@@ -829,7 +829,7 @@ TRO = [
          tieuDe='Cờ vua ba người', tieu=('Cờ vua', 'ba người'),
          dong=['Trắng, Đen, Đỏ trên bàn lục giác', 'Tạo phòng, mỗi người một máy', 'Còn vua cuối cùng thì thắng'],
          moTa='Trắng, Đen, Đỏ trên bàn lục giác 96 ô. Tạo phòng mời bạn bè, mỗi người một máy, ghế trống thì máy chơi '
-              'thay; hoặc đấu với hai máy có tính cách riêng. Còn vua cuối cùng thì thắng. Miễn phí, không cần tài khoản.',
+              'thay; hoặc đấu với hai máy. Luật Tam quốc: giết vua là chiếm cả đạo quân. Miễn phí, không cần tài khoản.',
          alt='Cờ vua ba người: bàn lục giác với quân Trắng, Đen, Đỏ', mo='Mở Cờ vua ba người',
          # link mời vào phòng (…/co-vua-ba-nguoi/?phong=MÃ) thì chuyển thẳng vào phòng đó
          chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#co-ba-nguoi' + (m ? '/' + m[1] : ''));"),

@@ -241,6 +241,32 @@ function mayKhach(ten, url) {
     may.datLech(0);
   }
 
+  console.log('\n— Phòng luật Tam quốc —');
+  {
+    /* chủ phòng chọn luật Tam quốc: phòng nhớ luật (ô luat, chỉ ghi lúc tạo), máy nào vào cũng chơi đúng luật đó; nước phong
+       tướng (ô đi = ô đến) đi qua máy chủ như mọi nước khác */
+    await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An', luat: 'tq' });
+    const ma3 = An.C._phong().ma;
+    await doi(() => An.C._phong().cay);
+    Binh.C._vaoPhong(ma3);
+    await doi(() => Binh.C._phong() && Binh.C._phong().cay);
+    Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
+    await Binh.C._ngoiGhe(2);
+    await doi(() => An.C._phong().cay.ghe && An.C._phong().cay.ghe[2]);
+    await An.C._batDauPhong();
+    await doi(() => [An, Binh].every(m => m.C._van() && m.C._van().cheDo === 'phong' && m.C._van().ma === ma3));
+    ok('phòng Tam quốc: máy chủ nhớ luat = tq; cả hai máy vào ván đúng luật Tam quốc', may.lay(`coba/${ma3}/luat`) === 'tq' && [An, Binh].every(m => m.C._van().the.tq === true && m.C._van().luat === 'tq'));
+    const r = await fetch(`${url}/coba/${ma3}/luat.json`, { method: 'PUT', body: JSON.stringify('tq') });
+    ok('không ai đổi được luật sau khi tạo phòng', r.status === 401);
+    /* thế chờ chọn tướng dựng tay: nước phong tướng từ máy chủ được nhận đúng; nước thường lúc đó thì không */
+    const t = L.theMoi('tq'); t.o.fill(0); t.nhap = 0; t.vua = [o(0, 'e', 1), -1, o(2, 'e', 1)]; t.song = [1, 0, 1];
+    t.o[o(0, 'e', 1)] = 6; t.o[o(2, 'e', 1)] = 2 * 8 + 6; t.o[o(1, 'a', 2)] = 1 * 8 + 1; t.o[o(1, 'b', 1)] = 1 * 8 + 2; t.chu = [0, 0, 2]; t.cho = [{ ai: 0, dao: 1, sau: 0 }]; t.luot = 0;
+    ok('nước phong tướng từ máy chủ được nhận; lúc đang chờ chọn tướng thì nước thường bị bỏ qua',
+       !!An.C._timNuocMang(t, { P: 0, tu: o(1, 'b', 1), toi: o(1, 'b', 1), phong: 0, nhap: 0 }) && !An.C._timNuocMang(t, { P: 0, tu: o(0, 'e', 1), toi: o(0, 'd', 1), phong: 0, nhap: 0 }) &&
+       !An.C._timNuocMang(t, { P: 0, tu: o(0, 'e', 1), toi: o(0, 'e', 1), phong: 0, nhap: 0 }));
+    for (const m of [An, Binh]) m.C._roiPhong();
+  }
+
   console.log('\n— Phòng không có, phòng quá hạn —');
   {
     xem.C._vaoPhong('ZZZZZZ');

@@ -123,27 +123,34 @@ function LOI() {
     for (let i = 0; i < q.length; i++) for (const y of VUA[q[i]]) if (XA_TAM[y] > XA_TAM[q[i]] + 1) { XA_TAM[y] = XA_TAM[q[i]] + 1; q.push(y); } }
 
   /* ---------- quân, thế cờ ----------
-     mã quân = P·8 + loại; loại 1 tốt, 2 mã, 3 tượng, 4 xe, 5 hậu, 6 vua. Quân của nhà đã bị loại vẫn nằm đó ("đá"). */
-  const TOT = 1, MA_ = 2, TUONG = 3, XE = 4, HAU = 5, VUA_ = 6;
-  const GIA = [0, 100, 300, 320, 500, 900, 0];
+     mã quân = D·8 + loại, D là đạo quân gốc (nhà sinh ra quân đó); loại 1 tốt, 2 mã, 3 tượng, 4 xe, 5 hậu, 6 vua, 7 tướng.
+     t.chu[D] là nhà đang cầm đạo quân D. Luật thường: luôn là D, quân của nhà đã bị loại vẫn nằm đó ("đá"). Luật Tam quốc
+     (người dùng: "giết vua thì được bầu 1 quân bên chết làm tướng, tướng đi yếu như vua, các quân còn sống bên chết thuộc
+     về quân giết — như đánh trận lúc xưa, chiếm qua chiếm lại"): giết vua là cướp mọi đạo quân nhà đó đang cầm, người
+     giết chọn một quân làm tướng (t.cho: đang chờ chọn); giết tướng là cướp đạo quân của tướng. Tốt vẫn tiến theo hướng
+     của đạo gốc. */
+  const TOT = 1, MA_ = 2, TUONG = 3, XE = 4, HAU = 5, VUA_ = 6, TG = 7;
+  const GIA = [0, 100, 300, 320, 500, 900, 0, 250];
   const THU_TU = [0, 2, 1];                                           // Trắng → Đen → Đỏ, theo chiều kim đồng hồ
   const HANG_QUAN = [XE, MA_, TUONG, HAU, VUA_, TUONG, MA_, XE];      // hậu bên trái vua, như mọi bản cờ ba người
-  function theMoi() {
+  function theMoi(luat) {
     const o = new Int8Array(96);
     for (let P = 0; P < 3; P++) for (let f = 0; f < 8; f++) { o[oCua(P, f, 1)] = P * 8 + HANG_QUAN[f]; o[oCua(P, f, 2)] = P * 8 + TOT; }
-    return { o, luot: 0, song: [1, 1, 1], vua: [oCua(0, 4, 1), oCua(1, 4, 1), oCua(2, 4, 1)], nhap: 63, dem50: 0, soNuoc: 0, thang: -1, hoa: false };
+    return { o, luot: 0, song: [1, 1, 1], vua: [oCua(0, 4, 1), oCua(1, 4, 1), oCua(2, 4, 1)], nhap: 63, dem50: 0, soNuoc: 0, thang: -1, hoa: false,
+      tq: luat === 'tq', chu: [0, 1, 2], cho: [] };
   }
-  const chepThe = (t) => ({ o: Int8Array.from(t.o), luot: t.luot, song: t.song.slice(), vua: t.vua.slice(), nhap: t.nhap, dem50: t.dem50, soNuoc: t.soNuoc, thang: t.thang, hoa: t.hoa });
+  const chepThe = (t) => ({ o: Int8Array.from(t.o), luot: t.luot, song: t.song.slice(), vua: t.vua.slice(), nhap: t.nhap, dem50: t.dem50, soNuoc: t.soNuoc,
+    thang: t.thang, hoa: t.hoa, tq: !!t.tq, chu: (t.chu || [0, 1, 2]).slice(), cho: (t.cho || []).map(k => Object.assign({}, k)) });
   const soSong = (t) => t.song[0] + t.song[1] + t.song[2];
   function keTiep(t, P) { let i = THU_TU.indexOf(P); for (let k = 0; k < 3; k++) { i = (i + 1) % 3; if (t.song[THU_TU[i]]) return THU_TU[i]; } return P; }
 
-  /* ô c có bị nhà nào còn sống (khác P) nhắm tới không */
+  /* ô c có bị nhà nào còn sống (khác P) nhắm tới không — quân tính theo nhà đang cầm nó; tướng nhắm như vua */
   function biNham(t, c, P) {
-    const o = t.o, song = t.song;
-    const dich = (x) => { const Q = x >> 3; return Q !== P && song[Q]; };
+    const o = t.o, song = t.song, chu = t.chu;
+    const dich = (x) => { const Q = chu[x >> 3]; return Q !== P && song[Q]; };
     for (const y of MA[c]) { const x = o[y]; if (x && (x & 7) === MA_ && dich(x)) return true; }
-    for (const y of VUA[c]) { const x = o[y]; if (x && (x & 7) === VUA_ && dich(x)) return true; }
-    for (let Q = 0; Q < 3; Q++) if (Q !== P && song[Q]) for (const y of TOT_BI_AN[Q][c]) if (o[y] === Q * 8 + TOT) return true;
+    for (const y of VUA[c]) { const x = o[y]; if (x && ((x & 7) === VUA_ || (x & 7) === TG) && dich(x)) return true; }
+    for (let D = 0; D < 3; D++) { const Q = chu[D]; if (Q !== P && song[Q]) for (const y of TOT_BI_AN[D][c]) if (o[y] === D * 8 + TOT) return true; }
     for (const tia of TRUC[c]) for (const y of tia) { const x = o[y]; if (!x) continue; if (((x & 7) === XE || (x & 7) === HAU) && dich(x)) return true; break; }
     for (const tia of CHEO[c]) for (const y of tia) { const x = o[y]; if (!x) continue; if (((x & 7) === TUONG || (x & 7) === HAU) && dich(x)) return true; break; }
     return false;
@@ -153,10 +160,10 @@ function LOI() {
   function aiChieu(t, P) {
     const o = t.o, c = t.vua[P], ra = [];
     if (c < 0 || !t.song[P]) return ra;
-    const dich = (x) => { const Q = x >> 3; return Q !== P && t.song[Q]; };
+    const dich = (x) => { const Q = t.chu[x >> 3]; return Q !== P && t.song[Q]; };
     for (const y of MA[c]) { const x = o[y]; if (x && (x & 7) === MA_ && dich(x)) ra.push({ o: y, duong: [y, c] }); }
-    for (const y of VUA[c]) { const x = o[y]; if (x && (x & 7) === VUA_ && dich(x)) ra.push({ o: y, duong: [y, c] }); }
-    for (let Q = 0; Q < 3; Q++) if (Q !== P && t.song[Q]) for (const y of TOT_BI_AN[Q][c]) if (o[y] === Q * 8 + TOT) ra.push({ o: y, duong: [y, c] });
+    for (const y of VUA[c]) { const x = o[y]; if (x && ((x & 7) === VUA_ || (x & 7) === TG) && dich(x)) ra.push({ o: y, duong: [y, c] }); }
+    for (let D = 0; D < 3; D++) { const Q = t.chu[D]; if (Q !== P && t.song[Q]) for (const y of TOT_BI_AN[D][c]) if (o[y] === D * 8 + TOT) ra.push({ o: y, duong: [y, c] }); }
     const quet = (tias, loai) => { for (const tia of tias) for (let i = 0; i < tia.length; i++) { const x = o[tia[i]]; if (!x) continue;
       if (loai.includes(x & 7) && dich(x) && !ra.some(r => r.o === tia[i])) ra.push({ o: tia[i], duong: tia.slice(0, i + 1).reverse().concat([c]) }); break; } };
     quet(TRUC[c], [XE, HAU]); quet(CHEO[c], [TUONG, HAU]);
@@ -164,41 +171,43 @@ function LOI() {
   }
 
   /* ---------- nước đi ----------
-     nước = { tu, toi, phong (loại quân phong, 0 nếu không), nhap (1 nhập thành cánh vua, 2 cánh hậu) } */
-  const laHangCuoi = (P, c) => (c >> 5) !== P && hangO(c) === 1;
+     nước = { tu, toi, phong (loại quân phong, 0 nếu không), nhap (1 nhập thành cánh vua, 2 cánh hậu) }. Luật Tam quốc thêm
+     nước phong tướng: tu === toi, là ô của quân được chọn — ghi lên máy chủ như mọi nước khác. */
+  const laHangCuoi = (D, c) => (c >> 5) !== D && hangO(c) === 1;
   function nuocGia(t, P, chiAn, ds) {
-    const o = t.o, tem = nuocGia.tem || (nuocGia.tem = new Int32Array(96));
+    const o = t.o, chu = t.chu, tem = nuocGia.tem || (nuocGia.tem = new Int32Array(96));
     let dau = (nuocGia.dau = (nuocGia.dau || 0) + 1);
     for (let c = 0; c < 96; c++) {
       const x = o[c];
-      if (!x || (x >> 3) !== P) continue;
-      const loai = x & 7;
+      if (!x || chu[x >> 3] !== P) continue;
+      const loai = x & 7, D = x >> 3;
       const them = (toi) => {
         const y = o[toi];
-        if (y && (y >> 3) === P) return;
+        if (y && chu[y >> 3] === P) return;
         if (chiAn && !y) return;
         ds.push({ tu: c, toi, phong: 0, nhap: 0 });
       };
       if (loai === TOT) {
-        const toi = TOT_TIEN[P][c];
+        const toi = TOT_TIEN[D][c];
         if (toi >= 0 && !o[toi] && !chiAn) {
-          if (laHangCuoi(P, toi)) ds.push({ tu: c, toi, phong: HAU, nhap: 0 });
+          if (laHangCuoi(D, toi)) ds.push({ tu: c, toi, phong: HAU, nhap: 0 });
           else {
             ds.push({ tu: c, toi, phong: 0, nhap: 0 });
-            if ((c >> 5) === P && hangO(c) === 2) { const t2 = TOT_TIEN[P][toi]; if (t2 >= 0 && !o[t2]) ds.push({ tu: c, toi: t2, phong: 0, nhap: 0 }); }
+            if ((c >> 5) === D && hangO(c) === 2) { const t2 = TOT_TIEN[D][toi]; if (t2 >= 0 && !o[t2]) ds.push({ tu: c, toi: t2, phong: 0, nhap: 0 }); }
           }
-        } else if (toi >= 0 && !o[toi] && chiAn && laHangCuoi(P, toi)) ds.push({ tu: c, toi, phong: HAU, nhap: 0 });
-        for (const y of TOT_AN[P][c]) { const z = o[y]; if (z && (z >> 3) !== P) ds.push({ tu: c, toi: y, phong: laHangCuoi(P, y) ? HAU : 0, nhap: 0 }); }
+        } else if (toi >= 0 && !o[toi] && chiAn && laHangCuoi(D, toi)) ds.push({ tu: c, toi, phong: HAU, nhap: 0 });
+        for (const y of TOT_AN[D][c]) { const z = o[y]; if (z && chu[z >> 3] !== P) ds.push({ tu: c, toi: y, phong: laHangCuoi(D, y) ? HAU : 0, nhap: 0 }); }
       } else if (loai === MA_) { for (const y of MA[c]) them(y); }
       else if (loai === VUA_) {
         for (const y of VUA[c]) them(y);
-        if (!chiAn) nhapThanh(t, P, c, ds);
-      } else {
+        if (!chiAn && D === P) nhapThanh(t, P, c, ds);
+      } else if (loai === TG) { for (const y of VUA[c]) them(y); }
+      else {
         dau = ++nuocGia.dau;
         const tias = loai === XE ? TRUC[c] : loai === TUONG ? CHEO[c] : TRUC[c].concat(CHEO[c]);
         for (const tia of tias) for (const y of tia) {
           const z = o[y];
-          if (tem[y] !== dau) { tem[y] = dau; if (!z) { if (!chiAn) ds.push({ tu: c, toi: y, phong: 0, nhap: 0 }); } else if ((z >> 3) !== P) ds.push({ tu: c, toi: y, phong: 0, nhap: 0 }); }
+          if (tem[y] !== dau) { tem[y] = dau; if (!z) { if (!chiAn) ds.push({ tu: c, toi: y, phong: 0, nhap: 0 }); } else if (chu[z >> 3] !== P) ds.push({ tu: c, toi: y, phong: 0, nhap: 0 }); }
           if (z) break;
         }
       }
@@ -214,40 +223,92 @@ function LOI() {
     if ((t.nhap & (2 << (2 * P))) && o[oCua(P, 0, 1)] === P * 8 + XE && !o[oCua(P, 1, 1)] && !o[oCua(P, 2, 1)] && !o[oCua(P, 3, 1)]
         && !biNham(t, oCua(P, 3, 1), P) && !biNham(t, oCua(P, 2, 1), P)) ds.push({ tu: c, toi: oCua(P, 2, 1), phong: 0, nhap: 2 });
   }
-  /* đi một nước (sửa thẳng vào t), trả thông tin để hoàn lại */
-  function diNuoc(t, m) {
-    const o = t.o, x = o[m.tu], P = x >> 3, an = o[m.toi];
-    const lui = { m, x, an, nhap: t.nhap, dem50: t.dem50, vua: t.vua.slice(), song: t.song.slice() };
-    o[m.toi] = m.phong ? P * 8 + m.phong : x; o[m.tu] = 0;
+  /* ---------- Tam quốc: đổi chủ, phong tướng ---------- */
+  function coQuan(t, D) { for (let c = 0; c < 96; c++) { const x = t.o[c]; if (x && (x >> 3) === D) return true; } return false; }
+  function coTuong(t, D) { for (let c = 0; c < 96; c++) if (t.o[c] === D * 8 + TG) return true; return false; }
+  /* quân máy chọn làm tướng: rẻ, không đang bị nhắm (tướng mất là mất cả đạo quân) */
+  function chonTuong(t, D) {
+    const P = t.chu[D];
+    let tot = -1, diem = Infinity;
+    for (let c = 0; c < 96; c++) {
+      const x = t.o[c];
+      if (!x || (x >> 3) !== D) continue;
+      const d = GIA[x & 7] + (biNham(t, c, P) ? 2000 : 0) + XA_TAM[c] * 2;
+      if (d < diem) { diem = d; tot = c; }
+    }
+    return tot;
+  }
+  /* đạo quân D vừa đổi chủ mà chưa có tướng: tuDong (máy nghĩ thử) thì phong luôn, không thì chờ người cầm chọn.
+     sau: ván dừng ở nhà nào — chọn tướng xong thì tới lượt nhà kế sau nhà đó */
+  function canTuong(t, D, sau, tuDong, lui) {
+    if (t.chu[D] === D || coTuong(t, D) || !coQuan(t, D)) return;
+    if (tuDong) {
+      const c = chonTuong(t, D);
+      if (c >= 0) { if (lui) (lui.doi || (lui.doi = [])).push([c, t.o[c]]); t.o[c] = D * 8 + TG; }
+      return;
+    }
+    if (!t.cho.some(k => k.dao === D)) t.cho.push({ ai: t.chu[D], dao: D, sau });
+  }
+  /* nhà B mất vua vào tay P: mọi đạo quân B đang cầm về tay P */
+  function giet(t, B, P, sau, tuDong, lui) {
+    for (let D = 0; D < 3; D++) if (t.chu[D] === B) t.chu[D] = P;
+    for (let D = 0; D < 3; D++) if (t.chu[D] === P) canTuong(t, D, sau, tuDong, lui);
+  }
+  /* đi một nước (sửa thẳng vào t), trả thông tin để hoàn lại. tuDong: lúc máy nghĩ thử, cướp được đạo quân thì phong tướng
+     luôn, khỏi dừng chờ chọn */
+  function diNuoc(t, m, tuDong) {
+    const o = t.o, x = o[m.tu], D = x >> 3, P = t.chu[D], an = o[m.toi];
+    const lui = { m, x, an, nhap: t.nhap, dem50: t.dem50, vua: t.vua.slice(), song: t.song.slice(), chu: t.chu.slice(), cho: t.cho.slice(), doi: null };
+    if (m.tu === m.toi) {                                              // phong quân này làm tướng của đạo quân nó
+      o[m.tu] = D * 8 + TG;
+      t.cho = t.cho.filter(k => k.dao !== D);
+      t.soNuoc++;
+      return lui;
+    }
+    o[m.toi] = m.phong ? D * 8 + m.phong : x; o[m.tu] = 0;
     if ((x & 7) === VUA_) {
-      t.vua[P] = m.toi; t.nhap &= ~(3 << (2 * P));
-      if (m.nhap === 1) { o[oCua(P, 5, 1)] = o[oCua(P, 7, 1)]; o[oCua(P, 7, 1)] = 0; }
-      if (m.nhap === 2) { o[oCua(P, 3, 1)] = o[oCua(P, 0, 1)]; o[oCua(P, 0, 1)] = 0; }
+      t.vua[D] = m.toi; t.nhap &= ~(3 << (2 * D));
+      if (m.nhap === 1) { o[oCua(D, 5, 1)] = o[oCua(D, 7, 1)]; o[oCua(D, 7, 1)] = 0; }
+      if (m.nhap === 2) { o[oCua(D, 3, 1)] = o[oCua(D, 0, 1)]; o[oCua(D, 0, 1)] = 0; }
     }
     for (let Q = 0; Q < 3; Q++) {                                    // xe rời chỗ cũ, hay bị ăn ở chỗ cũ: mất quyền nhập thành
       if (m.tu === oCua(Q, 7, 1) || m.toi === oCua(Q, 7, 1)) t.nhap &= ~(1 << (2 * Q));
       if (m.tu === oCua(Q, 0, 1) || m.toi === oCua(Q, 0, 1)) t.nhap &= ~(2 << (2 * Q));
     }
-    if (an && (an & 7) === VUA_ && t.song[an >> 3]) { t.song[an >> 3] = 0; t.vua[an >> 3] = -1; }   // ăn vua: nhà đó bị loại
+    if (an && (an & 7) === VUA_ && t.song[an >> 3]) {                  // ăn vua: nhà đó bị loại
+      const B = an >> 3; t.song[B] = 0; t.vua[B] = -1;
+      if (t.tq) giet(t, B, P, P, tuDong, lui);                          // Tam quốc: cướp mọi đạo quân nhà đó đang cầm
+    } else if (an && (an & 7) === TG && t.tq) {                        // giết tướng: cướp đạo quân của tướng
+      const B = an >> 3; t.chu[B] = P; canTuong(t, B, P, tuDong, lui);
+    }
     t.dem50 = an || (x & 7) === TOT ? 0 : t.dem50 + 1;
     t.soNuoc++;
     return lui;
   }
   function hoanNuoc(t, lui) {
-    const o = t.o, m = lui.m, P = lui.x >> 3;
-    o[m.tu] = lui.x; o[m.toi] = lui.an;
-    if (m.nhap === 1) { o[oCua(P, 7, 1)] = o[oCua(P, 5, 1)]; o[oCua(P, 5, 1)] = 0; }
-    if (m.nhap === 2) { o[oCua(P, 0, 1)] = o[oCua(P, 3, 1)]; o[oCua(P, 3, 1)] = 0; }
-    t.nhap = lui.nhap; t.dem50 = lui.dem50; t.vua = lui.vua; t.song = lui.song; t.soNuoc--;
+    const o = t.o, m = lui.m, D = lui.x >> 3;
+    if (lui.doi) for (let i = lui.doi.length - 1; i >= 0; i--) o[lui.doi[i][0]] = lui.doi[i][1];
+    o[m.tu] = lui.x;
+    if (m.tu !== m.toi) o[m.toi] = lui.an;
+    if (m.nhap === 1) { o[oCua(D, 7, 1)] = o[oCua(D, 5, 1)]; o[oCua(D, 5, 1)] = 0; }
+    if (m.nhap === 2) { o[oCua(D, 0, 1)] = o[oCua(D, 3, 1)]; o[oCua(D, 3, 1)] = 0; }
+    t.nhap = lui.nhap; t.dem50 = lui.dem50; t.vua = lui.vua; t.song = lui.song; t.chu = lui.chu; t.cho = lui.cho; t.soNuoc--;
   }
-  /* nước hợp lệ: không để vua mình bị nhắm sau khi đi */
+  /* nước hợp lệ: không để vua mình bị nhắm sau khi đi. Đang chờ chọn tướng thì chỉ có các nước phong tướng. */
   function nuocHopLe(t, P, chiAn) {
+    if (t.cho.length) {
+      const k = t.cho[0], ra = [];
+      if (k.ai !== P || chiAn) return ra;
+      for (let c = 0; c < 96; c++) { const x = t.o[c]; if (x && (x >> 3) === k.dao) ra.push({ tu: c, toi: c, phong: 0, nhap: 0 }); }
+      return ra;
+    }
     const gia = nuocGia(t, P, !!chiAn, []), ra = [];
-    for (const m of gia) { const lui = diNuoc(t, m); if (!biChieu(t, P)) ra.push(m); hoanNuoc(t, lui); }
+    for (const m of gia) { const lui = diNuoc(t, m, true); if (!biChieu(t, P)) ra.push(m); hoanNuoc(t, lui); }
     return ra;
   }
   /* đường quân đi qua (để trượt quân theo đúng đường cong qua tâm) */
   function duongDi(t, m) {
+    if (m.tu === m.toi) return [m.tu];
     const x = t.o[m.tu], loai = x & 7;
     if (loai === XE || loai === TUONG || loai === HAU) {
       const tias = loai === XE ? TRUC[m.tu] : loai === TUONG ? CHEO[m.tu] : TRUC[m.tu].concat(CHEO[m.tu]);
@@ -262,17 +323,36 @@ function LOI() {
   /* ---------- sau mỗi nước: tới lượt ai, ai bị loại, hết ván chưa ----------
      trả danh sách sự kiện để màn hình nói ra. Sửa thẳng vào t. */
   function sauNuoc(t, lui) {
-    const ev = [];
-    if (lui && lui.an && (lui.an & 7) === VUA_ && lui.song[lui.an >> 3]) ev.push({ loai: 'anvua', ai: lui.x >> 3, bi: lui.an >> 3 });
-    if (soSong(t) <= 1) { t.thang = t.song.indexOf(1); ev.push({ loai: 'thang', ai: t.thang }); return ev; }
-    let P = t.luot, dem = 0;
+    const ev = [], phong = lui && lui.m.tu === lui.m.toi;
+    if (phong) ev.push({ loai: 'phongtuong', ai: t.chu[lui.x >> 3], dao: lui.x >> 3, o: lui.m.tu, cu: lui.x & 7 });
+    else if (lui && lui.an) {
+      const ai = lui.chu[lui.x >> 3], B = lui.an >> 3;
+      if ((lui.an & 7) === VUA_ && lui.song[B]) ev.push({ loai: 'anvua', ai, bi: B });
+      if ((lui.an & 7) === TG && t.tq) ev.push({ loai: 'antuong', ai, dao: B, cu: lui.chu[B] });
+    }
+    if (lui && t.tq && !phong) for (let D = 0; D < 3; D++) if (t.chu[D] !== lui.chu[D]) ev.push({ loai: 'chiemquan', ai: t.chu[D], dao: D, cu: lui.chu[D] });
+    const het = () => { t.cho = []; t.thang = t.song.indexOf(1); ev.push({ loai: 'thang', ai: t.thang }); return ev; };
+    const choChon = () => { t.luot = t.cho[0].ai; ev.push({ loai: 'chontuong', ai: t.cho[0].ai, dao: t.cho[0].dao }); return ev; };
+    if (soSong(t) <= 1) return het();
+    if (t.cho.length) return choChon();
+    /* vừa phong tướng: đi tiếp từ chỗ ván đã dừng (nhà vừa giết, hay nhà vừa bị chiếu hết) */
+    let P = phong && lui.cho.length && lui.cho[0].sau !== undefined ? lui.cho[0].sau : t.luot, dem = 0;
     for (;;) {
       P = keTiep(t, P);
       if (++dem > 6) { t.hoa = true; ev.push({ loai: 'hoa', vi: 'kẹt' }); return ev; }
       if (nuocHopLe(t, P).length) break;
       if (biChieu(t, P)) {
+        /* Tam quốc: chiếu hết cũng là giết vua — vua bị bắt khỏi bàn, người giết là nhà đang chiếu (ưu tiên nhà vừa đi) */
+        const ke = t.tq ? aiChieu(t, P).map(r => t.chu[t.o[r.o] >> 3]) : [], nguoiDi = lui ? lui.chu[lui.x >> 3] : -1, vuaO = t.vua[P];
         t.song[P] = 0; t.vua[P] = -1; ev.push({ loai: 'chieuhet', bi: P });
-        if (soSong(t) <= 1) { t.thang = t.song.indexOf(1); ev.push({ loai: 'thang', ai: t.thang }); return ev; }
+        if (t.tq && ke.length) {
+          const truoc = t.chu.slice();
+          t.o[vuaO] = 0;
+          giet(t, P, ke.includes(nguoiDi) ? nguoiDi : ke[0], P, false, null);
+          for (let D = 0; D < 3; D++) if (t.chu[D] !== truoc[D]) ev.push({ loai: 'chiemquan', ai: t.chu[D], dao: D, cu: truoc[D] });
+        }
+        if (soSong(t) <= 1) return het();
+        if (t.cho.length) return choChon();
       } else {
         if (soSong(t) === 2) { t.hoa = true; ev.push({ loai: 'hoa', vi: 'hếtnước', ai: P }); return ev; }
         ev.push({ loai: 'boluot', ai: P });
@@ -285,34 +365,39 @@ function LOI() {
     if (biChieu(t, P)) ev.push({ loai: 'chieu', bi: P });
     return ev;
   }
-  /* còn hai nhà mà chẳng nhà nào đủ quân chiếu hết (chỉ còn vua, hay vua với một mã/tượng): hoà */
+  /* còn hai nhà mà chẳng nhà nào đủ quân chiếu hết (chỉ còn vua, hay vua với một mã/tượng): hoà. Tướng đi như vua nên
+     cùng vua chiếu hết được: tính như quân đủ sức. */
   function thieuQuan(t) {
     if (soSong(t) !== 2) return false;
-    for (let c = 0; c < 96; c++) { const x = t.o[c]; if (!x || !t.song[x >> 3]) continue; const l = x & 7; if (l === TOT || l === XE || l === HAU) return false; }
+    const chuCua = (x) => t.chu[x >> 3];
+    for (let c = 0; c < 96; c++) { const x = t.o[c]; if (!x || !t.song[chuCua(x)]) continue; const l = x & 7; if (l === TOT || l === XE || l === HAU || l === TG) return false; }
     const nhe = [0, 0, 0];
-    for (let c = 0; c < 96; c++) { const x = t.o[c]; if (x && t.song[x >> 3] && ((x & 7) === MA_ || (x & 7) === TUONG)) nhe[x >> 3]++; }
+    for (let c = 0; c < 96; c++) { const x = t.o[c]; if (x && t.song[chuCua(x)] && ((x & 7) === MA_ || (x & 7) === TUONG)) nhe[chuCua(x)]++; }
     return nhe.every(n => n <= 1);
   }
 
   /* ---------- chấm điểm thế cờ ----------
-     Điểm một nhà = giá quân + điểm vị trí; nhà đã loại tính 0. Máy nhìn từ phía mình: điểm mình − trung bình hai nhà kia.
-     Tính cách: Hổ cộng điểm cho quân đã sang nhà người và quân áp sát vua địch; Rùa cộng điểm cho quân đứng che vua mình. */
+     Điểm một nhà = giá quân + điểm vị trí của mọi quân nhà đó đang cầm; nhà đã loại tính 0. Máy nhìn từ phía mình: điểm
+     mình − trung bình hai nhà kia. Tính cách: Hổ cộng điểm cho quân đã sang nhà người và quân áp sát vua địch; Rùa cộng
+     điểm cho quân đứng che vua mình. Luật Tam quốc thì cướp được đạo quân là điểm vọt lên ngay, nên máy tự biết rình vua,
+     rình tướng của người. */
   function diemNha(t, P, tc) {
-    const o = t.o;
+    const o = t.o, chu = t.chu;
     let s = 0, quanLon = 0;
-    for (let c = 0; c < 96; c++) { const x = o[c]; if (x && (x >> 3) !== P && t.song[x >> 3] && (x & 7) >= MA_ && (x & 7) <= HAU) quanLon++; }
+    for (let c = 0; c < 96; c++) { const x = o[c]; if (x && chu[x >> 3] !== P && t.song[chu[x >> 3]] && (x & 7) >= MA_ && (x & 7) <= HAU) quanLon++; }
     const tanCuoc = quanLon <= 4;
     for (let c = 0; c < 96; c++) {
       const x = o[c];
-      if (!x || (x >> 3) !== P) continue;
-      const loai = x & 7, nha = c >> 5, r = hangO(c), xa = XA_TAM[c];
+      if (!x || chu[x >> 3] !== P) continue;
+      const loai = x & 7, D = x >> 3, nha = c >> 5, r = hangO(c), xa = XA_TAM[c];
       s += GIA[loai];
-      if (loai === TOT) s += nha === P ? (r - 2) * 8 : 30 + (4 - r) * 18;
+      if (loai === TOT) s += nha === D ? (r - 2) * 8 : 30 + (4 - r) * 18;
       else if (loai === MA_) s += (6 - Math.min(6, xa)) * 6;
       else if (loai === TUONG) s += (6 - Math.min(6, xa)) * 4;
-      else if (loai === XE) s += nha !== P ? 12 : 0;
+      else if (loai === XE) s += nha !== D ? 12 : 0;
       else if (loai === HAU) s += (6 - Math.min(6, xa)) * 2;
       else if (loai === VUA_) s += tanCuoc ? (6 - Math.min(6, xa)) * 6 : (nha === P && r === 1 ? 24 : -16 - (6 - Math.min(6, xa)) * 4);
+      else if (loai === TG) s += (6 - Math.min(6, xa)) * 2;
       if (tc && loai !== VUA_) {
         if (tc.hang && nha !== P) s += 10;
         if (tc.hang) for (let Q = 0; Q < 3; Q++) if (Q !== P && t.song[Q] && t.vua[Q] >= 0 && VUA[t.vua[Q]].includes(c)) s += 22;
@@ -330,16 +415,25 @@ function LOI() {
 
   /* ---------- tìm nước ----------
      kieu 'hoangtuong': hai đối thủ cùng tìm cách hại mình (min, min). kieu 'brs': Best-Reply Search — sau nước mình, chỉ
-     một đối thủ đi (ai có nước đáp mạnh nhất), rồi lại tới mình. Tìm sâu dần tới khi hết giờ. */
+     một đối thủ đi (ai có nước đáp mạnh nhất), rồi lại tới mình. Tìm sâu dần tới khi hết giờ. Đang tới lượt mình chọn tướng
+     (Tam quốc) thì chọn quân rẻ, không đang bị nhắm. */
   const VO_CUC = 1e6;
   function timNuoc(t0, X, ch) {
     const t = chepThe(t0), cauHinh = Object.assign({ kieu: 'hoangtuong', sau: 3, ms: 900, tinhCach: null, nhieu: 0 }, ch || {});
+    if (t.cho.length) {
+      const c = t.cho[0].ai === X ? chonTuong(t, t.cho[0].dao) : -1;
+      return { nuoc: c >= 0 ? { tu: c, toi: c, phong: 0, nhap: 0 } : null, diem: 0, sau: 0, nut: 0 };
+    }
     const tc = cauHinh.tinhCach, hetGio = Date.now() + cauHinh.ms;
     let nut = 0;
     const DUNG = {};
     const kiemGio = () => { if ((++nut & 511) === 0 && Date.now() > hetGio) throw DUNG; };
     const xepNuoc = (ds) => {
-      for (const m of ds) { const an = t.o[m.toi]; m.k = an ? ((an & 7) === VUA_ ? 1e5 : GIA[an & 7] * 10 - GIA[t.o[m.tu] & 7] / 10) : 0; if (m.phong) m.k += 800; }
+      for (const m of ds) {
+        const an = t.o[m.toi];
+        m.k = an ? ((an & 7) === VUA_ ? 1e5 : (an & 7) === TG ? 5e4 : GIA[an & 7] * 10 - GIA[t.o[m.tu] & 7] / 10) : 0;
+        if (m.phong) m.k += 800;
+      }
       return ds.sort((a, b) => b.k - a.k);
     };
     const dg = () => danhGia(t, X, tc) + (cauHinh.nhieu ? (Math.random() - .5) * cauHinh.nhieu : 0);
@@ -360,7 +454,7 @@ function LOI() {
       else ds = nuocHopLe(t, P, true);
       let best = dung;
       for (const m of xepNuoc(ds)) {
-        const lui = diNuoc(t, m);
+        const lui = diNuoc(t, m, true);
         const v = brs ? tinh(a, b, X, ply + 1, qd + 1, !max, true) : tinh(a, b, keTiep(t, P), ply + 1, qd + 1, keTiep(t, P) === X, false);
         hoanNuoc(t, lui);
         if (max) { if (v > best) best = v; if (best > a) a = best; } else { if (v < best) best = v; if (best < b) b = best; }
@@ -378,10 +472,14 @@ function LOI() {
       if (!ds.length) {
         const ai = brs && !max ? -1 : P;
         if (ai >= 0 && biChieu(t, ai)) {                               // bị chiếu hết: loại nhà đó rồi đi tiếp
-          const s = t.song.slice(), v0 = t.vua.slice();
+          const s = t.song.slice(), v0 = t.vua.slice(), chu0 = t.chu.slice(), vo = t.vua[ai], xv = t.o[vo];
+          const ke = t.tq ? aiChieu(t, ai).map(r => t.chu[t.o[r.o] >> 3]) : [], tam = { doi: null };
           t.song[ai] = 0; t.vua[ai] = -1;
+          if (t.tq && ke.length) { t.o[vo] = 0; giet(t, ai, ke[0], ai, true, tam); }
           const v = brs ? ab(depth - 1, a, b, X, ply + 1, !max, true) : ab(depth - 1, a, b, keTiep(t, ai), ply + 1, keTiep(t, ai) === X, false);
-          t.song = s; t.vua = v0;
+          if (tam.doi) for (let i = tam.doi.length - 1; i >= 0; i--) t.o[tam.doi[i][0]] = tam.doi[i][1];
+          if (t.tq && ke.length) t.o[vo] = xv;
+          t.song = s; t.vua = v0; t.chu = chu0;
           return v;
         }
         if (soSong(t) === 2) return 0;
@@ -389,7 +487,7 @@ function LOI() {
       }
       let best = max ? -Infinity : Infinity;
       for (const m of xepNuoc(ds)) {
-        const lui = diNuoc(t, m);
+        const lui = diNuoc(t, m, true);
         const v = brs ? ab(depth - 1, a, b, X, ply + 1, !max, true) : ab(depth - 1, a, b, keTiep(t, P), ply + 1, keTiep(t, P) === X, false);
         hoanNuoc(t, lui);
         if (max) { if (v > best) best = v; if (best > a) a = best; } else { if (v < best) best = v; if (best < b) b = best; }
@@ -405,7 +503,7 @@ function LOI() {
       let botNhat = null, botDiem = -Infinity;
       try {
         for (const m of goc) {
-          const lui = diNuoc(t, m);
+          const lui = diNuoc(t, m, true);
           const v = brs ? ab(sau - 1, botDiem, Infinity, X, 1, false, true) : ab(sau - 1, botDiem, Infinity, keTiep(t, X), 1, keTiep(t, X) === X, false);
           hoanNuoc(t, lui);
           m.v = v;
@@ -425,8 +523,8 @@ function LOI() {
 
   return {
     oCua, nhaO, cotO, hangO, dieu, tuDieu, buoc, cheo, BANG: { TRUC, CHEO, MA, VUA, KE }, TOT_TIEN, TOT_AN, TOT_BI_AN, HOA_THI, XA_TAM,
-    LOAI: { TOT, MA: MA_, TUONG, XE, HAU, VUA: VUA_ }, GIA, THU_TU, theMoi, chepThe, soSong, keTiep, biNham, biChieu, aiChieu,
-    nuocGia, nuocHopLe, diNuoc, hoanNuoc, duongDi, sauNuoc, thieuQuan, danhGia, timNuoc,
+    LOAI: { TOT, MA: MA_, TUONG, XE, HAU, VUA: VUA_, TG }, GIA, THU_TU, theMoi, chepThe, soSong, keTiep, biNham, biChieu, aiChieu,
+    nuocGia, nuocHopLe, diNuoc, hoanNuoc, duongDi, sauNuoc, thieuQuan, danhGia, timNuoc, chonTuong, coTuong,
   };
 }
 const L = LOI();
@@ -471,6 +569,7 @@ function apDungNuocMay(so, P, kq) {
    GIAO DIỆN
    ====================================================================================================== */
 const TEN_MAU = ['Trắng', 'Đỏ', 'Đen'];
+const TEN_LOAI = { 1: 'Tốt', 2: 'Mã', 3: 'Tượng', 4: 'Xe', 5: 'Hậu', 6: 'Vua', 7: 'Tướng' };
 const MAU = [                                                         // màu quân: sáng, giữa, tối, viền
   { sang: '#fffdf6', giua: '#efe6d2', toi: '#c9bb9c', vien: '#3b2f22', cham: '#f4ecd8' },
   { sang: '#ff9a8a', giua: '#e0473a', toi: '#9e2219', vien: '#3a0b07', cham: '#e0473a' },
@@ -480,10 +579,12 @@ const DA = { sang: '#c8c4bc', giua: '#9a968e', toi: '#66635d', vien: '#34322e' }
 const TINH_CACH = {
   ho: { ten: 'Hổ', hang: true, kieu: 'brs',
     noi: { batDau: ['Vào trận thôi!', 'Hổ đây, ai trước nào?'], an: ['Ngon!', 'Của tôi nhé!', 'Xin nhé!'], chieu: ['Chiếu! Chạy đi đâu?', 'Chiếu tướng!'],
-      mat: ['Hừ, nhớ đấy!', 'Được lắm!'], loai: ['Một người ra khỏi trận!'], biLoai: ['Hổ thua rồi… lần sau gặp lại!'], thang: ['Hổ vô địch!'] } },
+      mat: ['Hừ, nhớ đấy!', 'Được lắm!'], loai: ['Một người ra khỏi trận!'], biLoai: ['Hổ thua rồi… lần sau gặp lại!'], thang: ['Hổ vô địch!'],
+      chiem: ['Đạo quân này giờ theo Hổ!', 'Về dưới cờ Hổ cả!'], biCuop: ['Dám cướp quân của Hổ à!', 'Trả quân đây!'] } },
   rua: { ten: 'Rùa', chac: true, kieu: 'hoangtuong',
     noi: { batDau: ['Chơi chậm thôi nhé.', 'Chậm mà chắc.'], an: ['Từ từ mà chắc.', 'Nhặt được rồi.', 'Cảm ơn nhé.'], chieu: ['Chiếu nhé, cẩn thận.'],
-      mat: ['Không sao, còn nhiều.', 'Ừm…'], loai: ['Chậm mà chắc.'], biLoai: ['Rùa xin rút trước.'], thang: ['Rùa về đích!'] } },
+      mat: ['Không sao, còn nhiều.', 'Ừm…'], loai: ['Chậm mà chắc.'], biLoai: ['Rùa xin rút trước.'], thang: ['Rùa về đích!'],
+      chiem: ['Thu nạp cả rồi.', 'Từ nay theo Rùa nhé.'], biCuop: ['Ây da, mất cả đạo quân…', 'Rùa sẽ lấy lại.'] } },
 };
 const KHO = [{ ten: 'Dễ', sau: 2, ms: 400, nhieu: 140 }, { ten: 'Vừa', sau: 3, ms: 700, nhieu: 16 }, { ten: 'Khó', sau: 6, ms: 1500, nhieu: 0 }];
 const KHOA = 'tdtd.coba';
@@ -591,7 +692,7 @@ function tamO(c) { return veRa(TAM_O[c][0], TAM_O[c][1]); }
 function coO(c) { return CO_O[c] * ban.R; }
 
 /* quân cờ vẽ bằng nét (không dùng chữ ♔♕: máy nào cũng giống nhau, có khối, có bóng) — cao 1 đơn vị, đế ở y = 0 */
-function vePhan(loai, x, y, s, m, da) {
+function vePhan(loai, x, y, s, m, da, goc) {
   ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
   ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(.04, .015, .37, .095, 0, 0, 6.2832); ctx.fill();
   const g = ctx.createLinearGradient(-.4, -.5, .4, -.3);
@@ -599,6 +700,9 @@ function vePhan(loai, x, y, s, m, da) {
   ctx.fillStyle = g; ctx.strokeStyle = m.vien; ctx.lineWidth = .05; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
   const hinh = (f) => { ctx.beginPath(); f(); ctx.fill(); ctx.stroke(); };
   hinh(() => { ctx.moveTo(-.34, 0); ctx.lineTo(.34, 0); ctx.quadraticCurveTo(.37, -.1, .26, -.13); ctx.lineTo(-.26, -.13); ctx.quadraticCurveTo(-.37, -.1, -.34, 0); ctx.closePath(); });
+  if (goc) {                                                         // Tam quốc: quân cướp được mang vành màu đạo gốc
+    ctx.fillStyle = goc.giua; ctx.beginPath(); ctx.ellipse(0, -.065, .3, .048, 0, 0, 6.2832); ctx.fill(); ctx.stroke(); ctx.fillStyle = g;
+  }
   if (loai === 1) {                                                   // tốt
     hinh(() => { ctx.moveTo(-.18, -.13); ctx.quadraticCurveTo(-.09, -.32, -.11, -.46); ctx.lineTo(.11, -.46); ctx.quadraticCurveTo(.09, -.32, .18, -.13); ctx.closePath(); });
     hinh(() => ctx.ellipse(0, -.48, .17, .05, 0, 0, 6.2832));
@@ -625,6 +729,15 @@ function vePhan(loai, x, y, s, m, da) {
     hinh(() => { ctx.rect(-.24, -.73, .48, .08); });
     hinh(() => { ctx.moveTo(-.04, -.73); ctx.lineTo(-.04, -.83); ctx.lineTo(-.12, -.83); ctx.lineTo(-.12, -.9); ctx.lineTo(-.04, -.9); ctx.lineTo(-.04, -.99); ctx.lineTo(.04, -.99);
       ctx.lineTo(.04, -.9); ctx.lineTo(.12, -.9); ctx.lineTo(.12, -.83); ctx.lineTo(.04, -.83); ctx.lineTo(.04, -.73); ctx.closePath(); });
+  } else if (loai === 7) {                                            // tướng (Tam quốc): mũ trụ, cờ hiệu màu đạo quân mình cầm đầu
+    hinh(() => { ctx.moveTo(-.2, -.13); ctx.quadraticCurveTo(-.27, -.42, -.15, -.5); ctx.lineTo(.15, -.5); ctx.quadraticCurveTo(.27, -.42, .2, -.13); ctx.closePath(); });
+    hinh(() => { ctx.moveTo(-.2, -.5); ctx.quadraticCurveTo(-.21, -.8, 0, -.86); ctx.quadraticCurveTo(.21, -.8, .2, -.5); ctx.closePath(); });
+    hinh(() => { ctx.rect(-.23, -.55, .46, .07); });
+    ctx.beginPath(); ctx.moveTo(0, -.86); ctx.lineTo(0, -.97); ctx.stroke();
+    ctx.lineWidth = .04; ctx.beginPath(); ctx.moveTo(.27, -.12); ctx.lineTo(.27, -1.04); ctx.stroke();
+    const co = goc || m;
+    ctx.fillStyle = co.giua; ctx.lineWidth = .035;
+    ctx.beginPath(); ctx.moveTo(.27, -1.06); ctx.lineTo(.66, -.95); ctx.lineTo(.27, -.81); ctx.closePath(); ctx.fill(); ctx.stroke();
   }
   if (da) {                                                          // quân đá: vài vết nứt
     ctx.strokeStyle = 'rgba(40,38,34,.6)'; ctx.lineWidth = .025;
@@ -633,10 +746,10 @@ function vePhan(loai, x, y, s, m, da) {
   ctx.restore();
 }
 function veQuan(x, c, toa, tiLe = 1, mo = 1) {
-  const P = x >> 3, loai = x & 7, da = !demo && van && !van.the.song[P];
+  const D = x >> 3, loai = x & 7, P = !demo && van ? van.the.chu[D] : D, da = !demo && van && !van.the.song[P];
   const s = Math.max(15, Math.min(54, coO(c) * 2.15)) * tiLe;
   ctx.globalAlpha = mo;
-  vePhan(loai, toa[0], toa[1] + s * .38, s, da ? DA : MAU[P], da);
+  vePhan(loai, toa[0], toa[1] + s * .38, s, da ? DA : MAU[P], da, !da && P !== D ? MAU[D] : null);
   ctx.globalAlpha = 1;
 }
 function veDuongDo(duong, t) {                                       // báo nguy: đường đỏ từ quân đang chiếu tới vua
@@ -677,6 +790,22 @@ function veCanh(t) {
   thuTu.sort((a, b) => tamO(a)[1] - tamO(b)[1]);
   for (const c of thuTu) veQuan(the.o[c], c, tamO(c));
   vet.forEach((v, i) => veMuiTen(v, (chon >= 0 ? .35 : 1) * (i === vet.length - 1 ? .95 : i === vet.length - 2 ? .7 : .45)));
+  if (the.cho && the.cho.length && !hoat) {                          // Tam quốc: đang chờ chọn tướng
+    const D = the.cho[0].dao, nhip = .5 + .5 * Math.sin(t / 220);
+    for (let c = 0; c < 96; c++) {
+      const x = the.o[c];
+      if (!x || (x >> 3) !== D) continue;
+      const [px, py] = tamO(c), r = coO(c);
+      ctx.lineWidth = Math.max(2.5, r * .16); ctx.strokeStyle = `rgba(255,214,90,${.5 + .45 * nhip})`;
+      ctx.beginPath(); ctx.arc(px, py, r * .9, 0, 6.2832); ctx.stroke();
+    }
+  }
+  if (van.loe && t - van.loe.t0 < 1400) {                            // tướng vừa phong: loé sáng một nhịp
+    const [px, py] = tamO(van.loe.c), r = coO(van.loe.c) * (1.2 + (t - van.loe.t0) / 700), a = 1 - (t - van.loe.t0) / 1400;
+    const g = ctx.createRadialGradient(px, py, 0, px, py, r * 1.6);
+    g.addColorStop(0, `rgba(255,226,140,${.75 * a})`); g.addColorStop(1, 'rgba(255,226,140,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, r * 1.6, 0, 6.2832); ctx.fill();
+  }
   for (const d of bao) veDuongDo(d.duong, t);
   if (chon >= 0 && nuocCuaChon.length) veDuongChon(the);
   for (const m of nuocCuaChon) {                                     // chỗ đi được: chấm trắng viền xanh, ăn quân thì vòng đỏ
@@ -765,7 +894,7 @@ function veHoat(t) {
 
 /* ---------- ván cờ ---------- */
 function vanMoi(ch) {
-  ch = Object.assign({ mau: 0, kho: 1 }, ch || {});
+  ch = Object.assign({ mau: 0, kho: 1, luat: 'thuong' }, ch || {});
   roiPhong();                                                         // đấu với máy thì rời phòng đang ở (nếu có)
   boViec();
   const nguoi = [0, 1, 2].map(P => (P === ch.mau ? 'nguoi' : 'may'));
@@ -773,7 +902,7 @@ function vanMoi(ch) {
   const tinh = [null, null, null];
   const sauNguoi = (P) => { const i = L.THU_TU.indexOf(P); return [1, 2].map(k => L.THU_TU[(i + k) % 3]); };
   const [a, b] = sauNguoi(ch.mau); tinh[a] = 'ho'; tinh[b] = 'rua';
-  van = { the: L.theMoi(), cheDo: 'may', nguoi, tinh, kho: ch.kho, nguoiChoi: ch.mau, lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: false };
+  van = { the: L.theMoi(ch.luat), luat: ch.luat === 'tq' ? 'tq' : 'thuong', cheDo: 'may', nguoi, tinh, kho: ch.kho, nguoiChoi: ch.mau, lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: false };
   chon = -1; nuocCuaChon = []; hoat = null; phongCho = null;
   xoay = xoayDen = GOC_NHIN[nhaNhin()];
   tatTin(); capNhatChu();
@@ -819,7 +948,16 @@ function gocGan(g) { while (g - xoay > Math.PI) g -= 2 * Math.PI; while (xoay - 
 function thucHien(m, P) {
   const the = van.the;
   if (the.luot !== P || the.thang >= 0 || the.hoa) return;
-  const x = the.o[m.tu], an = the.o[m.toi], duong = L.duongDi(the, m);
+  if (m.tu === m.toi) {                                              // phong tướng: không trượt, sáng lên một nhịp
+    chon = -1; nuocCuaChon = [];
+    const ev = apDung(m, P);
+    van.loe = { c: m.tu, t0: bay() };
+    tiengPhong(); baoSuKien(ev);
+    if (!raf) raf = requestAnimationFrame(vong);
+    denLuot();
+    return;
+  }
+  const x = the.o[m.tu], an = the.o[m.toi], chuAn = an ? the.chu[an >> 3] : -1, duong = L.duongDi(the, m);
   const quan = [{ x, duong, nhay: (x & 7) === 2 }];
   if (m.nhap) { const r = the.o[L.oCua(P, m.nhap === 1 ? 7 : 0, 1)]; quan.push({ x: r, duong: [L.oCua(P, m.nhap === 1 ? 7 : 0, 1), L.oCua(P, m.nhap === 1 ? 5 : 3, 1)] }); }
   chon = -1; nuocCuaChon = [];
@@ -827,7 +965,7 @@ function thucHien(m, P) {
   hoat = { quan, dau: quan.map(q => q.duong[0]), an: an ? m.toi : -1, anX: an, t0: bay(), lau, xong: () => {
     const ev = apDung(m, P);
     tiengDi(!!an);
-    noiVeNuoc(P, an, ev);
+    noiVeNuoc(P, an, ev, chuAn);
     baoSuKien(ev);
     denLuot();
   } };
@@ -839,7 +977,7 @@ function apDung(m, P) {
   const lui = L.diNuoc(the, m);
   van.nuocCuoi = { tu: m.tu, toi: m.toi }; van.soNuoc++;
   if (!van.vet) van.vet = [null, null, null];
-  van.vet[P] = { duong, ma, thu: van.soNuoc };                          // mũi tên nước vừa đi của nhà này
+  if (m.tu !== m.toi) van.vet[P] = { duong, ma, thu: van.soNuoc };      // mũi tên nước vừa đi của nhà này (phong tướng thì không)
   if (an) van.an[P] += L.GIA[an & 7] || 0;
   return L.sauNuoc(the, lui);
 }
@@ -853,8 +991,10 @@ function noi(P, loai, xacSuat = 1, cho = 0) {
   const cau = ds[Math.floor(Math.random() * ds.length)];
   setTimeout(() => hienNoi(P, cau), cho);
 }
-function noiVeNuoc(P, an, ev) {
-  if (an && (an & 7) !== 6) { noi(P, 'an', .5); if (van.tinh[an >> 3] && van.the.song[an >> 3]) noi(an >> 3, 'mat', .45, 900); }
+function noiVeNuoc(P, an, ev, chuAn = an ? an >> 3 : -1) {
+  if (an && (an & 7) !== 6) { noi(P, 'an', .5); if (chuAn >= 0 && van.tinh[chuAn] && van.the.song[chuAn]) noi(chuAn, 'mat', .45, 900); }
+  const cq = ev.find(e => e.loai === 'chiemquan');
+  if (cq) { noi(cq.ai, 'chiem', 1, 700); if (cq.cu >= 0 && van.the.song[cq.cu]) noi(cq.cu, 'biCuop', 1, 1700); }
   for (const e of ev) {
     if (e.loai === 'chieu' && e.bi !== P && van.tinh[P]) noi(P, 'chieu', 1);
     if ((e.loai === 'anvua' || e.loai === 'chieuhet') && van.tinh[e.bi]) noi(e.bi, 'biLoai', 1, 300);
@@ -873,9 +1013,19 @@ function hienNoi(P, cau) {
   clearTimeout(hienNoi.t); hienNoi.t = setTimeout(() => { b.hidden = true; }, 2600);
 }
 function baoSuKien(ev) {
+  const tq = van && van.the.tq;
   for (const e of ev) {
-    if (e.loai === 'anvua') { bao(`${tenNha(e.ai)} ăn vua ${tenNha(e.bi)}! ${tenNha(e.bi)} bị loại, quân hoá đá.`); tiengLoai(); }
-    else if (e.loai === 'chieuhet') { bao(`${tenNha(e.bi)} bị chiếu hết — bị loại, quân hoá đá.`); tiengLoai(); }
+    const cq = ev.find(x => x.loai === 'chiemquan' && x.dao === (e.bi !== undefined ? e.bi : e.dao));
+    if (e.loai === 'anvua') {
+      bao(tq ? `${tenNha(e.ai)} giết vua ${tenNha(e.bi)}! Cả đạo quân ${TEN_MAU[e.bi]} về tay ${tenNha(e.ai)}.` : `${tenNha(e.ai)} ăn vua ${tenNha(e.bi)}! ${tenNha(e.bi)} bị loại, quân hoá đá.`);
+      tiengLoai();
+    } else if (e.loai === 'chieuhet') {
+      bao(tq && cq ? `${tenNha(e.bi)} bị chiếu hết — vua bị bắt, đạo quân ${TEN_MAU[e.bi]} về tay ${tenNha(cq.ai)}.` : `${tenNha(e.bi)} bị chiếu hết — bị loại, quân hoá đá.`);
+      tiengLoai();
+    } else if (e.loai === 'antuong') { bao(`${tenNha(e.ai)} giết tướng, cướp đạo quân ${TEN_MAU[e.dao]} từ tay ${tenNha(e.cu)}!`); tiengLoai(); }
+    else if (e.loai === 'chontuong') {
+      if (laMinh(e.ai)) { bao(`Chạm một quân ${TEN_MAU[e.dao].toLowerCase()} (vòng vàng) để phong tướng — tướng đi như vua, mất tướng là mất cả đạo quân.`); tiengToiLuot(); }
+    } else if (e.loai === 'phongtuong') bao(`${tenNha(e.ai)} phong ${TEN_LOAI[e.cu]} làm tướng đạo quân ${TEN_MAU[e.dao]}.`);
     else if (e.loai === 'boluot') bao(`${tenNha(e.ai)} hết nước đi mà không bị chiếu: bỏ lượt.`);
     else if (e.loai === 'chieu') {
       if (laMinh(e.bi)) { bao('Vua đang bị chiếu! Đường đỏ là quân đang nhắm vào vua.'); tiengChieu(); }
@@ -903,6 +1053,8 @@ function capNhatChu() {
     else if (the.luot === P && the.thang < 0 && !the.hoa) tt = L.biChieu(the, P) ? 'bị chiếu!' : 'đang đi';
     else tt = van.an[P] ? `ăn ${Math.round(van.an[P] / 100)} điểm` : '';
     if (van.cheDo === 'phong' && laNguoi(P) && P !== van.nguoiChoi && the.song[P] && !conO(P)) tt = tt ? tt + ' · vắng' : 'vắng';
+    const daoGiu = the.tq && the.song[P] ? [0, 1, 2].filter(D => D !== P && the.chu[D] === P).length : 0;
+    if (daoGiu) tt = (tt ? tt + ' · ' : '') + `giữ ${daoGiu + 1} đạo quân`;
     n.querySelector('span').textContent = tt;
     n.classList.toggle('cb-dang', the.luot === P && the.thang < 0 && !the.hoa);
     n.classList.toggle('cb-loai', !the.song[P]);
@@ -912,6 +1064,7 @@ function capNhatChu() {
   if (the.thang >= 0) l.textContent = `${tenNha(the.thang)} thắng!`;
   else if (the.hoa) l.textContent = 'Hoà.';
   else if (van.cheDo === 'phong' && phong && phong.rot) l.textContent = 'Mất mạng — đang nối lại…';
+  else if (the.cho && the.cho.length) l.textContent = laMinh(P) ? `Chạm một quân ${TEN_MAU[the.cho[0].dao].toLowerCase()} (vòng vàng) để phong tướng` : `${tenNha(P)} đang chọn tướng cho đạo quân ${TEN_MAU[the.cho[0].dao]}…`;
   else if (van.dangNghi >= 0) l.textContent = `${tenNha(van.dangNghi)} (${TEN_MAU[van.dangNghi]}) đang nghĩ…`;
   else if (laMinh(P)) l.textContent = 'Lượt của bạn — chạm một quân để đi';
   else if (van.cheDo === 'phong') l.textContent = laNguoi(P) ? `Chờ ${tenNha(P)} (${TEN_MAU[P]}) đi…${conO(P) ? '' : ' — đang vắng'}` : `Lượt ${tenNha(P)} (${TEN_MAU[P]}, máy chơi thay)`;
@@ -924,9 +1077,9 @@ function capNhatChu() {
   t.textContent = viec === 'tudi' ? 'Tự đi tiếp' : viec === 'thay' ? `Cho máy đi thay ${tenNha(P)}` : '';
   tam.querySelector('.cb-moi').textContent = van.cheDo === 'phong' ? 'Phòng' : 'Ván mới';
   const ten = tam.querySelector('.cb-ten span');
-  ten.textContent = van.cheDo === 'phong'
+  ten.textContent = (van.cheDo === 'phong'
     ? `Phòng ${van.ma} · ${van.nguoiChoi >= 0 ? `bạn cầm ${TEN_MAU[van.nguoiChoi]}` : 'đang xem'} · máy ${KHO[van.kho].ten.toLowerCase()}`
-    : `Bạn cầm ${TEN_MAU[van.nguoiChoi]} · máy ${KHO[van.kho].ten.toLowerCase()}`;
+    : `Bạn cầm ${TEN_MAU[van.nguoiChoi]} · máy ${KHO[van.kho].ten.toLowerCase()}`) + (the.tq ? ' · Tam quốc' : '');
 }
 /* hoàn tác: về đầu lượt trước của bạn (bỏ luôn hai nước máy đi sau đó) */
 /* ảnh chụp ở đầu mỗi lượt của bạn: tới lượt bạn thì cái cuối là lượt hiện tại, cần thêm một cái trước đó mới hoàn tác được */
@@ -948,6 +1101,12 @@ function chamBan(px, py) {
   if (!van || hoat || demo) return;
   const the = van.the, P = the.luot;
   if (the.thang >= 0 || the.hoa || !laMinh(P) || van.dangNghi >= 0) return;
+  if (the.cho && the.cho.length) {                                   // Tam quốc: chạm một quân của đạo quân vừa chiếm để phong tướng
+    const c = oTai(px, py), x = c >= 0 ? the.o[c] : 0;
+    if (x && (x >> 3) === the.cho[0].dao) diNuoc({ tu: c, toi: c, phong: 0, nhap: 0 }, P);
+    else bao(`Chạm một quân ${TEN_MAU[the.cho[0].dao].toLowerCase()} (vòng vàng) để phong làm tướng.`);
+    return;
+  }
   let c = oTai(px, py);
   /* chạm hơi lệch ô đích (ô rìa nhỏ): bắt vào chấm gần nhất trong tầm */
   if (chon >= 0 && (c < 0 || !nuocCuaChon.some(m => m.toi === c))) {
@@ -1008,7 +1167,7 @@ async function taoPhong(ch) {
   moTin('<p class="cb-tin-nho">Chơi qua mạng</p><h2>Đang tạo phòng…</h2>');
   for (let lan = 0; lan < 4; lan++) {
     const ma = ch.ma || MANG.maMoi();
-    const r = await MANG.goi(`coba/${ma}`, 'PUT', { tao: MANG.GIO, chu: ch.mau, kho: ch.kho, ghe: { [ch.mau]: { id, ten, thay: MANG.GIO } } });
+    const r = await MANG.goi(`coba/${ma}`, 'PUT', Object.assign({ tao: MANG.GIO, chu: ch.mau, kho: ch.kho, ghe: { [ch.mau]: { id, ten, thay: MANG.GIO } } }, ch.luat === 'tq' ? { luat: 'tq' } : {}));
     if (r.ok) { vaoPhong(ma, { id, P: ch.mau }); return true; }
     if (r.ma !== 401 || ch.ma) break;               // mất mạng, hay mã định sẵn (ván nữa) đã có người dùng
   }
@@ -1095,6 +1254,7 @@ function veSanh() {
   const loi = batDauDuoc ? 'Bấm Bắt đầu lúc nào cũng được — ghế còn trống thì máy chơi thay.' : minh >= 0 ? 'Chờ chủ phòng bấm Bắt đầu.' : 'Chọn một ghế còn trống để vào chơi.';
   const html = `<p class="cb-tin-nho">Phòng chờ</p><h2>Phòng <span class="cb-ma">${phong.ma}</span></h2>
     <div class="cb-ghe-ds">${dong}</div>
+    <p class="cb-meo">${cay.luat === 'tq' ? 'Luật Tam quốc: giết vua là chiếm cả đạo quân, chọn một quân làm tướng; giết tướng là cướp đạo quân.' : 'Luật thường: bị loại thì quân hoá đá.'}</p>
     ${minh < 0 ? `<p class="cb-nhan">Tên của bạn</p><input class="cb-o-ten" maxlength="20" value="${esc(tenMinh())}" placeholder="Để trống thì gọi theo màu quân">` : ''}
     <p class="cb-meo">Gửi link hay mã phòng cho bạn bè. ${loi}</p>
     ${batDauDuoc ? '<button type="button" class="cb-batdau-phong">Bắt đầu</button>' : ''}
@@ -1124,7 +1284,7 @@ async function batDauPhong() {
 }
 function batDauVanPhong() {
   boViec();
-  van = { the: L.theMoi(), cheDo: 'phong', ma: phong.ma, nguoi: ['nguoi', 'nguoi', 'nguoi'], tinh: [null, null, null], kho: 0, nguoiChoi: phong.P,
+  van = { the: L.theMoi(phong.cay.luat), luat: phong.cay.luat === 'tq' ? 'tq' : 'thuong', cheDo: 'phong', ma: phong.ma, nguoi: ['nguoi', 'nguoi', 'nguoi'], tinh: [null, null, null], kho: 0, nguoiChoi: phong.P,
     lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: true };
   capNhatNguoi();
   Object.assign(phong, { ke: 0, nhat: [], daGui: null, song: false, nghiO: -1, baoLuot: -1 });
@@ -1202,7 +1362,7 @@ function dungLaiPhong() {
   if (!van || !phong) return;
   boViec();
   hoat = null; chon = -1; nuocCuaChon = []; phongCho = null;
-  Object.assign(van, { the: L.theMoi(), nuocCuoi: null, vet: [null, null, null], an: [0, 0, 0], soNuoc: 0, hetVan: false });
+  Object.assign(van, { the: L.theMoi(phong.cay && phong.cay.luat), nuocCuoi: null, vet: [null, null, null], an: [0, 0, 0], soNuoc: 0, hetVan: false });
   Object.assign(phong, { ke: 0, nhat: [], daGui: null, song: false, nghiO: -1 });
   chayPhong();
 }
@@ -1258,7 +1418,7 @@ async function vanNua() {
   const r = await MANG.goi(`coba/${cu}/tiep`, 'PUT', ma);
   if (!phong || phong.ma !== cu) return;
   if (!r.ok) { bao(r.ma === 401 ? 'Có người vừa mời ván nữa — bấm Vào ván mới.' : 'Mất mạng, thử lại nhé.'); return; }
-  await taoPhong({ mau: P, kho, ten: tenMinh() || TEN_MAU[P], ma });
+  await taoPhong({ mau: P, kho, ten: tenMinh() || TEN_MAU[P], ma, luat: phong.cay.luat === 'tq' ? 'tq' : 'thuong' });
 }
 function theoTiep(ma) {
   const P = phong && phong.P >= 0 ? phong.P : -1;
@@ -1341,6 +1501,7 @@ function tiengCham() { if (amThanh()) not(880, am.currentTime + .01, .05, .03); 
 function tiengChieu() { if (!amThanh()) return; const t = am.currentTime + .02; not(988, t, .22, .08); not(784, t + .14, .3, .08); }
 function tiengLoai() { if (!amThanh()) return; const t = am.currentTime + .02; not(196, t, 1.2, .14); not(196 * 2.76, t, .5, .03); }
 function tiengToiLuot() { if (!amThanh()) return; const t = am.currentTime + .02; not(659.25, t, .16, .05); not(987.77, t + .13, .26, .05); if (navigator.vibrate) navigator.vibrate(40); }
+function tiengPhong() { if (!amThanh()) return; const t = am.currentTime + .02; not(523.25, t, .22, .06, 'triangle'); not(783.99, t + .1, .3, .06, 'triangle'); not(1046.5, t + .2, .4, .05, 'triangle'); }
 function tiengThang() { if (!amThanh()) return; const t = am.currentTime + .02; [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => not(f, t + i * .11, .5, .12, 'triangle')); }
 
 /* ---------- khung, bảng ---------- */
@@ -1390,6 +1551,7 @@ function moTin(html) { const h = tam.querySelector('.cb-tin'); h.querySelector('
 function tatTin() { if (tam) tam.querySelector('.cb-tin').hidden = true; }
 function moCaiDat() {
   const l = docLuu(), che = l.che === 'phong' && MANG ? 'phong' : 'may', mau = [0, 1, 2].includes(l.mau) ? l.mau : 0, kho = [0, 1, 2].includes(l.kho) ? l.kho : 1;
+  const luat = l.luat === 'tq' ? 'tq' : 'thuong';
   const nut = (ten, gt, chon_, nhom) => `<button type="button" class="cb-chon${chon_ ? ' cb-bat' : ''}" data-${nhom}="${gt}">${ten}</button>`;
   const quan = [0, 2, 1].map(P => nut(TEN_MAU[P] + (P === 0 ? ' (đi trước)' : ''), P, P === mau, 'mau')).join('');
   const muc = KHO.map((k, i) => nut(k.ten, i, i === kho, 'kho')).join('');
@@ -1406,9 +1568,11 @@ function moCaiDat() {
     <p class="cb-meo">Hai máy có tính cách riêng: <b>Hổ</b> hăng, dám đánh; <b>Rùa</b> chậm mà chắc.</p>
     <button type="button" class="cb-batdau">Bắt đầu</button>`;
   moTin(`<p class="cb-tin-nho">Ván mới</p><h2>Cờ vua ba người</h2>
-    <p class="cb-nhan">Cách chơi</p><div class="cb-hang">${nut('Đấu với 2 máy', 'may', che === 'may', 'che')}${MANG ? nut('Chơi qua mạng', 'phong', che === 'phong', 'che') : ''}</div>${phan}
+    <p class="cb-nhan">Cách chơi</p><div class="cb-hang">${nut('Đấu với 2 máy', 'may', che === 'may', 'che')}${MANG ? nut('Chơi qua mạng', 'phong', che === 'phong', 'che') : ''}</div>
+    <p class="cb-nhan">Luật</p><div class="cb-hang">${nut('Thường', 'thuong', luat === 'thuong', 'luat')}${nut('Tam quốc', 'tq', luat === 'tq', 'luat')}</div>
+    <p class="cb-meo">${luat === 'tq' ? 'Giết vua là chiếm cả đạo quân nhà đó: chọn một quân làm <b>tướng</b> — tướng đi như vua. Giết tướng là cướp đạo quân về tay mình. Chiếm qua chiếm lại, còn vua cuối cùng thì thắng.' : 'Bị loại thì quân hoá đá, vẫn chắn đường. Còn vua cuối cùng thì thắng.'}</p>${phan}
     <button type="button" class="cb-phu cb-tieng">${coTieng ? '🔊 Âm thanh: bật' : '🔇 Âm thanh: tắt'}</button>`);
-  moCaiDat.ch = { che, mau, kho };
+  moCaiDat.ch = { che, mau, kho, luat };
 }
 function moHuongDan() {
   moTin(`<p class="cb-tin-nho">Cách chơi</p><h2>Cờ vua ba người</h2>
@@ -1416,6 +1580,7 @@ function moHuongDan() {
     <p><b>Đường uốn qua giữa bàn:</b> cột của mình chạy thẳng sang nhà bên cạnh (cột h của Trắng nối cột a của Đỏ). Đi chéo qua đúng tâm thì chọn một trong hai nhánh, cùng màu ô. Tốt đứng ở d4, e4 có ba ô ăn chéo.</p>
     <p><b>Không được để vua mình bị chiếu.</b> Vua để hở cho người đi trước mình ăn là mất vua. Bị chiếu hết hay mất vua thì bị loại: quân hoá đá, vẫn chắn đường và ăn được, nhưng không ăn ai.</p>
     <p><b>Còn vua cuối cùng thì thắng.</b> Hết nước mà không bị chiếu: còn ba nhà thì bỏ lượt, còn hai nhà thì hoà. Tốt tới hàng cuối của một nhà khác thì phong cấp. Không có bắt tốt qua đường.</p>
+    <p><b>Luật Tam quốc</b> (chọn ở bảng ván mới): giết vua một nhà — ăn vua hay chiếu hết — là chiếm cả đạo quân nhà đó, quân đổi sang màu mình, giữ vành màu cũ. Người giết chạm một quân của đạo quân đó để phong <b>tướng</b>: tướng đi từng ô như vua, cầm cờ hiệu màu đạo quân. Nhà khác giết được tướng thì cướp luôn đạo quân, lại phong tướng mới — chiếm qua chiếm lại. Mất vua của chính mình thì mọi đạo quân mình giữ về tay người giết.</p>
     <p class="cb-meo">Đường đỏ là báo nguy: quân nào đang chiếu vua mình.</p>
     <button type="button" class="cb-demo">Xem hình động đường đi qua tâm</button>
     <button type="button" class="cb-phu cb-dongtin">Chơi</button>`);
@@ -1457,8 +1622,9 @@ function bam(e) {
   if ((n = q('[data-che]'))) { moCaiDat.ch.che = n.dataset.che; ghiLuu({ che: n.dataset.che }); moCaiDat(); return; }
   if ((n = q('[data-mau]'))) { ghiLuu({ mau: +n.dataset.mau }); moCaiDat(); return; }
   if ((n = q('[data-kho]'))) { ghiLuu({ kho: +n.dataset.kho }); moCaiDat(); return; }
+  if ((n = q('[data-luat]'))) { ghiLuu({ luat: n.dataset.luat }); moCaiDat(); return; }
   if ((n = q('[data-ngoi]'))) { ngoiGhe(+n.dataset.ngoi); return; }
-  if (q('.cb-tao')) { amThanh(); const c = moCaiDat.ch; taoPhong({ mau: c.mau, kho: c.kho, ten: tenMinh() }); return; }
+  if (q('.cb-tao')) { amThanh(); const c = moCaiDat.ch; taoPhong({ mau: c.mau, kho: c.kho, ten: tenMinh(), luat: c.luat }); return; }
   if (q('.cb-vao')) { amThanh(); vaoBangMa(); return; }
   if (q('.cb-batdau-phong')) { amThanh(); batDauPhong(); return; }
   if (q('.cb-moi-ban')) { moiBan(); return; }
@@ -1468,7 +1634,7 @@ function bam(e) {
   if ((n = q('.cb-thay'))) { if (n.dataset.viec === 'tudi') tuDiTiep(); else choMayThay(); return; }
   if (q('.cb-tieng')) { coTieng = !coTieng; if (!coTieng && am) am.suspend(); moCaiDat(); return; }
   if (q('.cb-batdau')) { amThanh(); vanMoi(moCaiDat.ch); return; }
-  if (q('.cb-lai')) { vanMoi({ che: van.cheDo, mau: van.nguoiChoi, kho: van.kho }); return; }
+  if (q('.cb-lai')) { vanMoi({ che: van.cheDo, mau: van.nguoiChoi, kho: van.kho, luat: van.luat }); return; }
   if (q('.cb-xemtiep')) { van.xemTiep = true; tatTin(); denLuot(); return; }
   if ((n = q('[data-phong]'))) { const m = Object.assign({}, phongCho, { phong: +n.dataset.phong }); phongCho = null; tatTin(); diNuoc(m, van.the.luot); return; }
 }
@@ -1480,7 +1646,7 @@ function vong(t) {
   /* bạn bị loại khi đấu với máy: hỏi xem tiếp hay ván mới (một lần) */
   if (van && van.cheDo === 'may' && !van.the.song[van.nguoiChoi] && !van.xemTiep && van.the.thang < 0 && !van.the.hoa && !hoat && !van.daHoiLoai) {
     van.daHoiLoai = true;
-    moTin(`<p class="cb-tin-nho">Bạn bị loại</p><h2>Vua của bạn đã mất</h2><p>Quân của bạn hoá đá. Hai máy vẫn đấu tiếp tới khi còn một vua.</p>
+    moTin(`<p class="cb-tin-nho">Bạn bị loại</p><h2>Vua của bạn đã mất</h2><p>${van.the.tq ? 'Cả đạo quân của bạn về tay người giết.' : 'Quân của bạn hoá đá.'} Hai máy vẫn đấu tiếp tới khi còn một vua.</p>
       <button type="button" class="cb-xemtiep">Xem hai máy đấu tiếp</button><button type="button" class="cb-phu cb-lai">Ván mới</button>`);
   }
   raf = requestAnimationFrame(vong);

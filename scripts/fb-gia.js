@@ -54,7 +54,8 @@ function taoMay(cong = 0) {
   const so = (v, a, b) => typeof v === 'number' && v >= a && v <= b;
   function hopLePhong(r, nay) {
     if (!r || typeof r !== 'object') return false;
-    for (const k of Object.keys(r)) if (!['tao', 'chu', 'kho', 'ghe', 'batDau', 'may', 'nuoc', 'xong', 'tiep'].includes(k)) return false;
+    for (const k of Object.keys(r)) if (!['tao', 'chu', 'kho', 'luat', 'ghe', 'batDau', 'may', 'nuoc', 'xong', 'tiep'].includes(k)) return false;
+    if ('luat' in r && r.luat !== 'tq') return false;                // luật Tam quốc, chỉ ghi lúc tạo phòng
     if (r.tao !== nay || !so(r.chu, 0, 2) || !so(r.kho, 0, 2) || !r.ghe || typeof r.ghe !== 'object') return false;
     return Object.keys(r.ghe).every(P => /^[012]$/.test(P) && hopLeGhe(r.ghe[P], nay));
   }
