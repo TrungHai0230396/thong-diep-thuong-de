@@ -1763,6 +1763,36 @@ Chạy song song trên máy M2 (7 luồng, chừng một giờ) được **216 m
 
 Đã chơi thử trên trình duyệt cỡ điện thoại: bảng cách chơi hiện đúng lần đầu; màn 1 bằng nút mũi tên, chạm ô để đi, chạm thùng để đẩy — thắng 3 sao; đi thừa bốn bước rồi đẩy đúng 4 lần — vẫn 3 sao, bảng khen "Bạn đẩy 4 lần (đi 16 bước)"; hoàn tác từ "2 lần đẩy · 3 bước" về "1 lần đẩy · 1 bước", robot về chỗ đứng đẩy, bấm nữa về chỗ xuất phát; vuốt để đẩy; xoay cảnh (mũi tên vẫn theo màn hình); đẩy thùng vào góc — thùng đỏ, có lời nhắc, hoàn tác thì hết; danh sách màn; chế độ thử tự chơi lời giải; màn 5 thùng; không còn nút gợi ý. Một khung hình vẽ hết 0,1–0,4 ms trên máy tính.
 
+## Cờ vua ba người
+
+Người dùng: "làm 1 ngôi sao nữa cờ vua cho 3 người chơi, thú vị đặc biệt". Ngôi sao **Cờ vua ba người** (`assets/coba.js`, mở thẳng bằng `#co-ba-nguoi`): Trắng, Đen, Đỏ trên bàn lục giác 96 ô.
+
+**Tìm hiểu trước khi làm** (người dùng dặn):
+
+- Cờ ba người có cả chục kiểu; kiểu phổ biến nhất là bàn lục giác 96 ô ghép từ ba nửa bàn cờ 4×8 — bằng sáng chế của Robert Zubrin (US 3652091, 1971), cùng kiểu với Yalta, Three-Man Chess (George Dekle, 1984), 3-chess.com và bộ cờ bán sẵn của Yellow Mountain Imports ([Wikipedia: Three-player chess](https://en.wikipedia.org/wiki/Three-player_chess), [Three-man chess](https://en.wikipedia.org/wiki/Three-man_chess)).
+- **Hình bàn theo đúng lời bằng sáng chế** ([Google Patents](https://patents.google.com/patent/US3652091)): ba cạnh xen kẽ là ba hàng quân; mỗi nhà chia đôi bằng "đường đỉnh" từ giữa cạnh vào tâm; mỗi nửa là một tứ giác chia 4×4 — đường ngang cắt đường đỉnh và cạnh bên ở 1/4, 1/2, 3/4, đường dọc chia mỗi đường ngang thành bốn phần bằng nhau. App dựng ô bằng nội suy song tuyến trên mỗi tứ giác, ra đúng cách chia đó.
+- **Đường đi**: cột của mình chạy thẳng sang nhà bên cạnh (cột h của Trắng nối cột a của Đỏ; cột e uốn qua sát tâm sang cột d của Đỏ, chạy tiếp về hàng quân Đỏ). Sáu ô d4, e4 của ba nhà gặp nhau ở tâm ("hoa thị"); đường chéo qua đúng tâm thì rẽ hai nhánh, cùng màu ô (Yalta: tốt, tượng, hậu "được chọn đường khi đi qua tâm"; [3-chess.com](https://3-chess.com/rules): "qua tâm thì chọn nhánh, vẫn cùng màu ô") — nên tốt ở d4 có ba ô ăn chéo (Dekle). Mã gần tâm tới được hơn tám ô (3-chess.com) và luôn sang ô khác màu (Yalta).
+- **Luật thắng** khác nhau tuỳ bản: còn vua cuối cùng (Zubrin, 3-chess.com), hay ai chiếu hết trước thì thắng, người thứ ba cùng thua (Dekle, Yellow Mountain).
+- **Máy chơi cờ nhiều người**: cách "hoang tưởng" (paranoid) coi mọi đối thủ cùng hợp sức đánh mình; Best-Reply Search (Schadd & Winands, 2011, [bài báo](https://dke.maastrichtuniversity.nl/m.winands/documents/BestReplySearch.pdf)) mỗi lượt chỉ cho một đối thủ — người có nước đáp mạnh nhất — đi. Nghiên cứu ở Đại học Maastricht thấy BRS mạnh hơn trong nhiều trò, và bản cải tiến BRS+ thắng cả maxⁿ lẫn hoang tưởng trong cờ bốn người ([Esser và cộng sự](https://dke.maastrichtuniversity.nl/m.winands/documents/brsplus.pdf)).
+
+Người dùng chọn: **còn vua cuối cùng thì thắng**, **đấu với 2 máy hoặc 3 người chung máy**, **bàn lục giác nhìn từ trên, quân vẽ nổi**, và cả bốn điểm đặc biệt: **hình động đường uốn qua tâm**, **báo nguy**, **máy có tính cách**, **hoàn tác khi đấu với máy**.
+
+**Luật trong app**: như cờ vua thường; **Trắng → Đen → Đỏ** theo chiều kim đồng hồ; hậu bên trái vua ở cả ba nhà. Không được để vua mình bị chiếu. Vua để hở cho người đi trước mình ăn là mất vua (3-chess.com). Bị chiếu hết hay mất vua thì bị loại: quân **hoá đá** (xám, có vết nứt, dải màu trên khung bàn cũng xám) — vẫn chắn đường, ăn được, nhưng không chiếu ai. **Còn vua cuối cùng thì thắng.** Hết nước mà không bị chiếu: còn ba nhà thì bỏ lượt, còn hai nhà thì hoà; còn hai nhà mà không đủ quân chiếu hết, hay 50 vòng không ăn quân không đi tốt: hoà. Tốt sang nhà khác thì tiến về hàng quân nhà đó, tới hàng 1 thì phong cấp (bạn chọn Hậu, Xe, Tượng hay Mã). Nhập thành như thường, không qua ô bị nhắm. Không có bắt tốt qua đường (như bộ threeChess của Đại học Tây Úc) — với ba người, "nước vừa đi" của ai cũng khó định nghĩa.
+
+**Lõi** (`LOI`, viết tự chứa): sáu tứ giác ("diều") quanh tâm, ô trong mỗi diều có toạ độ (p, q) tính từ hai cạnh trong; bước qua cạnh trong thì sang diều bên cạnh, hai trục đổi vai cho nhau. Đường chéo đi theo hai cách (đi trục này trước hay trục kia trước): thường ra cùng một ô, chỉ ở sáu ô hoa thị đi về phía tâm mới ra hai ô — chính là hai nhánh qua tâm. Tia xe, tượng, ô mã, ô vua, ô tốt tiến và ăn tính sẵn hết một lần.
+
+**Hai máy có tính cách**: **Hổ** dùng Best-Reply Search và cộng điểm cho quân đã sang nhà người, quân áp sát vua địch — dám đánh; **Rùa** dùng cách hoang tưởng và cộng điểm cho quân đứng che vua mình — chậm mà chắc. Cả hai tìm theo cây có cắt tỉa alpha–beta, tới đáy thì xét tiếp các nước ăn quân cho khỏi dừng giữa một cuộc đổi quân. Ba mức: **Dễ** (nghĩ 2 nước, chấm điểm có nhiễu), **Vừa** (3 nước), **Khó** (tìm sâu dần tới khi hết 1,5 giây — trên máy tính thường tới 4–5 nước, điện thoại ít hơn). Máy nghĩ ở **luồng riêng** (Web Worker dựng từ chính mã lõi, không tải tệp nào thêm, chạy được cả khi mất mạng), màn hình không đứng; nghĩ nhanh mấy cũng đợi gần nửa giây mới đi cho người xem kịp theo. Thỉnh thoảng nói một câu ngắn trong bong bóng: lúc vào trận, ăn quân, chiếu, mất quân, bị loại, thắng.
+
+**Chơi**: chạm quân của mình thì thấy chấm ở các ô đi được (vòng đỏ là ăn quân); chạm hơi lệch ô nhỏ ở rìa thì tự bắt vào chấm gần nhất. Quân **trượt theo đúng đường đi** — xe đi qua tâm thì trượt cong theo cột; mã nhảy vòng. **Báo nguy**: vua mình bị chiếu thì vua đỏ rực, và đường đỏ đứt nét chạy từ từng quân đang chiếu tới vua, uốn theo đúng đường quân đó đi — biết ngay ai trong hai đối thủ đang nhắm mình. **Hoàn tác** (đấu với máy) về đầu lượt trước của bạn, bỏ luôn hai nước máy đi sau đó. **Ba người chung máy**: đi xong, bàn tự xoay về phía người tới lượt. Bạn bị loại khi đấu với máy thì được chọn xem hai máy đấu tiếp hay ván mới. Nút **?** có cách chơi và **hình động bốn cảnh**: xe đi cột e uốn qua tâm sang nhà Đỏ, tượng rẽ hai nhánh ở tâm, tốt ở d4 với ba ô ăn, mã tới 10 ô gần tâm.
+
+**Hình**: bàn gỗ hai màu, mỗi nhà nhuộm nhẹ màu riêng, khung gỗ có bóng đổ, dải màu ba nhà dọc cạnh hàng quân, ngôi sao đồng nhỏ ở hoa thị; quân vẽ bằng nét (không dùng chữ ♔♕ — máy nào cũng giống nhau) có khối và bóng: Trắng ngà, Đỏ, Đen viền sáng cho nổi trên gỗ; quân ở ô sát tâm to hơn quân ở ô rìa nhỏ. Âm thanh tạo bằng Web Audio: cộc khi đi, trầm khi ăn, hai nốt khi chiếu, chuông trầm khi một nhà bị loại, nhạc khi thắng; tắt được ở bảng ván mới.
+
+**Lưu đúng một mục** `tdtd.coba`: cách chơi, màu quân, mức khó, đã xem hướng dẫn. Không lưu ván.
+
+`scripts/test-coba.js`, 46 bài: hình học (ô kề đối xứng, 6 ô góc, hoa thị đúng sáu ô d4/e4; ô kề khác màu, ô chéo cùng màu, mã luôn sang ô khác màu; cột h → cột a nhà bên phải, cột e uốn qua tâm → cột d, cột a, d sang nhà bên trái; chéo từ a1 rẽ hai nhánh ở d4 và chỉ sáu ô hoa thị mới rẽ; tốt ở d4 có đúng ba ô ăn như Dekle; mã đi ngược lại được, gần tâm tới 10 ô; tia xe, tượng đối xứng); luật (20 nước đầu ván mỗi nhà; thứ tự; nhập thành và không nhập thành qua ô bị xe Đỏ nhắm qua đường biên; tốt sang nhà Đỏ phong cấp ở hàng 1 của Đỏ; quân bị ghim qua tâm không được rời cột; Trắng mở đường cho Đen ăn vua Đỏ, Đỏ bị loại ngay, quân hoá đá; đá không chiếu ai nhưng ăn được; chiếu hết thì loại; hết nước thì bỏ lượt; còn vua cuối cùng thì thắng; thiếu quân thì hoà; báo nguy ra đúng quân và đường uốn qua tâm); máy nghĩ (cả hai cách tìm sâu 4 nước trong vài chục mili giây, ăn hậu bỏ không, máy đấu máy 36 nước toàn nước hợp lệ); giao diện (Hổ, Rùa đúng cách tìm; bạn đi rồi hai máy đáp; hoàn tác; chạm chọn quân, chạm ô đích; chạm giữa ô nào cũng ra đúng ô ở cả ba góc nhìn; ba người thì bàn xoay; chỉ lưu cài đặt; hình động bốn cảnh); gắn vào app. Thử phá code ở 12 chỗ (bỏ nhánh qua tâm, đổi hướng sai khi qua đường biên, cho tự để vua bị chiếu, đá vẫn chiếu, hết nước coi như chiếu hết, ăn vua không loại, đảo thứ tự, nhập thành qua ô bị nhắm, hoàn tác lệch lượt, bàn không xoay, máy coi hậu không đáng giá, tốt không phong): lần đầu bắt được 11 — chỗ "ăn vua không loại" lọt vì nhà mất vua vẫn bị loại một bước sau; thêm bài "loại ngay, không báo nhầm thành chiếu hết", giờ bắt cả 12.
+
+Đã chơi thử trên trình duyệt cỡ điện thoại: bảng cách chơi hiện lần đầu; hình động đường đi; đấu với máy — đi e2–e4, Hổ và Rùa lần lượt đáp, Hổ nói câu chào; báo nguy với hậu Đỏ chiếu vua Trắng qua tâm; quân Đỏ hoá đá; phong cấp chọn Mã; chiếu hết nhà cuối cùng — "Bạn thắng!", Hổ nói "Hổ thua rồi… lần sau gặp lại!"; ba người chung máy — Trắng đi xong bàn xoay cho Đen nằm dưới.
+
 ## Cấu trúc
 
 ```
@@ -1791,7 +1821,7 @@ scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlie
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-chomsao.js    10 kiểm thử Nối sao thành chòm: tự nối đúng thứ tự nét, chạm để xong ngay, giảm chuyển động, xoay sau khi xong
-scripts/test-sao.js        118 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        123 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -1817,6 +1847,8 @@ scripts/tim-loi-giai-gon.js  thử mọi chương trình ngắn hơn lời giả
 assets/sokoban.js          Đẩy thùng sao (Sokoban): luật đi đẩy, bộ giải ít lần đẩy / ít bước nhất, ô chết, cảnh 3D nhìn nghiêng
 assets/mansoko.js          100 màn của Đẩy thùng sao (ký hiệu XSB), mỗi màn có số lần đẩy ít nhất và một lời giải, sinh bởi scripts/tao-man-sokoban.js
 scripts/tao-man-sokoban.js tạo màn theo Taylor & Parberry 2011 (17 mẫu phòng, đặt ổ, chơi ngược), chạy song song nhiều luồng, chọn 100 màn
+assets/coba.js             Cờ vua ba người: bàn lục giác 96 ô (bằng sáng chế Zubrin), luật, máy nghĩ (Best-Reply Search, hoang tưởng) ở luồng riêng, giao diện
+scripts/test-coba.js       46 kiểm thử cờ ba người: hình học bàn, luật, máy nghĩ, giao diện
 scripts/test-sokoban.js    60 kiểm thử Đẩy thùng sao: luật, bộ giải đối chiếu dò từng bước, bộ tạo, cả 100 màn, giao diện
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -1847,6 +1879,7 @@ node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
+node scripts/test-coba.js        # chạy 46 kiểm thử Cờ vua ba người
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
 node scripts/tao-man-sokoban.js tao ung-vien.jsonl 7 [4,5]   # tạo màn liên tục, 7 luồng, ghi mỗi màn một dòng (tuỳ chọn: chỉ số thùng này)
 node scripts/tao-man-sokoban.js chon ung-vien.jsonl          # chọn 100 màn từ các ứng viên, ghi assets/mansoko.js
