@@ -656,7 +656,12 @@ function veCanh(t) {
   if (demo) { veDemo(t); return; }
   if (!van) return;
   const the = van.the;
-  if (van.nuocCuoi) { toO(van.nuocCuoi.tu, 'rgba(255,214,90,.32)'); toO(van.nuocCuoi.toi, 'rgba(255,214,90,.42)'); }
+  /* nước vừa đi của từng nhà, cũ trước mới sau: tới lượt mình là thấy cả hai nhà kia vừa làm gì */
+  const vet = (van.vet || []).map((v, P) => v && Object.assign({ P }, v)).filter(Boolean).sort((a, b) => a.thu - b.thu);
+  vet.forEach((v, i) => {
+    const moi = i === vet.length - 1, m = MUI[v.P].o;
+    toO(v.duong[0], `rgba(${m},${moi ? .28 : .15})`); toO(v.duong[v.duong.length - 1], `rgba(${m},${moi ? .46 : .26})`);
+  });
   if (chon >= 0) toO(chon, 'rgba(120,200,255,.45)');
   const nguoiXem = nhaNhin();
   const bao = nguoiXem >= 0 && the.song[nguoiXem] && the.thang < 0 ? L.aiChieu(the, nguoiXem) : [];
@@ -671,13 +676,69 @@ function veCanh(t) {
   for (let c = 0; c < 96; c++) if (the.o[c] && !(hoat && (hoat.an === c || hoat.dau.includes(c)))) thuTu.push(c);
   thuTu.sort((a, b) => tamO(a)[1] - tamO(b)[1]);
   for (const c of thuTu) veQuan(the.o[c], c, tamO(c));
+  vet.forEach((v, i) => veMuiTen(v, (chon >= 0 ? .35 : 1) * (i === vet.length - 1 ? .95 : i === vet.length - 2 ? .7 : .45)));
   for (const d of bao) veDuongDo(d.duong, t);
-  for (const m of nuocCuaChon) {                                     // chấm chỗ đi được
+  if (chon >= 0 && nuocCuaChon.length) veDuongChon(the);
+  for (const m of nuocCuaChon) {                                     // chỗ đi được: chấm trắng viền xanh, ăn quân thì vòng đỏ
     const [x, y] = tamO(m.toi), r = coO(m.toi);
-    if (the.o[m.toi]) { ctx.strokeStyle = 'rgba(200,40,30,.75)'; ctx.lineWidth = Math.max(2, r * .16); ctx.beginPath(); ctx.arc(x, y, r * .82, 0, 6.2832); ctx.stroke(); }
-    else { ctx.fillStyle = 'rgba(25,20,15,.38)'; ctx.beginPath(); ctx.arc(x, y, Math.max(3.5, r * .28), 0, 6.2832); ctx.fill(); }
+    if (the.o[m.toi]) {
+      ctx.lineWidth = Math.max(3, r * .2) + 3; ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.beginPath(); ctx.arc(x, y, r * .82, 0, 6.2832); ctx.stroke();
+      ctx.lineWidth = Math.max(3, r * .2); ctx.strokeStyle = 'rgba(215,40,30,.95)'; ctx.stroke();
+    } else {
+      ctx.beginPath(); ctx.arc(x, y, Math.max(4.5, r * .3), 0, 6.2832);
+      ctx.fillStyle = 'rgba(255,255,255,.95)'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(20,120,175,.95)'; ctx.stroke();
+    }
   }
   if (hoat) veHoat(t);
+}
+/* màu mũi tên từng nhà (ruột, viền) và màu tô ô: chọn cho nổi trên gỗ sáng lẫn gỗ tối */
+const MUI = [{ ruot: '#fff4c8', vien: 'rgba(60,40,20,.8)', o: '255,214,90' },
+  { ruot: '#ff5a45', vien: 'rgba(255,255,255,.85)', o: '235,80,60' },
+  { ruot: '#2f3a5c', vien: 'rgba(255,255,255,.85)', o: '80,120,220' }];
+/* mũi tên theo đúng đường quân đã đi (xe, tượng, hậu qua tâm thì cong theo cột); mã nhảy thì vòng cung. Đầu mũi tên
+   dừng trước tâm ô đích một chút cho khỏi che quân vừa tới. */
+function veMuiTen(v, mo) {
+  const pts = v.duong.map(tamO);
+  if (pts.length < 2 || mo <= 0) return;
+  const c = MUI[v.P], w = Math.max(3, ban.R * .026), cuoi = pts[pts.length - 1], dauMui = w * 2.7;
+  let truoc = pts[pts.length - 2], dk = null;
+  if (v.ma) {                                                         // mã: cung qua một điểm lệch sang bên
+    const [a, b] = pts, dx = b[0] - a[0], dy = b[1] - a[1];
+    dk = [(a[0] + b[0]) / 2 - dy * .28, (a[1] + b[1]) / 2 + dx * .28]; truoc = dk;
+  }
+  const g = Math.atan2(cuoi[1] - truoc[1], cuoi[0] - truoc[0]), lui = coO(v.duong[v.duong.length - 1]) * .45;
+  const dinh = [cuoi[0] - Math.cos(g) * lui, cuoi[1] - Math.sin(g) * lui];
+  const day = [dinh[0] - Math.cos(g) * dauMui, dinh[1] - Math.sin(g) * dauMui];
+  const than = () => {
+    ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]);
+    if (dk) ctx.quadraticCurveTo(dk[0], dk[1], day[0], day[1]);
+    else { for (let i = 1; i < pts.length - 1; i++) ctx.lineTo(pts[i][0], pts[i][1]); ctx.lineTo(day[0], day[1]); }
+  };
+  const mui = () => {
+    const n = [-Math.sin(g) * w * 1.7, Math.cos(g) * w * 1.7];
+    ctx.beginPath(); ctx.moveTo(dinh[0], dinh[1]); ctx.lineTo(day[0] + n[0], day[1] + n[1]); ctx.lineTo(day[0] - n[0], day[1] - n[1]); ctx.closePath();
+  };
+  ctx.save();
+  ctx.globalAlpha = mo; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  than(); ctx.strokeStyle = c.vien; ctx.lineWidth = w + 3; ctx.stroke();
+  mui(); ctx.fillStyle = c.vien; ctx.lineWidth = 3; ctx.strokeStyle = c.vien; ctx.stroke(); ctx.fill();
+  than(); ctx.strokeStyle = c.ruot; ctx.lineWidth = w; ctx.stroke();
+  mui(); ctx.fillStyle = c.ruot; ctx.fill();
+  ctx.beginPath(); ctx.arc(pts[0][0], pts[0][1], w * .9, 0, 6.2832); ctx.fillStyle = c.ruot; ctx.fill(); ctx.lineWidth = 1.5; ctx.strokeStyle = c.vien; ctx.stroke();
+  ctx.restore();
+}
+/* quân đang chọn: vẽ mọi đường nó đi được, uốn đúng theo bàn (đi qua tâm thì rẽ nhánh) — khỏi phải tự hình dung */
+let duongChon = { c: -1, n: null, ds: [] };
+function veDuongChon(the) {
+  if (duongChon.c !== chon || duongChon.n !== nuocCuaChon) duongChon = { c: chon, n: nuocCuaChon, ds: nuocCuaChon.map(m => L.duongDi(the, m)) };
+  const w = Math.max(2.5, ban.R * .016);
+  ctx.save();
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (const [nen, rong] of [['rgba(10,35,60,.45)', w + 3], ['rgba(110,215,255,.9)', w]]) {
+    ctx.strokeStyle = nen; ctx.lineWidth = rong;
+    for (const d of duongChon.ds) { const pts = d.map(tamO); ctx.beginPath(); pts.forEach((p, i) => (i ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.stroke(); }
+  }
+  ctx.restore();
 }
 function nhaNhin() {                                                  // nhà đang được nhìn từ phía dưới bàn
   if (!van) return 0;
@@ -712,7 +773,7 @@ function vanMoi(ch) {
   const tinh = [null, null, null];
   const sauNguoi = (P) => { const i = L.THU_TU.indexOf(P); return [1, 2].map(k => L.THU_TU[(i + k) % 3]); };
   const [a, b] = sauNguoi(ch.mau); tinh[a] = 'ho'; tinh[b] = 'rua';
-  van = { the: L.theMoi(), cheDo: 'may', nguoi, tinh, kho: ch.kho, nguoiChoi: ch.mau, lichSu: [], nuocCuoi: null, dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: false };
+  van = { the: L.theMoi(), cheDo: 'may', nguoi, tinh, kho: ch.kho, nguoiChoi: ch.mau, lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: false };
   chon = -1; nuocCuaChon = []; hoat = null; phongCho = null;
   xoay = xoayDen = GOC_NHIN[nhaNhin()];
   tatTin(); capNhatChu();
@@ -749,7 +810,7 @@ function denLuot() {
     if (!laNguoi(P) && van.dangNghi < 0 && phong && phong.nghiO !== phong.ke && toiChayMay()) { phong.nghiO = phong.ke; nhoMayNghi(P); }
     return;
   }
-  if (laNguoi(P)) { van.lichSu.push({ the: L.chepThe(the), nuocCuoi: van.nuocCuoi, an: van.an.slice() }); capNhatChu(); return; }
+  if (laNguoi(P)) { van.lichSu.push({ the: L.chepThe(the), nuocCuoi: van.nuocCuoi, vet: (van.vet || []).slice(), an: van.an.slice() }); capNhatChu(); return; }
   if (!the.song[van.nguoiChoi] && !van.xemTiep) return;               // bạn bị loại: chờ chọn xem tiếp hay ván mới
   nhoMayNghi(P);
 }
@@ -774,9 +835,11 @@ function thucHien(m, P) {
 }
 /* phần còn lại của một nước, lúc quân tới nơi — hay áp ngay không trượt, khi đuổi kịp ván qua mạng */
 function apDung(m, P) {
-  const the = van.the, an = the.o[m.toi];
+  const the = van.the, an = the.o[m.toi], duong = L.duongDi(the, m), ma = (the.o[m.tu] & 7) === L.LOAI.MA;
   const lui = L.diNuoc(the, m);
   van.nuocCuoi = { tu: m.tu, toi: m.toi }; van.soNuoc++;
+  if (!van.vet) van.vet = [null, null, null];
+  van.vet[P] = { duong, ma, thu: van.soNuoc };                          // mũi tên nước vừa đi của nhà này
   if (an) van.an[P] += L.GIA[an & 7] || 0;
   return L.sauNuoc(the, lui);
 }
@@ -874,7 +937,7 @@ function hoanTac() {
   boViec();
   const s = van.lichSu.pop();
   if (!s) return;
-  van.the = L.chepThe(s.the); van.nuocCuoi = s.nuocCuoi; van.an = s.an.slice(); van.soNuoc = Math.max(0, van.soNuoc - 3); van.hetVan = false;
+  van.the = L.chepThe(s.the); van.nuocCuoi = s.nuocCuoi; van.vet = (s.vet || [null, null, null]).slice(); van.an = s.an.slice(); van.soNuoc = Math.max(0, van.soNuoc - 3); van.hetVan = false;
   chon = -1; nuocCuaChon = [];
   tatTin();
   denLuot();
@@ -1062,7 +1125,7 @@ async function batDauPhong() {
 function batDauVanPhong() {
   boViec();
   van = { the: L.theMoi(), cheDo: 'phong', ma: phong.ma, nguoi: ['nguoi', 'nguoi', 'nguoi'], tinh: [null, null, null], kho: 0, nguoiChoi: phong.P,
-    lichSu: [], nuocCuoi: null, dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: true };
+    lichSu: [], nuocCuoi: null, vet: [null, null, null], dangNghi: -1, an: [0, 0, 0], soNuoc: 0, xemTiep: true };
   capNhatNguoi();
   Object.assign(phong, { ke: 0, nhat: [], daGui: null, song: false, nghiO: -1, baoLuot: -1 });
   chon = -1; nuocCuaChon = []; hoat = null; phongCho = null;
@@ -1139,7 +1202,7 @@ function dungLaiPhong() {
   if (!van || !phong) return;
   boViec();
   hoat = null; chon = -1; nuocCuaChon = []; phongCho = null;
-  Object.assign(van, { the: L.theMoi(), nuocCuoi: null, an: [0, 0, 0], soNuoc: 0, hetVan: false });
+  Object.assign(van, { the: L.theMoi(), nuocCuoi: null, vet: [null, null, null], an: [0, 0, 0], soNuoc: 0, hetVan: false });
   Object.assign(phong, { ke: 0, nhat: [], daGui: null, song: false, nghiO: -1 });
   chayPhong();
 }
@@ -1462,6 +1525,6 @@ self.TDTD_COBA = {
   _phong: () => phong, _taoPhong: (ch) => taoPhong(ch), _vaoPhong: (ma, minh, muon) => vaoPhong(ma, minh, muon), _ngoiGhe: (P) => ngoiGhe(P),
   _batDauPhong: () => batDauPhong(), _diNuoc: (m, P) => diNuoc(m, P), _roiPhong: () => roiPhong(), _vanNua: () => vanNua(), _theoTiep: (ma) => theoTiep(ma),
   _kiemPhong: () => kiemPhong(), _toiChayMay: () => toiChayMay(), _viecPhong: () => viecPhong(), _choMayThay: () => choMayThay(), _tuDiTiep: () => tuDiTiep(),
-  _timNuocMang: (the, mv) => timNuocMang(the, mv), _moCaiDat: () => moCaiDat(), _laMinh: (P) => laMinh(P),
+  _timNuocMang: (the, mv) => timNuocMang(the, mv), _moCaiDat: () => moCaiDat(), _laMinh: (P) => laMinh(P), _duongChon: () => duongChon,
 };
 })();

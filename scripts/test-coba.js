@@ -227,6 +227,32 @@ async function choTaiNguoi() {                                       // chạy h
   await choTaiNguoi();
   const k = JSON.parse(luu['tdtd.coba'] || '{}');
   ok('chỉ lưu cài đặt (cách chơi, màu, mức khó, tên, phòng đang ở, đã xem hướng dẫn), không lưu ván', Object.keys(k).every(x => ['che', 'mau', 'kho', 'h', 'ten', 'phong'].includes(x)));
+  /* Người dùng: "giờ khó hình dung nước đi quá" — mỗi lượt của mình thì hai nhà kia đã đi hai nước, bản trước chỉ tô
+     nhạt hai ô của nước cuối. Giờ mỗi nhà có mũi tên nước vừa đi, theo đúng đường; chọn quân thì vẽ đường nó đi được. */
+  C._vanMoi({ mau: TRANG, kho: 0 });
+  const t0 = theTrong([[o(TRANG, 'e', 1), TRANG, LO.VUA], [o(DO, 'e', 1), DO, LO.VUA], [o(DEN, 'e', 1), DEN, LO.VUA], [o(TRANG, 'd', 1), TRANG, LO.HAU]]);
+  Object.assign(C._van().the, t0);
+  const quaTam = L.nuocHopLe(C._van().the, TRANG).filter(n => n.tu === o(TRANG, 'd', 1)).map(n => ({ n, d: L.duongDi(C._van().the, n) }))
+    .find(x => x.d.length >= 6 && L.nhaO(x.n.toi) !== TRANG);
+  C._thucHien(quaTam.n, TRANG); C._xongHoat();
+  let vt = C._van().vet;
+  ok('đi xong: nhớ mũi tên của nhà vừa đi theo đúng đường (hậu đi cột d qua tâm sang nhà khác — đường uốn, không phải đoạn thẳng)',
+     vt[TRANG] && vt[TRANG].duong.join() === quaTam.d.join() && vt[TRANG].duong[0] === o(TRANG, 'd', 1) && vt[TRANG].duong.slice(-1)[0] === quaTam.n.toi &&
+     new Set(vt[TRANG].duong.map(c => L.nhaO(c))).size >= 2, quaTam.d.map(ten).join(' → '));
+  await choTaiNguoi();
+  vt = C._van().vet;
+  ok('tới lượt mình lại: có mũi tên của cả ba nhà, xếp theo thứ tự đi (mình đi trước, Đen, rồi Đỏ)', vt.every(Boolean) && vt[TRANG].thu < vt[DEN].thu && vt[DEN].thu < vt[DO].thu);
+  const truocHoan = JSON.stringify(vt[TRANG]);
+  const m2 = L.nuocHopLe(C._van().the, TRANG)[0]; C._thucHien(m2, TRANG); C._xongHoat(); await choTaiNguoi();
+  C._hoanTac(); await choTaiNguoi();
+  ok('hoàn tác: mũi tên cũng lùi về như trước nước đó', JSON.stringify(C._van().vet[TRANG]) === truocHoan);
+  /* chọn quân: đường đi được vẽ theo đúng đường của từng nước */
+  C._canhBan(); C._datXoay(C._GOC_NHIN[TRANG]);
+  const vua = C._van().the.vua[TRANG], [xv, yv] = C._tamO(vua); C._chamBan(xv, yv);
+  C._veCanh(1e6);
+  const dc = C._duongChon();
+  ok('chạm chọn quân: vẽ đường đi cho từng chỗ đi được, mỗi đường bắt đầu ở quân, kết thúc ở chỗ đến',
+     C._chon() === vua && dc.ds.length === C._nuocCuaChon().length && dc.ds.length > 0 && dc.ds.every((d, i) => d[0] === vua && d[d.length - 1] === C._nuocCuaChon()[i].toi));
   /* hình động hướng dẫn */
   C._batDemo();
   const dau = C._demo() ? C._demo().buoc : -1;

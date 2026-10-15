@@ -28,11 +28,12 @@ function taoMay(cong = 0) {
     }
   }
   const sao = (v) => (v === undefined ? null : JSON.parse(JSON.stringify(v)));
-  function giaiGio(v) {
+  /* một yêu cầu dùng đúng một mốc giờ cho cả dấu giờ lẫn luật (như Firebase); lấy giờ hai lần thì có lúc lệch 1 ms */
+  function giaiGio(v, nay) {
     if (v && typeof v === 'object') {
-      if (v['.sv'] === 'timestamp' && Object.keys(v).length === 1) return bayGio();
+      if (v['.sv'] === 'timestamp' && Object.keys(v).length === 1) return nay;
       const o = Array.isArray(v) ? [] : {};
-      for (const k of Object.keys(v)) o[k] = giaiGio(v[k]);
+      for (const k of Object.keys(v)) o[k] = giaiGio(v[k], nay);
       return o;
     }
     return v;
@@ -111,8 +112,9 @@ function taoMay(cong = 0) {
     const cors = { 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET,PUT,PATCH,DELETE,OPTIONS', 'Access-Control-Allow-Headers': '*' };
     if (req.method === 'OPTIONS') { res.writeHead(204, cors); res.end(); return; }
     const duong = u.pathname.replace(/\.json$/, ''), k = tach(duong);
+    let than = '';
     const tu = (ma, du) => { res.writeHead(ma, Object.assign({ 'Content-Type': 'application/json' }, cors)); res.end(JSON.stringify(du)); };
-    const khong = () => { tuChoi++; tu(401, { error: 'Permission denied' }); };
+    const khong = () => { tuChoi++; if (process.env.FB_GIA_KE) console.log('  [từ chối]', req.method, duong, than.slice(0, 120)); tu(401, { error: 'Permission denied' }); };
     const doc = k[0] === 'coba' && k.length >= 2 && LA_MA.test(k[1]);
     if (req.method === 'GET') {
       if (!doc) return khong();
@@ -126,7 +128,6 @@ function taoMay(cong = 0) {
       }
       return tu(200, thanhMang(sao(lay(k))));
     }
-    let than = '';
     req.on('data', (c) => { than += c; });
     req.on('end', () => {
       let gt = null;
@@ -135,7 +136,7 @@ function taoMay(cong = 0) {
       const nay = bayGio(), ma = k[1], trong = k.slice(2);
       if (req.method === 'PATCH') {
         if (!gt || typeof gt !== 'object') return tu(400, { error: 'Invalid data' });
-        const ghi = Object.keys(gt).map(x => ({ k: trong.concat(tach(x)), gt: giaiGio(gt[x]) }));
+        const ghi = Object.keys(gt).map(x => ({ k: trong.concat(tach(x)), gt: giaiGio(gt[x], nay) }));
         /* từng chỗ phải qua luật; ghế (ghe/P) thì xét luôn điều kiện "phải có id" sau khi ghi */
         for (const g of ghi) if (!choGhi(ma, g.k, g.gt, nay)) return khong();
         for (const g of ghi) if (g.k[0] === 'ghe') {
@@ -143,12 +144,12 @@ function taoMay(cong = 0) {
           if (!('id' in cu) && !ghi.some(x => x.k[0] === 'ghe' && x.k[1] === g.k[1] && x.k[2] === 'id')) return khong();
         }
         for (const g of ghi) dat(['coba', ma].concat(g.k), g.gt);
-        const du = {}; for (const x of Object.keys(gt)) du[x] = giaiGio(gt[x]);
+        const du = {}; for (const x of Object.keys(gt)) du[x] = giaiGio(gt[x], nay);
         guiSuKien(duong, 'patch', du);
         return tu(200, du);
       }
       if (req.method === 'PUT' || req.method === 'DELETE') {
-        const v = req.method === 'DELETE' ? null : giaiGio(gt);
+        const v = req.method === 'DELETE' ? null : giaiGio(gt, nay);
         if (trong[0] === 'ghe' && trong.length === 3 && trong[2] !== 'id' && !(lay(['coba', ma, 'ghe', trong[1], 'id']))) return khong();
         if (!choGhi(ma, trong, v, nay)) return khong();
         dat(k, v);
