@@ -570,12 +570,15 @@ function apDungNuocMay(so, P, kq) {
    ====================================================================================================== */
 const TEN_MAU = ['Trắng', 'Đỏ', 'Đen'];
 const TEN_LOAI = { 1: 'Tốt', 2: 'Mã', 3: 'Tượng', 4: 'Xe', 5: 'Hậu', 6: 'Vua', 7: 'Tướng' };
-const MAU = [                                                         // màu quân: sáng, giữa, tối, viền
-  { sang: '#fffdf6', giua: '#efe6d2', toi: '#c9bb9c', vien: '#3b2f22', cham: '#f4ecd8' },
-  { sang: '#ff9a8a', giua: '#e0473a', toi: '#9e2219', vien: '#3a0b07', cham: '#e0473a' },
-  { sang: '#6c7590', giua: '#363d52', toi: '#151925', vien: '#dfe6fb', cham: '#2b3142' },
+/* màu quân, tô như gỗ tiện mặt mờ: sang (chỗ ánh sáng rọi, bên trái), giua, toi (bên phải), ria (mép ngoài cùng), vien (nét
+   viền); cham: chấm màu trên thẻ, nút. Ba nhà ba độ sáng khác nhau (sáng, vừa, tối) cho người mù màu vẫn phân biệt */
+const MAU = [
+  { sang: '#fffaef', giua: '#eee0c2', toi: '#c9b286', ria: '#a18760', vien: '#4a3925', cham: '#f4ecd8' },
+  { sang: '#f59a88', giua: '#d4493b', toi: '#9a2b21', ria: '#6b1a13', vien: '#3d0c07', cham: '#e0473a' },
+  { sang: '#7c87a4', giua: '#3e455a', toi: '#202434', ria: '#14161f', vien: '#151824', cham: '#2b3142' },
 ];
-const DA = { sang: '#c8c4bc', giua: '#9a968e', toi: '#66635d', vien: '#34322e' };
+const VIEN_SANG = Object.assign({}, MAU[2], { vien: '#aab3d0' });       // quân Đen vẽ trên nền tối (hàng quân mất trên thẻ): viền sáng
+const DA = { sang: '#d4d0c8', giua: '#a4a098', toi: '#706d67', ria: '#56534e', vien: '#34322e' };
 const TINH_CACH = {
   ho: { ten: 'Hổ', hang: true, kieu: 'brs',
     noi: { batDau: ['Vào trận thôi!', 'Hổ đây, ai trước nào?'], an: ['Ngon!', 'Của tôi nhé!', 'Xin nhé!'], chieu: ['Chiếu! Chạy đi đâu?', 'Chiếu tướng!'],
@@ -693,65 +696,137 @@ function toO(c, mau) { duongDa(GOC_O[c]); ctx.fillStyle = mau; ctx.fill(); }
 function tamO(c) { return veRa(TAM_O[c][0], TAM_O[c][1]); }
 function coO(c) { return CO_O[c] * ban.R; }
 
-/* quân cờ vẽ bằng nét (không dùng chữ ♔♕: máy nào cũng giống nhau, có khối, có bóng) — cao 1 đơn vị, đế ở y = 0 */
-function vePhan(loai, x, y, s, m, da, goc) {
-  ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
-  ctx.fillStyle = 'rgba(0,0,0,.3)'; ctx.beginPath(); ctx.ellipse(.04, .015, .37, .095, 0, 0, 6.2832); ctx.fill();
-  const g = ctx.createLinearGradient(-.4, -.5, .4, -.3);
-  g.addColorStop(0, m.sang); g.addColorStop(.55, m.giua); g.addColorStop(1, m.toi);
-  ctx.fillStyle = g; ctx.strokeStyle = m.vien; ctx.lineWidth = .05; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-  const hinh = (f) => { ctx.beginPath(); f(); ctx.fill(); ctx.stroke(); };
-  hinh(() => { ctx.moveTo(-.34, 0); ctx.lineTo(.34, 0); ctx.quadraticCurveTo(.37, -.1, .26, -.13); ctx.lineTo(-.26, -.13); ctx.quadraticCurveTo(-.37, -.1, -.34, 0); ctx.closePath(); });
-  if (goc) {                                                         // Tam quốc: quân cướp được mang vành màu đạo gốc
-    ctx.fillStyle = goc.giua; ctx.beginPath(); ctx.ellipse(0, -.065, .3, .048, 0, 0, 6.2832); ctx.fill(); ctx.stroke(); ctx.fillStyle = g;
+/* ---------- quân cờ ----------
+   Người dùng: "làm UIUX quân cờ đẹp hơn". Theo chuẩn thiết bị cờ của FIDE (bản có hiệu lực từ 1/3/2026): dáng Staunton;
+   thứ tự cao thấp vua > hậu > tượng > mã > xe > tốt, chuẩn 95 / 85 / 70 / 60 / 55 / 50 mm, được lệch tối đa 10% — ở đây vua
+   1,10 thì hậu 1,01, tượng 0,88, mã 0,76, xe 0,70, tốt 0,63 (đều trong khoảng cho phép, nghiêng về phía cao để quân nhỏ khỏi
+   bé quá trên ô nhỏ); đầu vua khác hẳn đầu hậu (thập tự / vương miện có hạt), đầu tượng khác đầu tốt (khe chéo trên mũ);
+   mặt mờ, không bóng loáng. Đế rộng hơn chuẩn (40–50% chiều cao) cho dễ nhận ra trên điện thoại. Tô như gỗ tiện: sáng bên
+   trái, tối dần sang phải, vạch ở các khấc tiện; bóng đổ mềm dưới đế. Vẽ bằng nét (không dùng chữ ♔♕): máy nào cũng như nhau.
+   Bản trước: quân nào cũng cao gần bằng nhau (tốt gần bằng hậu), tô một dải chéo. */
+const CAO = [0, .63, .76, .88, .70, 1.01, 1.10, .86];                 // chiều cao từng loại (đơn vị s); 7 là tướng Tam quốc
+const DE = [0, .205, .25, .235, .255, .27, .28, .25];                 // bán kính đế
+/* thân tiện, đối xứng: điểm điều khiển nửa phải từ góc đế lên tới đỉnh (x = 0). Đường đi qua trung điểm hai điểm kề nhau
+   (mượt như gỗ tiện); điểm viết hai lần thành góc. */
+function thanTien(ds) {
+  const pts = ds.concat(ds.slice(0, -1).reverse().map(([x, y]) => [-x, y]));
+  ctx.moveTo(0, 0); ctx.lineTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length - 1; i++) ctx.quadraticCurveTo(pts[i][0], pts[i][1], (pts[i][0] + pts[i + 1][0]) / 2, (pts[i][1] + pts[i + 1][1]) / 2);
+  ctx.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]); ctx.closePath();
+}
+const deTien = (r) => [[r, 0], [r, 0], [r, -.03], [r * 1.03, -.052], [r * .92, -.078], [r * .78, -.088], [r * .76, -.104]];
+const tron2 = (x, y, rr) => { ctx.moveTo(x + rr, y); ctx.arc(x, y, rr, 0, 6.2832); };
+/* từng loại: vien vẽ đường viền (một hay nhiều mảnh, cùng tô một lần), khac là các khấc tiện (độ cao, nửa rộng) để vạch,
+   them vẽ chi tiết đè lên (mắt ngựa, khe mũ tượng, cờ của tướng) */
+const DANG = {
+  1: { vien: (r) => { thanTien(deTien(r).concat([[r * .58, -.15], [r * .44, -.27], [r * .36, -.355], [r * .84, -.37], [r * .86, -.40], [r * .86, -.40],
+         [r * .40, -.42], [.06, -.43], [.118, -.47], [.12, -.585], [.06, -.64], [0, -.64]])); },
+       khac: [[-.4, .17]] },
+  4: { vien: (r) => {
+         thanTien(deTien(r).concat([[r * .72, -.15], [r * .66, -.30], [r * .64, -.46], [r * .86, -.47], [r * .86, -.50], [r * .86, -.50], [r * .70, -.52], [0, -.52]]));
+         const w = r * .9, b = -.505, t = -.70, kh = .06, k = w * .3;
+         ctx.moveTo(-w, b); ctx.lineTo(-w, t); ctx.lineTo(-w + k, t); ctx.lineTo(-w + k, t + kh); ctx.lineTo(-k / 2, t + kh); ctx.lineTo(-k / 2, t);
+         ctx.lineTo(k / 2, t); ctx.lineTo(k / 2, t + kh); ctx.lineTo(w - k, t + kh); ctx.lineTo(w - k, t); ctx.lineTo(w, t); ctx.lineTo(w, b); ctx.closePath(); },
+       khac: [[-.48, .22], [-.6, .23]] },
+  2: { vien: (r) => {
+         thanTien(deTien(r).concat([[r * .8, -.12], [r * .8, -.12], [0, -.12]]));
+         ctx.moveTo(.2, -.11);
+         ctx.bezierCurveTo(.23, -.30, .2, -.52, .1, -.66);                  // gáy
+         ctx.bezierCurveTo(.07, -.70, .05, -.73, .035, -.77);               // bờm sau tai
+         ctx.lineTo(.0, -.72);                                              // tai
+         ctx.bezierCurveTo(-.06, -.69, -.12, -.65, -.17, -.59);             // trán
+         ctx.bezierCurveTo(-.21, -.54, -.25, -.50, -.255, -.465);           // sống mũi
+         ctx.bezierCurveTo(-.26, -.43, -.22, -.415, -.18, -.425);           // mõm
+         ctx.bezierCurveTo(-.14, -.435, -.11, -.45, -.075, -.43);           // hàm
+         ctx.bezierCurveTo(-.06, -.39, -.15, -.31, -.17, -.22);             // cổ họng, ức
+         ctx.bezierCurveTo(-.18, -.17, -.17, -.13, -.16, -.11);
+         ctx.closePath(); },
+       khac: [],
+       them: (r, m) => {
+         ctx.fillStyle = m.vien; ctx.beginPath(); ctx.ellipse(-.085, -.585, .022, .016, -.5, 0, 6.2832); ctx.fill();   // mắt
+         ctx.beginPath(); ctx.arc(-.225, -.455, .012, 0, 6.2832); ctx.fill();                                        // lỗ mũi
+         ctx.strokeStyle = m.vien; ctx.globalAlpha *= .55; ctx.lineWidth = .016;                                      // bờm
+         ctx.beginPath(); for (const [a, b] of [[.13, -.62], [.17, -.52], [.19, -.42], [.2, -.32]]) { ctx.moveTo(a, b); ctx.quadraticCurveTo(a - .05, b + .02, a - .07, b + .07); } ctx.stroke();
+       } },
+  3: { vien: (r) => thanTien(deTien(r).concat([[r * .62, -.16], [r * .46, -.30], [r * .40, -.42], [r * .86, -.44], [r * .88, -.47], [r * .88, -.47],
+         [r * .44, -.49], [r * .5, -.53], [r * .78, -.62], [r * .7, -.74], [.03, -.82], [.045, -.84], [.05, -.875], [0, -.88]])),
+       khac: [[-.455, .2]],
+       them: (r, m) => {                                                   // khe chéo trên mũ (FIDE: đầu tượng khác đầu tốt)
+         ctx.strokeStyle = m.vien; ctx.lineWidth = .03; ctx.lineCap = 'round';
+         ctx.beginPath(); ctx.moveTo(r * .52, -.73); ctx.lineTo(-r * .06, -.62); ctx.stroke();
+       } },
+  5: { vien: (r) => {
+         thanTien(deTien(r).concat([[r * .64, -.17], [r * .46, -.34], [r * .42, -.52], [r * .82, -.55], [r * .84, -.58], [r * .84, -.58], [r * .48, -.60],
+           [r * .6, -.70], [r * .9, -.82], [r * .9, -.84], [r * .5, -.86], [.07, -.90], [.04, -.93], [.05, -.97], [0, -1.01]]));
+         ctx.moveTo(-r * .9, -.83);                                            // vương miện: năm mũi, đầu mũi có hạt
+         for (const [a, b] of [[-.9, -.94], [-.6, -.86], [-.32, -.97], [0, -.88], [.32, -.97], [.6, -.86], [.9, -.94], [.9, -.83]]) ctx.lineTo(r * a, b);
+         ctx.closePath();
+         for (const a of [-.9, -.32, .32, .9]) tron2(r * a, Math.abs(a) > .5 ? -.955 : -.985, .028);
+       },
+       khac: [[-.565, .235]] },
+  6: { vien: (r) => {
+         thanTien(deTien(r).concat([[r * .64, -.17], [r * .46, -.36], [r * .42, -.57], [r * .84, -.60], [r * .86, -.63], [r * .86, -.63], [r * .48, -.65],
+           [r * .64, -.76], [r * .84, -.84], [r * .84, -.86], [r * .5, -.875], [r * .44, -.93], [.035, -.945], [0, -.945]]));
+         const v = .032, n = .1, y1 = -.935, y2 = -1.10, yn = -1.035;           // thập tự trên đỉnh
+         ctx.moveTo(-v, y1); ctx.lineTo(-v * .8, yn + .025); ctx.lineTo(-n, yn + .03); ctx.lineTo(-n, yn - .03); ctx.lineTo(-v * .8, yn - .03); ctx.lineTo(-v, y2);
+         ctx.lineTo(v, y2); ctx.lineTo(v * .8, yn - .03); ctx.lineTo(n, yn - .03); ctx.lineTo(n, yn + .03); ctx.lineTo(v * .8, yn + .025); ctx.lineTo(v, y1); ctx.closePath();
+       },
+       khac: [[-.615, .24], [-.85, .23]] },
+  7: { vien: (r) => thanTien(deTien(r).concat([[r * .62, -.16], [r * .46, -.30], [r * .42, -.42], [r * .86, -.45], [r * .88, -.48], [r * .88, -.48],
+         [r * .52, -.50], [r * .92, -.53], [r * .92, -.55], [r * .7, -.56], [r * .78, -.66], [r * .5, -.77], [.04, -.80], [.03, -.86], [0, -.86]])),
+       khac: [[-.465, .2], [-.54, .23]],
+       them: (r, m, goc) => {                                              // cán cờ và cờ hiệu màu đạo quân tướng cầm đầu
+         ctx.strokeStyle = m.vien; ctx.lineWidth = .028;
+         ctx.beginPath(); ctx.moveTo(r + .02, -.04); ctx.lineTo(r + .02, -.98); ctx.stroke();
+         const co = goc || m;
+         ctx.fillStyle = co.giua; ctx.lineWidth = .025;
+         ctx.beginPath(); ctx.moveTo(r + .02, -.99); ctx.quadraticCurveTo(r + .22, -.97, r + .38, -.91); ctx.quadraticCurveTo(r + .22, -.86, r + .02, -.83); ctx.closePath(); ctx.fill(); ctx.stroke();
+       } },
+};
+/* (x, y): giữa đế trên màn hình; s: cỡ quân; m: màu; da: quân đá (nhà đã bị loại); goc: màu đạo gốc khi quân đã đổi chủ
+   (Tam quốc — vẽ vành màu đó quanh đế); nang: quân đang chọn nhấc lên khỏi bàn (0..1), bóng ở lại dưới bàn */
+function vePhan(loai, x, y, s, m, da, goc, nang = 0) {
+  const d = DANG[loai] || DANG[1], h = CAO[loai] || 1, r = DE[loai] || .25;
+  ctx.save(); ctx.translate(x, y);
+  const bong = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+  bong.addColorStop(0, `rgba(0,0,0,${.42 - nang * .16})`); bong.addColorStop(.6, `rgba(0,0,0,${.2 - nang * .08})`); bong.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.save(); ctx.translate(s * .03, s * .012); ctx.scale(s * r * (1.45 + nang * .35), s * r * (.42 + nang * .1));
+  ctx.fillStyle = bong; ctx.beginPath(); ctx.arc(0, 0, 1, 0, 6.2832); ctx.fill(); ctx.restore();
+  ctx.translate(0, -nang * s * .12); ctx.scale(s, s);
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.beginPath(); d.vien(r);
+  ctx.save(); ctx.clip();
+  const w = r * 1.08, g = ctx.createLinearGradient(-w, 0, w, 0);
+  g.addColorStop(0, m.ria); g.addColorStop(.2, m.sang); g.addColorStop(.46, m.giua); g.addColorStop(.8, m.toi); g.addColorStop(1, m.ria);
+  ctx.fillStyle = g; ctx.fillRect(-.8, -1.2, 1.6, 1.3);
+  const g2 = ctx.createLinearGradient(0, -h, 0, 0);
+  g2.addColorStop(0, 'rgba(255,255,255,.13)'); g2.addColorStop(.5, 'rgba(255,255,255,0)'); g2.addColorStop(1, 'rgba(0,0,0,.18)');
+  ctx.fillStyle = g2; ctx.fillRect(-.8, -1.2, 1.6, 1.3);
+  for (const [yk, wk] of d.khac.concat([[-.088, r * .8]])) {                 // vạch tiện: rãnh tối, mép sáng ngay dưới
+    ctx.lineWidth = .014; ctx.strokeStyle = 'rgba(0,0,0,.28)';
+    ctx.beginPath(); ctx.ellipse(0, yk, wk, wk * .14, 0, 0, Math.PI); ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,255,255,.22)';
+    ctx.beginPath(); ctx.ellipse(0, yk + .016, wk, wk * .14, 0, 0, Math.PI); ctx.stroke();
   }
-  if (loai === 1) {                                                   // tốt
-    hinh(() => { ctx.moveTo(-.18, -.13); ctx.quadraticCurveTo(-.09, -.32, -.11, -.46); ctx.lineTo(.11, -.46); ctx.quadraticCurveTo(.09, -.32, .18, -.13); ctx.closePath(); });
-    hinh(() => ctx.ellipse(0, -.48, .17, .05, 0, 0, 6.2832));
-    hinh(() => ctx.arc(0, -.66, .16, 0, 6.2832));
-  } else if (loai === 4) {                                            // xe
-    hinh(() => { ctx.moveTo(-.24, -.13); ctx.lineTo(-.19, -.6); ctx.lineTo(.19, -.6); ctx.lineTo(.24, -.13); ctx.closePath(); });
-    hinh(() => { ctx.moveTo(-.28, -.6); ctx.lineTo(-.28, -.84); ctx.lineTo(-.17, -.84); ctx.lineTo(-.17, -.74); ctx.lineTo(-.06, -.74); ctx.lineTo(-.06, -.84); ctx.lineTo(.06, -.84);
-      ctx.lineTo(.06, -.74); ctx.lineTo(.17, -.74); ctx.lineTo(.17, -.84); ctx.lineTo(.28, -.84); ctx.lineTo(.28, -.6); ctx.closePath(); });
-  } else if (loai === 2) {                                            // mã
-    hinh(() => { ctx.moveTo(.25, -.13); ctx.quadraticCurveTo(.3, -.55, .14, -.8); ctx.lineTo(.08, -.96); ctx.lineTo(-.02, -.84); ctx.quadraticCurveTo(-.2, -.78, -.33, -.56);
-      ctx.quadraticCurveTo(-.36, -.47, -.28, -.45); ctx.lineTo(-.12, -.52); ctx.quadraticCurveTo(-.18, -.32, -.2, -.13); ctx.closePath(); });
-    ctx.fillStyle = m.vien; ctx.beginPath(); ctx.arc(-.06, -.7, .035, 0, 6.2832); ctx.fill();
-  } else if (loai === 3) {                                            // tượng
-    hinh(() => { ctx.moveTo(-.2, -.13); ctx.quadraticCurveTo(-.32, -.46, 0, -.82); ctx.quadraticCurveTo(.32, -.46, .2, -.13); ctx.closePath(); });
-    hinh(() => ctx.ellipse(0, -.24, .2, .05, 0, 0, 6.2832));
-    ctx.beginPath(); ctx.moveTo(.04, -.64); ctx.lineTo(.14, -.5); ctx.stroke();
-    hinh(() => ctx.arc(0, -.88, .06, 0, 6.2832));
-  } else if (loai === 5) {                                            // hậu
-    hinh(() => { ctx.moveTo(-.2, -.13); ctx.lineTo(-.31, -.66); ctx.lineTo(-.18, -.52); ctx.lineTo(-.16, -.72); ctx.lineTo(-.06, -.55); ctx.lineTo(0, -.77);
-      ctx.lineTo(.06, -.55); ctx.lineTo(.16, -.72); ctx.lineTo(.18, -.52); ctx.lineTo(.31, -.66); ctx.lineTo(.2, -.13); ctx.closePath(); });
-    for (const [bx, by] of [[-.31, -.69], [-.16, -.75], [0, -.81], [.16, -.75], [.31, -.69]]) hinh(() => ctx.arc(bx, by, .045, 0, 6.2832));
-  } else if (loai === 6) {                                            // vua
-    hinh(() => { ctx.moveTo(-.2, -.13); ctx.quadraticCurveTo(-.33, -.5, -.22, -.66); ctx.lineTo(.22, -.66); ctx.quadraticCurveTo(.33, -.5, .2, -.13); ctx.closePath(); });
-    hinh(() => { ctx.rect(-.24, -.73, .48, .08); });
-    hinh(() => { ctx.moveTo(-.04, -.73); ctx.lineTo(-.04, -.83); ctx.lineTo(-.12, -.83); ctx.lineTo(-.12, -.9); ctx.lineTo(-.04, -.9); ctx.lineTo(-.04, -.99); ctx.lineTo(.04, -.99);
-      ctx.lineTo(.04, -.9); ctx.lineTo(.12, -.9); ctx.lineTo(.12, -.83); ctx.lineTo(.04, -.83); ctx.lineTo(.04, -.73); ctx.closePath(); });
-  } else if (loai === 7) {                                            // tướng (Tam quốc): mũ trụ, cờ hiệu màu đạo quân mình cầm đầu
-    hinh(() => { ctx.moveTo(-.2, -.13); ctx.quadraticCurveTo(-.27, -.42, -.15, -.5); ctx.lineTo(.15, -.5); ctx.quadraticCurveTo(.27, -.42, .2, -.13); ctx.closePath(); });
-    hinh(() => { ctx.moveTo(-.2, -.5); ctx.quadraticCurveTo(-.21, -.8, 0, -.86); ctx.quadraticCurveTo(.21, -.8, .2, -.5); ctx.closePath(); });
-    hinh(() => { ctx.rect(-.23, -.55, .46, .07); });
-    ctx.beginPath(); ctx.moveTo(0, -.86); ctx.lineTo(0, -.97); ctx.stroke();
-    ctx.lineWidth = .04; ctx.beginPath(); ctx.moveTo(.27, -.12); ctx.lineTo(.27, -1.04); ctx.stroke();
-    const co = goc || m;
-    ctx.fillStyle = co.giua; ctx.lineWidth = .035;
-    ctx.beginPath(); ctx.moveTo(.27, -1.06); ctx.lineTo(.66, -.95); ctx.lineTo(.27, -.81); ctx.closePath(); ctx.fill(); ctx.stroke();
+  if (goc) {                                                                 // Tam quốc: quân cướp được mang vành màu đạo gốc
+    ctx.fillStyle = goc.giua; ctx.globalAlpha *= .95;
+    ctx.beginPath(); ctx.ellipse(0, -.05, r * 1.04, r * .2, 0, 0, Math.PI); ctx.lineTo(-r * 1.04, -.02); ctx.ellipse(0, -.02, r * 1.04, r * .2, 0, Math.PI, 0, true); ctx.closePath(); ctx.fill();
   }
-  if (da) {                                                          // quân đá: vài vết nứt
-    ctx.strokeStyle = 'rgba(40,38,34,.6)'; ctx.lineWidth = .025;
-    ctx.beginPath(); ctx.moveTo(-.1, -.3); ctx.lineTo(.02, -.42); ctx.lineTo(-.03, -.5); ctx.moveTo(.08, -.2); ctx.lineTo(.13, -.32); ctx.stroke();
+  if (da) {                                                                  // quân đá: vài vết nứt
+    ctx.strokeStyle = 'rgba(40,38,34,.6)'; ctx.lineWidth = .022;
+    ctx.beginPath(); ctx.moveTo(-r * .4, -h * .42); ctx.lineTo(r * .05, -h * .55); ctx.lineTo(-r * .1, -h * .63); ctx.moveTo(r * .3, -h * .25); ctx.lineTo(r * .5, -h * .38); ctx.stroke();
   }
   ctx.restore();
+  ctx.lineWidth = Math.max(.026, .9 / s); ctx.strokeStyle = m.vien;
+  ctx.beginPath(); d.vien(r); ctx.stroke();
+  if (d.them) { ctx.save(); d.them(r, m, goc); ctx.restore(); }
+  ctx.restore();
 }
-function veQuan(x, c, toa, tiLe = 1, mo = 1) {
+function veQuan(x, c, toa, tiLe = 1, mo = 1, nang = 0) {
   const D = x >> 3, loai = x & 7, thuc = !demo && !xem && van, P = thuc ? van.the.chu[D] : D, da = thuc && !van.the.song[P];
-  const s = Math.max(15, Math.min(54, coO(c) * 2.15)) * tiLe;
+  const s = Math.max(16, Math.min(60, coO(c) * 2.4)) * tiLe;
   ctx.globalAlpha = mo;
-  vePhan(loai, toa[0], toa[1] + s * .38, s, da ? DA : MAU[P], da, !da && P !== D ? MAU[D] : null);
+  vePhan(loai, toa[0], toa[1] + s * .32, s, da ? DA : MAU[P], da, !da && P !== D ? MAU[D] : null, nang);
   ctx.globalAlpha = 1;
 }
 function veDuongDo(duong, t) {                                       // báo nguy: đường đỏ từ quân đang chiếu tới vua
@@ -794,7 +869,7 @@ function veCanh(t) {
   const thuTu = [];
   for (let c = 0; c < 96; c++) if (the.o[c] && !(hoat && (hoat.an === c || hoat.dau.includes(c)))) thuTu.push(c);
   thuTu.sort((a, b) => tamO(a)[1] - tamO(b)[1]);
-  for (const c of thuTu) veQuan(the.o[c], c, tamO(c));
+  for (const c of thuTu) if (c !== chon) veQuan(the.o[c], c, tamO(c));
   vet.forEach((v, i) => veMuiTen(v, (chon >= 0 ? .35 : 1) * (i === vet.length - 1 ? .95 : i === vet.length - 2 ? .7 : .45)));
   if (the.cho && the.cho.length && !hoat) {                          // Tam quốc: đang chờ chọn tướng
     const D = the.cho[0].dao, nhip = .5 + .5 * Math.sin(t / 220);
@@ -815,6 +890,7 @@ function veCanh(t) {
   for (const d of bao) veDuongDo(d.duong, t);
   if (chon >= 0 && nuocCuaChon.length) veDuongChon(the);
   veCham(the, nuocCuaChon, chonXem ? 'xem' : 'di');
+  if (chon >= 0 && the.o[chon]) veQuan(the.o[chon], chon, tamO(chon), 1, 1, 1);   // quân đang chọn nhấc lên khỏi bàn, nằm trên đường đi
   if (hoat) veHoat(t);
 }
 /* màu mũi tên từng nhà (ruột, viền) và màu tô ô: chọn cho nổi trên gỗ sáng lẫn gỗ tối */
@@ -1130,13 +1206,14 @@ function veMat() {
     const c2 = k.getContext('2d');
     c2.setTransform(DPR, 0, 0, DPR, 0, 0); c2.clearRect(0, 0, w, h);
     if (!ds.length) continue;
-    const s = h - 1, xs = [];
-    let x = s * .42;
-    ds.forEach((q, i) => { if (i) x += ((q & 7) === (ds[i - 1] & 7) ? .4 : .72) * s; xs.push(x); });
-    const ep = xs.length > 1 && xs[xs.length - 1] + s * .42 > w ? (w - s * .84) / (xs[xs.length - 1] - xs[0]) : 1;
+    /* hình nhỏ: quân thấp vẽ to lên một chút (cao ít nhất 0,8 vua) cho tốt khỏi bé quá, vua hậu vừa khít hàng */
+    const s = h - 2, xs = [], co = (q) => s / Math.max(CAO[q & 7] || 1, .8);
+    let x = s * .32;
+    ds.forEach((q, i) => { if (i) x += ((q & 7) === (ds[i - 1] & 7) ? .34 : .6) * s; xs.push(x); });
+    const ep = xs.length > 1 && xs[xs.length - 1] + s * .32 > w ? (w - s * .64) / (xs[xs.length - 1] - xs[0]) : 1;
     const cu = ctx;
     ctx = c2;
-    ds.forEach((q, i) => vePhan(q & 7, xs[0] + (xs[i] - xs[0]) * ep, h - 1.5, s, MAU[P], false, (q >> 3) !== P ? MAU[q >> 3] : null));
+    ds.forEach((q, i) => vePhan(q & 7, xs[0] + (xs[i] - xs[0]) * ep, h - 1.5, co(q), P === 2 ? VIEN_SANG : MAU[P], false, (q >> 3) !== P ? MAU[q >> 3] : null));
     ctx = cu;
   }
 }
@@ -2034,7 +2111,8 @@ self.TDTD_COBA = {
   _batDauPhong: () => batDauPhong(), _diNuoc: (m, P) => diNuoc(m, P), _roiPhong: () => roiPhong(), _vanNua: () => vanNua(), _theoTiep: (ma) => theoTiep(ma),
   _kiemPhong: () => kiemPhong(), _toiChayMay: () => toiChayMay(), _viecPhong: () => viecPhong(), _choMayThay: () => choMayThay(), _tuDiTiep: () => tuDiTiep(),
   _timNuocMang: (the, mv) => timNuocMang(the, mv), _moCaiDat: () => moCaiDat(), _laMinh: (P) => laMinh(P), _duongChon: () => duongChon,
-  _bam: (e) => bam(e), _trichMa: (s) => trichMa(s), _chonXem: () => chonXem, _xem: () => xem, _batXem: (tu) => batXem(tu), _chonXemQuan: (l) => chonXemQuan(l),
+  _bam: (e) => bam(e), _trichMa: (s) => trichMa(s), _CAO: CAO, _MAU: MAU, _DA: DA,
+  _vePhan: (c2, ...a) => { const cu = ctx; ctx = c2; try { vePhan(...a); } finally { ctx = cu; } }, _chonXem: () => chonXem, _xem: () => xem, _batXem: (tu) => batXem(tu), _chonXemQuan: (l) => chonXemQuan(l),
   _chamXem: (x, y) => chamXem(x, y), _thoatXem: () => thoatXem(), _baoMat: (P) => baoMat(P), _noi: (P, loai) => noi(P, loai),
 };
 })();

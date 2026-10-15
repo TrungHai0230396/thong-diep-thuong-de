@@ -479,6 +479,31 @@ console.log('\n— Xem nước đi từng quân, chạm xem lúc chưa tới lư
   C.dong();
 }
 
+console.log('\n— Hình quân —');
+{
+  /* Người dùng: "làm UIUX quân cờ đẹp hơn". Chuẩn thiết bị cờ của FIDE (bản từ 1/3/2026): vua > hậu > tượng > mã > xe > tốt,
+     chuẩn 95 / 85 / 70 / 60 / 55 / 50 mm, được lệch tối đa 10% */
+  const CAO = C._CAO, FIDE = { 6: 95, 5: 85, 3: 70, 2: 60, 4: 55, 1: 50 }, thuTu = [6, 5, 3, 2, 4, 1];
+  const mm = (l) => CAO[l] / CAO[6] * 95;
+  ok('chiều cao quân đúng thứ tự FIDE: vua > hậu > tượng > mã > xe > tốt (bản trước tốt cao gần bằng hậu)', thuTu.every((l, i) => !i || CAO[thuTu[i - 1]] > CAO[l]));
+  ok('đổi ra mm với vua 95 mm: quân nào cũng trong khoảng FIDE cho phép (chuẩn ± 10%)', thuTu.every(l => mm(l) >= FIDE[l] * .9 - 1e-9 && mm(l) <= FIDE[l] * 1.1 + 1e-9),
+     thuTu.map(l => mm(l).toFixed(1)).join(' / '));
+  /* vẽ thử mọi loại quân, mọi màu, quân đá, vành đạo gốc, quân nhấc lên vào một khung ghi lại: không có số hỏng (NaN, vô cực),
+     save/restore cân nhau */
+  const ghi = { goi: 0, loi: [], muc: 0 };
+  const kiem = (k, a) => { if (a.some(x => typeof x === 'number' && !Number.isFinite(x))) ghi.loi.push(k); };
+  const khung = new Proxy({}, { get: (_, k) => {
+    if (k === 'createLinearGradient' || k === 'createRadialGradient') return (...a) => { kiem(k, a); return { addColorStop: (...b) => kiem('addColorStop', b) }; };
+    if (k === 'save') return () => { ghi.muc++; };
+    if (k === 'restore') return () => { ghi.muc--; };
+    return (...a) => { ghi.goi++; kiem(k, a); };
+  }, set: () => true });
+  for (const l of [1, 2, 3, 4, 5, 6, 7]) for (const m of C._MAU.concat([C._DA])) for (const goc of [null, C._MAU[1]]) for (const nang of [0, 1])
+    C._vePhan(khung, l, 50, 80, 40, m, m === C._DA, goc, nang);
+  ok('vẽ đủ bảy loại quân × ba màu và quân đá × có/không vành đạo gốc × nhấc lên: không số hỏng, save/restore cân nhau',
+     !ghi.loi.length && ghi.muc === 0 && ghi.goi > 7 * 4 * 2 * 2 * 10, ghi.loi.slice(0, 3).join() || `${ghi.goi} lệnh vẽ`);
+}
+
 console.log('\n— Gắn vào app —');
 {
   const html = fs.readFileSync(path.join(goc, 'index.html'), 'utf8'), sw = fs.readFileSync(path.join(goc, 'sw.js'), 'utf8');

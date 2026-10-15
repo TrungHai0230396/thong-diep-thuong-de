@@ -1916,6 +1916,17 @@ Người dùng: "gửi link mời cho sao chép link nữa". Trên điện tho�
 
 `scripts/test-phong.js` thêm 5 bài (giờ 57): điện thoại có hai nút; bấm Chép link thì chép đúng link mời, nút đổi chữ, lời báo nằm trên bảng; máy không có bảng chia sẻ thì một nút Chép link mời; chép không được thì hiện ô link; bấm Xong về lại phòng chờ. Đã thử trên trình duyệt khổ 375 px với database thật: hai nút cạnh nhau, bấm Chép link thì nút thành "Đã chép ✓" và lời báo hiện rõ ở cuối màn hình.
 
+### Quân cờ vẽ lại theo dáng Staunton
+
+Người dùng: "làm UIUX quân cờ đẹp hơn được không". Tìm hiểu trước khi vẽ: [chuẩn thiết bị cờ của FIDE](https://handbook.fide.com/chapter/ChessEquipmentWithoutElectronicComponenets032026) (bản có hiệu lực từ 1/3/2026; [bản 2022](https://handbook.fide.com/chapter/StandardsOfChessEquipment2022) cùng số liệu) quy định quân theo dáng Staunton; thứ tự cao thấp vua > hậu > tượng > mã > xe > tốt, chuẩn 95 / 85 / 70 / 60 / 55 / 50 mm, được lệch tối đa 10%; đế rộng 40–50% chiều cao; đầu vua phải khác hẳn đầu hậu, đầu tượng khác đầu tốt (thường là khe chéo); mặt mờ, không bóng loáng; hai bên phân biệt được cả với người mù màu. Bản trước quân nào cũng cao gần bằng nhau (tốt gần bằng hậu), tô một dải chéo.
+
+- **Dáng**: thân tiện đối xứng vẽ bằng đường cong mượt qua các điểm điều khiển — đế có gờ, thân thắt eo, khấc cổ. Vua đội vương miện có thập tự; hậu đội vương miện năm mũi có hạt; tượng đội mũ có khe chéo và hạt trên đỉnh; xe có răng thành; mã là đầu ngựa có tai, mắt, lỗ mũi, bờm; tốt đầu tròn trên vành cổ. Tướng (Tam quốc) đội mũ trụ, cầm cờ hiệu màu đạo quân.
+- **Cỡ**: vua 1,10 thì hậu 1,01, tượng 0,88, mã 0,76, xe 0,70, tốt 0,63 — đổi ra mm với vua 95 là 87 / 76 / 66 / 60 / 54, đều trong khoảng FIDE cho phép, nghiêng về phía cao để quân nhỏ khỏi bé quá trên ô nhỏ. Đế rộng hơn chuẩn (51–73% chiều cao thay vì 40–50%, quân thấp rộng hơn) cho dễ nhận ra trên điện thoại. Cả bộ to hơn bản trước chừng 12%.
+- **Tô**: như gỗ tiện mặt mờ — sáng bên trái, tối dần sang phải, mép ngoài tối nhất, trên sáng dưới tối, vạch rãnh ở các khấc; bóng đổ mềm dưới đế. Trắng màu ngà, Đỏ sơn mài trầm, Đen gỗ mun viền tối (bản trước viền sáng trông như miếng dán) — ba độ sáng khác nhau cho người mù màu. Hàng quân mất trên thẻ (nền tối) vẫn vẽ quân Đen viền sáng.
+- **Quân đang chọn nhấc lên khỏi bàn**, bóng ở lại dưới, vẽ sau cùng nên nằm trên đường đi (trước đây đường đi vẽ đè lên quân).
+
+Đo trên trình duyệt: vẽ cả bàn 48 quân chừng 0,85 ms một khung hình. `scripts/test-coba.js` thêm 3 bài (giờ 93): thứ tự cao thấp đúng FIDE, đổi ra mm thì quân nào cũng trong khoảng ± 10%, vẽ đủ bảy loại × ba màu và quân đá × vành đạo gốc × nhấc lên vào một khung ghi lại không ra số hỏng và save/restore cân nhau. Thử phá 4 chỗ (tốt cao như cũ, mã cao quá khoảng, quên trả save, thiếu bán kính đế tướng): bắt 3; chỗ còn lại không đổi gì vì đã có giá trị dự phòng.
+
 ## Cấu trúc
 
 ```
@@ -1974,7 +1985,7 @@ assets/sokoban.js          Đẩy thùng sao (Sokoban): luật đi đẩy, bộ 
 assets/mansoko.js          100 màn của Đẩy thùng sao (ký hiệu XSB), mỗi màn có số lần đẩy ít nhất và một lời giải, sinh bởi scripts/tao-man-sokoban.js
 scripts/tao-man-sokoban.js tạo màn theo Taylor & Parberry 2011 (17 mẫu phòng, đặt ổ, chơi ngược), chạy song song nhiều luồng, chọn 100 màn
 assets/coba.js             Cờ vua ba người: bàn lục giác 96 ô (bằng sáng chế Zubrin), luật, máy nghĩ (Best-Reply Search, hoang tưởng) ở luồng riêng, giao diện
-scripts/test-coba.js       90 kiểm thử cờ ba người: hình học bàn, luật thường và Tam quốc, máy nghĩ, giao diện, mũi tên nước đi, xem cách đi từng quân, quân đã mất
+scripts/test-coba.js       93 kiểm thử cờ ba người: hình học bàn, luật thường và Tam quốc, máy nghĩ, giao diện, mũi tên nước đi, xem cách đi từng quân, quân đã mất
 assets/phong.js            chơi qua mạng: đọc ghi Firebase Realtime Database bằng REST và luồng sự kiện, không thư viện
 assets/maqr.js             mã QR tự vẽ cho phòng chờ (ISO/IEC 18004, kiểu byte, mức M, phiên bản 1–6), không thư viện
 scripts/test-maqr.js       12 kiểm thử mã QR: số liệu chuẩn, đọc ngược bằng bộ đọc riêng, sát sức chứa, 300 chữ ngẫu nhiên
@@ -2012,7 +2023,7 @@ node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
-node scripts/test-coba.js        # chạy 90 kiểm thử Cờ vua ba người
+node scripts/test-coba.js        # chạy 93 kiểm thử Cờ vua ba người
 node scripts/test-phong.js       # chạy 57 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
 node scripts/test-maqr.js        # chạy 12 kiểm thử mã QR
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
