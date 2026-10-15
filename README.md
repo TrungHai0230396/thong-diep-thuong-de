@@ -1712,6 +1712,57 @@ Bấm vẫn như cũ (chạm rồi nhả: ô mới vào chỗ dấu + xanh; ch�
 
 Bảng giới thiệu chương dặn thêm cách kéo thả. Đã thử trên trình duyệt cỡ điện thoại, cả chuột thật lẫn ngón tay giả lập: kéo từ bảng vào chương trình trống, chen vào trước một ô, đổi chỗ, kéo về bảng để bỏ, kéo vào giữa thân vòng lặp, kéo cả khối Lặp, kéo khối vào chính nó (bị từ chối), kéo sang Hàm ★, thả lên chữ "không thì", tự cuộn ở bài 90, hoàn tác ngay sau khi kéo. `scripts/test-laptrinh.js` từ 71 lên 91 bài (đổi chỗ trước/sau, tính lại vị trí khi kéo về sau trong cùng hàng, vào/ra vòng lặp, kéo cả ô chứa, không thả vào chính nó, "không thì" sang "thì", sang Hàm ★, hoàn tác, chỗ chèn theo hàng ô…); thử phá code ở 5 chỗ, bài kiểm bắt cả 5.
 
+## Đẩy thùng sao — Sokoban 100 màn
+
+Người dùng: "làm 1 ngôi sao game Sokoban". Ngôi sao **Đẩy thùng sao** (`assets/sokoban.js`, màn ở `assets/mansoko.js`, mở thẳng bằng `#day-thung`): chú robot của Robot thắp sao đẩy những thùng gỗ có ngôi sao trên nắp vào các ổ vàng; thùng vào ổ thì sao trên nắp sáng lên, mọi thùng đều sáng là xong màn.
+
+**Tìm hiểu trước khi làm** (người dùng dặn):
+
+- Luật gốc (Hiroyuki Imabayashi, Thinking Rabbit, 1982): đi bốn hướng trên lưới; đi vào ô có thùng thì đẩy thùng trượt thêm một ô nếu ô ấy trống; không kéo được, không đẩy hai thùng một lúc; mọi thùng nằm trên ổ là xong.
+- Màn ghi theo ký hiệu **XSB** mà chương trình Sokoban nào cũng đọc được (`#` tường, `.` ổ, `$` thùng, `*` thùng trong ổ, `@` người, `+` người đứng trên ổ); lời giải ghi kiểu **LURD** (chữ thường là đi, chữ hoa là đẩy).
+- Màn có sẵn thì vướng bản quyền: màn gốc của Thinking Rabbit không rõ quyền dùng; các bộ nổi tiếng (Microban, Sasquatch của David W. Skinner) được nhiều trang chia sẻ lại "có phép, ghi tên tác giả" nhưng không tìm thấy lời cho phép của chính tác giả. Nên **máy tự tạo màn**.
+- Cách tạo theo **Joshua Taylor và Ian Parberry, "Procedural Generation of Sokoban Levels"** (GAMEON-NA 2011, tr. 5–12, [bản PDF của tác giả](https://ianparberry.com/pubs/GAMEON-NA_METH_03.pdf)): ghép phòng từ các mẫu 3×3, thử chỗ đặt ổ, rồi **chơi ngược** từ lúc mọi thùng đã nằm trong ổ để tìm thế bày cần nhiều đường đẩy nhất. Thế nào kéo ra được thì đẩy về được, nên màn nào cũng chắc chắn giải được.
+
+Người dùng chọn: **máy tự tạo màn** (có bộ giải kiểm từng màn), **3D nhìn nghiêng như Robot thắp sao**, **robot đẩy thùng sao về ổ cho sáng**.
+
+**Tạo màn** (`scripts/tao-man-sokoban.js`), đúng ba bước của bài báo:
+
+1. **Phòng trống.** Chọn số khối 3×3 theo chiều ngang, dọc; lấp mỗi khối bằng một trong **17 mẫu** — chép từ hình 2 của bài báo (lấy ảnh trong tệp PDF, phóng to, đọc từng ô) — xoay hay lật ngẫu nhiên. Mẫu 5×5: lõi 3×3 và một viền chồng sang khối bên cạnh; ô viền nào có ghi thì phải khớp ô đã có. Không mẫu nào khớp thì bỏ cả phòng làm lại. Rồi loại phòng có sàn rời nhau (ô "người qua được mà thùng không qua" của mẫu 10 tính như tường khi xét chỗ này), có khoảng trống 4×3 hay 3×4 (bài báo: cây trạng thái rậm mà nông, khó tạo mà chẳng khó giải), thiếu sàn, có ô bị tường bao ba mặt.
+2. **Đặt ổ:** thử mọi cách đặt, theo thứ tự xáo ngẫu nhiên, có hẹn giờ cho mỗi phòng; hết giờ thì lấy kết quả tốt nhất đã có.
+3. **Thế xa nhất:** chơi ngược (người kéo thùng), đo bằng **đường đẩy** — đẩy một thùng bao nhiêu ô theo cùng một hướng vẫn tính là một đường, thước đo bài báo thấy khớp với độ khó nhất; chỗ người đứng gộp thành vùng đi được. Bài báo dùng tìm sâu dần hai lớp cho đỡ tốn bộ nhớ (máy năm 2011, có lúc ngốn 1,5 GB rồi sập); ở đây tìm theo chiều rộng thường, cùng kết quả mà nhanh hơn hẳn: phòng 2×2 khối ba thùng thử hết mọi cách đặt ổ trong vài giây (bài báo đo 2,7 phút), bốn thùng vài chục giây (bài báo: 3,4 giờ). Phòng lớn 4–5 thùng vẫn phải hẹn giờ, 2–4 phút một phòng.
+
+Chọn màn bằng điểm của bài báo: 100 × (số lần đẩy − số màn "anh em" cùng độ xa + 4 × số đường − 12 × số thùng) + ngẫu nhiên 0–300; thùng kẹt cứng −100000, mỗi thùng sát tường −150, thùng sát người +50, thùng sát thùng +30, ổ sát ổ +30; điểm ≤ 0 thì bỏ; trùng màn đã có (kể cả xoay, lật, bỏ qua chỗ người đứng) thì bỏ. Thêm mấy việc bài báo không có: **bộ giải tìm số bước ít nhất** của từng màn để chấm sao (màn nào không giải xong trong giới hạn thì bỏ); bỏ màn có thùng nằm sẵn trong ổ mà lời giải không đụng tới (thùng chỉ để trang trí); chương làm quen bỏ màn robot đứng sẵn trên ổ, cho người mới thấy ngay ổ ở đâu.
+
+Chạy song song trên máy M2 (7 luồng, chừng một giờ) được **216 màn ứng viên khác nhau** — 1 thùng: 29, 2 thùng: 59, 3 thùng: 58, 4 thùng: 43, 5 thùng: 27 — rồi chọn 100 (`node scripts/tao-man-sokoban.js chon …`): mỗi chương một số thùng; trong chương xếp theo độ khó của bài báo (đường·log đường − đường/lần đẩy) và lấy cách đều từ dễ tới khó; chương làm quen lấy những màn dễ nhất; trùng thì bỏ.
+
+**Bộ giải ít bước nhất** (`giaiItBuoc`): duyệt các thế sau mỗi lần đẩy, chi phí = số bước đi tới sau thùng + 1, theo Dijkstra nên thế xong lấy ra đầu tiên là lời giải ít bước nhất (hoà thì ít lần đẩy nhất); bỏ qua thế có thùng ở ô chết hay kẹt 2×2 vì không bao giờ giải được. Đối chiếu với cách dò từng bước một (chậm mà không thể sai) trên các màn nhỏ: trùng hết.
+
+**5 chương, 100 màn** (đường đẩy: thước đo độ khó của bài báo):
+
+| Chương | Màn | Đường đẩy | Bước ít nhất |
+|---|---|---|---|
+| 1. Một thùng — làm quen | 1–6 | 3 | 8–13 |
+| 2. Hai thùng | 7–30 | 5–14 | 15–83 |
+| 3. Ba thùng | 31–60 | 11–23 | 56–143 |
+| 4. Bốn thùng | 61–85 | 14–26 | 65–180 |
+| 5. Năm thùng | 86–100 | 15–37 | 84–204 |
+
+**Chơi:** bấm mũi tên (giữ thì đi liên tục), vuốt trên cảnh (mỗi quãng vuốt một bước), hay **chạm vào một ô** để robot tự đi tới theo đường ngắn nhất, không đẩy gì; chạm thùng ngay cạnh robot là đẩy, chạm thùng ở xa thì robot đi tới sát thùng. Máy tính: phím mũi tên hay WASD, Z hoàn tác, R chơi lại. **↶ Hoàn tác** lùi từng bước (giữ để lùi nhanh); **↻ Chơi lại** bày lại từ đầu, lỡ tay thì Hoàn tác lấy lại được. ⟲ ⟳ xoay cảnh 90°; mũi tên luôn theo hướng trên màn hình (▲ là đi lên trên màn), dù đang xoay góc nào. Bấm nhanh hơn hình chạy thì nước sau xếp hàng chờ, không mất.
+
+**Thùng kẹt:** đẩy thùng vào chỗ không bao giờ đưa về ổ được nữa — ô chết (góc tường, dọc bức tường không có ổ: tính sẵn bằng cách kéo ngược từ mọi ổ) hay bốn ô 2×2 toàn thùng với tường — thì thùng đỏ lên ngay, kèm lời nhắc bấm ↶. Người mới hay đẩy thùng vào góc rồi loay hoay mãi không hiểu vì sao.
+
+**Gợi ý 💡:** chỉ lần đẩy tiếp theo — mũi tên xanh trên nắp thùng và chấm xanh trên đường robot cần đi tới sau thùng; bấm 💡 lần nữa thì robot làm giúp lần đẩy đó. Còn đi đúng theo lời giải ít bước nhất (chưa lạc bước nào) thì chỉ theo đúng lời giải đó; lạc rồi thì bộ giải nhanh (`giaiNhanh`) tìm cách từ thế hiện tại: A* trên số lần đẩy, người gộp thành vùng, cận dưới là tổng khoảng cách đẩy của từng thùng tới ổ gần nhất nhân 2 — đo cả 100 màn: nhanh gần gấp năm so với không nhân (màn chậm nhất 0,11 giây thay vì 0,54 giây trên máy tính), tổng số lần đẩy chỉ hơn cách ít lần đẩy nhất 3%. Đã kẹt thì gợi ý nói không còn cách, bấm ↶.
+
+**Chấm sao** như Robot thắp sao ("làm tối ưu nhất thì được nhiều sao"): bằng số bước ít nhất → 3 sao; dư không quá một phần tư → 2 sao; dư hơn → 1 sao. Bảng khen nói ít nhất là bao nhiêu bước. Danh sách màn hiện sao từng màn và tổng ★ / 300; màn nào cũng mở, chơi màn nào cũng được.
+
+**Lưu đúng một mục** `tdtd.soko`: số sao từng màn (chuỗi 0–3), màn đang chơi, đã xem cách chơi chưa. Không lưu nước đi — đóng giữa chừng thì lần sau chơi lại màn đó từ đầu.
+
+**Hình 3D**, vẽ bằng canvas như Robot thắp sao (đá xanh lơ lửng giữa trời sao, cùng chú robot), nhưng nhìn từ cao hơn và gần như thẳng theo lưới — Sokoban cần thấy rõ từng ô, và bấm ▲ thì robot phải đi lên chứ không đi chéo. Tường là khối đá; sàn ô cờ tối; ổ là vòng vàng khắc trên sàn có hình ngôi sao, nhấp nháy nhẹ; thùng gỗ có khung ván, ngôi sao trên nắp — vào ổ thì thùng ửng vàng, sao sáng rực có quầng; kẹt thì đỏ. Mỗi màn tự chọn trong bốn góc nhìn góc cho ô to nhất trên màn hình. Âm thanh tạo bằng Web Audio: tiếng cộc khi đẩy, chuông cao dần mỗi thùng vào ổ, nốt trầm khi thùng rời ổ, "bộp" khi đâm tường, nhạc mừng khi xong; tắt được ở danh sách màn.
+
+`scripts/test-sokoban.js`, 61 bài: luật (đi, đẩy, không đẩy hai thùng, không xuyên tường, hoàn tác trả đúng chỗ, chuỗi LURD chữ hoa phải là đẩy thật, tìm đường vòng qua thùng); ô chết và kẹt 2×2; **bộ giải ít bước nhất trùng với cách dò từng bước** trên 11 màn nhỏ, màn không giải được thì trả rỗng; bộ giải nhanh giải được mọi màn từ đầu (màn chậm nhất 0,11 giây, cả bộ 0,8 giây trên máy tính), thùng ở góc thì báo không còn cách; bộ tạo: 17 mẫu, 75 biến thể xoay lật, bốn luật lọc phòng, **thế xa nhất của chơi ngược cần đúng ngần ấy đường đẩy khi tìm xuôi**, so trùng qua xoay lật; **cả 100 màn**: đọc được, kín tường, số thùng bằng số ổ, vừa màn điện thoại, lời giải lưu sẵn chơi lại xong màn đúng số bước đã ghi, **bộ giải giải lại cả 100 màn ra đúng số bước ít nhất** (chừng 20 giây), lời giải đẩy mọi thùng, không thùng nào kẹt sẵn lúc bày, không màn nào trùng, độ khó không giảm trong mỗi chương; giao diện: mũi tên theo màn hình ở mọi góc xoay, đếm bước, hoàn tác, Chơi lại rồi Hoàn tác lấy lại được, gợi ý đúng lần đẩy của lời giải, làm giúp, **theo gợi ý từ đầu tới cuối là đúng số bước ít nhất**, lạc rồi vẫn gợi ý được, thùng kẹt tô đỏ rồi hoàn tác hết đỏ, **chạm giữa ô nào cũng ra đúng ô đó ở cả bốn góc xoay** (hay khối cao chắn trước mặt), chạm để đi, chấm sao, chỉ lưu một mục; gắn vào app. Thử phá code ở 10 chỗ (cho đẩy hai thùng, tắt kẹt 2×2, bộ giải quên bước đi bộ, không ô nào chết, mũi tên theo bản đồ thay vì màn hình, nới mức 2 sao, Hoàn tác sau Chơi lại, gợi ý bỏ lời giải lưu sẵn, chạm sàn quên góc xoay, thùng kẹt không đỏ): lần đầu bắt được 8, lọt hai chỗ (gợi ý bỏ lời giải lưu sẵn, chạm sàn quên góc xoay) — viết thêm hai bài (chạm mọi ô ở bốn góc xoay; theo gợi ý tới cuối ở một màn mà bộ giải nhanh tốn bước hơn), giờ bắt cả 10.
+
+Đã chơi thử trên trình duyệt cỡ điện thoại: bảng cách chơi hiện đúng lần đầu; màn 1 bằng nút mũi tên, 💡 gợi ý rồi làm giúp, chạm ô để đi, chạm thùng để đẩy — thắng 3 sao; một màn đi thừa bước — bảng khen 1 sao, nói ít nhất bao nhiêu bước; vuốt để đẩy; xoay cảnh (mũi tên vẫn theo màn hình); đẩy thùng vào góc — thùng đỏ, có lời nhắc, hoàn tác thì hết; danh sách màn; chế độ thử tự chơi lời giải màn 31 (56 bước, đúng số ít nhất); màn 5 thùng. Một khung hình vẽ hết 0,1–0,4 ms trên máy tính.
+
 ## Cấu trúc
 
 ```
@@ -1739,7 +1790,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
-scripts/test-sao.js        113 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        118 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ
@@ -1762,6 +1813,10 @@ assets/laptrinh.js         Robot thắp sao: chạy chương trình, dựng bả
 assets/baicode.js          100 bài, 10 chương của Robot thắp sao, viết bằng cú pháp gọn, mỗi bài có lời giải mẫu
 scripts/test-laptrinh.js   57 kiểm thử Robot thắp sao: cả 100 bài giải được, buộc dùng điều đang học, luật chạy, gợi ý, chấm sao
 scripts/tim-loi-giai-gon.js  thử mọi chương trình ngắn hơn lời giải mẫu, báo bài nào có cách gọn hơn (chạy tay khi sửa bài)
+assets/sokoban.js          Đẩy thùng sao (Sokoban): luật đi đẩy, bộ giải ít bước nhất, bộ giải nhanh cho gợi ý, ô chết, cảnh 3D nhìn nghiêng
+assets/mansoko.js          100 màn của Đẩy thùng sao (ký hiệu XSB), mỗi màn có số bước ít nhất và một lời giải, sinh bởi scripts/tao-man-sokoban.js
+scripts/tao-man-sokoban.js tạo màn theo Taylor & Parberry 2011 (17 mẫu phòng, đặt ổ, chơi ngược), chạy song song nhiều luồng, chọn 100 màn
+scripts/test-sokoban.js    61 kiểm thử Đẩy thùng sao: luật, bộ giải đối chiếu dò từng bước, bộ tạo, cả 100 màn, giao diện
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
 scripts/test-amvi.js       47 phép đo phổ bộ dựng âm, đối chiếu số liệu ngữ âm học
@@ -1790,6 +1845,9 @@ node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
+node scripts/test-sokoban.js     # chạy 61 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
+node scripts/tao-man-sokoban.js tao ung-vien.jsonl 7 [4,5]   # tạo màn liên tục, 7 luồng, ghi mỗi màn một dòng (tuỳ chọn: chỉ số thùng này)
+node scripts/tao-man-sokoban.js chon ung-vien.jsonl          # chọn 100 màn từ các ứng viên, ghi assets/mansoko.js
 node scripts/test-nghe.js        # chạy 17 kiểm thử bộ so khớp câu nói
 node scripts/test-phatam.js      # chạy 192 kiểm thử trò luyện phát âm
 node scripts/test-dophatam.js    # chạy 26 kiểm thử máy đo phát âm (phần giọng mẫu cần macOS)

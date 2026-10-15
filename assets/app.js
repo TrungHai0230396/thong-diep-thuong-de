@@ -29,6 +29,7 @@ const HINH_SAO = {
   trang:     'M15.2 2.6A9.6 9.6 0 1 0 21.4 15.4 7.8 7.8 0 0 1 15.2 2.6z',
   sao8:      'M12 1.4L13.76 7.75L19.5 4.5L16.25 10.24L22.6 12L16.25 13.76L19.5 19.5L13.76 16.25L12 22.6L10.24 16.25L4.5 19.5L7.75 13.76L1.4 12L7.75 10.24L4.5 4.5L10.24 7.75z',
   khoi:      'M12 1.8l8.6 4.9v10.6L12 22.2l-8.6-4.9V6.7zM12 4.1L5.6 7.7 12 11.4l6.4-3.7z',
+  thung:     'M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zM12 6.8l-1.41 3.66-3.92.21 3.05 2.47-1.01 3.79L12 14.8l3.29 2.13-1.01-3.79 3.05-2.47-3.92-.21z',
   sen:       'M12 3.2c1.9 2.3 2.9 4.7 2.9 7.2 0 2.6-1 4.8-2.9 6.9-1.9-2.1-2.9-4.3-2.9-6.9 0-2.5 1-4.9 2.9-7.2zM2.6 9.6c3 .1 5.4 1.3 7 3.6 1 1.4 1.5 3 1.7 4.6-2.6-.1-4.8-1.1-6.4-2.9-1.3-1.5-2.1-3.3-2.3-5.3zM21.4 9.6c-3 .1-5.4 1.3-7 3.6-1 1.4-1.5 3-1.7 4.6 2.6-.1 4.8-1.1 6.4-2.9 1.3-1.5 2.1-3.3 2.3-5.3zM4.5 18.8c2.3 1.3 4.8 2 7.5 2s5.2-.7 7.5-2c-2.2.6-4.7.9-7.5.9s-5.3-.3-7.5-.9z',
 };
 
@@ -57,6 +58,8 @@ const SAO = [
     duong: 'thien-luan-xa', khung: '.luanxa', mun: 'TDTD_LUANXA' },
   { id: 'sao-laptrinh', mau: '#8fd0ff', hinh: 'khoi',  nhan: 'Robot thắp sao: 100 bài lập trình cho bé 6–10 tuổi',
     duong: 'lap-trinh', khung: '.laptrinh', mun: 'TDTD_LAPTRINH', tieuDe: 'Robot thắp sao — lập trình cho bé' },
+  { id: 'sao-sokoban', mau: '#f2c46b', hinh: 'thung', nhan: 'Đẩy thùng sao: Sokoban 100 màn, đẩy thùng vào ổ cho sáng lên',
+    duong: 'day-thung', khung: '.sokoban', mun: 'TDTD_SOKOBAN', tieuDe: 'Đẩy thùng sao — Sokoban' },
 ];
 
 
