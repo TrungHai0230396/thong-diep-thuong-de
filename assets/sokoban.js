@@ -335,14 +335,19 @@ let tam = null, cv = null, ctx = null, W = 360, H = 420, DPR = 1, raf = 0;
 let so = 0, M = null, G = null, the = null, lichSu = [], truocLamLai = null;
 let dang = null, hang = [], huong = 2, thang = false, maMan = 0;
 let ket = new Set(), sang = [], sangLuc = [], oVe = [], xemGiai = false;
-let goc = .32, gocDen = .32;
+let goc = 0, gocDen = 0;
 
 /* ---------- vẽ cảnh 3D nhìn nghiêng ----------
-   Cùng kiểu với Robot thắp sao (đá xanh lơ lửng giữa trời sao, robot ấy) nhưng nhìn từ cao hơn và gần như thẳng theo
-   lưới: Sokoban phải thấy rõ từng ô, và bấm ▲ thì robot phải đi lên trên màn chứ không đi chéo. Xoay được 90° một lần. */
-const KY = .74, KZ = .62;                      // nén chiều sâu, chiều cao
-const ZT = .56, DAY_T = -.3;                   // tường: mặt trên, đáy (lơ lửng như các khối đá của Robot thắp sao)
-const RT = .36, ZTH = .6;                      // thùng: nửa cạnh, cao
+   Cùng kiểu với Robot thắp sao (đá xanh lơ lửng giữa trời sao, robot ấy) nhưng nhìn từ cao hơn và THẲNG theo lưới: hàng
+   ô nằm ngang, cột ô đứng dọc trên màn hình, chỉ thấy mặt trên và mặt trước của khối. Bản đầu xoay lệch 18° cho thấy cả
+   mặt bên — người dùng: "làm cho map thẳng đi, nó bị xéo qua một góc người dùng khó chịu". Sokoban phải thấy rõ từng ô,
+   và bấm ▲ thì robot đi lên trên màn chứ không đi chéo. Xoay được 90° một lần, xoay xong vẫn thẳng. */
+/* Nhìn thẳng thì khối ở hàng dưới che phần ô ngay sau nó: bản đầu (tường cao .56, nén .74/.62) che gần nửa ô — ổ sát
+   tường dưới bị khuất một nửa. Nhìn cao hơn (nén chiều sâu ít hơn, chiều cao nhiều hơn) và tường thấp hơn chút: che
+   chừng một phần ba ô, ổ và thùng sau tường vẫn nhìn rõ. */
+const KY = .8, KZ = .52;                       // nén chiều sâu, chiều cao
+const ZT = .5, DAY_T = -.3;                    // tường: mặt trên, đáy (lơ lửng như các khối đá của Robot thắp sao)
+const RT = .36, ZTH = .58;                     // thùng: nửa cạnh, cao
 let toa = { cx: 0, cy: 0, s: 40, tx: 0, ty: 0 };
 function chieu(x, y, z) {
   const dx = x - toa.tx, dy = y - toa.ty, c = Math.cos(goc), s = Math.sin(goc);
@@ -371,8 +376,8 @@ function canhKhung() {
 }
 /* góc nhìn mặc định: trong bốn góc (cách nhau 90°), góc cho ô to nhất — màn bề ngang thì nằm ngang trên màn hình */
 function gocTot() {
-  let tot = .32, co = 0;
-  for (let k = 0; k < 4; k++) { const g = .32 + k * Math.PI / 2, s = coCanh(khungCanh(g)); if (s > co * 1.04) { co = s; tot = g; } }
+  let tot = 0, co = 0;
+  for (let k = 0; k < 4; k++) { const g = k * Math.PI / 2, s = coCanh(khungCanh(g)); if (s > co * 1.04) { co = s; tot = g; } }
   return tot;
 }
 /* hướng trên màn hình (0 lên, 1 phải, 2 xuống, 3 trái) → hướng trên bản đồ đang hiện gần nhất với nó */
@@ -1044,6 +1049,6 @@ self.TDTD_SOKOBAN = {
   _the: () => the, _lichSu: () => lichSu, _ket: () => ket, _hang: () => hang, _chamO: chamO, _ketThucMan: () => ketThucMan(),
   _huongTheoMan: (sd) => huongTheoMan(sd), _datGoc: (g) => { goc = gocDen = g; }, _buocTiep: (t) => vong(t), _dangThang: () => thang,
   _oDuocCham: (x, y) => oDuocCham(x, y), _chieu: (x, y, z) => chieu(x, y, z), _canhKhung: () => canhKhung(),
-  _dang: () => dang,
+  _dang: () => dang, _goc: () => goc,
 };
 })();

@@ -277,11 +277,16 @@ const chayHet = () => { let t = Date.now() + 1e6; for (let i = 0; i < 5000 && (S
   S.mo();
   S._moMan(0);
   const m = S.docMan(S.MAN[0].m.split('|'));
-  S._datGoc(.32);
+  /* người dùng: "làm cho map thẳng đi, nó bị xéo qua một góc người dùng khó chịu" */
+  const thang = (g) => Math.abs(g / (Math.PI / 2) - Math.round(g / (Math.PI / 2))) < 1e-9;
+  const lech = S.MAN.map((x, i) => { S._moMan(i); return thang(S._goc()) ? null : i + 1; }).filter(Boolean);
+  ok('màn nào mở ra cũng thẳng theo lưới (góc nhìn là bội của 90°, không xéo)', !lech.length, lech.join(', '));
+  S._moMan(0);
+  S._datGoc(0);
   ok('góc mặc định: bấm ▲ là đi lên bản đồ, ▶ sang phải', S._huongTheoMan(0) === 0 && S._huongTheoMan(1) === 1 && S._huongTheoMan(2) === 2 && S._huongTheoMan(3) === 3);
-  S._datGoc(.32 + Math.PI / 2);
+  S._datGoc(Math.PI / 2);
   ok('xoay cảnh 90°: ▲ vẫn là hướng đang hướng lên trên màn', S._huongTheoMan(0) === 3 && S._huongTheoMan(1) === 0);
-  S._datGoc(.32);
+  S._datGoc(0);
   /* hoàn tác lùi một lần đẩy (người dùng: "lùi lại cũng lùi tới chỗ thùng đẩy"): chọn màn mà lời giải có đi bộ trước lần
      đẩy đầu và đi bộ ngay sau nó */
   const kL = S.MAN.findIndex(x => { const g = x.giai, p = g.search(/[A-Z]/); return p > 0 && g[p + 1] && g[p + 1] === g[p + 1].toLowerCase(); });
@@ -301,7 +306,7 @@ const chayHet = () => { let t = Date.now() + 1e6; for (let i = 0; i < 5000 && (S
   S._hoanTac();
   ok('hoàn tác ngay sau khi chơi lại: lấy lại các bước cũ', S._lichSu().length === n1);
   /* sao tính theo số lần đẩy, không tính bước chân: đi thừa hai bước rồi giải đúng số lần đẩy ít nhất vẫn 3 sao */
-  S._moMan(0); S._datGoc(.32);
+  S._moMan(0); S._datGoc(0);
   const giai = S.MAN[0].giai;
   let thua = -1;
   for (let d = 0; d < 4 && thua < 0; d++) { const o = S.buocToi(m, m.nguoi, d); if (o >= 0 && m.trong[o] && !m.thung.includes(o)) thua = d; }
@@ -345,7 +350,7 @@ const chayHet = () => { let t = Date.now() + 1e6; for (let i = 0; i < 5000 && (S
       if (d0 && d0.length >= 2 && mk.trong[nam] && !mk.thung.includes(nam)) { dich = i; so = k; }
     }
   }
-  S._moMan(so); S._datGoc(.32); S._canhKhung();
+  S._moMan(so); S._datGoc(0); S._canhKhung();
   const w0 = S.docMan(S.MAN[so].m.split('|')).w;
   const pp = S._chieu(dich % w0, Math.floor(dich / w0), 0);
   const trung2 = S._oDuocCham(pp.x, pp.y);
@@ -358,7 +363,7 @@ const chayHet = () => { let t = Date.now() + 1e6; for (let i = 0; i < 5000 && (S
     S._moMan(k);
     const mk = S.docMan(S.MAN[k].m.split('|'));
     for (let q = 0; q < 4; q++) {
-      S._datGoc(.32 + q * Math.PI / 2); S._canhKhung();
+      S._datGoc(q * Math.PI / 2); S._canhKhung();
       for (let i = 0; i < mk.w * mk.h; i++) {
         if (!mk.trong[i]) continue;
         const p2 = S._chieu(i % mk.w, Math.floor(i / mk.w), 0), h = S._oDuocCham(p2.x, p2.y);
