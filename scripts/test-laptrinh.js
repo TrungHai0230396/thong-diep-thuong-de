@@ -204,5 +204,58 @@ console.log('\n— Dễ dùng trên điện thoại —');
      kq.buoc[0].ngan.join() === String(ct[0].id) && kq.buoc[1].ngan.join() === [ct[1].id, ct[1].than[0].id].join() && kq.buoc[2].ngan.join() === [ct[1].id, ct[1].than[0].id].join());
 }
 
+console.log('\n— Kéo thả ô lệnh —');
+{
+  /* Người dùng: "chèn thêm 1 ô hơi khó khăn, cho kéo thả hoặc kéo di chuyển qua lại được không" */
+  const tom = (ds) => ds.map(n => n.k + (n.than ? '(' + tom(n.than) + ')' : n.thi ? '(' + tom(n.thi) + '|' + tom(n.khac) + ')' : '')).join(' ');
+  const dat = (ma, h) => { const c = L.docMa(ma), hm = L.docMa(h || ''); L._datCt(c, hm); return c; };
+  let c = dat('d t L');
+  L._diChuyen(c[1].id, 'chinh', 0);
+  ok('kéo ô ra trước: Đi Thắp Rẽ trái → Thắp Đi Rẽ trái', tom(L._ct().chinh) === 'thap di trai', tom(L._ct().chinh));
+  c = dat('d t L');
+  L._diChuyen(c[0].id, 'chinh', 3);
+  ok('kéo ô ra sau cùng: vị trí tính theo trước khi nhấc ô lên', tom(L._ct().chinh) === 'thap trai di', tom(L._ct().chinh));
+  c = dat('d t L');
+  L._diChuyen(c[0].id, 'chinh', 2);
+  ok('kéo ô tới giữa hai ô phía sau nó (thả vào chỗ giữa Thắp và Rẽ trái)', tom(L._ct().chinh) === 'thap di trai', tom(L._ct().chinh));
+  c = dat('d t L');
+  ok('thả lại đúng chỗ cũ (ngay trước hay ngay sau chính nó) thì không đổi gì', L._diChuyen(c[1].id, 'chinh', 1) === false && L._diChuyen(c[1].id, 'chinh', 2) === false && tom(L._ct().chinh) === 'di thap trai');
+  c = dat('d 3(d t) L');
+  L._diChuyen(c[2].id, c[1].id + '.than', 2);
+  ok('kéo ô vào trong vòng lặp', tom(L._ct().chinh) === 'di lap(di thap trai)', tom(L._ct().chinh));
+  c = dat('d 3(d t) L');
+  L._diChuyen(c[1].than[1].id, 'chinh', 0);
+  ok('kéo ô từ trong vòng lặp ra ngoài', tom(L._ct().chinh) === 'thap di lap(di) trai', tom(L._ct().chinh));
+  c = dat('d 3(d t) L');
+  L._diChuyen(c[1].id, 'chinh', 0);
+  ok('kéo cả ô Lặp: các ô bên trong đi theo', tom(L._ct().chinh) === 'lap(di thap) di trai', tom(L._ct().chinh));
+  c = dat('w(?d(d)(R))');
+  ok('không thả được ô chứa vào thân của chính nó, hay của ô con nó', L._diChuyen(c[0].id, c[0].than[0].id + '.thi', 0) === false && L._diChuyen(c[0].id, c[0].id + '.than', 0) === false
+     && L._trongCay(c[0].id, c[0].than[0].id) && !L._trongCay(c[0].than[0].id, c[0].id) && tom(L._ct().chinh) === 'den(neu(di|phai))');
+  c = dat('w(?d(d)(R))');
+  L._diChuyen(c[0].than[0].khac[0].id, c[0].than[0].id + '.thi', 1);
+  ok('kéo ô từ phần "không thì" sang phần "thì"', tom(L._ct().chinh) === 'den(neu(di phai|))', tom(L._ct().chinh));
+  c = dat('F F t', 'd d');
+  L._diChuyen(c[2].id, 'ham', 2);
+  ok('kéo ô từ Chương trình sang Hàm ★', tom(L._ct().chinh) === 'ham ham' && tom(L._ct().ham) === 'di di thap');
+  L._hoanTac();
+  ok('kéo nhầm thì ↶ Hoàn tác được', tom(L._ct().chinh) === 'ham ham thap' && tom(L._ct().ham) === 'di di');
+  /* chỗ chèn tính theo hàng ô (xếp ngang, tràn thì xuống dòng) */
+  const o = (x, y, w = 50, h = 50) => ({ matches: (s) => s.includes('[data-nut]'), getBoundingClientRect: () => ({ left: x, top: y, right: x + w, bottom: y + h, width: w, height: h }) });
+  const hang = { children: [o(0, 0), o(60, 0), o(120, 0), o(0, 60)] };
+  const vt = (x, y) => L._viTriTha(hang, x, y);
+  ok('chỗ chèn: trái giữa ô đầu → 0; giữa ô 1 và 2 → 2; cuối hàng trên → 3 (trước ô hàng dưới); dưới cùng → 4',
+     vt(10, 25) === 0 && vt(100, 25) === 2 && vt(170, 25) === 3 && vt(40, 85) === 4 && vt(10, 85) === 3, [vt(10, 25), vt(100, 25), vt(170, 25), vt(40, 85), vt(10, 85)].join(','));
+  const src = fs.readFileSync(path.join(__dirname, '..', 'assets', 'laptrinh.js'), 'utf8');
+  ok('kéo về bảng ô bên dưới là bỏ ô; thả ra ngoài thì thôi', /if \(keo\.id != null && el\.closest\('\.lt-bang'\)\) return \{ xoa: true \}/.test(src) && /if \(!d\) return;/.test(src) && /if \(d\.xoa\) \{ boO\(k\.id\); return; \}/.test(src));
+  ok('chạm rồi nhả (không rê quá 8px) vẫn là bấm như cũ', /const NGUONG_KEO = 8/.test(src) && /if \(!k\.dang\) return;\s+\/\/ chỉ là chạm/.test(src));
+  ok('chỉ bỏ đúng cú "bấm" sinh ra lúc nhả tay sau khi kéo, chạm mới là bấm thật', /boQuaBam = 0;\s+\/\/ một lần chạm mới/.test(src) && /Date\.now\(\) - boQuaBam < 300/.test(src));
+  ok('ô bóng nổi phía trên điểm thả (không che vạch xanh), điểm thả cao hơn đầu ngón tay', /keo\.p\.y - keo\.h - 12/.test(src) && /keo\.cham \? 26 : 0/.test(src));
+  ok('kéo tới mép trên/dưới khung chương trình thì khung tự cuộn', /function tuCuon\(\)/.test(src) && /ma\.scrollTop \+= v/.test(src));
+  ok('chạm vào ô để kéo không làm cuộn trang (touch-action: none cho ô ở bảng và trong chương trình)', /\.lt-bang \.lt-chip,\.lt-ma \.lt-chip\{touch-action:none\}/.test(css));
+  ok('có vạch xanh chỉ chỗ thả, và bảng ô thành vùng "thả để bỏ" khi kéo ô đã xếp', /\.lt-vach\{/.test(css) && /\.lt-bang\.lt-xoa-vung::after\{content:"🗑  Thả vào đây để bỏ ô"/.test(css));
+  ok('bảng giới thiệu chương dặn cách kéo thả', /Kéo ô ở bảng dưới thả vào đúng chỗ muốn chèn\. Kéo ô đã xếp để đổi chỗ, kéo về bảng dưới để bỏ\./.test(src));
+}
+
 console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
 process.exit(fail ? 1 : 0);

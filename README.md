@@ -1700,6 +1700,18 @@ Chơi thử cả trò bằng mắt một bé cầm điện thoại, trên màn 3
 
 `scripts/test-laptrinh.js` từ 57 lên 71 bài: không bài nào bị khoá, nút chuyển bài, danh sách (làm tiếp, ✕, chạm ra ngoài, cuộn tới bài đang chơi), mở lại về bài đang chơi (kể cả chỗ nhớ hỏng), giới thiệu chương lần đầu, chặn chạm đúp phóng to mà tấm vẽ vẫn giữ `none`, cảnh co được, bảng ô lưới, "+ không thì", bỏ dấu + thừa, mỗi bước chạy biết mình nằm trong ô gọi hàm và vòng lặp nào. Thử phá code ở 8 chỗ, bài kiểm bắt cả 8.
 
+#### "Chèn thêm 1 ô hơi khó, cho kéo thả hoặc kéo di chuyển qua lại được không"
+
+Bấm vẫn như cũ (chạm rồi nhả: ô mới vào chỗ dấu + xanh; chạm ô đã xếp để chọn, × để bỏ). Thêm **kéo thả** (`assets/laptrinh.js`, phần "kéo thả"), dùng Pointer Events nên chạy cả ngón tay lẫn chuột:
+
+- **Kéo một ô từ bảng dưới, thả vào đúng chỗ muốn chèn** — đầu, giữa, cuối chương trình, vào trong vòng lặp, vào phần "thì" hay "không thì" (thả lên nút "+ không thì" hay chữ "không thì" là vào phần đó), sang Hàm ★.
+- **Kéo một ô đã xếp sang chỗ khác** để đổi chỗ qua lại; kéo ô Lặp, ô Nếu thì các ô bên trong đi theo. Không thả được ô chứa vào thân của chính nó (báo lý do).
+- **Kéo một ô đã xếp về bảng ô bên dưới là bỏ ô** — lúc kéo, bảng hiện chữ đỏ "🗑 Thả vào đây để bỏ ô". Thả ra ngoài (lên cảnh) thì không đổi gì. Mọi lần kéo đều ↶ Hoàn tác được.
+- Lúc kéo: ô bóng nổi lên **phía trên** chỗ sẽ thả, chỗ thả cao hơn đầu ngón tay một đoạn — ngón tay không che, và **vạch xanh** chỉ chỗ chèn luôn lộ ra (bản đầu đặt bóng ngay giữa chỗ thả, nó che mất vạch xanh); khung sẽ nhận ô sáng viền xanh; ô gốc mờ đi. Kéo tới mép trên/dưới khung chương trình thì khung **tự cuộn**.
+- Chạm mà rê dưới 8px vẫn là bấm. Cú "bấm" trình duyệt sinh ra lúc nhả tay sau khi kéo bị bỏ (chỉ đúng một cú, và lần chạm mới là bấm thật — bản đầu chặn mọi cú bấm trong 450ms, kéo xong bấm ngay Hoàn tác thì không ăn). Ô ở bảng và trong chương trình có `touch-action: none` để chạm-rê là kéo chứ không cuộn; cuộn khung chương trình bằng cách rê ở khoảng trống.
+
+Bảng giới thiệu chương dặn thêm cách kéo thả. Đã thử trên trình duyệt cỡ điện thoại, cả chuột thật lẫn ngón tay giả lập: kéo từ bảng vào chương trình trống, chen vào trước một ô, đổi chỗ, kéo về bảng để bỏ, kéo vào giữa thân vòng lặp, kéo cả khối Lặp, kéo khối vào chính nó (bị từ chối), kéo sang Hàm ★, thả lên chữ "không thì", tự cuộn ở bài 90, hoàn tác ngay sau khi kéo. `scripts/test-laptrinh.js` từ 71 lên 91 bài (đổi chỗ trước/sau, tính lại vị trí khi kéo về sau trong cùng hàng, vào/ra vòng lặp, kéo cả ô chứa, không thả vào chính nó, "không thì" sang "thì", sang Hàm ★, hoàn tác, chỗ chèn theo hàng ô…); thử phá code ở 5 chỗ, bài kiểm bắt cả 5.
+
 ## Cấu trúc
 
 ```

@@ -1175,3 +1175,17 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .lt-ds-luoi button.lt-dang{outline:2px solid #8fd0ff;outline-offset:1px}
 .lt-ds-luoi button:disabled{opacity:.3;cursor:default}
 @media (prefers-reduced-motion:reduce){.lt-cho.lt-cho-dang,.lt-goiy-o,.lt-chip.lt-sai{animation:none}}
+/* Kéo thả ô lệnh. Chạm vào một ô (ở bảng dưới hay trong chương trình) mà rê tay là kéo ô đó, không phải cuộn trang —
+   cuộn khung chương trình bằng cách rê ở khoảng trống, hoặc kéo ô tới mép trên/dưới cho nó tự cuộn. */
+.lt-bang .lt-chip,.lt-ma .lt-chip{touch-action:none}
+.lt-bong{position:fixed;left:0;top:0;z-index:20;pointer-events:none;will-change:transform}
+.lt-bong>.lt-chip{width:100%;height:100%;transform:scale(1.1) rotate(-3deg);box-shadow:0 0 0 3px #fff,0 12px 26px rgba(0,0,0,.55)}
+.lt-chip.lt-goc-keo{opacity:.3}
+.lt-vach{position:fixed;z-index:19;border-radius:3px;background:#8fd0ff;box-shadow:0 0 10px rgba(143,208,255,.95);pointer-events:none}
+.lt-vach[hidden]{display:none}
+.lt-tha-vao{border-color:rgba(143,208,255,.95)!important;background:rgba(143,208,255,.12)!important}
+.lt-bang.lt-xoa-vung{position:relative}
+.lt-bang.lt-xoa-vung::after{content:"🗑  Thả vào đây để bỏ ô";position:absolute;inset:4px;display:grid;place-items:center;border-radius:12px;
+  border:2px dashed rgba(255,130,120,.65);background:rgba(40,12,22,.82);color:#ffc9c3;font-size:14px;font-weight:600}
+.lt-bang.lt-xoa-day::after{border-color:#ff7a6e;background:rgba(130,24,34,.9);color:#fff}
+.lt-dangkeo .lt-cho-dang{animation:none}

@@ -498,10 +498,15 @@ function dungKhung() {
       <button class="lt-xoa" type="button" aria-label="Xoá hết"><span>🗑</span><small>Xoá hết</small></button>
     </div>
     <div class="lt-tin" hidden><div class="lt-tin-trong"></div></div>
-    <div class="lt-ds" hidden><div class="lt-ds-trong"></div></div>`;
+    <div class="lt-ds" hidden><div class="lt-ds-trong"></div></div>
+    <div class="lt-vach" hidden></div>`;
   document.body.appendChild(tam);
   cv = tam.querySelector('.lt-cv'); ctx = cv.getContext && cv.getContext('2d');
   tam.addEventListener('click', bam);
+  tam.addEventListener('pointerdown', batDauKeo);
+  addEventListener('pointermove', diKeo, { passive: false });
+  addEventListener('pointerup', thaKeo);
+  addEventListener('pointercancel', huyKeo);
   addEventListener('resize', doCo);
   /* khung cảnh đổi cỡ (xoay máy, bàn phím…) thì tấm vẽ đổi theo, kẻo lòi ra ngoài */
   if (typeof ResizeObserver === 'function') new ResizeObserver(doCo).observe(tam.querySelector('.lt-canh'));
@@ -666,6 +671,7 @@ function danhDauSai() {
 /* lau = 0: lời báo đứng yên tới khi bé sửa chương trình, chạy lại, hay chạm vào nó — báo vài giây rồi tắt thì dễ lỡ
    (người dùng: "bấm chạy xong đứng luôn" — lời "chưa thắp hết" đã hiện rồi tắt mà không thấy) */
 function bao(chu, lau = 2800) {
+  if (!tam) return;
   const p = tam.querySelector('.lt-bao');
   p.textContent = chu; p.hidden = false;
   clearTimeout(bao.t); if (lau) bao.t = setTimeout(() => { p.hidden = true; }, lau);
@@ -759,6 +765,7 @@ function goiY(tuDong) {
 }
 
 function moBai(i, hoi) {
+  huyKeo();
   dungChay();
   bai = Math.max(0, Math.min(BAI.length - 1, i));
   const b = BAI[bai], ch = CHUONG[b.chuong];
@@ -788,7 +795,7 @@ function moTin(loai, them) {
     html = `<p class="lt-tin-nho">Chương ${b.chuong + 1}</p><h2>${esc(ch.ten)}</h2>${ch.gioiThieu.map(p => `<p>${esc(p)}</p>`).join('')}
       <div class="lt-tin-o">${ch.lenhMoi.map(k => `<span class="lt-chip lt-${O[k].mau}">${hinhO(k)}<b>${O[k].chu}</b></span>`).join('')}</div>
       ${b.goiY ? `<p class="lt-tin-goiy">Bài này: ${esc(b.goiY)}</p>` : ''}
-      <p class="lt-tin-meo">Chạm một ô đã xếp để chọn nó: ô mới sẽ chèn ngay sau, bấm × để bỏ. Bí thì bấm 💡 Gợi ý.</p>
+      <p class="lt-tin-meo">Kéo ô ở bảng dưới thả vào đúng chỗ muốn chèn. Kéo ô đã xếp để đổi chỗ, kéo về bảng dưới để bỏ. Bấm vào ô cũng được: ô mới vào chỗ dấu + xanh. Bí thì bấm 💡 Gợi ý.</p>
       <button type="button" class="lt-tin-dong">Bắt đầu</button>`;
   } else if (loai === 'thang') {
     const mau = mauBai(b), sao = them.sao;
@@ -845,9 +852,187 @@ function themO(k) {
   daSua();
 }
 
+/* ---------- kéo thả ----------
+   Người dùng: "thêm, chèn thêm 1 ô hơi khó khăn, cho kéo thả hoặc kéo di chuyển qua lại được không". Bấm (chạm rồi nhả)
+   vẫn như cũ: ô mới vào chỗ dấu + xanh. Giờ thêm: KÉO một ô từ bảng dưới, thả vào đúng chỗ muốn chèn; kéo một ô đã xếp
+   sang chỗ khác — vào trong vòng lặp, sang Hàm ★ — để đổi chỗ; kéo nó về bảng ô bên dưới để bỏ. Vạch xanh chỉ chỗ sẽ
+   thả. Ô đang kéo nổi lên phía trên đầu ngón tay (ngón tay không che mất nó, và vạch xanh cũng ở đó); khung chương trình
+   tự cuộn khi kéo tới mép trên hay mép dưới. Kéo ô Lặp, ô Nếu thì cả các ô bên trong đi theo. */
+const NGUONG_KEO = 8;                                                     // nhích dưới 8px là chạm, không phải kéo
+let keo = null, boQuaBam = 0, cuonKeo = 0;
+const cacOCua = (dsEl) => [...dsEl.children].filter(e => e.matches && e.matches('[data-nut], .lt-hop'));
+const dauCua = (it) => (it.matches('.lt-hop') ? it.querySelector(':scope > [data-nut]') : it) || it;
+/* Chỗ chèn trong một hàng ô (xếp ngang, tràn thì xuống dòng): đứng trước ô đầu tiên nằm sau điểm thả theo thứ tự đọc. */
+function viTriTha(dsEl, x, y) {
+  const ds = cacOCua(dsEl);
+  for (let i = 0; i < ds.length; i++) {
+    const r = dauCua(ds[i]).getBoundingClientRect();
+    if (y < r.top) return i;                                             // điểm thả ở hàng trên hàng của ô này
+    if (y <= r.bottom && x < r.left + r.width / 2) return i;             // cùng hàng, bên trái giữa ô
+    if (ds[i].matches('.lt-hop')) {                                      // thả lên phần thân của ô chứa (ngoài khung con): sau nó
+      const R = ds[i].getBoundingClientRect();
+      if (y > r.bottom && y <= R.bottom) return i + 1;
+    }
+  }
+  return ds.length;
+}
+/* ô chứa có mã c nằm trong cây của ô id (là chính nó hay con cháu nó): không cho thả ô chứa vào thân của chính nó */
+function trongCay(id, c) {
+  const n = timNut(id);
+  const tim = (m) => m.id === c || (m.than || []).some(tim) || (m.thi || []).some(tim) || (m.khac || []).some(tim);
+  return !!n && tim(n);
+}
+function dichTai(x, y) {
+  const el = typeof document !== 'undefined' && document.elementFromPoint ? document.elementFromPoint(x, y) : null;
+  if (!el || !tam.contains(el) || !el.closest) return null;
+  if (keo.id != null && el.closest('.lt-bang')) return { xoa: true };
+  if (!el.closest('.lt-ma')) return null;
+  /* thả lên chữ "không thì" (hay nút "+ không thì"): vào phần "không thì" ngay dưới, không rơi ra sau cả khối Nếu */
+  const nhan = el.closest('.lt-nhanphu'), sauNhan = nhan && nhan.nextElementSibling;
+  const gon = el.closest('.lt-khac-gon') || (sauNhan && sauNhan.matches('.lt-than') && !cacOCua(sauNhan).length ? sauNhan : null);
+  let dsEl = gon || (sauNhan && sauNhan.matches('.lt-than') ? sauNhan : null) || el.closest('.lt-than, .lt-o');
+  if (!dsEl) {                                                           // khoảng trống giữa hai khung: khung gần nhất
+    const xa = (k) => { const R = k.getBoundingClientRect(); return y < R.top ? R.top - y : y > R.bottom ? y - R.bottom : 0; };
+    const khung = [...tam.querySelectorAll('.lt-khung')].filter(k => !k.hidden).sort((a, b) => xa(a) - xa(b))[0];
+    if (!khung) return null;
+    dsEl = khung.querySelector('.lt-o');
+  }
+  const ten = gon ? gon.dataset.chon : dsEl.matches('.lt-o') ? (dsEl.matches('.lt-o-ham') ? 'ham' : 'chinh') : dsEl.dataset.chon;
+  if (nhan && !gon && dsEl.matches('.lt-than')) return keo.id != null && trongCay(keo.id, +ten.split('.')[0]) ? { khong: true } : { ten, vt: 0, el: dsEl };
+  if (keo.id != null && ten.includes('.') && trongCay(keo.id, +ten.split('.')[0])) return { khong: true };
+  return { ten, vt: gon ? 0 : viTriTha(dsEl, x, y), el: dsEl };
+}
+/* vạch xanh chỉ chỗ sẽ thả: dọc giữa hai ô cùng hàng, ngang trên/dưới một ô chứa; và khung sẽ nhận ô sáng lên */
+function veVach(d, y) {
+  if (!tam) return;
+  const v = tam.querySelector('.lt-vach');
+  tam.querySelectorAll('.lt-tha-vao').forEach(n => n.classList.remove('lt-tha-vao'));
+  const bang = tam.querySelector('.lt-bang');
+  bang.classList.toggle('lt-xoa-day', !!(d && d.xoa));
+  if (!d || !d.el) { v.hidden = true; return; }
+  (d.el.matches('.lt-o') ? d.el.parentElement : d.el).classList.add('lt-tha-vao');
+  if (d.el.matches('.lt-khac-gon')) { v.hidden = true; return; }
+  const ds = cacOCua(d.el), truoc = d.vt > 0 ? ds[d.vt - 1] : null, sau = ds[d.vt] || null;
+  let o = null;
+  if (truoc && !truoc.matches('.lt-hop')) {                              // ngay sau ô trước, nếu điểm thả cùng hàng với nó
+    const R = dauCua(truoc).getBoundingClientRect();
+    if (!sau || sau.matches('.lt-hop') || (y >= R.top && y <= R.bottom)) o = { x: R.right + 1, y: R.top, w: 4, h: R.height };
+  }
+  if (!o && sau) {
+    const R = sau.matches('.lt-hop') ? sau.getBoundingClientRect() : dauCua(sau).getBoundingClientRect();
+    o = sau.matches('.lt-hop') ? { x: R.left, y: R.top - 5, w: R.width, h: 4 } : { x: R.left - 5, y: R.top, w: 4, h: R.height };
+  }
+  if (!o && truoc) { const R = truoc.getBoundingClientRect(); o = { x: R.left, y: R.bottom + 1, w: R.width, h: 4 }; }
+  if (!o) { const R = d.el.getBoundingClientRect(); o = { x: R.left + 5, y: R.top + 5, w: 4, h: Math.max(20, Math.min(44, R.height - 10)) }; }
+  Object.assign(v.style, { left: o.x + 'px', top: o.y + 'px', width: o.w + 'px', height: o.h + 'px' });
+  v.hidden = false;
+}
+function batDauKeo(e) {
+  boQuaBam = 0;                                                          // một lần chạm mới: cú bấm sau đó là bấm thật
+  if (dangChay || keo || (e.pointerType === 'mouse' && e.button !== 0)) return;
+  const t = e.target;
+  if (!t || !t.closest || t.closest('.lt-xoa-o, .lt-solan')) return;
+  const tu = t.closest('.lt-bang [data-them]'), o = !tu && t.closest('.lt-ma [data-nut]');
+  if (!tu && !o) return;
+  keo = { k: tu ? tu.dataset.them : null, id: o ? +o.dataset.nut : null, nut: tu || o, pid: e.pointerId,
+          x0: e.clientX, y0: e.clientY, cham: e.pointerType !== 'mouse', dang: false, d: null, p: null };
+}
+/* Điểm thả: trên đầu ngón tay một đoạn để ngón tay không che vạch xanh (chuột thì đúng chỗ con trỏ). Ô bóng nổi ngay
+   PHÍA TRÊN điểm thả — bản đầu đặt bóng giữa điểm thả, nó che mất đúng cái vạch xanh chỉ chỗ sẽ chèn. */
+const diemKeo = (e) => ({ x: e.clientX, y: e.clientY - (keo.cham ? 26 : 0) });
+function moKeo() {
+  const b = keo.nut.getBoundingClientRect(), bong = document.createElement('div');
+  bong.className = 'lt-bong';
+  bong.innerHTML = keo.nut.outerHTML;
+  bong.querySelectorAll('.lt-xoa-o').forEach(n => n.remove());
+  keo.w = b.width; keo.h = b.height;
+  bong.style.width = b.width + 'px'; bong.style.height = b.height + 'px';
+  tam.appendChild(bong); keo.bong = bong;
+  if (keo.id != null) { keo.nut.classList.add('lt-goc-keo'); tam.querySelector('.lt-bang').classList.add('lt-xoa-vung'); }
+  tam.classList.add('lt-dangkeo');
+  tatBao();
+  if (!cuonKeo) cuonKeo = requestAnimationFrame(tuCuon);
+}
+function diKeo(e) {
+  if (!keo || e.pointerId !== keo.pid) return;
+  if (!keo.dang) {
+    if (Math.hypot(e.clientX - keo.x0, e.clientY - keo.y0) < NGUONG_KEO) return;
+    if (keo.k && tongO() >= BAI[bai].toiDa) {                            // hết chỗ thì báo ngay, khỏi kéo cho phí công
+      bao(`Bài này chỉ cho ${BAI[bai].toiDa} ô lệnh. Thử dùng ít ô hơn${BAI[bai].lenh.includes('lap') ? ' — vòng lặp giúp được đấy' : ''}.`);
+      keo = null; return;
+    }
+    keo.dang = true; moKeo();
+  }
+  if (e.cancelable) e.preventDefault();
+  keo.p = diemKeo(e);
+  keo.bong.style.transform = `translate(${keo.p.x - keo.w * .3}px, ${keo.p.y - keo.h - 12}px)`;
+  keo.d = dichTai(keo.p.x, keo.p.y);
+  veVach(keo.d, keo.p.y);
+}
+/* kéo tới gần mép trên / mép dưới khung chương trình thì khung tự cuộn — chương trình dài hơn khung nhìn */
+function tuCuon() {
+  cuonKeo = 0;
+  if (!keo || !keo.dang || !tam) return;
+  const ma = tam.querySelector('.lt-ma'), R = ma.getBoundingClientRect(), p = keo.p;
+  if (p && p.x >= R.left && p.x <= R.right && p.y >= R.top && p.y <= R.bottom) {
+    const v = p.y < R.top + 32 ? -Math.min(12, (R.top + 32 - p.y) / 3 + 2) : p.y > R.bottom - 32 ? Math.min(12, (p.y - R.bottom + 32) / 3 + 2) : 0;
+    if (v) { const truoc = ma.scrollTop; ma.scrollTop += v; if (ma.scrollTop !== truoc) { keo.d = dichTai(p.x, p.y); veVach(keo.d, p.y); } }
+  }
+  cuonKeo = requestAnimationFrame(tuCuon);
+}
+function donKeo(k) {
+  if (k.bong) k.bong.remove();
+  if (k.nut && k.nut.classList) k.nut.classList.remove('lt-goc-keo');
+  if (tam) { tam.querySelector('.lt-bang').classList.remove('lt-xoa-vung', 'lt-xoa-day'); tam.classList.remove('lt-dangkeo'); }
+  veVach(null);
+  if (cuonKeo) { cancelAnimationFrame(cuonKeo); cuonKeo = 0; }
+}
+function thaKeo(e) {
+  if (!keo || e.pointerId !== keo.pid) return;
+  const k = keo; keo = null;
+  if (!k.dang) return;                                                    // chỉ là chạm: để sự kiện click lo như cũ
+  boQuaBam = Date.now();                                                  // cú nhả tay sau khi kéo không được tính là một cú bấm
+  donKeo(k);
+  const d = k.d;
+  if (!d) return;                                                         // thả ra ngoài (lên cảnh, lên nút): thôi
+  if (d.khong) { bao('Không thả ô chứa vào bên trong chính nó được.'); return; }
+  if (d.xoa) { boO(k.id); return; }
+  if (k.k) { dich = d.ten; viTri = d.vt; chonId = null; themO(k.k); }
+  else diChuyen(k.id, d.ten, d.vt);
+}
+function huyKeo(e) {
+  if (!keo || (e && e.pointerId !== keo.pid)) return;
+  const k = keo; keo = null;
+  if (k.dang) { boQuaBam = Date.now(); donKeo(k); }
+}
+/* chuyển ô id tới chỗ vt của danh sách ten (cùng danh sách: tính theo vị trí trước khi nhấc ô ra) */
+function diChuyen(id, ten, vt) {
+  const c = cha(id), ds = dsTheoTen(ten);
+  if (!c || !ds || (ten.includes('.') && trongCay(id, +ten.split('.')[0]))) return false;
+  let i = Math.max(0, Math.min(vt, ds.length));
+  if (ds === c.ds && i > c.i) i--;
+  if (ds === c.ds && i === c.i) { veMa(); return false; }                // thả lại đúng chỗ cũ: không đổi gì
+  luu();
+  const [n] = c.ds.splice(c.i, 1);
+  ds.splice(i, 0, n);
+  dich = ten; viTri = i + 1; chonId = null;
+  daSua();
+  return true;
+}
+function boO(id) {
+  const c = cha(id);
+  if (!c) return;
+  luu(); c.ds.splice(c.i, 1); dich = c.ten; viTri = c.i; chonId = null;
+  daSua();
+  bao('Đã bỏ ô. Lỡ tay thì bấm ↶ Hoàn tác.');
+}
+
 function bam(e) {
   const t = e.target && e.target.closest ? e.target : null;
   if (!t) return;
+  /* Cú "bấm" trình duyệt sinh ra ngay lúc nhả tay sau một lần kéo — bỏ đúng một cú đó (trong 300ms). Bản đầu chặn mọi cú
+     bấm trong 450ms, nên kéo xong bấm ngay ↶ Hoàn tác thì không ăn. */
+  if (boQuaBam) { const vua = Date.now() - boQuaBam < 300; boQuaBam = 0; if (vua) return; }
   const q = (sel) => t.closest(sel);
   if (q('.xn-dong')) { dong(); return; }
   if (q('.lt-bao')) { tatBao(); return; }
@@ -985,6 +1170,7 @@ function mo() {
   if (!raf) raf = requestAnimationFrame(vong);
 }
 function dong() {
+  huyKeo();
   dungChay();
   if (am && am.state === 'running') am.suspend();
   if (raf) { cancelAnimationFrame(raf); raf = 0; }
@@ -996,5 +1182,7 @@ addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classLis
 self.TDTD_LAPTRINH = { mo, dong, BAI, CHUONG, HUONG, docMa, soO, loaiO, dungBan, chay, itNhat, banBai, O,
   goiYBuoc, soSao, mauBai, gocTot, kiemChuongTrinh, _baiMo: () => baiMo(), _baiTiep: () => baiTiep(), _cheDoThu: (b) => { cheDoThu = !!b; },
   _daXemChuong: (c) => daXemChuong(c), _moBai: (i) => moBai(i, false), _moBaiHoi: (i) => moBai(i), _themO: themO, _ct: () => ({ chinh, ham, dich, viTri, chonId }),
-  _ve: () => ve, _chayNgay: batDauChay, _moDs: () => moDs(), _htmlDs: (ds, ten) => htmlDs(ds, ten) };
+  _ve: () => ve, _chayNgay: batDauChay, _moDs: () => moDs(), _htmlDs: (ds, ten) => htmlDs(ds, ten),
+  _datCt: (c, h) => { chinh = c; ham = h || []; dich = 'chinh'; viTri = null; chonId = null; lichSu = []; },
+  _diChuyen: (id, ten, vt) => diChuyen(id, ten, vt), _trongCay: trongCay, _viTriTha: viTriTha, _hoanTac: () => hoanTac() };
 })();
