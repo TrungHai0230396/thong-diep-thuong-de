@@ -11,8 +11,8 @@
      (GAMEON-NA 2011, tr. 5–12): ghép phòng từ 17 mẫu 3×3 trong bài báo, thử các chỗ đặt ổ, rồi chơi NGƯỢC từ lúc mọi
      thùng đã nằm trong ổ — kéo thùng ra — để tìm thế bày cần nhiều "đường đẩy" nhất. Thế nào kéo ra được thì đẩy về
      được, nên màn nào cũng chắc chắn giải được. Bộ tạo: scripts/tao-man-sokoban.js. Màn: assets/mansoko.js.
-   - Số bước ít nhất của mỗi màn do bộ giải ở đây tìm (giaiItBuoc: duyệt các thế sau mỗi lần đẩy, chi phí = số bước đi
-     tới chỗ đẩy cộng một — tìm theo Dijkstra nên ra đúng số bước nhỏ nhất). Chấm sao theo số bước.
+   - Số lần đẩy ít nhất của mỗi màn do bộ giải ở đây tìm (giaiItDay: duyệt các thế sau mỗi lần đẩy theo Dijkstra, mỗi
+     lần đẩy tính một, số bước đi chỉ để phân hoà). Chấm sao theo số lần đẩy, không tính bước chân (người dùng dặn).
    Người dùng chọn: máy tự tạo màn, 3D nhìn nghiêng như Robot thắp sao, robot đẩy thùng sao về ổ cho sáng lên. */
 (function () {
 'use strict';
@@ -77,7 +77,7 @@ function chuanBi(m) {
   }
   const laDich = new Uint8Array(F);
   for (const i of m.dich) if (so[i] >= 0) laDich[so[i]] = 1;
-  /* khoảng cách đẩy ít nhất từ mỗi ô tới ổ gần nhất khi phòng trống (cận dưới cho bộ giải nhanh); -1: ô chết */
+  /* khoảng cách đẩy ít nhất từ mỗi ô tới ổ gần nhất khi phòng trống; -1: ô chết */
   const xa = new Int32Array(F).fill(-1), q = [];
   for (let f = 0; f < F; f++) if (laDich[f]) { xa[f] = 0; q.push(f); }
   for (let k = 0; k < q.length; k++) {
@@ -162,12 +162,17 @@ function loang(g, coThung, p, kc, tem, dau, cha) {
   return nho;                                                         // ô nhỏ nhất vùng: đại diện cho cả vùng người đi được
 }
 
-/* ---------- bộ giải ít bước nhất ----------
+/* ---------- bộ giải ----------
    Thế = vị trí các thùng + chỗ người đứng sau lần đẩy vừa rồi. Từ một thế: loang tìm khoảng cách tới mọi ô, rồi thử
-   đẩy từng thùng theo từng hướng; chi phí = số bước đi tới sau thùng + 1. Dijkstra trên chi phí (bước, rồi tới số lần
-   đẩy) nên thế đích lấy ra đầu tiên là lời giải ít bước nhất, hoà thì ít lần đẩy nhất. Bỏ qua thế có thùng ở ô chết
-   hay kẹt 2×2 (không bao giờ giải được nên không làm sai kết quả). trả { loiGiai, buoc, day, the } hoặc null. */
-function giaiItBuoc(m, gioiHan = 6e6) {
+   đẩy từng thùng theo từng hướng. Dijkstra trên chi phí ghép hai số:
+   - giaiItDay (chấm sao dùng cái này — người dùng: "tính sao bằng bước đẩy thùng, ai lại tính bước chân"): mỗi lần đẩy
+     tính trước, số bước đi chỉ để phân hoà → lời giải ít lần đẩy nhất, trong đó ít bước nhất;
+   - giaiItBuoc: số bước đi trước, rồi tới số lần đẩy → lời giải ít bước nhất.
+   Thế đích lấy ra đầu tiên là lời giải tốt nhất theo cách tính đó. Bỏ qua thế có thùng ở ô chết hay kẹt 2×2 (không bao
+   giờ giải được nên không làm sai kết quả). trả { loiGiai, buoc, day, the } hoặc null. */
+const giaiItBuoc = (m, gioiHan) => giai(m, false, gioiHan);
+const giaiItDay = (m, gioiHan) => giai(m, true, gioiHan);
+function giai(m, theoDay, gioiHan = 6e6) {
   const g = themCheo(chuanBi(m)), { F, ke, laDich, chet } = g, K = m.thung.length;
   if (m.thung.some(i => g.so[i] < 0) || g.so[m.nguoi] < 0) return null;
   const ma = (bs, p) => { let v = 0; for (let i = 0; i < K; i++) v = v * F + bs[i]; return v * F + p; };
@@ -175,7 +180,7 @@ function giaiItBuoc(m, gioiHan = 6e6) {
   const ids = new Map(), khoa = [], cha = [], cach = [], gia = [];
   const them = (k, c, ch, ca) => { const id = khoa.length; ids.set(k, id); khoa.push(k); gia.push(c); cha.push(ch); cach.push(ca); return id; };
   const bs0 = m.thung.map(i => g.so[i]).sort((a, b) => a - b);
-  const dong = dongMoi(), BAC = 1024;
+  const dong = dongMoi(), BAC = 1024, DAY = 65536;             // ít bước: bước·1024 + lần đẩy; ít lần đẩy: lần đẩy·65536 + bước
   dongDay(dong, 0, them(ma(bs0, g.so[m.nguoi]), 0, -1, -1));
   const bs = new Int32Array(K), coThung = new Uint8Array(F), kc = new Int32Array(F), tem = new Int32Array(F);
   let dau = 0, xet = 0;
@@ -199,7 +204,7 @@ function giaiItBuoc(m, gioiHan = 6e6) {
         coThung[toi] = 0; coThung[b] = 1;
         if (ket) continue;
         const moi = Array.from(bs); moi[i] = toi; moi.sort((a, b2) => a - b2);
-        const k = ma(moi, b), c2 = c + (kc[sau] + 1) * BAC + 1, cu = ids.get(k);
+        const k = ma(moi, b), c2 = theoDay ? c + DAY + kc[sau] + 1 : c + (kc[sau] + 1) * BAC + 1, cu = ids.get(k);
         if (cu === undefined) dongDay(dong, c2, them(k, c2, id, b * 4 + d));
         else if (c2 < gia[cu]) { gia[cu] = c2; cha[cu] = id; cach[cu] = b * 4 + d; dongDay(dong, c2, cu); }
       }
@@ -224,65 +229,6 @@ function dungLoiGiai(m, g, khoa, cha, cach, id, the) {
     coThung[b] = 0; coThung[ke[b * 4 + d]] = 1; p = b;
   });
   return { loiGiai: s, buoc: s.length, day: day.length, the };
-}
-
-/* ---------- bộ giải nhanh cho nút Gợi ý ----------
-   Không cần ít bước nhất, chỉ cần một cách giải từ thế hiện tại, nhanh trên điện thoại: A* trên số lần đẩy, người
-   gộp thành "vùng đi được" (Taylor & Parberry cũng gộp như vậy), cận dưới = tổng khoảng cách đẩy của từng thùng tới
-   ổ gần nhất, nhân 2 (A* có trọng số). Đo trên cả 100 màn: nhân 2 nhanh gần gấp năm — màn chậm nhất 0,11 giây thay vì
-   0,54 giây trên máy tính — mà tổng số lần đẩy chỉ hơn cách ít lần đẩy nhất 3%. Thử hết mà không có cách thì vẫn
-   chắc là không có cách. trả { day: [{ o, d }] } (o: ô lưới của thùng, d: hướng đẩy), { khongGiai: true }
-   nếu không còn cách, null nếu quá giới hạn. */
-function giaiNhanh(m, thung, nguoi, gioiHan = 120000) {
-  const g = themCheo(chuanBi(m)), { F, ke, laDich, chet, xa } = g, K = thung.length;
-  const bs0 = thung.map(i => g.so[i]).sort((a, b) => a - b);
-  /* A: thế đang mở (chỗ người đi tới được); B: tính vùng của thế mới — hai bộ mảng riêng, kẻo ghi đè lẫn nhau */
-  const coA = new Uint8Array(F), kcA = new Int32Array(F), temA = new Int32Array(F);
-  const coB = new Uint8Array(F), kcB = new Int32Array(F), temB = new Int32Array(F);
-  if (bs0.some(f => chet[f])) return { khongGiai: true };
-  for (const f of bs0) coA[f] = 1;
-  if (bs0.some(f => ket2x2(g, coA, f))) return { khongGiai: true };
-  const ma = (bs, p) => { let v = 0; for (let i = 0; i < K; i++) v = v * F + bs[i]; return v * F + p; };
-  const giaiMa = (v, bs) => { const p = v % F; v = (v - p) / F; for (let i = K - 1; i >= 0; i--) { bs[i] = v % F; v = (v - bs[i]) / F; } return p; };
-  const uoc = (bs) => { let s = 0; for (let i = 0; i < K; i++) s += xa[bs[i]]; return s; };
-  let dauA = 0, dauB = 0, xet = 0;
-  const vungB = (bs, p) => { coB.fill(0); for (let i = 0; i < K; i++) coB[bs[i]] = 1; return loang(g, coB, p, kcB, temB, ++dauB); };
-  const ids = new Map(), khoa = [], cha = [], cach = [], gia = [], daMo = [];
-  const them = (k, c, ch, ca) => { const id = khoa.length; ids.set(k, id); khoa.push(k); gia.push(c); cha.push(ch); cach.push(ca); daMo.push(0); return id; };
-  const dong = dongMoi(), bs = new Int32Array(K);
-  dongDay(dong, 2 * uoc(bs0), them(ma(bs0, vungB(bs0, g.so[nguoi])), 0, -1, -1));
-  while (dong.gia.length) {
-    const [, id] = dongLay(dong);
-    if (daMo[id]) continue;
-    daMo[id] = 1;
-    const p = giaiMa(khoa[id], bs);
-    let xong = true;
-    for (let i = 0; i < K; i++) if (!laDich[bs[i]]) { xong = false; break; }
-    if (xong) {
-      const day = [];
-      for (let i = id; cha[i] >= 0; i = cha[i]) day.push({ o: g.san[cach[i] >> 2], d: cach[i] & 3 });
-      return { day: day.reverse(), the: ids.size };
-    }
-    if (++xet > gioiHan) return null;
-    coA.fill(0); for (let i = 0; i < K; i++) coA[bs[i]] = 1;
-    loang(g, coA, p, kcA, temA, ++dauA);
-    for (let i = 0; i < K; i++) {
-      const b = bs[i];
-      for (let d = 0; d < 4; d++) {
-        const sau = ke[b * 4 + ((d + 2) & 3)], toi = ke[b * 4 + d];
-        if (sau < 0 || toi < 0 || temA[sau] !== dauA || coA[toi] || chet[toi]) continue;
-        coA[b] = 0; coA[toi] = 1;
-        const ket = ket2x2(g, coA, toi);
-        coA[toi] = 0; coA[b] = 1;
-        if (ket) continue;
-        const moi = Array.from(bs); moi[i] = toi; moi.sort((a, b2) => a - b2);
-        const k = ma(moi, vungB(moi, b)), c2 = gia[id] + 1, cu = ids.get(k);
-        if (cu === undefined) dongDay(dong, c2 + 2 * uoc(moi), them(k, c2, id, b * 4 + d));
-        else if (!daMo[cu] && c2 < gia[cu]) { gia[cu] = c2; cha[cu] = id; cach[cu] = b * 4 + d; dongDay(dong, c2 + 2 * uoc(moi), cu); }
-      }
-    }
-  }
-  return { khongGiai: true };
 }
 
 /* ---------- chơi ----------
@@ -359,9 +305,9 @@ function thungKet(m, g, the, k) {
 }
 
 /* ======================================================================================================
-   Giao diện. Màn ở assets/mansoko.js: { m: XSB nối bằng "|", k: số thùng, it: số bước ít nhất, giai: lời giải LURD }.
+   Giao diện. Màn ở assets/mansoko.js: { m: XSB nối bằng "|", k: số thùng, day: số lần đẩy ít nhất, giai: lời giải LURD }.
    ====================================================================================================== */
-const S = { HUONG, CHU, docMan, chuanBi, themCheo, theMoi, di, luiLai, xongMan, duongToi, thungKet, buocToi, giaiNhanh };
+const S = { HUONG, CHU, docMan, chuanBi, themCheo, theMoi, di, luiLai, xongMan, duongToi, thungKet, buocToi };
 const MAN = self.TDTD_MANSOKO || [];
 const TEN_CHUONG = { 1: 'Một thùng — làm quen', 2: 'Hai thùng', 3: 'Ba thùng', 4: 'Bốn thùng', 5: 'Năm thùng', 6: 'Sáu thùng' };
 const CHUONG = [];
@@ -377,9 +323,10 @@ const docLuu = () => { try { const o = JSON.parse(localStorage.getItem(KHOA) || 
 const ghiLuu = (them) => { try { localStorage.setItem(KHOA, JSON.stringify(Object.assign(docLuu(), them))); } catch (e) {} };
 const saoCua = () => String(docLuu().s || '').replace(/[^0-3]/g, '0').padEnd(MAN.length, '0').slice(0, MAN.length);
 function ghiSao(i, n) { const s = saoCua().split(''); if (n > +s[i]) { s[i] = String(n); ghiLuu({ s: s.join('') }); } }
-/* Chấm sao theo số bước (người dùng ở Robot thắp sao: "làm tối ưu nhất thì được nhiều sao"): bằng số bước ít nhất bộ giải
-   tìm được → 3 sao; dư không quá một phần tư → 2 sao; dư hơn → 1 sao. Xong màn là có ít nhất 1 sao. */
-const soSao = (buoc, it) => buoc <= it ? 3 : buoc <= it + Math.ceil(it / 4) ? 2 : 1;
+/* Chấm sao theo số lần đẩy (người dùng: "tính sao bằng bước đẩy thùng đi, ai lại tính bước chân"): đẩy đúng số lần ít
+   nhất bộ giải tìm được → 3 sao; dư không quá một phần tư → 2 sao; dư hơn → 1 sao. Đi bao nhiêu bước cũng được. Xong
+   màn là có ít nhất 1 sao. */
+const soSao = (day, itNhat) => day <= itNhat ? 3 : day <= itNhat + Math.ceil(itNhat / 4) ? 2 : 1;
 const manMo = () => { const b = docLuu().b; return Number.isInteger(b) && b >= 0 && b < MAN.length ? b : Math.max(0, saoCua().indexOf('0')); };
 let cheDoThu = typeof location !== 'undefined' && /[?&]mohet\b/i.test(location.search || '');
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -387,7 +334,7 @@ const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt
 let tam = null, cv = null, ctx = null, W = 360, H = 420, DPR = 1, raf = 0;
 let so = 0, M = null, G = null, the = null, lichSu = [], truocLamLai = null;
 let dang = null, hang = [], huong = 2, thang = false, maMan = 0;
-let ket = new Set(), sang = [], sangLuc = [], goiYDang = null, oVe = [];
+let ket = new Set(), sang = [], sangLuc = [], oVe = [], xemGiai = false;
 let goc = .32, gocDen = .32;
 
 /* ---------- vẽ cảnh 3D nhìn nghiêng ----------
@@ -590,19 +537,6 @@ function veRobot(r, t) {
     ctx.globalAlpha = 1;
   }
 }
-/* gợi ý: chấm nhỏ trên đường robot cần đi, mũi tên sáng trên nắp thùng chỉ hướng đẩy */
-function veGoiY(t) {
-  const g = goiYDang, nhip = .55 + .45 * Math.sin(t / 220);
-  ctx.fillStyle = `rgba(143,208,255,${(.45 + .35 * nhip).toFixed(3)})`;
-  for (const o of g.duong) { const c = toaDo(o), p = chieu(c.x, c.y, .01); ctx.beginPath(); ctx.arc(p.x, p.y, Math.max(2.5, toa.s * .07), 0, 6.2832); ctx.fill(); }
-}
-function veMuiTen(x, y, d, t) {
-  const [dx, dy] = S.HUONG[d], nx = -dy, ny = dx, z = ZTH + .02, k = .06 * Math.sin(t / 200);
-  const P = (a, b) => chieu(x + dx * (a + k) + nx * b, y + dy * (a + k) + ny * b, z);
-  da([P(-.22, -.07), P(.06, -.07), P(.06, -.17), P(.3, 0), P(.06, .17), P(.06, .07), P(-.22, .07)]);
-  ctx.fillStyle = '#8fd0ff'; ctx.fill();
-  ctx.strokeStyle = '#06203a'; ctx.lineWidth = Math.max(1, toa.s * .02); ctx.stroke();
-}
 function veCanh(t) {
   if (!ctx || !M) return;
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -610,7 +544,6 @@ function veCanh(t) {
   canhKhung();
   const v = viTri(t);
   for (const c of oVe) if (!c.tuong) { veSan(c); if (c.dich) veO(c, t); }
-  if (goiYDang) veGoiY(t);
   const ds = [];
   for (const c of oVe) if (c.tuong) ds.push({ d: chieu(c.x, c.y, 0).d, loai: 0, c });
   v.thung.forEach((p, k) => ds.push({ d: chieu(p.x, p.y, 0).d, loai: 1, p, k }));
@@ -621,7 +554,6 @@ function veCanh(t) {
     else if (o.loai === 1) {
       const no = sangLuc[o.k] ? Math.max(0, 1 - (t - sangLuc[o.k]) / 600) : 0;
       veThung(o.p.x, o.p.y, sang[o.k], ket.has(o.k), t, t >= (sangLuc[o.k] || 0) ? no : 0);
-      if (goiYDang && goiYDang.k === o.k) veMuiTen(o.p.x, o.p.y, goiYDang.d, t);
     } else veRobot(v.robot, t);
   }
 }
@@ -673,7 +605,6 @@ function thucHien(d, t, nhanh) {
   const b = S.di(M, the, d);
   if (!b) { dang = { kieu: 'vuong', d, t0: t, lau: 180 }; hang = []; tiengCham(); return; }
   lichSu.push(b); truocLamLai = null;
-  if (goiYDang && (!goiYDang.lam || b.thung >= 0)) goiYDang = null;
   dang = { kieu: b.thung >= 0 ? 'day' : 'di', b, t0: t, lau: b.thung >= 0 ? 165 : nhanh ? 85 : 120 };
   if (b.thung >= 0) {
     const vao = M.dich.includes(the.thung[b.thung]), ra = M.dich.includes(b.toi);
@@ -684,7 +615,7 @@ function thucHien(d, t, nhanh) {
   }
   capNhatChu();
   if (S.xongMan(M, the)) {
-    thang = true; hang = []; goiYDang = null; tatBao();
+    thang = true; hang = []; tatBao();
     const ma = maMan;
     setTimeout(() => { if (ma === maMan && thang) ketThucMan(); }, dang.lau + 420);
   }
@@ -696,15 +627,17 @@ function kiemKet(baoMoi) {
   the.thung.forEach((o, k) => { if (S.thungKet(M, G, the, k)) moi.add(k); });
   const them = [...moi].some(k => !ket.has(k));
   ket = moi;
-  if (them && baoMoi) { bao('Thùng này kẹt rồi, không đưa về ổ được nữa. Bấm ↶ Hoàn tác để lùi lại.', 0); tiengVuong(); }
+  if (them && baoMoi) { bao('Thùng này kẹt rồi, không đưa về ổ được nữa. Bấm ↶ Hoàn tác để lùi lại lần đẩy vừa rồi.', 0); tiengVuong(); }
   else if (!moi.size && tam.querySelector('.sk-bao').dataset.ket) tatBao();
   if (them && baoMoi) tam.querySelector('.sk-bao').dataset.ket = '1';
 }
 function datXong() { dang = null; }
+/* Hoàn tác lùi một lần đẩy (người dùng: "lùi lại cũng lùi tới chỗ thùng đẩy"): bỏ các bước đi sau lần đẩy cuối và bỏ cả
+   lần đẩy đó — robot về đúng chỗ đứng đẩy, thùng về chỗ cũ. Chưa đẩy lần nào thì robot về chỗ xuất phát. */
 function hoanTac() {
   if (!M) return;
   if (thang) { thang = false; tam.querySelector('.sk-tin').hidden = true; }
-  datXong(); hang = []; goiYDang = null;
+  datXong(); hang = [];
   if (!lichSu.length) {
     if (truocLamLai) {                                                 // hoàn tác cả lần bấm Chơi lại
       const ls = truocLamLai; truocLamLai = null;
@@ -714,15 +647,15 @@ function hoanTac() {
     }
     return;
   }
+  while (lichSu.length && lichSu[lichSu.length - 1].thung < 0) { const b = lichSu.pop(); S.luiLai(M, the, b); huong = b.d; }
   const b = lichSu.pop();
-  S.luiLai(M, the, b); huong = b.d;
-  dang = { kieu: 'lui', b, t0: bay(), lau: 95 };
+  if (b) { S.luiLai(M, the, b); huong = b.d; dang = { kieu: 'lui', b, t0: bay(), lau: 150 }; }
   kiemKet(false); capNhatChu();
 }
 function choiLaiMan() {
   if (!lichSu.length) return;
   if (thang) { thang = false; tam.querySelector('.sk-tin').hidden = true; }
-  datXong(); hang = []; goiYDang = null;
+  datXong(); hang = []; xemGiai = false;
   truocLamLai = lichSu; lichSu = []; the = S.theMoi(M); huong = 2;
   kiemKet(false); capNhatChu();
   bao('Đã bày lại từ đầu. Bấm ↶ Hoàn tác nếu lỡ tay.', 2600);
@@ -822,45 +755,10 @@ function batDauGiu(e) {
   const lamMot = () => { if (n.classList.contains('sk-hoan')) hoanTac(); else lam(huongTheoMan(+n.dataset.man)); };
   dungGiu();
   lamMot();
-  giu = { n, t: setTimeout(function lap() { lamMot(); giu.t = setTimeout(lap, n.classList.contains('sk-hoan') ? 110 : 150); }, 340) };
+  giu = { n, t: setTimeout(function lap() { lamMot(); giu.t = setTimeout(lap, n.classList.contains('sk-hoan') ? 280 : 150); }, n.classList.contains('sk-hoan') ? 450 : 340) };
   n.classList.add('sk-dang-bam');
 }
 function dungGiu() { if (giu) { clearTimeout(giu.t); giu.n.classList.remove('sk-dang-bam'); giu = null; } }
-
-/* ---------- gợi ý ----------
-   Còn đi đúng theo lời giải ít bước nhất (chưa lạc bước nào) thì chỉ theo lời giải đó — đi theo gợi ý từ đầu tới cuối
-   là đúng số bước ít nhất. Lạc rồi thì bộ giải nhanh tìm cách từ thế hiện tại. Bấm 💡 lần nữa: robot làm giúp lần đẩy
-   đó (đi tới, đẩy một ô). */
-function goiY() {
-  if (thang || !M) return;
-  if (goiYDang && goiYDang.duong) {                                    // lần bấm thứ hai: làm giúp
-    const g = goiYDang;
-    datXong(); hang = g.huong.concat([g.d]); goiYDang = Object.assign({}, g, { lam: true });
-    return;
-  }
-  datXong(); hang = [];
-  if (ket.size) { bao('Có thùng kẹt rồi (thùng đỏ). Bấm ↶ Hoàn tác cho tới khi hết thùng đỏ, rồi bấm 💡 lại.', 0); return; }
-  const giai = MAN[so].giai, da = lichSu.map(b => (b.thung >= 0 ? S.CHU[b.d].toUpperCase() : S.CHU[b.d])).join('');
-  let buoc = null;
-  if (giai && giai.startsWith(da)) {
-    let i = da.length; const huongDi = [];
-    while (i < giai.length && giai[i] === giai[i].toLowerCase()) { huongDi.push(S.CHU.indexOf(giai[i])); i++; }
-    if (i < giai.length) buoc = { huong: huongDi, d: S.CHU.indexOf(giai[i].toLowerCase()) };
-  }
-  if (!buoc) {
-    const kq = S.giaiNhanh(M, the.thung, the.p, 150000);
-    if (!kq) { bao('Thế này khó quá, máy chưa tìm ra cách. Thử ↶ Hoàn tác vài bước rồi bấm 💡 lại.', 0); return; }
-    if (kq.khongGiai) { bao('Từ thế này không còn cách đưa hết thùng vào ổ. Bấm ↶ Hoàn tác vài bước rồi bấm 💡 lại.', 0); return; }
-    const p0 = kq.day[0], sau = S.buocToi(M, p0.o, (p0.d + 2) & 3);
-    buoc = { huong: S.duongToi(M, the, sau) || [], d: p0.d };
-  }
-  /* ô thùng sẽ bị đẩy: đi hết đường rồi bước theo hướng d */
-  let o = the.p; const duong = [];
-  for (const d of buoc.huong) { o = S.buocToi(M, o, d); duong.push(o); }
-  const k = the.co[S.buocToi(M, o, buoc.d)];
-  goiYDang = { duong, huong: buoc.huong, d: buoc.d, k };
-  bao('Đẩy thùng có mũi tên xanh theo hướng mũi tên (đi theo chấm xanh tới sau thùng). Bấm 💡 lần nữa để robot làm giúp.', 5200);
-}
 
 /* ---------- âm thanh ----------
    Như Robot thắp sao: tạo ngay bằng Web Audio, không tải tệp. Đẩy: tiếng "cộc" gỗ nhỏ. Thùng vào ổ: tiếng chuông, mỗi thùng
@@ -939,9 +837,8 @@ function dungKhung() {
     </div>
     <div class="sk-duoi">
       <div class="sk-lenh">
-        <button class="sk-hoan" type="button" aria-label="Hoàn tác một bước"><span>↶</span>Hoàn tác</button>
+        <button class="sk-hoan" type="button" aria-label="Hoàn tác: lùi lại một lần đẩy"><span>↶</span>Hoàn tác</button>
         <button class="sk-lai" type="button" aria-label="Bày lại từ đầu"><span>↻</span>Chơi lại</button>
-        <button class="sk-goiy" type="button" aria-label="Gợi ý"><span>💡</span>Gợi ý</button>
       </div>
       <div class="sk-pad">
         <button type="button" data-man="0" aria-label="Đi lên">▲</button>
@@ -982,19 +879,19 @@ function capNhatChu() {
   if (!tam || !M) return;
   const n = M.thung.length, vao = soTrongO(), day = lichSu.filter(b => b.thung >= 0).length;
   tam.querySelector('.sk-muc').innerHTML = `<b>${vao}/${n}</b> thùng vào ổ`;
-  tam.querySelector('.sk-dem').textContent = `${lichSu.length} bước · ${day} lần đẩy`;
+  tam.querySelector('.sk-dem').textContent = `${day} lần đẩy · ${lichSu.length} bước`;
   tam.querySelector('.sk-hoan').disabled = !lichSu.length && !truocLamLai;
   tam.querySelector('.sk-lai').disabled = !lichSu.length;
 }
-/* dòng phụ ở đầu trang: số bước ít nhất, và số sao cao nhất đã được ở màn này (★★☆) — ngắn cho vừa màn hẹp */
-const dongPhu = (it, sao) => `Ít nhất ${it} bước${sao ? ' · ' + '★'.repeat(sao) + '☆'.repeat(3 - sao) : ''}`;
+/* dòng phụ ở đầu trang: số lần đẩy ít nhất, và số sao cao nhất đã được ở màn này (★★☆) — ngắn cho vừa màn hẹp */
+const dongPhu = (day, sao) => `Ít nhất ${day} lần đẩy${sao ? ' · ' + '★'.repeat(sao) + '☆'.repeat(3 - sao) : ''}`;
 function moMan(i) {
   so = Math.max(0, Math.min(MAN.length - 1, i));
   maMan++;
   tam.querySelector('.sk-tin').hidden = true; tam.querySelector('.sk-ds').hidden = true;
   const m = MAN[so];
   M = S.docMan(m.m.split('|')); G = S.themCheo(S.chuanBi(M));
-  the = S.theMoi(M); lichSu = []; truocLamLai = null; dang = null; hang = []; thang = false; huong = 2; goiYDang = null;
+  the = S.theMoi(M); lichSu = []; truocLamLai = null; dang = null; hang = []; thang = false; huong = 2; xemGiai = false;
   sang = M.thung.map(o => (M.dich.includes(o) ? 1 : 0)); sangLuc = [];
   oVe = [];
   for (let y = 0; y < M.h; y++) for (let x = 0; x < M.w; x++) {
@@ -1006,7 +903,7 @@ function moMan(i) {
   goc = gocDen = gocTot();
   tatBao();
   const sao = +saoCua()[so];
-  tam.querySelector('.sk-ten').innerHTML = `<b>Màn ${so + 1}</b> · ${M.thung.length} thùng<span>${dongPhu(m.it, sao)}</span>`;
+  tam.querySelector('.sk-ten').innerHTML = `<b>Màn ${so + 1}</b> · ${M.thung.length} thùng<span>${dongPhu(m.day, sao)}</span>`;
   const [lui, toi] = tam.querySelectorAll('[data-chuyen]');
   if (lui) { lui.textContent = `‹ Màn ${so}`; lui.hidden = so === 0; lui.setAttribute('aria-label', `Màn trước: màn ${so}`); }
   if (toi) { toi.textContent = `Màn ${so + 2} ›`; toi.hidden = so === MAN.length - 1; toi.setAttribute('aria-label', `Màn sau: màn ${so + 2}`); }
@@ -1020,21 +917,27 @@ function moTin(loai, them) {
   if (loai === 'cach') {
     html = `<p class="sk-tin-nho">Sokoban</p><h2>Đẩy thùng sao</h2>
       <p>Đẩy hết thùng vào các <b>ổ vàng</b>. Thùng vào ổ thì ngôi sao trên nắp sáng lên; mọi thùng đều sáng là xong màn.</p>
-      <p>Robot chỉ <b>đẩy</b> được, không kéo được, và mỗi lần chỉ đẩy một thùng. Đẩy thùng vào góc tường là hết lấy ra — thùng sẽ đỏ lên, bấm <b>↶ Hoàn tác</b> để lùi lại.</p>
+      <p>Robot chỉ <b>đẩy</b> được, không kéo được, và mỗi lần chỉ đẩy một thùng. Đẩy thùng vào góc tường là hết lấy ra — thùng sẽ đỏ lên. <b>↶ Hoàn tác</b> lùi lại một lần đẩy: robot về đúng chỗ đứng đẩy, thùng về chỗ cũ.</p>
       <p>Đi: bấm mũi tên, vuốt trên cảnh, hay chạm vào một ô để robot tự đi tới. Chạm vào thùng ngay cạnh robot để đẩy. Máy tính: phím mũi tên, Z hoàn tác, R chơi lại.</p>
-      <p class="sk-tin-meo">Càng ít bước càng nhiều sao: bằng số bước ít nhất là 3 sao. Bí thì bấm 💡.</p>
+      <p class="sk-tin-meo">Sao tính theo số lần đẩy thùng, đi bao nhiêu bước cũng được: đẩy đúng số lần ít nhất là 3 sao. Bí thì bấm ↻ Chơi lại, nhìn lại từ đầu.</p>
       <button type="button" class="sk-tin-dong">Chơi</button>`;
   } else if (loai === 'thang') {
     const m = MAN[so], { buoc, day, sao } = them;
-    const nhanXet = buoc < m.it ? 'Còn ít bước hơn cả lời giải của máy — giỏi quá!'
-      : buoc === m.it ? 'Đúng số bước ít nhất — đủ 3 sao!'
-      : `Ít nhất là ${m.it} bước. Bớt ${buoc - m.it} bước nữa là được 3 sao — thử lại xem?`;
+    const nhanXet = day < m.day ? 'Còn ít lần đẩy hơn cả lời giải của máy — giỏi quá!'
+      : day === m.day ? 'Đúng số lần đẩy ít nhất — đủ 3 sao!'
+      : `Ít nhất là ${m.day} lần đẩy. Bớt ${day - m.day} lần đẩy nữa là được 3 sao — thử lại xem?`;
     html = `<div class="sk-tin-sao">${[0, 1, 2].map(k => `<span class="${k < sao ? 'sk-co' : ''}">★</span>`).join('')}</div>
       <h2>${sao === 3 ? 'Tuyệt vời!' : 'Xong màn ' + (so + 1) + '!'}</h2>
-      <p>Bạn đi ${buoc} bước, đẩy ${day} lần. ${nhanXet}</p>
+      <p>Bạn đẩy ${day} lần (đi ${buoc} bước). ${nhanXet}</p>
       ${so < MAN.length - 1 ? `<button type="button" class="sk-tin-tiep">Màn ${so + 2} ›</button>` : '<p class="sk-tin-meo">Đây là màn cuối. Còn màn nào chưa đủ 3 sao thì vào ☰ chơi lại nhé.</p>'}
       ${sao < 3 ? '<button type="button" class="sk-tin-lai sk-phu">Chơi lại cho đủ 3 sao</button>' : ''}
       <button type="button" class="sk-tin-ds sk-phu">Danh sách màn</button>`;
+  }
+  else if (loai === 'xem') {
+    html = `<p class="sk-tin-nho">Chế độ thử</p><h2>Lời giải của máy</h2>
+      <p>Máy vừa chơi lời giải ít lần đẩy nhất: ${them.day} lần đẩy. Máy chơi thì không tính sao — tự chơi để lấy sao nhé.</p>
+      <button type="button" class="sk-tin-lai">Tự chơi màn này</button>
+      ${so < MAN.length - 1 ? `<button type="button" class="sk-tin-tiep sk-phu">Màn ${so + 2} ›</button>` : ''}`;
   }
   hop.querySelector('.sk-tin-trong').innerHTML = html;
   hop.hidden = false;
@@ -1070,7 +973,6 @@ function bam(e) {
   if ((n = q('[data-xoay]'))) { gocDen += (+n.dataset.xoay) * Math.PI / 2; return; }
   if ((n = q('[data-chuyen]'))) { moMan(so + (+n.dataset.chuyen)); return; }
   if (q('.sk-lai')) { choiLaiMan(); return; }
-  if (q('.sk-goiy')) { goiY(); return; }
   if (q('.sk-hoi')) { moTin('cach'); return; }
   if (q('.sk-dsnut')) { moDs(); return; }
   if ((n = q('[data-man-so]'))) { tam.querySelector('.sk-ds').hidden = true; moMan(+n.dataset.manSo); return; }
@@ -1082,23 +984,27 @@ function bam(e) {
     return;
   }
   if (q('[data-tieng]')) { coTieng = !coTieng; if (!coTieng && am) am.suspend(); moDs(); if (coTieng) tingSao(0); return; }
-  if (q('[data-xem]')) {                                               // chế độ thử: tự chơi lời giải ít bước nhất
-    tam.querySelector('.sk-ds').hidden = true;
-    moMan(so);
-    hang = [...MAN[so].giai].map(c => S.CHU.indexOf(c.toLowerCase()));
-    return;
-  }
+  if (q('[data-xem]')) { xemLoiGiai(); return; }
   if (q('.sk-tin-tiep')) { tam.querySelector('.sk-tin').hidden = true; moMan(so + 1); return; }
   if (q('.sk-tin-lai')) { tam.querySelector('.sk-tin').hidden = true; moMan(so); return; }
   if (q('.sk-tin-ds')) { tam.querySelector('.sk-tin').hidden = true; moDs(); return; }
   if (q('.sk-tin-dong')) { tam.querySelector('.sk-tin').hidden = true; return; }
 }
+/* Chế độ thử (chạm 7 lần vào tên trò): máy tự chơi lời giải ít bước nhất để người làm app kiểm màn. Máy chơi thì không
+   tính sao — kẻo xem lời giải là được 3 sao. */
+function xemLoiGiai() {
+  tam.querySelector('.sk-ds').hidden = true;
+  moMan(so);
+  xemGiai = true;
+  hang = [...MAN[so].giai].map(c => S.CHU.indexOf(c.toLowerCase()));
+}
 function ketThucMan() {
-  const buoc = lichSu.length, day = lichSu.filter(b => b.thung >= 0).length, sao = soSao(buoc, MAN[so].it);
-  ghiSao(so, sao);
+  const buoc = lichSu.length, day = lichSu.filter(b => b.thung >= 0).length, sao = soSao(day, MAN[so].day);
   nhacThang();
+  if (xemGiai) { moTin('xem', { day }); return; }
+  ghiSao(so, sao);
   moTin('thang', { buoc, day, sao });
-  tam.querySelector('.sk-ten span').textContent = dongPhu(MAN[so].it, +saoCua()[so]);
+  tam.querySelector('.sk-ten span').textContent = dongPhu(MAN[so].day, +saoCua()[so]);
 }
 function phim(e) {
   if (!tam || !tam.classList.contains('hien')) return;
@@ -1131,11 +1037,11 @@ function dong() {
 }
 
 self.TDTD_SOKOBAN = {
-  HUONG, CHU, docMan, vietMan, chuanBi, themCheo, ket2x2, loang, giaiItBuoc, giaiNhanh,
+  HUONG, CHU, docMan, vietMan, chuanBi, themCheo, ket2x2, loang, giaiItBuoc, giaiItDay,
   theMoi, di, luiLai, xongMan, choiLai, duongToi, thungKet, buocToi, dongMoi, dongDay, dongLay,
   MAN, CHUONG, soSao, mo, dong,
-  _moMan: (i) => moMan(i), _lam: (d) => lam(d), _hoanTac: () => hoanTac(), _choiLai: () => choiLaiMan(), _goiY: () => goiY(),
-  _the: () => the, _lichSu: () => lichSu, _ket: () => ket, _goiYDang: () => goiYDang, _hang: () => hang, _chamO: chamO,
+  _moMan: (i) => moMan(i), _lam: (d) => lam(d), _hoanTac: () => hoanTac(), _choiLai: () => choiLaiMan(), _xemLoiGiai: () => xemLoiGiai(),
+  _the: () => the, _lichSu: () => lichSu, _ket: () => ket, _hang: () => hang, _chamO: chamO, _ketThucMan: () => ketThucMan(),
   _huongTheoMan: (sd) => huongTheoMan(sd), _datGoc: (g) => { goc = gocDen = g; }, _buocTiep: (t) => vong(t), _dangThang: () => thang,
   _oDuocCham: (x, y) => oDuocCham(x, y), _chieu: (x, y, z) => chieu(x, y, z), _canhKhung: () => canhKhung(),
   _dang: () => dang,

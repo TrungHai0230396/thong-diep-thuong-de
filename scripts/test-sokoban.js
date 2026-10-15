@@ -1,8 +1,9 @@
 /* Kiểm thử Đẩy thùng sao (Sokoban): node scripts/test-sokoban.js
-   Luật đi và đẩy; bộ giải ít bước nhất đối chiếu với cách dò từng bước một (chậm mà chắc); bộ giải nhanh của nút Gợi ý;
-   ô chết, kẹt 2×2; bộ tạo màn (17 mẫu của bài báo, lọc phòng, chơi ngược đo bằng đường đẩy — đối chiếu với tìm xuôi);
-   cả 100 màn: giải được bằng đúng lời giải lưu sẵn, số bước ít nhất là thật (giải lại), không thùng nào chỉ để trang
-   trí, không màn nào trùng (kể cả xoay, lật); giao diện: bấm, hoàn tác, chơi lại, gợi ý, chạm để đi, chấm sao, lưu. */
+   Luật đi và đẩy; bộ giải ít bước nhất đối chiếu với cách dò từng bước một (chậm mà chắc); ô chết, kẹt 2×2; bộ tạo màn
+   (17 mẫu của bài báo, lọc phòng, chơi ngược đo bằng đường đẩy — đối chiếu với tìm xuôi); cả 100 màn: giải được bằng
+   đúng lời giải lưu sẵn, số bước ít nhất là thật (giải lại), không thùng nào chỉ để trang trí, không màn nào trùng (kể
+   cả xoay, lật); giao diện: bấm, hoàn tác lùi một lần đẩy, chơi lại, chạm để đi, thùng kẹt, chấm sao theo số lần đẩy,
+   lưu, không có nút gợi ý. */
 'use strict';
 const fs = require('fs');
 const path = require('path');
@@ -116,6 +117,35 @@ function itDuongNhat(m) {
   return -1;
 }
 
+/* tìm theo chiều rộng, mỗi lần đẩy một ô là một bước, người gộp thành vùng: số lần đẩy ít nhất — đối chiếu giaiItDay */
+function itDayNhat(m) {
+  const g = S.chuanBi(m), F = g.F, dich = new Set(m.dich.map(i => g.so[i]));
+  const vung = (bs, p) => { const co = new Uint8Array(F); bs.forEach(b => { co[b] = 1; }); return S.loang(g, co, p, new Int32Array(F), new Int32Array(F), 1); };
+  const bs0 = m.thung.map(i => g.so[i]).sort((a, b) => a - b), r0 = vung(bs0, g.so[m.nguoi]);
+  const seen = new Set([bs0.join(',') + ':' + r0]);
+  let q = [{ bs: bs0, r: r0 }], d = 0;
+  while (q.length) {
+    const tiep = [];
+    for (const st of q) {
+      if (st.bs.every(b => dich.has(b))) return d;
+      const co = new Uint8Array(F); st.bs.forEach(b => { co[b] = 1; });
+      const tem = new Int32Array(F);
+      S.loang(g, co, st.r, new Int32Array(F), tem, 3);
+      st.bs.forEach((b, i) => {
+        for (let h = 0; h < 4; h++) {
+          const sau = g.ke[b * 4 + ((h + 2) & 3)], toi = g.ke[b * 4 + h];
+          if (sau < 0 || toi < 0 || tem[sau] !== 3 || co[toi]) continue;
+          const bs = st.bs.slice(); bs[i] = toi; bs.sort((a, c) => a - c);
+          const r = vung(bs, b), k = bs.join(',') + ':' + r;
+          if (!seen.has(k)) { seen.add(k); tiep.push({ bs, r }); }
+        }
+      });
+    }
+    q = tiep; d++;
+  }
+  return -1;
+}
+
 console.log('\n— Đọc màn, đi, đẩy —');
 {
   const m = S.docMan(['#######', '#+ $* #', '# $   #', '#. #  #', '#######']);
@@ -151,7 +181,7 @@ console.log('\n— Ô chết, kẹt 2×2 —');
   ok('hai thùng sát tường nhưng đều trong ổ: không tính là kẹt', !S.thungKet(m3, S.themCheo(S.chuanBi(m3)), S.theMoi(m3), 0));
 }
 
-console.log('\n— Bộ giải ít bước nhất, đối chiếu dò từng bước —');
+console.log('\n— Bộ giải, đối chiếu cách dò từng bước —');
 {
   const cac = [
     ['#######', '#.    #', '#  #  #', '#  $  #', '# @   #', '#######'],
@@ -160,35 +190,17 @@ console.log('\n— Bộ giải ít bước nhất, đối chiếu dò từng bư
   ];
   /* thêm vài màn thật ít thùng trong bộ màn */
   for (const m of S.MAN.filter(x => x.k <= 2).slice(0, 8)) cac.push(m.m.split('|'));
-  let khop = 0, sai = [];
+  let khop = 0, sai = [], saiDay = [];
   for (const r of cac) {
     const m = S.docMan(r), kq = S.giaiItBuoc(m), doi = doTungBuoc(m);
     if (kq && kq.buoc === doi && S.choiLai(m, kq.loiGiai).xong) khop++; else sai.push(`${r.join('|')}: ${kq && kq.buoc} / ${doi}`);
+    const kd = S.giaiItDay(m), doiDay = itDayNhat(m), lai = kd && S.choiLai(m, kd.loiGiai);
+    if (!kd || kd.day !== doiDay || !lai.xong || lai.day !== kd.day) saiDay.push(`${r.join('|')}: ${kd && kd.day} / ${doiDay}`);
+    else if (kd.day > kq.day) saiDay.push(`${r.join('|')}: ít lần đẩy nhất ${kd.day} mà lời giải ít bước chỉ ${kq.day} lần đẩy`);
   }
   ok(`số bước ít nhất trùng với dò từng bước (${cac.length} màn), lời giải chơi lại xong màn`, !sai.length, sai.join('; '));
+  ok(`số lần đẩy ít nhất trùng với tìm theo chiều rộng từng lần đẩy (${cac.length} màn), lời giải chơi lại xong màn`, !saiDay.length, saiDay.join('; '));
   ok('màn không giải được (thùng nằm ở góc): trả null', S.giaiItBuoc(S.docMan(['#####', '#$ .#', '#@  #', '#####'])) === null);
-}
-
-console.log('\n— Bộ giải nhanh (nút Gợi ý) —');
-{
-  const m = S.docMan(['  #####', '###   #', '#.@$  #', '### $.#', '#.##$ #', '# # . ##', '#$ *$$.#', '#   .  #', '########']);
-  const kq = S.giaiNhanh(m, m.thung, m.nguoi);
-  let the = S.theMoi(m), dung = !!(kq && kq.day);
-  for (const b of (kq && kq.day) || []) {                              // làm theo từng lần đẩy: đi tới sau thùng rồi đẩy
-    const duong = S.duongToi(m, the, S.buocToi(m, b.o, (b.d + 2) & 3));
-    if (!duong) { dung = false; break; }
-    for (const h of duong) S.di(m, the, h);
-    const r = S.di(m, the, b.d);
-    if (!r || r.thung < 0) { dung = false; break; }
-  }
-  ok('tìm được cách giải, làm theo từng lần đẩy thì xong màn', dung && S.xongMan(m, the), kq && kq.day && `${kq.day.length} lần đẩy, ${kq.the} thế`);
-  const m2 = S.docMan(['######', '#    #', '#$   #', '#@ . #', '######']);
-  const t2 = S.theMoi(m2); S.di(m2, t2, 0);                           // đẩy thùng vào góc
-  ok('thùng nằm ở góc (ô chết): báo không còn cách giải', S.giaiNhanh(m2, t2.thung, t2.p).khongGiai === true);
-  const lau = Date.now();
-  let toiDa = 0;
-  for (const x of S.MAN) { const mm = S.docMan(x.m.split('|')), t0 = Date.now(); const r = S.giaiNhanh(mm, mm.thung, mm.nguoi); toiDa = Math.max(toiDa, Date.now() - t0); if (!r || !r.day) { toiDa = Infinity; break; } }
-  ok('giải nhanh được mọi màn từ đầu, màn chậm nhất dưới nửa giây (điện thoại chậm hơn máy tính vài lần)', toiDa < 500, `chậm nhất ${toiDa} ms, cả bộ ${Date.now() - lau} ms`);
 }
 
 console.log('\n— Bộ tạo màn (Taylor & Parberry 2011) —');
@@ -220,7 +232,7 @@ console.log('\n— Bộ tạo màn (Taylor & Parberry 2011) —');
 }
 
 console.log('\n— Cả bộ màn —');
-const loi = { doc: [], so: [], giai: [], it: [], tao: [], co: [], ket: [] };
+const loi = { doc: [], so: [], giai: [], day: [], tao: [], co: [], ket: [] };
 const chuan = new Set(), trung = [];
 S.MAN.forEach((x, i) => {
   const ten = `màn ${i + 1}`, rows = x.m.split('|');
@@ -230,15 +242,15 @@ S.MAN.forEach((x, i) => {
   if (m.thung.length !== x.k || m.dich.length !== x.k) loi.so.push(`${ten}: ${m.thung.length} thùng, ${m.dich.length} ổ, ghi ${x.k}`);
   if (m.w > 12 || m.h > 12) loi.co.push(`${ten}: ${m.w}×${m.h}`);
   const lai = S.choiLai(m, x.giai);
-  if (!lai.xong || lai.buoc !== x.it) loi.giai.push(`${ten}: ${lai.xong ? lai.buoc + ' bước, ghi ' + x.it : 'không xong'}`);
+  if (!lai.xong || lai.day !== x.day) loi.giai.push(`${ten}: ${lai.xong ? lai.day + ' lần đẩy, ghi ' + x.day : 'không xong'}`);
   /* thùng nào cũng phải được đẩy ít nhất một lần */
   const the = S.theMoi(m), dung = new Set();
   for (const ch of x.giai) { const b = S.di(m, the, S.CHU.indexOf(ch.toLowerCase())); if (b && b.thung >= 0) dung.add(b.thung); }
   if (dung.size !== m.thung.length) loi.tao.push(`${ten}: ${m.thung.length - dung.size} thùng không phải đẩy`);
   const g = S.themCheo(S.chuanBi(m)), t0 = S.theMoi(m);
   if (m.thung.some((o, k) => S.thungKet(m, g, t0, k))) loi.ket.push(ten);
-  const kq = S.giaiItBuoc(m, 8e6);                                     // cả bộ chừng 20 giây
-  if (!kq || kq.buoc !== x.it) loi.it.push(`${ten}: giải lại ra ${kq && kq.buoc}, ghi ${x.it}`);
+  const kq = S.giaiItDay(m, 8e6);                                      // cả bộ chừng 20 giây
+  if (!kq || kq.day !== x.day || kq.buoc !== lai.buoc) loi.day.push(`${ten}: giải lại ra ${kq && kq.day} lần đẩy ${kq && kq.buoc} bước, ghi ${x.day} lần đẩy ${lai.buoc} bước`);
   const c = T.dangChuan(rows);
   if (chuan.has(c)) trung.push(ten); chuan.add(c);
 });
@@ -246,8 +258,8 @@ ok('đúng 100 màn', S.MAN.length === 100, `${S.MAN.length} màn`);
 ok('màn nào cũng đọc được: một robot, kín tường, chỉ ký hiệu XSB', !loi.doc.length, loi.doc.join(', '));
 ok('số thùng = số ổ = số ghi trong màn', !loi.so.length, loi.so.join(', '));
 ok('vừa màn hình điện thoại (không quá 12×12 ô)', !loi.co.length, loi.co.join(', '));
-ok('lời giải lưu sẵn chơi lại xong màn, đúng số bước ít nhất đã ghi', !loi.giai.length, loi.giai.join(', '));
-ok('số bước ít nhất là thật: bộ giải giải lại cả bộ ra đúng số đã ghi', !loi.it.length, loi.it.join(', '));
+ok('lời giải lưu sẵn chơi lại xong màn, đúng số lần đẩy ít nhất đã ghi', !loi.giai.length, loi.giai.join(', '));
+ok('số lần đẩy ít nhất là thật: bộ giải giải lại cả bộ ra đúng số đã ghi (và lời giải lưu sẵn ít bước nhất trong số đó)', !loi.day.length, loi.day.join(', '));
 ok('không thùng nào chỉ để trang trí (lời giải đẩy mọi thùng)', !loi.tao.length, loi.tao.join(', '));
 ok('lúc bày không thùng nào kẹt sẵn', !loi.ket.length, loi.ket.join(', '));
 ok('không có hai màn trùng nhau, kể cả xoay, lật', !trung.length, trung.join(', '));
@@ -270,24 +282,35 @@ const chayHet = () => { let t = Date.now() + 1e6; for (let i = 0; i < 5000 && (S
   S._datGoc(.32 + Math.PI / 2);
   ok('xoay cảnh 90°: ▲ vẫn là hướng đang hướng lên trên màn', S._huongTheoMan(0) === 3 && S._huongTheoMan(1) === 0);
   S._datGoc(.32);
-  const giai = S.MAN[0].giai;
-  for (const ch of giai.slice(0, 3)) { S._lam(S.CHU.indexOf(ch.toLowerCase())); chayHet(); }
-  ok('đi theo lời giải: đếm đúng số bước', S._lichSu().length === 3);
+  /* hoàn tác lùi một lần đẩy (người dùng: "lùi lại cũng lùi tới chỗ thùng đẩy"): chọn màn mà lời giải có đi bộ trước lần
+     đẩy đầu và đi bộ ngay sau nó */
+  const kL = S.MAN.findIndex(x => { const g = x.giai, p = g.search(/[A-Z]/); return p > 0 && g[p + 1] && g[p + 1] === g[p + 1].toLowerCase(); });
+  S._moMan(kL);
+  const mL = S.docMan(S.MAN[kL].m.split('|')), gL = S.MAN[kL].giai, p1 = gL.search(/[A-Z]/);
+  let n1 = p1 + 1; while (n1 < gL.length && gL[n1] === gL[n1].toLowerCase()) n1++;
+  for (const ch of gL.slice(0, n1)) { S._lam(S.CHU.indexOf(ch.toLowerCase())); chayHet(); }
+  ok('đi theo lời giải: đếm đúng số bước, số lần đẩy', S._lichSu().length === n1 && S._lichSu().filter(b => b.thung >= 0).length === 1);
+  const tL = S.theMoi(mL); for (const ch of gL.slice(0, p1)) S.di(mL, tL, S.CHU.indexOf(ch));
   S._hoanTac(); chayHet();
-  ok('hoàn tác lùi một bước', S._lichSu().length === 2);
+  ok('hoàn tác lùi cả lần đẩy: bỏ các bước đi sau nó, robot về đúng chỗ đứng đẩy, thùng về chỗ cũ', S._lichSu().length === p1 && S._the().p === tL.p && S._the().thung.join() === mL.thung.join());
+  S._hoanTac(); chayHet();
+  ok('chưa đẩy lần nào thì hoàn tác về chỗ xuất phát', S._lichSu().length === 0 && S._the().p === mL.nguoi);
+  for (const ch of gL.slice(0, n1)) { S._lam(S.CHU.indexOf(ch.toLowerCase())); chayHet(); }
   S._choiLai();
-  ok('chơi lại: bày lại từ đầu', S._lichSu().length === 0 && S._the().p === m.nguoi);
+  ok('chơi lại: bày lại từ đầu', S._lichSu().length === 0 && S._the().p === mL.nguoi);
   S._hoanTac();
-  ok('hoàn tác ngay sau khi chơi lại: lấy lại các bước cũ', S._lichSu().length === 2);
-  S._choiLai();
-  S._goiY();
-  const g = S._goiYDang(), dau = giai.search(/[A-Z]/);
-  ok('gợi ý lúc chưa lạc: đúng lần đẩy đầu tiên của lời giải ít bước nhất', g && g.d === S.CHU.indexOf(giai[dau].toLowerCase()) && g.huong.length === dau);
-  S._goiY(); chayHet();
-  ok('bấm 💡 lần nữa: robot đi tới và đẩy giúp', S._lichSu().length === dau + 1 && S._lichSu()[dau].thung >= 0);
-  for (const ch of giai.slice(dau + 1)) { S._lam(S.CHU.indexOf(ch.toLowerCase())); chayHet(); }
-  ok('đi hết lời giải: xong màn', S._dangThang() && S._lichSu().length === S.MAN[0].it);
-  ok('chấm sao: đúng số bước ít nhất 3 sao, dư ¼ 2 sao, dư hơn 1 sao', S.soSao(20, 20) === 3 && S.soSao(25, 20) === 2 && S.soSao(26, 20) === 1 && S.soSao(19, 20) === 3);
+  ok('hoàn tác ngay sau khi chơi lại: lấy lại các bước cũ', S._lichSu().length === n1);
+  /* sao tính theo số lần đẩy, không tính bước chân: đi thừa hai bước rồi giải đúng số lần đẩy ít nhất vẫn 3 sao */
+  S._moMan(0); S._datGoc(.32);
+  const giai = S.MAN[0].giai;
+  let thua = -1;
+  for (let d = 0; d < 4 && thua < 0; d++) { const o = S.buocToi(m, m.nguoi, d); if (o >= 0 && m.trong[o] && !m.thung.includes(o)) thua = d; }
+  S._lam(thua); chayHet(); S._lam((thua + 2) & 3); chayHet();
+  for (const ch of giai) { S._lam(S.CHU.indexOf(ch.toLowerCase())); chayHet(); }
+  ok('đi hết lời giải: xong màn', S._dangThang() && S._lichSu().filter(b => b.thung >= 0).length === S.MAN[0].day);
+  S._ketThucMan();
+  ok('đi thừa bước mà đẩy đúng số lần ít nhất: vẫn 3 sao (không tính bước chân)', S._lichSu().length === giai.length + 2 && JSON.parse(luu['tdtd.soko']).s[0] === '3');
+  ok('chấm sao theo lần đẩy: đúng số ít nhất 3 sao, dư ¼ 2 sao, dư hơn 1 sao', S.soSao(20, 20) === 3 && S.soSao(25, 20) === 2 && S.soSao(26, 20) === 1 && S.soSao(19, 20) === 3);
   S._moMan(1);
   ok('mở màn khác: thế mới, chưa đi bước nào', S._lichSu().length === 0 && !S._dangThang());
   const o = JSON.parse(luu['tdtd.soko'] || '{}');
@@ -306,24 +329,12 @@ const chayHet = () => { let t = Date.now() + 1e6; for (let i = 0; i < 5000 && (S
       S._lam(d); chayHet();
       thayKet = S._ket().has(k);
       if (thayKet) {
-        S._goiY();
-        const kh = !S._goiYDang();
         S._hoanTac(); chayHet();
-        ok('đẩy thùng vào ô chết: tô đỏ ngay; gợi ý thì nhắc hoàn tác; hoàn tác thì hết đỏ', kh && !S._ket().size);
+        ok('đẩy thùng vào ô chết: tô đỏ ngay; hoàn tác thì hết đỏ', !S._ket().size);
       }
     }
   }
   if (!thayKet) ok('tìm được màn để thử đẩy thùng vào ô chết', false);
-  /* gợi ý khi đã lạc khỏi lời giải: dùng bộ giải nhanh */
-  S._moMan(5);
-  const mm = S.docMan(S.MAN[5].m.split('|'));
-  let di = false;
-  for (let d = 0; d < 4 && !di; d++) {
-    const t = S.buocToi(mm, S._the().p, d);
-    if (t >= 0 && mm.trong[t] && S._the().co[t] < 0 && S.CHU[d] !== S.MAN[5].giai[0].toLowerCase()) { S._lam(d); chayHet(); di = true; }
-  }
-  S._goiY();
-  ok('lạc khỏi lời giải rồi bấm 💡: vẫn chỉ được lần đẩy tiếp theo', di && !!S._goiYDang());
   /* chạm vào sàn: robot tự đi tới. Chọn ô mà ô phía trước (phía nam) cũng là sàn trống — không khối cao nào đứng chắn
      trước mặt ô đó trên màn hình */
   let dich = -1, so = -1;
@@ -356,18 +367,14 @@ const chayHet = () => { let t = Date.now() + 1e6; for (let i = 0; i < 5000 && (S
     }
   }
   ok('chạm giữa ô nào cũng ra đúng ô đó (hay khối chắn trước mặt), ở cả bốn góc xoay', !sai.length && dung > 2 * che, `${dung} trúng, ${che} bị khối chắn${sai.length ? '; sai: ' + sai.slice(0, 5).join(', ') : ''}`);
-  /* theo gợi ý từ đầu tới cuối (bấm 💡 hai lần mỗi lần đẩy) ở một màn mà bộ giải nhanh tốn nhiều bước hơn: vẫn đúng số bước
-     ít nhất — vì còn trên lời giải lưu sẵn thì gợi ý theo đúng lời giải đó */
-  const buocNhanh = (mk) => {
-    const r = S.giaiNhanh(mk, mk.thung, mk.nguoi), t = S.theMoi(mk);
-    let n = 0;
-    for (const b of r.day) { const d0 = S.duongToi(mk, t, S.buocToi(mk, b.o, (b.d + 2) & 3)); for (const h of d0) S.di(mk, t, h); S.di(mk, t, b.d); n += d0.length + 1; }
-    return n;
-  };
-  const kh = S.MAN.findIndex(x => x.k >= 2 && buocNhanh(S.docMan(x.m.split('|'))) > x.it);
-  S._moMan(kh);
-  for (let lan = 0; lan < 200 && !S._dangThang(); lan++) { S._goiY(); S._goiY(); chayHet(); }
-  ok('theo gợi ý từ đầu tới cuối thì đúng số bước ít nhất (ở màn mà bộ giải nhanh tốn hơn)', kh >= 0 && S._dangThang() && S._lichSu().length === S.MAN[kh].it, `màn ${kh + 1}: ${S._lichSu().length} bước, ít nhất ${S.MAN[kh] && S.MAN[kh].it}`);
+  /* người dùng: "cho gợi ý chi vậy, người dùng dùng gợi ý hết sao" — bỏ hẳn. Chế độ thử của người làm app vẫn xem được
+     lời giải, nhưng máy chơi thì không tính sao */
+  const nguon = fs.readFileSync(path.join(goc, 'assets', 'sokoban.js'), 'utf8');
+  ok('không còn nút gợi ý, không còn bộ giải gợi ý', !/sk-goiy|💡|giaiNhanh|Gợi ý/.test(nguon) && S.giaiNhanh === undefined);
+  const kx = S.MAN.length - 1, truoc = JSON.parse(luu['tdtd.soko']).s || '';
+  S._moMan(kx); S._xemLoiGiai(); chayHet(); S._ketThucMan();
+  const sau = JSON.parse(luu['tdtd.soko']).s || '';
+  ok('chế độ thử: máy chơi hết lời giải mà không ghi sao', S._dangThang() && S._lichSu().filter(b => b.thung >= 0).length === S.MAN[kx].day && (sau[kx] || '0') === (truoc[kx] || '0') && (sau[kx] || '0') === '0');
   S.dong();
 }
 

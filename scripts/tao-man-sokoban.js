@@ -18,8 +18,9 @@
    −100000; mỗi thùng sát tường −150; thùng sát người +50; thùng sát thùng +30; ổ sát ổ +30; điểm ≤ 0 thì bỏ. Màn
    trùng (kể cả xoay, lật, bỏ qua chỗ người đứng) thì bỏ. Độ khó để xếp thứ tự: đường·log(đường) − đường/lần đẩy
    (bài báo cộng thêm log thời gian tạo chỉ để phân xử hoà — ở đây hoà thì xét số bước ít nhất).
-   Thêm một bước bài báo không có: bộ giải tìm số bước ít nhất (để chấm sao); màn nào bộ giải không xong trong giới
-   hạn thì bỏ, và bỏ màn có thùng nằm sẵn trong ổ mà lời giải không đụng tới (thùng chỉ để trang trí).
+   Thêm một bước bài báo không có: bộ giải tìm số lần đẩy ít nhất (để chấm sao — người dùng: "tính sao bằng bước đẩy
+   thùng, ai lại tính bước chân"); màn nào bộ giải không xong trong giới hạn thì bỏ, và bỏ màn có thùng nằm sẵn trong ổ
+   mà lời giải không đụng tới (thùng chỉ để trang trí).
 
    Chạy:  node scripts/tao-man-sokoban.js tao <tệp-kết-quả.jsonl> [số-luồng]   — tạo liên tục, ghi từng màn một dòng
           node scripts/tao-man-sokoban.js chon <tệp-kết-quả.jsonl>...            — chọn 100 màn, ghi assets/mansoko.js */
@@ -361,36 +362,51 @@ if (!isMainThread) {
    cách đều từ dễ tới khó; chương một thùng (làm quen) lấy những màn dễ nhất. Hai màn liền nhau không được giống nhau
    quá (cùng phòng). */
 const PHAN = { 1: 6, 2: 24, 3: 30, 4: 25, 5: 15 };
-/* số lần đẩy lấy theo lời giải ít bước nhất (lời giải lưu trong màn) để bài kiểm tính lại được */
-const doKho = (c) => c.duong * Math.log(c.duong) - c.duong / c.dayIt;
+/* số lần đẩy = số lần đẩy ít nhất (lời giải lưu trong màn) để bài kiểm tính lại được */
+const doKho = (c) => c.duong * Math.log(c.duong) - c.duong / c.dayMin;
+/* lời giải ít lần đẩy nhất (trong đó ít bước nhất); null nếu không giải xong hay có thùng lời giải không đụng tới */
+function giaiTheoDay(c) {
+  const m = S.docMan(c.dong), g = S.giaiItDay(m, 8e6);
+  if (!g) return null;
+  const the = S.theMoi(m), dung = new Set();
+  for (const ch of g.loiGiai) { const b = S.di(m, the, S.CHU.indexOf(ch.toLowerCase())); if (b.thung >= 0) dung.add(b.thung); }
+  return dung.size === m.thung.length ? g : null;
+}
 function chon(tep) {
   const tat = [];
   for (const t of tep) for (const s of fs.readFileSync(t, 'utf8').split('\n')) if (s.trim()) tat.push(JSON.parse(s));
   const da = new Set(), ra = [];
   for (const K of Object.keys(PHAN).map(Number)) {
     const nhom = [], thay = new Set();                                 // bỏ màn trùng (kể cả xoay, lật) ngay trong nhóm
-    for (const c of tat.filter(c => c.thung === K && c.it && !c.thungThua).sort((a, b) => doKho(a) - doKho(b) || a.it - b.it)) {
+    for (const c of tat.filter(c => c.thung === K && c.it && !c.thungThua)) {
       const d = dangChuan(c.dong);
       /* chương làm quen: robot không đứng sẵn trên ổ — người mới phải thấy ngay ổ ở đâu */
       if (K === 1 && c.dong.some(r => r.includes('+'))) continue;
-      if (!da.has(d) && !thay.has(d)) { thay.add(d); nhom.push(c); }
+      if (da.has(d) || thay.has(d)) continue;
+      thay.add(d);
+      const g = giaiTheoDay(c);
+      if (!g) continue;
+      c.dayMin = g.day; c.giaiDay = g.loiGiai;
+      nhom.push(c);
     }
+    nhom.sort((a, b) => doKho(a) - doKho(b) || a.dayMin - b.dayMin);
     const n = Math.min(PHAN[K], nhom.length);
     const lay = K === 1 ? nhom.slice(0, n) : Array.from({ length: n }, (_, i) => nhom[Math.round(i * (nhom.length - 1) / Math.max(1, n - 1))]);
     for (const c of lay) { da.add(dangChuan(c.dong)); ra.push(c); }
-    console.log(`${K} thùng: ${nhom.length} ứng viên, lấy ${lay.length}; đường ${lay.map(c => c.duong).join(' ')}`);
+    console.log(`${K} thùng: ${nhom.length} ứng viên, lấy ${lay.length}; đường ${lay.map(c => c.duong).join(' ')}; lần đẩy ${lay.map(c => c.dayMin).join(' ')}`);
   }
   return ra;
 }
 function ghiMan(ds) {
-  const dong = ds.map(c => `  { m: '${c.dong.join('|')}', k: ${c.thung}, it: ${c.it}, d: ${c.duong}, giai: '${c.loiGiai}' },`);
+  const dong = ds.map(c => `  { m: '${c.dong.join('|')}', k: ${c.thung}, day: ${c.dayMin}, d: ${c.duong}, giai: '${c.giaiDay}' },`);
   const dau = `/* ${ds.length} màn của Đẩy thùng sao (assets/sokoban.js). Máy tự tạo bằng scripts/tao-man-sokoban.js theo Taylor & Parberry
    (GAMEON-NA 2011): ghép phòng từ 17 mẫu, đặt ổ, chơi ngược từ lúc mọi thùng nằm trong ổ để tìm thế xa nhất — màn nào
    cũng giải được. Đừng sửa tay: chạy lại "node scripts/tao-man-sokoban.js chon …" (bài kiểm scripts/test-sokoban.js
-   giải lại từng màn để chắc số bước ít nhất đúng).
+   giải lại từng màn để chắc số lần đẩy ít nhất đúng).
    m: màn ký hiệu XSB (# tường, . ổ, $ thùng, * thùng trong ổ, @ robot, + robot đứng trên ổ), các hàng nối bằng "|".
-   k: số thùng. it: số bước ít nhất. d: số đường đẩy (box lines — đẩy một thùng nhiều ô cùng hướng tính một đường),
-   thước đo độ khó của bài báo. giai: một lời giải ít bước nhất, kiểu LURD (chữ thường đi, chữ hoa đẩy). */
+   k: số thùng. day: số lần đẩy ít nhất (chấm sao theo số này). d: số đường đẩy (box lines — đẩy một thùng nhiều ô cùng
+   hướng tính một đường), thước đo độ khó của bài báo. giai: một lời giải ít lần đẩy nhất, trong đó ít bước nhất, kiểu
+   LURD (chữ thường đi, chữ hoa đẩy). */
 self.TDTD_MANSOKO = [
 `;
   fs.writeFileSync(path.join(__dirname, '..', 'assets', 'mansoko.js'), dau + dong.join('\n') + '\n];\n');
