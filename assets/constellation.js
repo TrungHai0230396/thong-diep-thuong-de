@@ -1,5 +1,7 @@
-/* Nối sao thành chòm — kéo tay nối các ngôi sáng lại thành hình.
-   Không đếm giờ, không thua. Nối trật thì đường tự tan.
+/* Nối sao thành chòm — app tự nối từng nét, như vẽ chòm sao trên bản đồ sao.
+   Bản đầu để người xem tự kéo từ ngôi này sang ngôi kia, nhưng không có gì chỉ ngôi nào nối với ngôi nào, nên người
+   dùng nói: "bạn tự nối luôn đi, chứ người dùng không biết cách nối đâu". Giờ mở ra là đường vàng tự chạy dần từ ngôi
+   này sang ngôi kia; chạm màn hình thì nối xong ngay. Nối xong thì kéo để xoay, xem chòm sao vỡ ra ở góc nhìn khác.
    Toạ độ sao trong khung 0..1, sẽ co giãn theo màn hình. */
 (() => {
 'use strict';
@@ -212,8 +214,11 @@ function chieuSao(sao) {
 
 
 let tam, cv, ctx, W, H, DPR, raf = null, tTruoc = 0;
-let chi = 0, diem = [], canhCanNoi = [], daNoi = new Set(), keo = null, xong = false, sangDan = 0, nen = [];
-let banKinhBam = 34;   // co lại ở chòm có sao nằm sát nhau, để không bắt nhầm ngôi bên cạnh
+let chi = 0, diem = [], canhCanNoi = [], daNoi = new Set(), xong = false, sangDan = 0, nen = [];
+/* đang tự nối: nét thứ k trong danh sách noi của chòm, bắt đầu chạy từ lúc t0 (ms), chạy hết trong lau ms */
+let tuNoi = null;
+const CHO_DAU = 900, NGHI = 160;           // chờ một nhịp cho thấy đám sao trước khi nối; nghỉ giữa hai nét
+const lauNet = (dai) => Math.max(380, Math.min(950, 320 + dai * 1.6));   // nét dài chạy lâu hơn chút, như tay vẽ
 let goc3d = [0, 0], tyLe = 0, tyLeDich = 0, tam3d = null, diem3d = null, xoayTay = null, oX = 0, oY = 0;
 let giua = [0, 0];   // tâm khung bao của hình chiếu, không phải trọng tâm 3 chiều
 
@@ -231,7 +236,7 @@ function dungKhung() {
       <p class="cs-ten"></p>
       <p class="cs-phu"></p>
     </div>
-    <p class="cs-nhac">Kéo từ ngôi sao này sang ngôi sao kia</p>
+    <p class="cs-nhac"></p>
     <button class="cs-goc" hidden>Về góc nhìn Trái Đất</button>
     <div class="cs-xong" hidden>
       <p class="cs-loi"></p>
@@ -246,45 +251,20 @@ function dungKhung() {
   tam.querySelector('.cs-goc').onclick = () => { goc3d = [0, 0]; xoayTay = null; };
 
   const toa = (e) => { const r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
-  const gan = (p) => {
-    let tot = -1, gn = banKinhBam;
-    diem.forEach((d, i) => { const k = Math.hypot(d.x - p.x, d.y - p.y); if (k < gn) { gn = k; tot = i; } });
-    return tot;
-  };
   cv.addEventListener('pointerdown', e => {
     const p = toa(e);
     cv.setPointerCapture(e.pointerId);
-    if (xong) { xoayTay = { x: p.x, y: p.y, g0: goc3d.slice() }; return; }   // xong rồi thì kéo để xoay
-    const i = gan(p);
-    if (i >= 0) keo = { tu: i, ...p };
+    if (!xong) { noiHet(); return; }                      // đang tự nối mà chạm: nối xong ngay, khỏi chờ
+    xoayTay = { x: p.x, y: p.y, g0: goc3d.slice() };      // xong rồi thì kéo để xoay
   });
   cv.addEventListener('pointermove', e => {
-    const p = toa(e);
-    if (xoayTay) {
-      const GH = 1.15;                                    // chặn góc, không cho lộn ngược
-      goc3d[0] = Math.max(-GH, Math.min(GH, xoayTay.g0[0] + (p.x - xoayTay.x) * .0055));
-      goc3d[1] = Math.max(-1.0, Math.min(1.0, xoayTay.g0[1] - (p.y - xoayTay.y) * .0055));
-      return;
-    }
-    if (keo) Object.assign(keo, p);
+    if (!xoayTay) return;
+    const p = toa(e), GH = 1.15;                          // chặn góc, không cho lộn ngược
+    goc3d[0] = Math.max(-GH, Math.min(GH, xoayTay.g0[0] + (p.x - xoayTay.x) * .0055));
+    goc3d[1] = Math.max(-1.0, Math.min(1.0, xoayTay.g0[1] - (p.y - xoayTay.y) * .0055));
   });
-  cv.addEventListener('pointerup', e => {
-    if (xoayTay) { xoayTay = null; return; }
-    if (!keo) return;
-    const j = gan(toa(e));
-    if (j >= 0 && j !== keo.tu) {
-      const k = khoa(keo.tu, j);
-      if (canhCanNoi.has(k) && !daNoi.has(k)) {
-        daNoi.add(k);
-        diem[keo.tu].sang = diem[j].sang = 1;
-        if (navigator.vibrate) { try { navigator.vibrate(14); } catch (err) {} }
-        tam.querySelector('.cs-nhac').classList.add('mo');
-        if (daNoi.size === canhCanNoi.size) hoanThanh();
-      }
-    }
-    keo = null;
-  });
-  cv.addEventListener('pointercancel', () => { keo = null; xoayTay = null; });
+  cv.addEventListener('pointerup', () => { xoayTay = null; });
+  cv.addEventListener('pointercancel', () => { xoayTay = null; });
   addEventListener('resize', doCo);
 }
 
@@ -322,14 +302,6 @@ function datSao() {
   if (!tyLe) tyLe = tyLeDich;                       // lần đầu thì khớp luôn, không phóng dần
 
   veLaiDiem(ph);
-
-  /* Có chòm mà hai ngôi nằm rất sát nhau ngoài trời thật, như hai sao giữa lưỡi cày.
-     Thay vì kéo giãn cho dễ bấm, giữ nguyên hình và thu nhỏ vùng bắt điểm lại. */
-  let gapMin = Infinity;
-  for (let a = 0; a < diem.length; a++)
-    for (let b = a + 1; b < diem.length; b++)
-      gapMin = Math.min(gapMin, Math.hypot(diem[a].x - diem[b].x, diem[a].y - diem[b].y));
-  banKinhBam = Math.max(13, Math.min(34, gapMin * .46));
 }
 
 /* Đo bề rộng và tâm của hình sau khi chiếu.
@@ -365,7 +337,7 @@ function veLaiDiem(ph) {
 }
 
 function nap(i) {
-  chi = i; xong = false; sangDan = 0; daNoi = new Set(); keo = null;
+  chi = i; xong = false; sangDan = 0; daNoi = new Set();
   goc3d = [0, 0]; tyLe = 0; xoayTay = null;
   const c = CHOM[chi];
   canhCanNoi = new Set(c.noi.map(([a, b]) => khoa(a, b)));
@@ -374,13 +346,40 @@ function nap(i) {
   tam.querySelector('.cs-ten').textContent = c.ten;
   tam.querySelector('.cs-phu').textContent = c.phu;
   tam.querySelector('.cs-xong').hidden = true;
-  tam.querySelector('.cs-nhac').textContent = 'Kéo từ ngôi sao này sang ngôi sao kia';
+  tam.querySelector('.cs-nhac').textContent = '';
   tam.querySelector('.cs-nhac').classList.remove('mo', 'tren');
   tam.querySelector('.cs-goc').hidden = true;
+  /* người dặn máy giảm chuyển động: hiện cả chòm luôn, không chạy từng nét */
+  const itChuyenDong = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  tuNoi = { k: 0, t0: performance.now() + CHO_DAU };
+  if (itChuyenDong) noiHet();
+}
+
+/* Chạy nét đang nối; tới đầu kia thì sáng ngôi đó, nghỉ một nhịp rồi sang nét sau. Hết nét thì xong chòm. */
+function chayNet(t) {
+  const c = CHOM[chi];
+  while (tuNoi && t >= tuNoi.t0) {
+    const [a, b] = c.noi[tuNoi.k];
+    if (!diem[a] || !diem[b]) return;
+    diem[a].sang = 1;
+    const lau = lauNet(Math.hypot(diem[b].x - diem[a].x, diem[b].y - diem[a].y));
+    if (t < tuNoi.t0 + lau) return;                       // còn đang chạy, buoc() vẽ phần đã tới
+    daNoi.add(khoa(a, b)); diem[b].sang = 1;
+    const t0 = tuNoi.t0 + lau + NGHI;
+    tuNoi = tuNoi.k + 1 < c.noi.length ? { k: tuNoi.k + 1, t0 } : null;
+    if (!tuNoi) hoanThanh();
+  }
+}
+function noiHet() {
+  if (xong) return;
+  const c = CHOM[chi];
+  for (const [a, b] of c.noi) { daNoi.add(khoa(a, b)); if (diem[a]) diem[a].sang = 1; if (diem[b]) diem[b].sang = 1; }
+  tuNoi = null;
+  hoanThanh();
 }
 
 function hoanThanh() {
-  xong = true;
+  xong = true; tuNoi = null;
   tam.querySelector('.cs-nhac').classList.add('mo');
   const c = CHOM[chi];
   tam.querySelector('.cs-loi').textContent = c.loi;
@@ -421,6 +420,8 @@ function buoc(t) {
     }
   }
 
+  if (tuNoi && !xong) chayNet(t);
+
   const g = ctx.createLinearGradient(0, 0, 0, H);
   g.addColorStop(0, '#141032'); g.addColorStop(.6, '#100d28'); g.addColorStop(1, '#080716');
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
@@ -444,12 +445,20 @@ function buoc(t) {
   }
   ctx.shadowBlur = 0;
 
-  // đường đang kéo
-  if (keo && diem[keo.tu]) {
-    ctx.strokeStyle = 'rgba(232,195,122,.4)'; ctx.lineWidth = 1.2;
-    ctx.setLineDash([4, 6]);
-    ctx.beginPath(); ctx.moveTo(diem[keo.tu].x, diem[keo.tu].y); ctx.lineTo(keo.x, keo.y); ctx.stroke();
-    ctx.setLineDash([]);
+  // nét đang tự nối: chạy dần từ ngôi này sang ngôi kia, đầu nét có đốm sáng như ngòi bút
+  if (tuNoi && !xong && t >= tuNoi.t0) {
+    const [a, b] = CHOM[chi].noi[tuNoi.k], A = diem[a], B = diem[b];
+    if (A && B) {
+      const lau = lauNet(Math.hypot(B.x - A.x, B.y - A.y)), p = Math.min(1, (t - tuNoi.t0) / lau), e = p * p * (3 - 2 * p);
+      const x = A.x + (B.x - A.x) * e, y = A.y + (B.y - A.y) * e;
+      ctx.strokeStyle = 'rgba(232,195,122,.75)'; ctx.lineWidth = 1.8;
+      ctx.shadowColor = 'rgba(232,195,122,.7)'; ctx.shadowBlur = 8;
+      ctx.beginPath(); ctx.moveTo(A.x, A.y); ctx.lineTo(x, y); ctx.stroke();
+      ctx.shadowBlur = 0;
+      const q = ctx.createRadialGradient(x, y, 0, x, y, 9);
+      q.addColorStop(0, 'rgba(255,240,200,.95)'); q.addColorStop(1, 'rgba(255,220,150,0)');
+      ctx.fillStyle = q; ctx.beginPath(); ctx.arc(x, y, 9, 0, 6.284); ctx.fill();
+    }
   }
 
   // các ngôi sao của chòm
@@ -486,11 +495,8 @@ function dong() {
 
 addEventListener('keydown', e => { if (e.key === 'Escape' && tam && tam.classList.contains('hien')) dong(); });
 self.TDTD_CHOMSAO = { mo, dong, _v3: viTri3D, _chieuXa: chieu, _buoc: (t) => buoc(t), _chom: CHOM, _chieu: chieuSao,
-  _nap: (i) => nap(i),
-  _diem: () => diem.map(d => ({ x: d.x, y: d.y, sau: d.sau, ten: d.ten })),
+  _nap: (i) => nap(i), _noiHet: () => noiHet(), _tuNoi: () => tuNoi && Object.assign({}, tuNoi), _daNoi: () => [...daNoi],
+  _diem: () => diem.map(d => ({ x: d.x, y: d.y, sau: d.sau, ten: d.ten, sang: d.sang })),
   _xoay: (a, b) => { goc3d = [a, b]; },
-  _noi: (a, b) => { const k = khoa(a, b);
-    if (canhCanNoi.has(k) && !daNoi.has(k)) { daNoi.add(k); diem[a].sang = diem[b].sang = 1;
-      if (daNoi.size === canhCanNoi.size) hoanThanh(); return true; } return false; },
   _debug: () => ({ chom: CHOM[chi].ten, canNoi: canhCanNoi.size, daNoi: daNoi.size, xong, soSao: diem.length }) };
 })();

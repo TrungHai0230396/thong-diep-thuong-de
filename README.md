@@ -527,7 +527,9 @@ có dấu hiệu nào đo được ổn định bằng cách này, nên vẫn d�
 
 ### Sao trắng ngà — nối sao thành chòm
 
-Mã ở `assets/constellation.js`. Trong đám sao lấm tấm có vài ngôi sáng hơn. Kéo từ ngôi này sang ngôi kia để nối. Nối trúng thì đường vàng sáng lên và dính lại, nối trật thì đường tự tan, không báo sai, không đếm giờ, không thua. Nối đủ thì cả chòm bừng sáng, hiện lời giải thích và câu ca dao nếu có.
+Mã ở `assets/constellation.js`. Trong đám sao lấm tấm có vài ngôi sáng hơn. **App tự nối từng nét**: chờ một nhịp cho thấy đám sao, rồi đường vàng chạy dần từ ngôi này sang ngôi kia theo thứ tự nét của chòm, như vẽ chòm sao trên bản đồ sao — đầu nét có đốm sáng như ngòi bút, nét dài chạy lâu hơn chút. Nối đủ thì cả chòm bừng sáng, hiện lời giải thích và câu ca dao nếu có. Chạm màn hình thì nối xong ngay, khỏi chờ; máy dặn giảm chuyển động thì hiện cả chòm luôn.
+
+Bản đầu để người xem tự kéo từ ngôi này sang ngôi kia, nối trật thì đường tự tan — nhưng không có gì chỉ ngôi nào nối với ngôi nào. Người dùng: "bạn tự nối luôn đi, chứ người dùng không biết cách nối đâu". Nên bỏ phần tự kéo; chòm Sư Tử nhiều nét nhất (9 nét) nối xong trong chừng 6 giây.
 
 Tám nhóm sao, tên theo cách gọi tiếng Việt:
 
@@ -549,8 +551,6 @@ Bắc Đẩu trải từ 79 tới 123 năm ánh sáng, Lưỡi Cày từ 243 t�
 Vài khoảng cách còn tranh cãi trong giới thiên văn, rõ nhất là Betelgeuse và Alnilam; file có ghi chú điều này.
 
 Thêm chòm mới chỉ cần thêm một mục vào mảng `CHOM`: tên, lời giải thích, và danh sách sao dạng `[tên, xích kinh giờ, xích vĩ độ, năm ánh sáng]` cùng các cặp cần nối. Không phải căn chỉnh toạ độ màn hình, chương trình tự chiếu và tự co giãn.
-
-Vùng bắt điểm khi chạm cũng tự co theo từng chòm: chòm nào có hai ngôi nằm sát nhau ngoài trời thật, như hai sao giữa lưỡi cày cách nhau 33 pixel, thì bán kính bắt nhỏ lại thay vì kéo giãn hình cho dễ bấm.
 
 Một lưu ý về độ chính xác: Hội Thiên văn Việt Nam nêu rõ Thần Nông chỉ là **nhóm sao** do người xưa đặt tên, không trùng khớp với chòm Thiên Yết trong thiên văn học hiện đại. App ghi đúng như vậy trong phần chú thích chứ không gọi nhầm là chòm sao.
 
@@ -1790,6 +1790,7 @@ assets/datlien.js          mặt nạ đất/biển 720×360 từ Natural Earth,
 scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlien.js
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
+scripts/test-chomsao.js    10 kiểm thử Nối sao thành chòm: tự nối đúng thứ tự nét, chạm để xong ngay, giảm chuyển động, xoay sau khi xong
 scripts/test-sao.js        118 kiểm thử vòng đời MỌI ngôi sao, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
@@ -1836,6 +1837,7 @@ node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 117 kiểm thử bầu trời đêm
 node scripts/test-toancanh.js    # chạy 83 kiểm thử hiệu ứng toàn cảnh
 node scripts/test-mua.js         # chạy 58 kiểm thử phần đọc dự báo mưa
+node scripts/test-chomsao.js     # chạy 10 kiểm thử Nối sao thành chòm
 node scripts/test-sao.js         # chạy kiểm thử vòng đời mọi ngôi sao
 node scripts/test-lich.js        # chạy 97 kiểm thử lịch vạn niên
 node scripts/test-sohoc.js       # chạy 48 kiểm thử thần số học
