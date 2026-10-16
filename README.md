@@ -185,7 +185,7 @@ Bộ số này tôi phải đo bốn lần mới ra, vì hai đầu đều sai:
 - Lá nào lớn hơn 34 px thì cứ 50–100 giây **đẻ một nhánh**: một mầm 13 px nhú ra cách mép lá mẹ 24–46 px, không đè lá nào, không lọt ra ngoài khung. Mầm còn dính **cuống** với lá mẹ, cuống nhạt dần rồi rụng sau 20 giây.
 - Mầm lớn dần, 80 giây thì đạt cỡ tối đa của nó. Mầm dưới 22 px chỉ chở nổi **một** con ếch.
 - Quá 78% tuổi thì lá **úa dần** sang vàng nâu. Hết tuổi thì tàn trong 5 giây: úa hẳn, teo lại 16%, chìm xuống, mờ đi rồi mất, để lại một vòng sóng.
-- Lá bắt đầu tàn thì **dọn khách**: con nào đang ngồi sẽ nhảy sang chiếc lá còn chỗ, không còn lá nào thì tuột xuống nước mà bơi.
+- Lá bắt đầu tàn thì **dọn khách**: con nào đang ngồi sẽ nhảy sang chiếc lá còn chỗ, không còn lá nào thì tuột xuống nước mà bơi. Con đang bơi tới thì thôi nhắm nó; con đang bay tới thì chạm chân xuống là phóng đi luôn.
 - Nhiều nhất 8 lá cùng lúc. Nếu hồ trắng không còn lá nào thì một mầm mọc lên từ gốc dưới đáy, hồ không bao giờ thành mặt nước trơ.
 
 Chạy thử ba hồ, mỗi hồ 30 phút: số lá trung bình 4,7–7,5 chiếc, mỗi hồ có 22–44 lá sinh ra và 19–42 lá tàn đi; có hồ thưa xuống còn một lá rồi dày lại.
@@ -193,7 +193,7 @@ Chạy thử ba hồ, mỗi hồ 30 phút: số lá trung bình 4,7–7,5 chiế
 Hai chỗ dễ sai khi lá biến mất, đều đã sửa và có bài kiểm bất biến chạy 30 phút để canh:
 
 - Ếch nhớ **chỉ số** lá trong mảng, nên bỏ một chiếc là mọi chỉ số phía sau phải dời theo, và con nào đang ngồi, **đang bay tới**, hay đang bơi tới chiếc lá vừa mất đều phải cho xuống nước. Thiếu vế "đang bay tới" thì con ếch đáp xuống chỗ trống rồi ngồi trên mặt nước cho tới lần tự nhảy sau.
-- Con đang bơi phải **cắm đầu tới chiếc lá đã nhắm**, chỉ nhắm lại khi lá đó mất hẳn. Bản đầu cho nó đổi lá mỗi khi lá đích đầy, thành ra lúc hồ đông thì nó lượn vòng giữa hai chiếc lá đầy tới 25 giây không lên được. Giờ đầy cũng trèo lên, đầy quá thì lá lún và có con khác tuột xuống.
+- Con đang bơi phải **cắm đầu tới chiếc lá đã nhắm**, chỉ nhắm lại khi lá đó mất hẳn hay bắt đầu tàn (xem *Lá năm chỗ chở mười con*). Bản đầu cho nó đổi lá mỗi khi lá đích đầy, thành ra lúc hồ đông thì nó lượn vòng giữa hai chiếc lá đầy tới 25 giây không lên được. Giờ đầy cũng trèo lên, đầy quá thì lá lún và có con khác tuột xuống.
 
 **Tiếng.** Hồ có tiếng, **sinh hết bằng Web Audio, không nhúng file âm thanh nào** — cả app vẫn 168 KB. **Mặc định tắt**; nút loa ở góc trên bên trái để bật, lựa chọn nhớ ở khoá `tdtd.tieng`. Đang tắt thì **không tạo `AudioContext` nào cả**, không tốn gì.
 
@@ -651,6 +651,44 @@ Cú phóng của cá phải bắt đầu **xa hơn** khoảng nòng nọc cong �
 Nay cá phóng từ 95 pixel, bơi 46–66 px/s, và nòng nọc vọt xong phải nghỉ hơn nửa giây mới vọt tiếp. Đo thử với 10 nòng nọc và 3 con cá trong 30 giây: cá ăn được 9 tới 10 con. Chạy tự nhiên 4 phút thì hồ vẫn cân, ếch từ 4 lên 9 rồi về 6, nòng nọc không bị quét sạch.
 
 Thẻ bọc màn hình lúc đang ẩn có bề rộng bằng 0, mọi toạ độ tính từ đó thành vô định rồi canvas ném lỗi. Cả năm màn hình phủ kín đều đã chặn: lấy tạm kích thước cửa sổ cho tới khi trang bày xong.
+
+## Lá năm chỗ chở mười con
+
+Chạy `scripts/test-pond.js` liền mười lần thì ba lần báo một lỗi, mỗi lần một chỗ khác nhau. Lộ ra lúc một phiên khác chạy toàn bộ kiểm thử cho việc sửa nút Cài app, không đụng gì tới hồ:
+
+- `số con ngồi không vượt tổng chỗ — ngồi 21 / chỗ 18`
+- `gỡ lá xong không con nào rơi vào trạng thái mâu thuẫn — hồ chưa đủ lá để dựng phép thử`
+- `không khung nào đơ quá 60 ms — nặng nhất 79 ms`, lúc máy đang chạy nhiều bài kiểm song song
+
+Ba câu, ba kiểu hỏng, và chỉ câu đầu là lỗi thật của hồ.
+
+**"Ngồi 21 / chỗ 18" là lỗi thật.** Cho `Math.random` một hạt cố định để lặp lại được một lượt hỏng y như vậy, rồi lần từng khung. Một con trên lá #0 nhảy đi, để lại đúng một chỗ trống. Tám con đang nổi dưới nước, con nào cũng hai giây rưỡi ngó quanh một lần, cùng thấy chỗ đó và cùng bơi tới. Tới mép lá, con nào cũng hỏi "lá còn chỗ không" — mà câu hỏi đó (`soEch`) chỉ đếm con **đã đáp**. Con đầu phóng lên, đang bay nên không ai đếm; con thứ hai tới, vẫn thấy còn một chỗ, phóng lên; rồi con thứ ba, thứ tư, thứ năm, thứ sáu. Lá năm chỗ chở mười con. Cái mù đó có ở cả ba chỗ hỏi "còn chỗ không": con bơi tới mép lá; tìm lá gần nhất còn chỗ (`laConCho`, dùng khi lá tàn đuổi khách, khi tuột xuống nước, khi nòng nọc hoá ếch); và con tới giờ tự nhảy.
+
+Bài kiểm cũ chỉ đếm một lần ở giây 60 và còn chừa hai con, nên phần lớn lượt thì cảnh chen đã tự gỡ xong trước lúc đếm (lá lún rồi hất con lên sau cùng xuống nước) — vì vậy nó lúc đạt lúc hỏng chứ không hỏng hẳn. Đếm ở mọi khung thì thấy rõ: với `pond.js` cũ, 293/300 lượt có lúc số con ngồi vượt tổng chỗ, nhiều nhất 14 con; đếm từng lá thì lượt nào cũng có lá chở quá sức, cứ ba khung có một khung, có khung số con dư trên các lá cộng lại tới 29.
+
+Gỡ chỗ mù đó xong, đếm lại vẫn còn 13/300 lượt có lúc dư một tới bốn con, lần này toàn là con ngồi trên **lá đang tàn**. Lá bắt đầu tàn thì chỗ của nó thôi tính, con đang ngồi bị đuổi đi đúng luật; nhưng con đang **bơi** tới thì cứ bơi tiếp rồi trèo lên, còn con đang **bay** tới thì đáp xuống rồi ngồi luôn. Chuyện đáp xuống lá đang tàn không hiếm: 62 lần trong 20 tiếng mô phỏng.
+
+Chữa trong `assets/pond.js`:
+
+- **`giuCho(l)`**: chỗ đã có chủ là con đang ngồi cộng con đang bay tới — nó đã rời chân khỏi chỗ cũ, chiếc lá kia là của nó. Ba chỗ hỏi "còn chỗ không" đều hỏi bằng hàm này. `soEch` vẫn giữ cho phần sức nặng đè lên lá, vì con đang bay chưa đè.
+- Lá đang nhắm bắt đầu tàn thì con đang bơi **thôi nhắm nó**; lần ngó quanh sau nó chọn lá khác.
+- Đang bay mà lá đích bắt đầu tàn thì **chạm chân xuống là phóng đi**, như mấy con đang ngồi trên đó lúc lá bắt đầu tàn (`roiLa`, tách ra từ `donKhachTro`).
+
+Con bị chạm giật mình vẫn được nhảy bừa lên lá đông như trước; giờ đó là đường duy nhất làm lá chở quá sức, và đúng ý đồ. Đo lại 300 lượt nhồi ếch: không khung nào số con ngồi vượt tổng chỗ, và trong 818 100 khung (90 giây mỗi lượt) không lá nào chở quá sức — bản cũ thì lượt nào cũng có, một phần ba số khung. Trong trình duyệt thật cũng vậy: nhồi 32 con vào hồ 22 chỗ, 721 khung không dư con nào, mấy con thừa nổi quanh mép lá, không lỗi console.
+
+Bài kiểm cũ còn có cờ `chat` để khỏi đòi lá tự gỡ ở hồ bị nhồi, kèm lời giải thích rằng nhồi quá sức chứa thì lá chở quá sức "liên tục và đúng ý đồ". Hoá ra đó không phải ý đồ mà chính là lỗi này. Cờ đã bỏ.
+
+**"Hồ chưa đủ lá" là bài kiểm hỏng oan.** Phép thử gỡ lá (`soatBoLa`) dựng trên hồ của bài ngay trước, là hồ vừa chạy bù một ngày — mà hồ qua một ngày có lúc chỉ còn một hai chiếc lá (đo ba ngày mô phỏng, mỗi phút nhìn một lần: 1,7% số lần). Phép thử chỉ cần ba lá bất kỳ, nên giờ nó mở hồ mới; mở hồ là rải đủ năm lá.
+
+**"Nặng nhất 79 ms" cũng hỏng oan, và đáng nói hơn.** Bài đo bằng giờ treo tường. Máy bận thì hệ điều hành cất tiến trình sang một bên chờ tới lượt, còn giờ treo tường vẫn chạy. Cho 16 tiến trình chạy không ngừng trên máy 8 lõi: cùng đoạn mã đó đo ra khung nặng nhất 120–197 ms, 65–68 khung quá 60 ms, trong khi khung nặng nhất chính tiến trình đó chỉ làm chừng 37 ms việc. Nới ngưỡng là sai: nới bao nhiêu thì máy bận thêm chút nữa vẫn vượt, mà ngưỡng càng rộng thì càng không bắt được gì.
+
+Giờ cả ngân sách của hồ lẫn phép đo trong bài kiểm chạy theo **giờ CPU của chính luồng đó** (`process.threadCpuUsage`, có từ Node 23.9; bản cũ hơn lấy giờ CPU cả tiến trình). Giờ đó chỉ chạy khi mã của hồ chạy, bị cất đi chờ lượt bao lâu cũng không tính. Đo lại: máy rảnh hay 16 tiến trình chen, khung nặng nhất đều 40,5–40,8 ms — đúng ngân sách 40 ms cộng một bước. Phụ thêm: số khung để trả tám tiếng nợ bớt phụ thuộc tải máy (máy rảnh 126–171 khung; 16 tiến trình chen thì cách cũ 288–384, cách mới 180–207), nên bài "một ngày nợ không tốn quá nhiều khung hơn tám tiếng" cũng vững hơn.
+
+`scripts/test-pond.js` thêm 5 bài (giờ 53), dựng thẳng từng đường chứ không chờ chúng tự xảy ra: năm con cùng bơi tới mép lá còn một chỗ thì chỉ một con lên; lá tàn đuổi khách thì chỗ trống cuối cùng chỉ một con nhận; mấy con cùng tới giờ tự nhảy cũng vậy; lá đang nhắm bắt đầu tàn thì con đang bơi tới thôi trèo lên; đang bay mà lá đích bắt đầu tàn thì đáp xong phóng đi. Bài "số con ngồi không vượt tổng chỗ" giờ đếm ở mọi khung trong một phút và không chừa con nào; `soatBoLa` mở hồ mới; bài 60 ms đo bằng giờ CPU. `pond.js` có thêm móc `_giaLa(i)` cho bài kiểm làm một lá bắt đầu tàn ở bước sau.
+
+Thử phá 10 chỗ, mỗi lần chạy nguyên bộ kiểm trên một bản sao, không đụng `pond.js` thật. Bản `pond.js` cũ hỏng 7 bài: năm bài mới, bài đếm mọi khung, và bài bất biến sau khi nhồi ếch (giờ không còn được miễn: "quá sức kéo dài: lá#6 3/2"). Gỡ riêng chỗ đếm con đang bay ở con bơi tới mép, ở `laConCho`, ở con tự nhảy thì hỏng đúng bài dựng cho chỗ đó: "lá#0 8/4", "lá#1 8/4", "lá#1 7/3". Gỡ cả ba thì hỏng 4 bài, bài đếm mọi khung báo "dư 14 con ở giây 0.4 sau khi nhồi". Để con bơi vẫn nhắm lá đang tàn: "3 con vẫn trèo lên lá đang tàn". Bỏ chỗ phóng đi khi đáp xuống lá đang tàn: "1 con ngồi trên lá đang tàn". Nới ngân sách trả nợ lên 80 ms: "nặng nhất 80.6 ms". Thêm một việc nặng (chừng 25 ms lúc máy rảnh) vào một bước tính thầm: "nặng nhất 173.6 ms"; vào khung có vẽ: "nặng nhất 199.4 ms". Bắt cả 10.
+
+Chạy liền 20 lượt, bốn lượt cùng lúc nên máy luôn bận (tải 4,6–18,5, có cả các phiên khác đang chạy): cả 20 lượt 53/53, bài 60 ms nặng nhất 40,4–40,7 ms. Thêm một lượt trên Node 16, đồng hồ lấy giờ CPU cả tiến trình: 53/53, nặng nhất 44,6 ms.
 
 ## Bộ bài: 209 lá, gộp từ hai nguồn
 
@@ -2095,7 +2133,7 @@ scripts/lam-trang-chia-se.py  tạo trang chia sẻ và ảnh xem trước cho m
 scripts/lam-ke-khai.py     viết các <trò>/app.webmanifest từ manifest.webmanifest và danh sách trò trong assets/app.js
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       39 kiểm thử lõi
-scripts/test-pond.js       48 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
+scripts/test-pond.js       53 kiểm thử hồ nước, chạy hồ ngoài trình duyệt, đo cả phổ tiếng ếch
 scripts/test-astro.js      73 kiểm thử thiên văn, đối chiếu số liệu ngoài (có giờ mọc lặn Trăng theo JPL Horizons)
 assets/saosang.js          5.080 sao tới cấp 6 từ Danh mục sao sáng Yale, sinh bởi scripts/lam-saosang.py
 scripts/lam-saosang.py     lọc danh mục BSC5 (CDS V/50) thành saosang.js
@@ -2162,7 +2200,7 @@ scripts/validate-cards.py  kiểm tra nội dung của bản v3 nói trên
 ```bash
 python3 scripts/build-data.py    # dựng lại data/cards.json từ CSV
 node scripts/test-core.js        # chạy 39 kiểm thử lõi (Node 18+)
-node scripts/test-pond.js        # chạy 48 kiểm thử hồ, gồm một tiếng mô phỏng
+node scripts/test-pond.js        # chạy 53 kiểm thử hồ, gồm một tiếng mô phỏng
 node scripts/test-astro.js       # chạy 73 kiểm thử thiên văn
 node scripts/test-troidem.js     # chạy 117 kiểm thử bầu trời đêm
 node scripts/test-toancanh.js    # chạy 83 kiểm thử hiệu ứng toàn cảnh

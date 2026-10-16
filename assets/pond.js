@@ -275,14 +275,16 @@ function boLa(i) {
   }
 }
 
-/* Lá bắt đầu tàn: con nào đang ngồi thì nhảy sang lá khác, không còn lá thì xuống nước. */
+/* Lá bắt đầu tàn: con nào đang ngồi thì nhảy sang lá khác, không còn lá thì xuống nước.
+   Con đang bay dở mà lá đích bắt đầu tàn thì chạm chân xuống cũng làm y như vậy (xem chỗ đáp). */
+function roiLa(e, i) {
+  const dich = laConCho(i, e.x, e.y);
+  if (dich >= 0 && dich !== i) nhaySang(e, dich);
+  else tuotXuongNuoc(e, i);
+}
+
 function donKhachTro(l, i) {
-  for (const e of ech) {
-    if (!nguoi(e) || la[e.la] !== l) continue;
-    const dich = laConCho(i, e.x, e.y);
-    if (dich >= 0 && dich !== i) nhaySang(e, dich);
-    else tuotXuongNuoc(e, i);
-  }
+  for (const e of ech) if (nguoi(e) && la[e.la] === l) roiLa(e, i);
 }
 
 function buocLa(dt) {
@@ -351,6 +353,12 @@ const KIET = 220000;                                    // no đầy mà không 
 const BU_MOI = .4;                                      // một con mồi bù được bốn phần mười mức no
 const DU_DE = .6, TON_DE = .3;                          // no hơn 0,6 mới đẻ, đẻ một ổ tốn 0,3
 const soEch = (l) => ech.reduce((n, e) => n + (nguoi(e) && la[e.la] === l ? 1 : 0), 0);
+/* Chỗ đã có chủ: con đang ngồi cộng con đang bay tới — nó đã rời chân khỏi chỗ cũ, chiếc lá này là
+   của nó. Hỏi "lá còn chỗ không" thì phải đếm bằng hàm này. Bản trước đếm bằng soEch, chỉ thấy con
+   đã đáp, nên chỗ trống cuối cùng bị cả đám cùng nhận: tám con đang nổi cùng nhắm một chỗ, con nào
+   bơi tới mép cũng thấy "còn chỗ" mà phóng lên, đo được sáu con cùng phóng vào một chỗ — lá năm chỗ
+   chở mười con. soEch vẫn dùng cho phần sức nặng: con đang bay chưa đè lên lá. */
+const giuCho = (l) => ech.reduce((n, e) => n + (!e.boi && e.tan === null && la[e.la] === l ? 1 : 0), 0);
 const suc = (l) => l.r < 22 ? 1                          // mầm mới nhú chỉ chở nổi một con
   : Math.max(2, Math.min(5, 2 + Math.floor((l.r - 26) / 6)));   // 22–31 px chịu 2 con, rồi 3, 4, và từ 44 px là 5
 
@@ -453,7 +461,7 @@ function giatMinh(e, x, y) {
 const laConCho = (tru, x, y) => {
   let cho = -1, dCho = Infinity;
   la.forEach((l, i) => {
-    if (i === tru || l.chet !== null || soEch(l) >= suc(l)) return;
+    if (i === tru || l.chet !== null || giuCho(l) >= suc(l)) return;
     const d = Math.hypot(l.x - x, yLa(l) - y);
     if (d < dCho) { dCho = d; cho = i; }
   });
@@ -556,12 +564,16 @@ function buocMotCon(e, dt) {
       if (e.la >= 0) e.dich = -1;
       if (la[e.la]) la[e.la].lun += 5;
       themSong(e.x, e.y, .5, 'dapXuong');               // đáp xuống lá, sóng lan ra từ chỗ đáp
+      if (la[e.la] && la[e.la].chet !== null) roiLa(e, e.la);   // lá bắt đầu tàn lúc nó đang bay: phóng đi luôn
     }
     return;
   }
   if (e.boi) {                                          // dưới nước: hoặc đang bơi tới một chiếc lá, hoặc thả nổi
     e.tBoi = (e.tBoi || 0) + dt;
     e.tTim = (e.tTim || 0) - dt;
+    /* Lá đang nhắm bắt đầu tàn thì thôi nhắm nó. Chỗ của lá tàn không còn tính, con ngồi trên đó
+       vừa bị đuổi xuống, mà con đang bơi tới thì cứ bơi tiếp rồi trèo lên: đo được bốn con. */
+    if (la[e.dich] && la[e.dich].chet !== null) e.dich = -1;
     if (!la[e.dich] || e.tBoi > 18000) {                 // chưa nhắm được lá nào, hoặc lá nhắm tới mất rồi
       if (e.tTim <= 0) {                                 // hai giây rưỡi ngó quanh một lần, chứ không dò từng khung
         e.tTim = 2500;
@@ -573,7 +585,7 @@ function buocMotCon(e, dt) {
     if (!d0) { troiNoi(e, dt); return; }                 // hồ hết chỗ ngồi thì cứ nổi, không chen
     const dx = d0.x - e.x, dy = yLa(d0) - e.y, d = Math.hypot(dx, dy) || 1;
     if (d < d0.r * .9) {                                 // tới mép lá rồi
-      if (soEch(d0) >= suc(d0)) {                        // lúc nhắm thì còn chỗ, bơi tới nơi đã có con khác ngồi mất
+      if (giuCho(d0) >= suc(d0)) {                       // lúc nhắm thì còn chỗ, bơi tới nơi đã có con khác ngồi hay đang bay tới
         e.dich = -1; e.tTim = 2500; troiNoi(e, dt); return;
       }
       e.tBoi = 0; nhaySang(e, e.dich); return;
@@ -598,7 +610,7 @@ function buocMotCon(e, dt) {
   e.tuNhay -= dt * (l && soEch(l) > 1 ? .5 : 1) * (1 - gia * .45);   // ngồi cùng bạn, hoặc già rồi, thì nhảy lười hơn
   if (e.tuNhay <= 0) {                                  // đến giờ thì tự nhảy sang lá khác, nhưng phải là lá còn chỗ
     const cho = [];
-    la.forEach((l, i) => { if (i !== e.la && l.chet === null && soEch(l) < suc(l)) cho.push(i); });
+    la.forEach((l, i) => { if (i !== e.la && l.chet === null && giuCho(l) < suc(l)) cho.push(i); });
     if (cho.length) nhaySang(e, cho[Math.floor(Math.random() * cho.length)]);
     else e.tuNhay = rnd(4000, 9000);                    // cả hồ không còn chỗ trống thì ngồi yên, lát nữa xét lại
   }
@@ -1587,6 +1599,7 @@ addEventListener('visibilitychange', () => {
 });
 self.TDTD_HO = { mo, dong, _buoc: (t) => buoc(t), _khung: (t) => khung(t), _buTru: (ms) => buTru(ms),
   _boLa: (i) => boLa(i),
+  _giaLa: (i) => { if (la[i]) la[i].tuoi = la[i].doiSong; return !!la[i]; },   // bước sau là lá bắt đầu tàn
   _datEch: (ds) => { ech.length = 0; for (const o of ds) ech.push(Object.assign({
       x: 0, y: 0, x0: 0, y0: 0, x1: 0, y1: 0, goc: 0, t: 0, doi: 500, cung: .5, dx: 0, dy: 0,
       la: -1, dich: -1, nhay: false, boi: false, tan: null, nghi: 0, tuNhay: 9e9, luoi: null,

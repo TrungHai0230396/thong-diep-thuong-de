@@ -49,17 +49,24 @@ global.devicePixelRatio = 1; global.innerWidth = 380; global.innerHeight = 720;
 global.matchMedia = () => ({ matches: false, addEventListener() {} });
 
 /* Đồng hồ: mặc định chỉ nhích khi mình bảo, cho kết quả lặp lại được.
-   Bật gioThuc thì cộng thêm thời gian thật đã trôi — cần cho chỗ đo ngân sách mỗi khung. */
+   Bật gioThuc thì cộng thêm thời gian thật đã trôi — cần cho chỗ đo ngân sách mỗi khung.
+   "Thời gian thật" ở đây là giờ CPU của chính luồng này, không phải giờ treo tường. Máy bận thì hệ
+   điều hành cất luồng này sang bên chờ tới lượt, còn giờ treo tường vẫn chạy: khung 40 ms đo ra 79,
+   120, có lúc 197 ms dù hồ không làm thêm gì, và bài "không khung nào đơ quá 60 ms" hỏng oan. Giờ CPU
+   chỉ chạy lúc mã của hồ chạy, nên cả ngân sách của hồ lẫn phép đo chỉ đếm đúng việc hồ tự làm: đo
+   lúc máy rảnh và lúc 16 tiến trình chạy không ngừng trên máy 8 lõi, khung nặng nhất đều 40,5–40,8 ms.
+   Node 23.9 trở lên có đồng hồ riêng của luồng, bản cũ hơn thì lấy giờ CPU của cả tiến trình. */
 let dongHo = 0, thuc = false, mocThuc = 0;
-global.performance = { now: () => dongHo + (thuc ? Date.now() - mocThuc : 0) };
-const gioThuc = (b) => { thuc = b; mocThuc = Date.now(); };
+const msCpu = () => { const u = process.threadCpuUsage ? process.threadCpuUsage() : process.cpuUsage(); return (u.user + u.system) / 1000; };
+global.performance = { now: () => dongHo + (thuc ? msCpu() - mocThuc : 0) };
+const gioThuc = (b) => { thuc = b; mocThuc = msCpu(); };
 const themGio = (v) => (dongHo += v);
 
 new Function(fs.readFileSync(path.join(__dirname, '..', 'assets', 'pond.js'), 'utf8'))();
 const HO = global.TDTD_HO;
-const chay = (giay, buoc = 33) => {
+const chay = (giay, buoc = 33, moiKhung) => {
   const n = Math.round(giay * 1000 / buoc);
-  for (let i = 0; i < n; i++) HO._khung(themGio(buoc));
+  for (let i = 0; i < n; i++) { HO._khung(themGio(buoc)); if (moiKhung) moiKhung(); }
   return n;
 };
 
@@ -81,8 +88,12 @@ const quaSuc = () => {
    2. boLa() so e.la === i SAU khi đã dời chỉ số, nên so nhầm sang chiếc lá khác.
    Kết quả: con ếch ngồi trên lá j > i, bị dời thành j-1, rồi vẫn bị gán cho đang bơi. */
 function soatBoLa() {
+  /* Dựng trên hồ mới mở. Bản trước dùng lại hồ của bài ngay trên, hồ vừa chạy bù một ngày, mà qua
+     một ngày có hồ chỉ còn một hai chiếc lá, nên chốc chốc lại hỏng oan vì "chưa đủ lá". Mở hồ là
+     rải đủ năm lá; vòng lặp để phòng khi sau này đổi cách rải. */
+  for (let thu = 0; thu < 5; thu++) { HO.mo(); if (HO._la().length >= 3) break; }
   const truoc = HO._la().length;
-  if (truoc < 3) return ['hồ chưa đủ lá để dựng phép thử'];
+  if (truoc < 3) return [`mở hồ năm lần vẫn chỉ có ${truoc} lá, không dựng được phép thử`];
   const loi = [];
   /* con #0 ngồi trên lá 2 nhưng còn mang mục tiêu cũ là lá 1 — đúng vết mà lỗi để lại */
   HO._datEch([{ la: 2, dich: 1 }, { la: 1, dich: -1 }, { la: -1, boi: true, dich: 1 }]);
@@ -98,20 +109,19 @@ function soatBoLa() {
   return loi;
 }
 
-/* `chat` = hồ đang bị nhồi ếch quá mức thiết kế. Lúc đó chuyện lá chở quá sức là liên tục và
-   đúng ý đồ: con nào cũng có quyền nhảy lên lá đông, lá lún rồi hất con lên sau cùng xuống,
-   nhồi gấp ba sức chứa thì vòng đó không bao giờ ngớt. Chỉ đòi lá tự gỡ ra ở hồ chạy tự nhiên. */
-const soatBatBien = (nhan, chat = false) => {
+/* Bản trước có cờ `chat` để bỏ qua bước đòi lá tự gỡ ở hồ bị nhồi ếch, vì tin rằng nhồi quá sức
+   chứa thì lá chở quá sức là liên tục và đúng ý đồ. Không phải: không ai chạm vào hồ thì không con
+   nào được nhảy bừa, cảnh chen đó là lỗi đếm chỗ (xem giuCho trong pond.js). Sửa rồi thì hồ nhồi
+   cũng không lá nào quá sức, nên bỏ cờ, kiểm như mọi hồ. */
+const soatBatBien = (nhan) => {
   const la = HO._la(), loi = [];
   HO._ech().forEach((e, i) => {
     if (!e.nhay && !e.boi && e.tan === null && !la[e.la]) loi.push(`ếch #${i} ngồi trên lá ${e.la} không có thật`);
     if (!Number.isFinite(e.x) || !Number.isFinite(e.y)) loi.push(`ếch #${i} toạ độ NaN`);
     if (e.boi && e.la >= 0) loi.push(`ếch #${i} vừa bơi vừa bám lá`);
   });
-  if (!chat) {
-    let qua = quaSuc();
-    if (qua.length) { chay(10); qua = quaSuc(); if (qua.length) loi.push(`quá sức kéo dài: ${qua.join(', ')}`); }
-  }
+  let qua = quaSuc();
+  if (qua.length) { chay(10); qua = quaSuc(); if (qua.length) loi.push(`quá sức kéo dài: ${qua.join(', ')}`); }
   ok(nhan, loi.length === 0, loi.slice(0, 3).join('; '));
 };
 
@@ -119,10 +129,20 @@ console.log('\n— Lá hết chỗ thì ếch ở lại dưới nước —');
 HO.mo(); chay(3);
 const chuaNhoi = HO._debug();
 HO._themEch(190, 400, chuaNhoi.cho + 10);               // nhồi nhiều hơn hẳn tổng chỗ ngồi
-chay(60);                                               // nhồi cả đàn vào một điểm, cho chúng tản ra đã
+/* Đếm ở MỌI khung, không chỉ lúc cuối. Bản trước nhìn một lần ở giây 60 và chừa hai con, coi chuyện
+   dư chỗ là thoáng qua, nên nó lúc đạt lúc hỏng; trong khi đếm mọi khung với pond.js cũ thì 293/300
+   lượt có lúc dư, nhiều nhất 14 con. Đó là lỗi đếm chỗ (giuCho trong pond.js). Sửa rồi thì 300 lượt
+   không khung nào dư con nào. */
+let du = 0, luc = 0, k = 0;
+chay(60, 33, () => {                                    // nhồi cả đàn vào một điểm, cho chúng tản ra đã
+  k++;
+  const v = HO._ech().filter(e => !e.nhay && !e.boi && e.tan === null).length - HO._debug().cho;
+  if (v > du) { du = v; luc = k; }
+});
 let d = HO._debug();
 ok('có ếch nổi dưới nước', d.boi > 0, `${d.boi}/${d.ech} con`);
-ok('số con ngồi không vượt tổng chỗ', d.ech - d.boi - d.bay <= d.cho + 2, `ngồi ${d.ech - d.boi - d.bay} / chỗ ${d.cho}`);
+ok('số con ngồi không vượt tổng chỗ, ở mọi khung trong một phút', du <= 0,
+   du > 0 ? `dư ${du} con ở giây ${(luc * .033).toFixed(1)} sau khi nhồi` : `lúc cuối ngồi ${d.ech - d.boi - d.bay} / chỗ ${d.cho}`);
 /* Chỉ đòi mấy con **thả nổi** giữ khoảng. Con đang bơi có đích thì cứ lao tới mép lá, xúm lại
    ở đó là đúng — như một đám chen lên bến, không phải lỗi. */
 ok('mấy con thả nổi không chồng lên nhau', (() => {
@@ -138,7 +158,7 @@ ok('mấy con thả nổi không chồng lên nhau', (() => {
     .map(b => Math.hypot(a.x - b.x, a.y - b.y)))));
   return `${n.length} con, gần nhau nhất ${Math.round(gan)} px`;
 })());
-soatBatBien('bất biến sau khi nhồi ếch', true);
+soatBatBien('bất biến sau khi nhồi ếch');
 ok('chỗ đếm ghi đúng số ếch', HO._dem() === String(d.ech), `"${HO._dem()}" / ${d.ech} con`);
 
 console.log('\n— Không quẩn vòng trèo lên rồi tuột xuống —');
@@ -166,13 +186,13 @@ ok('nhận đủ tám tiếng, không cắt bớt', no0 > 7.5 * 3600 * 1000, `${
 gioThuc(true);
 let dinh = 0, tong = 0, khung = 0;
 while (HO._debug().noTua > 0 && khung < 200000) {
-  const a = Date.now(); chay(1 / 30, 33); const b = Date.now() - a;
+  const a = msCpu(); chay(1 / 30, 33); const b = msCpu() - a;      // giờ CPU, xem chỗ đồng hồ ở đầu tệp
   dinh = Math.max(dinh, b); tong += b; khung++;
 }
 gioThuc(false);
-ok('trả hết nợ', HO._debug().noTua === 0, `${khung} khung, tổng ${tong} ms`);
+ok('trả hết nợ', HO._debug().noTua === 0, `${khung} khung, tổng ${Math.round(tong)} ms`);
 ok('chia ra nhiều khung chứ không dồn một cục', khung > 20, `${khung} khung`);
-ok('không khung nào đơ quá 60 ms', dinh <= 60, `nặng nhất ${dinh} ms`);   // ngân sách 40 cộng một bước lỡ nhịp
+ok('không khung nào đơ quá 60 ms', dinh <= 60, `nặng nhất ${dinh.toFixed(1)} ms`);   // ngân sách 40 cộng một bước lỡ nhịp
 const khung8 = khung;                                 // mốc để đong bài một ngày ở dưới
 
 HO.mo(); chay(3);
@@ -289,6 +309,70 @@ ok('ẩn tab một ngày rồi quay lại, hồ không chết sạch', chetHo <=
 console.log('\n— Gỡ một chiếc lá giữa mảng —');
 const loiBoLa = soatBoLa();
 ok('gỡ lá xong không con nào rơi vào trạng thái mâu thuẫn', loiBoLa.length === 0, loiBoLa.join('; '));
+
+/* Dựng thẳng từng đường làm một chỗ trên lá bị nhiều con cùng nhận, như soatBoLa, thay vì chờ chúng
+   tự xảy ra. Ba đường đầu cùng một gốc: hỏi "lá còn chỗ không" mà chỉ đếm con đã đáp, không đếm con
+   đang bay tới. Hai đường sau là con lên lá đang tàn, mà chỗ của lá đó đã không còn tính. */
+const con = (o) => Object.assign({ s: 20 }, o);         // thiếu cỡ s thì phần giữ khoảng dưới nước ra NaN
+const ngoiLen = (i, n, them) => Array.from({ length: n }, () => con({ la: i, ...them }));
+const nhanCho = (i) => HO._ech().filter(e => e.la === i && !e.boi && e.tan === null).length;   // ngồi hay đang bay tới
+const ngoiTren = (i) => HO._ech().filter(e => e.la === i && !e.boi && !e.nhay && e.tan === null).length;
+/* Lá non vẫn đang lớn, có thể thêm một chỗ ngay giữa phép thử, nên so với sức chở lúc kiểm chứ không
+   với con số chụp từ trước, và so trên mọi lá chứ không riêng lá có chỗ trống. */
+const nhanQua = (dem = nhanCho) => HO._la().map((l, i) => [i, dem(i), l.suc]).filter(([, n, s]) => n > s)
+  .map(([i, n, s]) => `lá#${i} ${n}/${s}`);
+const laRongNhat = (L) => L.reduce((m, l, i) => l.suc > L[m].suc ? i : m, 0);   // lá đầu tiên luôn chở được hai con trở lên
+
+console.log('\n— Chỗ trống cuối cùng chỉ một con được nhận —');
+{
+  HO.mo();
+  const L = HO._la(), T = 0;
+  HO._datEch([...ngoiLen(T, L[T].suc - 1), ...Array.from({ length: 5 }, () => con({ boi: true, dich: T, x: L[T].x, y: L[T].yVe }))]);
+  chay(1 / 30, 33);
+  const ngay = nhanQua();
+  chay(1);
+  const sau = nhanQua(ngoiTren);
+  ok('năm con cùng bơi tới mép lá còn một chỗ: chỉ một con lên', !ngay.length && !sau.length,
+     `lá ${L[T].suc} chỗ — nhận chỗ: ${ngay.join(', ') || 'vừa đủ'}; sau một giây ngồi: ${sau.join(', ') || 'vừa đủ'}`);
+}
+{
+  HO.mo();
+  const L = HO._la(), D = laRongNhat(L), T = D === 0 ? 1 : 0;
+  HO._datEch(L.flatMap((l, i) => ngoiLen(i, i === T ? l.suc - 1 : l.suc)));   // lá nào cũng kín, trừ T còn một chỗ
+  chay(1 / 30, 33);
+  HO._giaLa(D); chay(1 / 30, 33);
+  const qua = nhanQua();
+  ok('lá tàn đuổi mấy con đi, chỗ trống cuối cùng chỉ một con nhận', !qua.length,
+     `${L[D].suc} con bị đuổi khỏi lá#${D}, lá#${T} còn một chỗ — ${qua.join(', ') || 'không lá nào bị nhận quá chỗ'}`);
+}
+{
+  HO.mo();
+  const L = HO._la(), S = laRongNhat(L), T = S === 0 ? 1 : 0;
+  HO._datEch(L.flatMap((l, i) => ngoiLen(i, i === T ? l.suc - 1 : l.suc, i === S ? { tuNhay: 1 } : {})));
+  chay(1 / 30, 33);
+  const qua = nhanQua();
+  ok('mấy con cùng tới giờ tự nhảy, chỗ trống cuối cùng chỉ một con nhận', !qua.length,
+     `${L[S].suc} con trên lá#${S} cùng tới giờ, lá#${T} còn một chỗ — ${qua.join(', ') || 'không lá nào bị nhận quá chỗ'}`);
+}
+
+console.log('\n— Lá bắt đầu tàn thì không con nào lên nữa —');
+{
+  HO.mo();
+  const L = HO._la(), D = 1;
+  HO._datEch(Array.from({ length: 3 }, () => con({ boi: true, dich: D, x: L[D].x, y: L[D].yVe })));
+  HO._giaLa(D); chay(1 / 30, 33);
+  ok('lá đang nhắm bắt đầu tàn thì con đang bơi tới thôi trèo lên', nhanCho(D) === 0,
+     `${nhanCho(D)} con vẫn trèo lên lá đang tàn`);
+}
+{
+  HO.mo();
+  const L = HO._la(), D = 1, x = L[D].x, y = L[D].yVe;
+  HO._datEch([con({ nhay: true, la: D, t: 0, doi: 400, x0: x - 60, y0: y, x1: x, y1: y, x: x - 60, y })]);
+  HO._giaLa(D); chay(1);
+  const e = HO._ech()[0];
+  ok('đang bay thì lá đích bắt đầu tàn: chạm chân xuống là phóng đi', ngoiTren(D) === 0 && (e.boi || e.la !== D),
+     `${ngoiTren(D)} con ngồi trên lá đang tàn`);
+}
 
 console.log('\n— Chạy dài một tiếng —');
 HO.mo(); chay(3);
