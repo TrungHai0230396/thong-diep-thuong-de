@@ -1435,3 +1435,128 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
   .cb-nut button{height:38px}
   .cb-xem button{height:34px}
 }
+
+/* ---------- Bida lỗ (assets/bida.js) — cùng dáng với Cờ vua ba người ---------- */
+.bida{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;background:#0b1a16;color:#eef1ff;
+  background:radial-gradient(120% 80% at 50% 40%,#12302a 0%,#0b1a16 60%,#09110f 100%);
+  padding-bottom:env(safe-area-inset-bottom,0px);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.bida.hien{display:flex}
+.bd-dau{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 12px) 104px 6px 16px;min-height:52px}
+.bd-dau button{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
+  color:#eef1ff;font:inherit;font-size:16px;cursor:pointer}
+.bd-ten{flex:1;min-width:0;margin:0;line-height:1.3}
+.bd-ten b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:21px;font-weight:600;color:#ffe2a0}
+.bd-ten span{display:block;font-size:12.5px;color:rgba(238,241,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-nguoi{display:flex;gap:6px;padding:2px 12px 4px}
+.bd-nguoi:empty{display:none}
+.bd-the{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;padding:5px 8px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);transition:border-color .2s,background .2s}
+.bd-the b{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-the span{min-height:14px;font-size:11px;color:rgba(238,241,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bd-the em{display:flex;gap:2px;margin-top:2px;font-style:normal}
+.bd-the.bd-dang{border-color:rgba(255,214,120,.8);background:rgba(255,214,120,.1)}
+.bd-the.bd-dang span{color:#ffe6a6}
+.bd-mini{flex:none;width:10px;height:10px;border-radius:50%;box-shadow:inset -1px -1px 2px rgba(0,0,0,.35),0 0 0 .5px rgba(0,0,0,.4)}
+.bd-mini.bd-mat{opacity:.18}
+.bd-canh{position:relative;flex:1 1 0;min-height:160px;overflow:hidden}
+.bd-cv{position:absolute;inset:0;display:block;touch-action:none}
+.bd-bao{position:absolute;left:50%;top:8px;z-index:10;transform:translateX(-50%);width:max-content;max-width:86%;margin:0;padding:8px 14px;border-radius:12px;
+  background:rgba(12,28,24,.94);border:1px solid rgba(255,214,120,.4);font-size:13.5px;line-height:1.45;text-align:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+.bd-bao[hidden]{display:none}
+.bida.bd-co-tin .bd-bao{position:fixed;top:auto;bottom:calc(env(safe-area-inset-bottom,0px) + 18px)}
+/* chọn xoáy: bi chủ to, chấm đỏ là chỗ đầu cơ chạm */
+.bd-xoay-bang{position:absolute;left:50%;bottom:10px;z-index:9;transform:translateX(-50%);width:min(250px,80%);padding:14px 14px 12px;border-radius:18px;
+  background:rgba(12,28,24,.96);border:1px solid rgba(255,255,255,.14);box-shadow:0 14px 34px rgba(0,0,0,.5);text-align:center}
+.bd-xoay-bang[hidden]{display:none}
+.bd-xoay-bang svg{display:block;width:170px;height:170px;margin:0 auto;touch-action:none;cursor:pointer}
+.bd-xoay-chu{margin:8px 0 8px;font-size:14px;color:#ffe6a6}
+.bd-xoay-nut{display:flex;gap:8px}
+.bd-xoay-nut button{flex:1;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#eef1ff;font:inherit;font-size:14px;cursor:pointer}
+.bd-xoay-nut .bd-xoay-xong{border:0;background:linear-gradient(#ffd77a,#e9a93a);color:#2a1a00;font-weight:700}
+.bd-duoi{flex:none;padding:6px 14px 12px;border-top:1px solid rgba(255,255,255,.08)}
+.bd-luot{margin:0 0 8px;min-height:20px;font-size:13.5px;line-height:1.4;text-align:center;color:rgba(238,241,255,.85)}
+.bd-nut{display:flex;gap:10px;justify-content:center}
+.bd-nut button{height:44px;padding:0 16px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#eef1ff;
+  font:inherit;font-size:15px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.bd-nut button[hidden]{display:none}
+.bd-nut .bd-xoay span{position:relative;width:22px;height:22px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#e8e2d4 60%,#a9a396);box-shadow:0 0 0 1px rgba(0,0,0,.3)}
+.bd-nut .bd-xoay i{position:absolute;left:50%;top:50%;width:6px;height:6px;margin:-3px 0 0 -3px;border-radius:50%;background:#d42a20}
+.bd-nut .bd-xoay.bd-bat{border-color:#ffd77a;background:rgba(255,215,120,.18)}
+/* nút đóng, chép link, Cài app nằm trên bảng của trò (như cờ ba người) */
+.bida .xn-dong,.bida .nut-link,.bida .nut-cai{z-index:10}
+.co-nut-cai .bd-dau{padding-right:204px}
+@media (max-width:479px){
+  .co-nut-cai .bd-dau{padding-top:calc(env(safe-area-inset-top,0px) + 54px);padding-right:14px}
+}
+.bd-tin{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top,0px) + 58px) 20px calc(env(safe-area-inset-bottom,0px) + 20px);background:rgba(4,10,9,.72)}
+.bd-tin[hidden]{display:none}
+.bd-tin-trong{width:100%;max-width:420px;max-height:100%;overflow:auto;padding:22px 20px;border-radius:20px;background:linear-gradient(#173a32,#0f2621);
+  border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 50px rgba(0,0,0,.5);text-align:center}
+.bd-tin h2{margin:4px 0 12px;font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:#ffe2a0}
+.bd-tin p{margin:0 0 10px;font-size:14.5px;line-height:1.55;color:rgba(238,241,255,.88);text-align:left}
+.bd-tin p b{color:#ffe6a6;font-weight:600}
+.bd-tin .bd-tin-nho{margin:0;text-align:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(238,241,255,.5)}
+.bd-tin .bd-meo{font-size:13px;color:rgba(238,241,255,.65);text-align:center}
+.bd-tin .bd-nhan{margin:12px 0 6px;font-size:12.5px;color:rgba(238,241,255,.6)}
+.bd-tin .bd-trai{text-align:left}
+.bd-hang{display:flex;flex-wrap:wrap;gap:6px}
+.bd-tin .bd-hang + .bd-meo{margin-top:8px}
+.bd-chon{flex:1;min-width:0;min-height:42px;padding:4px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
+  color:#eef1ff;font:inherit;font-size:14px;cursor:pointer}
+.bd-chon small{display:block;font-size:10.5px;font-weight:400;opacity:.75;line-height:1.15}
+.bd-chon.bd-bat{border-color:#ffd77a;background:rgba(255,215,120,.18);color:#ffe6a6;font-weight:600}
+.bd-tin button:not(.bd-chon){display:block;width:100%;margin-top:10px;height:48px;border:0;border-radius:14px;background:linear-gradient(#ffd77a,#e9a93a);
+  color:#2a1a00;font:inherit;font-size:16px;font-weight:700;cursor:pointer}
+.bd-tin button.bd-phu{background:rgba(255,255,255,.08);color:#eef1ff;font-weight:500}
+.bd-tin button:disabled{opacity:.42;cursor:default}
+.bd-tin button + .bd-meo{margin-top:12px}
+.bd-o-ten,.bd-o-ma{box-sizing:border-box;width:100%;height:44px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);
+  color:#eef1ff;font:inherit;font-size:16px}
+.bd-o-ma{text-transform:uppercase;letter-spacing:.12em;font-family:ui-monospace,Menlo,monospace}
+.bd-o-ten:focus,.bd-o-ma:focus{outline:none;border-color:#ffd77a}
+.bd-o-ma-to{height:56px;font-size:24px;text-align:center;letter-spacing:.22em}
+.bd-o-link{margin:4px 0 2px;font-size:13px;-webkit-user-select:text;user-select:text}
+/* ván mới: các lối lớn */
+.bd-tin button.bd-lua{display:flex;align-items:center;gap:14px;width:100%;height:auto;min-height:68px;margin-top:10px;padding:11px 14px;border-radius:16px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eef1ff;text-align:left;font-weight:400}
+.bd-tin button.bd-lua:hover{border-color:rgba(255,215,120,.6);background:rgba(255,215,120,.1)}
+.bd-lua-hinh{flex:none;width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(255,215,120,.14);color:#ffd77a}
+.bd-lua-hinh svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.bd-lua-chu{display:flex;flex-direction:column;gap:3px;min-width:0}
+.bd-lua-chu b{font-size:16px;color:#ffe6a6;font-weight:600}
+.bd-lua-chu i{font-style:normal;font-size:13px;line-height:1.35;color:rgba(238,241,255,.7)}
+.bd-tin button.bd-lui{display:block;width:auto;height:32px;margin:-6px auto 2px -4px;padding:0 6px;background:none;color:rgba(238,241,255,.7);font-size:14px;font-weight:500}
+.bd-tin button.bd-chu{height:auto;margin-top:14px;padding:6px;background:none;color:rgba(238,241,255,.62);font-size:14px;font-weight:500;text-decoration:underline;text-underline-offset:3px}
+/* phòng chờ: mã to, ghế, mã QR */
+.bd-ma-dong{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 12px}
+.bd-ma-to{font-family:ui-monospace,Menlo,monospace;font-size:30px;font-weight:700;letter-spacing:.16em;color:#fff4d0}
+.bd-tin button.bd-chep-ma{display:inline-block;width:auto;height:32px;margin:0;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.1);color:#eef1ff;font-size:13px;font-weight:600}
+.bd-ghe-hang{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:4px 0 10px}
+.bd-ghe-hang.bd-ghe-3{grid-template-columns:repeat(3,1fr)}
+.bd-ghe-o{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.bd-ghe-o b{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;color:#eef1ff}
+.bd-ghe-o small{font-size:11px;line-height:1.3;color:rgba(238,241,255,.55);text-align:center}
+.bd-ghe-trong{border-style:dashed;opacity:.7}
+.bd-ghe-minh{border-color:rgba(255,215,120,.6);background:rgba(255,215,120,.1)}
+.bd-qr{width:min(220px,70%);margin:12px auto 4px;padding:6px;border-radius:12px;background:#fff}
+.bd-qr svg{display:block;width:100%;height:auto}
+.bd-tin button.bd-batdau-phong{height:auto;min-height:48px;padding:7px 12px;line-height:1.25}
+.bd-batdau-phong small{display:block;font-size:12.5px;font-weight:500;opacity:.78}
+.bd-hai{display:flex;gap:8px;margin-top:10px}
+.bd-tin .bd-hai button{flex:1;min-width:0;margin-top:0}
+.bd-tin .bd-hai button.bd-chep-link{flex:0 0 38%}
+.bd-ds-phong{display:flex;flex-direction:column;gap:8px;margin:12px 0 6px}
+.bd-tin button.bd-phong-mo{display:flex;flex-direction:column;align-items:flex-start;gap:3px;height:auto;min-height:58px;margin-top:0;padding:10px 14px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eef1ff;text-align:left;font-weight:400}
+.bd-tin button.bd-phong-mo:hover{border-color:rgba(255,215,120,.6);background:rgba(255,215,120,.1)}
+.bd-phong-mo b{font-size:16px;font-weight:600;color:#ffe6a6}
+.bd-phong-mo small{font-size:12.5px;color:rgba(238,241,255,.7)}
+@media (max-height:640px){
+  .bd-dau{min-height:44px;padding-top:calc(env(safe-area-inset-top,0px) + 6px)}
+  .bd-nguoi{padding:0 12px 2px}
+  .bd-the{padding:3px 8px}
+  .bd-duoi{padding:4px 14px 8px}
+  .bd-luot{margin-bottom:5px}
+  .bd-nut button{height:38px}
+}

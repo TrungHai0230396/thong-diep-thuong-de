@@ -701,6 +701,79 @@ def ve_sokoban(v, tro):
                 robot(v, x + o / 2, y + o * .8, .55)
 
 
+# bàn bida, số đo chép từ assets/bida.js (WPA): mặt bàn 2,54 × 1,27 m, bi 57,15 mm, miệng lỗ góc 4⅝", lỗ giữa 5⅛";
+# màu bi theo bộ Aramith. Ảnh vẽ nửa bàn phía chân (gần, bi to cho đọc được số): tam giác 15 bi ở chấm chân bàn, bi 8 giữa
+# hàng ba, hai góc hàng cuối một trơn một sọc; bi chủ, đường ngắm và cơ sắp phá.
+MAU_BIDA = ['#f4f1e8', '#f3bf12', '#1b4fb4', '#d4291e', '#56288c', '#f06c15', '#0d7a44', '#7b1e1a', '#151515']
+TAM_GIAC = [[1], [9, 2], [10, 8, 3], [11, 4, 12, 5], [13, 6, 14, 15, 7]]
+
+
+def bi_bida(v, x, y, r, so):
+    nga, mau = hex2(MAU_BIDA[0]), hex2(MAU_BIDA[so if so <= 8 else so - 8])
+    v.toa(lambda g: g.tron(x + r * .3, y + r * .4, r * 1.02, fill=255), (0, 0, 0), .5, r * .3)
+    if so >= 9:                                       # bi sọc: trắng, dải màu ngang giữa bi
+        v.tron(x, y, r, fill=nga)
+        t0 = math.asin(.56)
+        cung = [-t0 + 2 * t0 * i / 20 for i in range(21)]
+        v.da_giac([(x + r * math.cos(a), y + r * math.sin(a)) for a in cung] + [(x - r * math.cos(a), y - r * math.sin(a)) for a in cung], fill=mau)
+    else:
+        v.tron(x, y, r, fill=mau)
+    if so > 0:
+        v.tron(x, y, r * .5, fill=nga)
+        v.chu((x, y + r * .03), str(so), ft(r * (.64 if so < 10 else .52)), (24, 22, 22), 'mm')
+    else:
+        v.tron(x + r * .25, y - r * .1, r * .16, fill=(200, 36, 40))   # chấm đỏ của bi chủ
+    v.toa(lambda g: g.tron(x - r * .38, y - r * .42, r * .32, fill=255), (255, 255, 255), .75, r * .14)
+
+
+def ve_bida(v, tro):
+    k, DB = 600, 0.05715                              # cận cảnh: 600 điểm ảnh một mét, bi to cỡ 34 điểm
+    r = DB / 2 * k
+    ra = lambda x, y: (1140 - (2.54 - x) * k, 315 - (y - .635) * k)
+    X0 = 600                                          # nỉ bắt đầu từ đây (bên trái là chữ)
+    from PIL import ImageChops
+    cat = v.lop(lambda g: g.d.rectangle([X0 * S, 0, 1140 * S, H * S], fill=255))
+    def den(cx, cy, rx, ry, mau, a, nhoe):            # quầng sáng chỉ trên nỉ, không tràn sang chữ
+        m = v.lop(lambda g: g.elip(cx, cy, rx, ry, fill=255)).filter(ImageFilter.GaussianBlur(nhoe * S))
+        v.phu(ImageChops.multiply(m, cat), mau, a)
+    v.d.rectangle([X0 * S, 0, 1140 * S, H * S], fill=hex2('#125a3a'))
+    cx, cy = ra(1.98, .635)
+    den(cx - 40, cy, 360, 270, hex2('#2fa36e'), .8, 95)       # đèn rọi xuống bàn
+    den(cx - 40, cy, 170, 130, hex2('#45c086'), .35, 70)
+    for i in range(50):                               # mép trái nỉ chìm dần vào nền
+        v.d.rectangle([(X0 + i * 2) * S, 0, (X0 + i * 2 + 2) * S, H * S], fill=(20, 17, 38, round(255 * (1 - i / 50) ** 1.8)))
+    # băng chân bàn và khung gỗ bên phải, ba chấm ngắm
+    v.to_doc(lambda g: g.d.rectangle([1140 * S, 0, 1167 * S, H * S], fill=255), (1140, 0, 1167, H), hex2('#1b8052'), hex2('#135c3b'))
+    v.d.line([(1140 * S, 0), (1140 * S, H * S)], fill=(150, 230, 180, 90), width=2 * S)
+    v.to_doc(lambda g: g.d.rectangle([1167 * S, 0, W * S, H * S], fill=255), (1167, 0, W, H), hex2('#6e4024'), hex2('#4a2a12'))
+    for y in (.3175, .635, .9525):
+        X, Y = ra(2.54 + .095, y)
+        v.da_giac([(X, Y - 7), (X + 4.5, Y), (X, Y + 7), (X - 4.5, Y)], fill=(240, 230, 208))
+    # tam giác 15 bi ở chấm chân bàn, bi chủ, đường ngắm tới bóng bi chủ, cơ
+    K = DB + .0004
+    vt = {}
+    for h, hang in enumerate(TAM_GIAC):
+        for i, so in enumerate(hang):
+            vt[so] = (1.905 + h * K * math.sqrt(3) / 2, .635 + (i - h / 2) * K)
+    cai = (1.745, .49)
+    tx, ty = 1.905 - DB, .635
+    A, Bm = ra(*cai), ra(tx, ty)
+    for t in range(16):
+        p0, p1 = t / 16, (t + .5) / 16
+        v.net([(A[0] + (Bm[0] - A[0]) * p0, A[1] + (Bm[1] - A[1]) * p0), (A[0] + (Bm[0] - A[0]) * p1, A[1] + (Bm[1] - A[1]) * p1)], (255, 255, 255, 200), 2.5)
+    v.tron(Bm[0], Bm[1], r, outline=(255, 255, 255, 235), w=2.5)
+    for so in sorted(vt, key=lambda s: vt[s][0]):
+        bi_bida(v, *ra(*vt[so]), r, so)
+    bi_bida(v, *A, r, 0)
+    ux, uy = tx - cai[0], ty - cai[1]
+    n = math.hypot(ux, uy); ux, uy = ux / n, uy / n
+    for (t0, t1, mau) in [(.018, .026, (61, 120, 201)), (.026, .05, (241, 236, 224)), (.05, .9, (228, 198, 142))]:
+        a, b = ra(cai[0] - ux * (DB / 2 + t0), cai[1] - uy * (DB / 2 + t0)), ra(cai[0] - ux * (DB / 2 + t1), cai[1] - uy * (DB / 2 + t1))
+        if b[0] < X0 - 35:                            # cơ thò ra khỏi mép nỉ một chút rồi thôi
+            b = (X0 - 35, a[1] + (b[1] - a[1]) * (a[0] - X0 + 35) / max(1e-6, a[0] - b[0]))
+        v.net([a, b], mau, (.0066 + t1 * .006) * 2 * k)
+
+
 # hình bàn cờ, chép từ assets/coba.js: lục giác đỉnh ở 240° + 60°·i, Trắng ở cạnh dưới; diều n gồm tâm, trung điểm
 # M_{n−1}, đỉnh V_n, trung điểm M_n; ô (p, q) lấy bốn góc theo nội suy song tuyến (đúng bằng sáng chế Zubrin).
 DINH = [(math.cos(math.radians(240 + 60 * i)), math.sin(math.radians(240 + 60 * i))) for i in range(6)]
@@ -833,6 +906,14 @@ TRO = [
          alt='Cờ vua ba người: bàn lục giác với quân Trắng, Đen, Đỏ', mo='Mở Cờ vua ba người',
          # link mời vào phòng (…/co-vua-ba-nguoi/?phong=MÃ) thì chuyển thẳng vào phòng đó
          chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#co-ba-nguoi' + (m ? '/' + m[1] : ''));"),
+    dict(duong='bida', trang='bida-lo/', so=1, mau='#a6e07c', ve=ve_bida,
+         tieuDe='Bida lỗ — 8 bi, 9 bi', tieu=('Bida lỗ', '8 bi · 9 bi'),
+         dong=['Bi trượt, lăn, xoáy như bàn thật', 'Tạo phòng, mỗi người một máy', 'Hay đấu với máy Sóc, Cú, Cáo'],
+         moTa='Bida lỗ 8 bi và 9 bi trên bàn 9 feet đúng cỡ: bi trượt rồi lăn, đánh đâm, kéo, đẩy, xoáy ngang như thật. Tạo '
+              'phòng mời bạn bè, mỗi người một máy, ghế trống thì máy chơi thay; hoặc đấu với máy. Miễn phí, không cần tài khoản.',
+         alt='Bida lỗ: tam giác 15 bi trên bàn nỉ xanh, bi chủ và cơ sắp phá', mo='Mở Bida lỗ',
+         # link mời vào phòng (…/bida-lo/?phong=MÃ) thì chuyển thẳng vào phòng đó
+         chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#bida' + (m ? '/' + m[1] : ''));"),
 ]
 
 

@@ -33,6 +33,7 @@ const HINH_SAO = {
   khoi:      'M12 1.8l8.6 4.9v10.6L12 22.2l-8.6-4.9V6.7zM12 4.1L5.6 7.7 12 11.4l6.4-3.7z',
   thung:     'M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2zM12 6.8l-1.41 3.66-3.92.21 3.05 2.47-1.01 3.79L12 14.8l3.29 2.13-1.01-3.79 3.05-2.47-3.92-.21z',
   coba:      'M12 12.7L5.5 16.5L7.7 20.2L16.3 20.2L18.4 16.5zM12.6 11.6L19.1 15.4L21.2 11.6L16.9 4.2L12.6 4.2zM11.4 11.6L11.4 4.2L7.1 4.2L2.8 11.6L4.9 15.4z',
+  bida:      'M12 2.4a9.6 9.6 0 1 1 0 19.2a9.6 9.6 0 1 1 0-19.2zM10.4 5.9a4.3 4.3 0 1 0 0 8.6a4.3 4.3 0 1 0 0-8.6zM10.4 7.7a1.25 1.25 0 1 1 0 2.5a1.25 1.25 0 1 1 0-2.5zM10.4 10.2a1.45 1.45 0 1 1 0 2.9a1.45 1.45 0 1 1 0-2.9z',
   sen:       'M12 3.2c1.9 2.3 2.9 4.7 2.9 7.2 0 2.6-1 4.8-2.9 6.9-1.9-2.1-2.9-4.3-2.9-6.9 0-2.5 1-4.9 2.9-7.2zM2.6 9.6c3 .1 5.4 1.3 7 3.6 1 1.4 1.5 3 1.7 4.6-2.6-.1-4.8-1.1-6.4-2.9-1.3-1.5-2.1-3.3-2.3-5.3zM21.4 9.6c-3 .1-5.4 1.3-7 3.6-1 1.4-1.5 3-1.7 4.6 2.6-.1 4.8-1.1 6.4-2.9 1.3-1.5 2.1-3.3 2.3-5.3zM4.5 18.8c2.3 1.3 4.8 2 7.5 2s5.2-.7 7.5-2c-2.2.6-4.7.9-7.5.9s-5.3-.3-7.5-.9z',
 };
 
@@ -65,6 +66,8 @@ const SAO = [
     duong: 'day-thung', khung: '.sokoban', mun: 'TDTD_SOKOBAN', tieuDe: 'Đẩy thùng sao — Sokoban', tenApp: 'Đẩy thùng', trang: 'day-thung-sao/', nutCai: true },
   { id: 'sao-coba', mau: '#e9b3a8', hinh: 'coba', nhan: 'Cờ vua ba người: Trắng, Đen, Đỏ trên bàn lục giác, đấu với 2 máy hay mỗi người một máy qua mạng',
     duong: 'co-ba-nguoi', khung: '.coba', mun: 'TDTD_COBA', tieuDe: 'Cờ vua ba người', tenApp: 'Cờ ba người', trang: 'co-vua-ba-nguoi/', nutCai: true },
+  { id: 'sao-bida', mau: '#a6e07c', hinh: 'bida', nhan: 'Bida lỗ: 8 bi và 9 bi, đấu với máy hay mỗi người một máy qua mạng',
+    duong: 'bida', khung: '.bida', mun: 'TDTD_BIDA', tieuDe: 'Bida lỗ — 8 bi, 9 bi', tenApp: 'Bida lỗ', trang: 'bida-lo/', nutCai: true },
 ];
 
 
