@@ -11,6 +11,7 @@
         "chu": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2" },
         "kho": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2" },
         "luat": { ".validate": "newData.val() === 'tq'" },
+        "gio": { ".validate": "newData.isString() && newData.val().matches(/^(n30|n60|v5|v10)$/)" },
         "ghe": {
           "$P": {
             ".validate": "$P.matches(/^[012]$/) && newData.hasChild('id')",
@@ -36,6 +37,7 @@
             "toi": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 95" },
             "phong": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 6" },
             "nhap": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2" },
+            "luc": { ".validate": "newData.val() === now" },
             "$khac": { ".validate": false }
           }
         },
@@ -53,6 +55,7 @@
         "ten": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
         "trong": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 2" },
         "luat": { ".validate": "newData.val() === 'tq'" },
+        "gio": { ".validate": "newData.isString() && newData.val().matches(/^(n30|n60|v5|v10)$/)" },
         "thay": { ".validate": "newData.val() === now" },
         "$khac": { ".validate": false }
       }

@@ -11,6 +11,7 @@
 const http = require('http');
 
 const LA_MA = /^[A-HJ-NP-Z2-9]{6}$/;
+const GIO = /^(n30|n60|v5|v10)$/;                                   // đồng hồ của phòng (gio)
 function taoMay(cong = 0) {
   let goc = {}, lech = 0, tuChoi = 0;
   const bayGio = () => Date.now() + lech;
@@ -55,8 +56,9 @@ function taoMay(cong = 0) {
   const so = (v, a, b) => typeof v === 'number' && v >= a && v <= b;
   function hopLePhong(r, nay) {
     if (!r || typeof r !== 'object') return false;
-    for (const k of Object.keys(r)) if (!['tao', 'chu', 'kho', 'luat', 'ghe', 'batDau', 'may', 'nuoc', 'xong', 'tiep'].includes(k)) return false;
+    for (const k of Object.keys(r)) if (!['tao', 'chu', 'kho', 'luat', 'gio', 'ghe', 'batDau', 'may', 'nuoc', 'xong', 'tiep'].includes(k)) return false;
     if ('luat' in r && r.luat !== 'tq') return false;                // luật Tam quốc, chỉ ghi lúc tạo phòng
+    if ('gio' in r && !(typeof r.gio === 'string' && GIO.test(r.gio))) return false;   // đồng hồ, cũng chỉ ghi lúc tạo phòng
     if (r.tao !== nay || !so(r.chu, 0, 2) || !so(r.kho, 0, 2) || !r.ghe || typeof r.ghe !== 'object') return false;
     return Object.keys(r.ghe).every(P => /^[012]$/.test(P) && hopLeGhe(r.ghe[P], nay));
   }
@@ -85,8 +87,9 @@ function taoMay(cong = 0) {
     if (a === 'may' && k.length === 2) return /^[012]$/.test(b) && (gt == null || gt === 'ho' || gt === 'rua');
     if (a === 'nuoc' && k.length === 2) {
       if (!/^[0-9]{1,4}$/.test(b) || (r.nuoc && b in r.nuoc) || !('batDau' in r) || !gt || typeof gt !== 'object') return false;
-      const ks = Object.keys(gt);
-      return ks.length === 5 && ['P', 'tu', 'toi', 'phong', 'nhap'].every(x => ks.includes(x)) && so(gt.P, 0, 2) && so(gt.tu, 0, 95) && so(gt.toi, 0, 95) && so(gt.phong, 0, 6) && so(gt.nhap, 0, 2);
+      const ks = Object.keys(gt);                                    // luc (giờ máy chủ) không bắt buộc — bản app cũ không gửi
+      return ['P', 'tu', 'toi', 'phong', 'nhap'].every(x => ks.includes(x)) && ks.every(x => ['P', 'tu', 'toi', 'phong', 'nhap', 'luc'].includes(x)) &&
+        (!('luc' in gt) || gt.luc === nay) && so(gt.P, 0, 2) && so(gt.tu, 0, 95) && so(gt.toi, 0, 95) && so(gt.phong, 0, 6) && so(gt.nhap, 0, 2);
     }
     if (a === 'ghe' && k.length === 3 && /^[012]$/.test(b)) {
       const g = (r.ghe && r.ghe[b]) || {};
@@ -104,10 +107,10 @@ function taoMay(cong = 0) {
     if (v == null) return true;
     const r = lay(['coba', ma]), cu = lay(['sanh', ma]);
     if (!r || 'batDau' in r || typeof v !== 'object') return false;
-    for (const k of Object.keys(v)) if (!['tao', 'ten', 'trong', 'luat', 'thay'].includes(k)) return false;
+    for (const k of Object.keys(v)) if (!['tao', 'ten', 'trong', 'luat', 'gio', 'thay'].includes(k)) return false;
     if (!['tao', 'ten', 'trong', 'thay'].every(k => k in v)) return false;
     const dung = { tao: (x) => typeof x === 'number' && (cu ? x === cu.tao : x === nay), ten: (x) => typeof x === 'string' && x.length >= 1 && x.length <= 20,
-      trong: (x) => so(x, 1, 2), luat: (x) => x === 'tq', thay: (x) => x === nay };
+      trong: (x) => so(x, 1, 2), luat: (x) => x === 'tq', gio: (x) => typeof x === 'string' && GIO.test(x), thay: (x) => x === nay };
     return viet.every(k => dung[k](v[k]));
   }
 

@@ -496,6 +496,148 @@ function mayKhach(ten, url) {
     Dung.C._roiPhong(); Dung.C.dong();
   }
 
+  console.log('\n— Đồng hồ: giây mỗi nước, phút cả ván —');
+  {
+    /* Người dùng: "thêm tạo phòng có config trước khi vô nữa vd như giây, phút" — chọn "cả hai kiểu"; hết giờ thì "máy đi
+       giùm". Khỏi chờ thật: vặn đồng hồ cả máy chủ giả lẫn các máy cùng lúc, như thời gian đã trôi qua */
+    const gioThe = (m, P) => m.khung().querySelector(`.cb-the[data-p="${P}"]`).querySelector('.cb-gio');
+    const baoCua = (m) => m.khung().querySelector('.cb-bao').textContent;
+    const sai = async (duong, cach, gt) => (await fetch(`${url}/${duong}.json`, { method: cach, body: JSON.stringify(gt) })).status;
+    let lechMay = 0;
+    const troiQua = (ms, ds) => { lechMay += ms; may.datLech(lechMay); for (const m of ds) m.C._phong().lech += ms; };
+    An.C._moCaiDat(); An.bam('[data-man]', { man: 'tao' });
+    const tao = An.tin();
+    ok('màn Tạo phòng có hàng Đồng hồ: Không đếm giờ (chọn sẵn), 30 giây / 1 phút mỗi nước, 5 / 10 phút cả ván',
+       /<p class="cb-nhan">Đồng hồ<\/p><div class="cb-hang cb-hang-gio"><button type="button" class="cb-chon cb-bat" data-gio="khong">Không<small>đếm giờ<\/small>/.test(tao) &&
+       ['n30', 'n60', 'v5', 'v10'].every(k => tao.includes(`data-gio="${k}"`)) && /30 giây<small>mỗi nước/.test(tao) && /10 phút<small>cả ván/.test(tao) && !/cb-bat" data-gio="[nv]/.test(tao));
+    An.bam('[data-gio]', { gio: 'v5' });
+    const v5 = An.tin();
+    An.bam('[data-gio]', { gio: 'khong' });
+    const khong = JSON.parse(An.luu['tdtd.coba']);
+    An.bam('[data-gio]', { gio: 'n30' });
+    ok('chọn đồng hồ: máy nhớ, nút sáng, nói rõ hết giờ thì sao (giây mỗi nước: máy đi giùm nước đó; phút cả ván: máy chơi thay tới hết ván); chọn lại Không thì thôi nhớ',
+       JSON.parse(An.luu['tdtd.coba']).gio === 'n30' && /cb-bat" data-gio="n30"/.test(An.tin()) && /Hết giờ thì máy đi giùm nước đó\./.test(An.tin()) &&
+       /Hết giờ thì máy chơi thay tới hết ván\./.test(v5) && !('gio' in khong));
+    const luuAn = JSON.parse(An.luu['tdtd.coba']);
+    An.luu['tdtd.coba'] = JSON.stringify(Object.assign(luuAn, { mau: 0, kho: 0, luat: 'thuong', mo: 1 }));
+    An.bam('.cb-tao');
+    await doi(() => An.C._phong() && An.C._phong().cay && may.lay(`sanh/${An.C._phong().ma}`));
+    const ma5 = An.C._phong().ma;
+    ok('bấm Tạo phòng: phòng trên máy chủ mang đồng hồ (gio = n30); phòng chờ ghi "30 giây/nước"; dòng trong danh sách phòng mở cũng có',
+       may.lay(`coba/${ma5}/gio`) === 'n30' && /Phòng mở · Luật thường · 30 giây\/nước/.test(An.tin()) && may.lay(`sanh/${ma5}`).gio === 'n30');
+    Binh.C._moCaiDat(); Binh.bam('[data-man]', { man: 'tim' });
+    await Binh.C._taiDsPhong();
+    const dsTim = Binh.khung().querySelector('.cb-tin .cb-ds-phong').innerHTML;       // danh sách tự làm mới vào ô riêng
+    Binh.bam('[data-phongmo]', { phongmo: ma5 });
+    await doi(() => Binh.C._phong() && Binh.C._phong().cay && /data-ngoi/.test(Binh.tin()));
+    ok('người tìm phòng thấy "30 giây/nước" trong danh sách; vào phòng thì đọc luật đồng hồ trước khi ngồi',
+       new RegExp(`data-phongmo="${ma5}"><b>Phòng của An</b><small>Luật thường · 30 giây/nước · còn 2 ghế`).test(dsTim) &&
+       /Đồng hồ: Mỗi lượt 30 giây; hết giờ thì máy đi giùm nước đó, người chơi vẫn chơi tiếp\./.test(Binh.tin()));
+    const phongMau = (gio) => ({ tao: { '.sv': 'timestamp' }, chu: 0, kho: 0, ghe: { 0: { id: 'abcdefgh1234', ten: 'A', thay: { '.sv': 'timestamp' } } }, gio });
+    ok('luật: đồng hồ chỉ nhận 4 kiểu, chỉ ghi lúc tạo phòng; dòng danh sách phòng mở cũng chỉ nhận 4 kiểu',
+       await sai('coba/GGGGG2', 'PUT', phongMau('n45')) === 401 && await sai('coba/GGGGG3', 'PUT', phongMau(30)) === 401 && await sai(`coba/${ma5}/gio`, 'PUT', 'v10') === 401 &&
+       await sai(`sanh/${ma5}`, 'PATCH', { gio: 'x' }) === 401 && await sai('coba/GGGGG4', 'PUT', phongMau('v10')) === 200);
+    may.gieo('coba/GGGGG4', null);
+    Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
+    await Binh.C._ngoiGhe(2);
+    await doi(() => An.C._phong().cay.ghe && An.C._phong().cay.ghe[2] && /Bắt đầu/.test(An.tin()));
+    await An.C._batDauPhong();
+    await doi(() => [An, Binh].every(m => m.C._van() && m.C._van().ma === ma5 && m.yen()));
+    for (const m of [An, Binh]) m.C._tichGio();
+    ok('vào ván: tới lượt An — thẻ Trắng có đồng hồ 0:30 trên cả hai máy; thẻ Đen chưa tới lượt và thẻ Đỏ (máy chơi) thì không có',
+       [An, Binh].every(m => /^0:(30|29)$/.test(gioThe(m, 0).textContent) && !gioThe(m, 0).hidden && gioThe(m, 2).hidden && gioThe(m, 1).hidden), gioThe(An, 0).textContent);
+    An.C._diNuoc(nuoc(An, 0, o(0, 'e', 2), o(0, 'e', 4)), 0);
+    await doi(() => [An, Binh].every(m => m.C._phong().ke === 1 && m.yen()) && may.lay(`coba/${ma5}/nuoc/0/luc`));
+    for (const m of [An, Binh]) m.C._tichGio();
+    ok('nước đi mang giờ máy chủ; tới lượt Bình: đồng hồ Đen chạy, hai máy tính ra cùng một số (lệch dưới 1 giây), thẻ Trắng thôi đồng hồ',
+       typeof may.lay(`coba/${ma5}/nuoc/0/luc`) === 'number' && Math.abs(An.C._conGio(2) - Binh.C._conGio(2)) < 1000 && Binh.C._conGio(2) > 28000 &&
+       /^0:(30|29)$/.test(gioThe(An, 2).textContent) && gioThe(An, 0).hidden, `${An.C._conGio(2)} / ${Binh.C._conGio(2)}`);
+    const ke = An.C._phong().ke;
+    troiQua(5000, [An, Binh]);
+    const truocSai = Binh.C._conGio(2);
+    const giaGio = await sai(`coba/${ma5}/nuoc/${ke}`, 'PUT', { P: 2, tu: 0, toi: 1, phong: 0, nhap: 0, luc: 12345 });
+    const ghiSai = await sai(`coba/${ma5}/nuoc/${ke}`, 'PUT', { P: 2, tu: 0, toi: 1, phong: 0, nhap: 0, luc: { '.sv': 'timestamp' } });
+    await doi(() => [An, Binh].every(m => m.C._phong().ke === ke + 1));
+    ok('luật: nước mang giờ giả bị chặn; nước sai luật cờ mà đúng giờ máy chủ thì ghi được, mọi máy bỏ qua — đồng hồ Đen không bị tính lại từ đầu',
+       giaGio === 401 && ghiSai === 200 && Binh.C._conGio(2) <= truocSai && truocSai < 26000, `${truocSai} → ${Binh.C._conGio(2)}`);
+    /* Bình còn 10 giây thì báo; hết giờ thì không đi được nữa, chờ máy đi giùm — máy Bình ghế bậc hai nên chờ thêm 5 giây */
+    Binh.C._phong().lech += 16000; Binh.C._tichGio();
+    const baoGap = baoCua(Binh), gap = gioThe(Binh, 2).classList.contains('cb-gap');
+    Binh.C._phong().lech += 10000; Binh.C._tichGio();
+    const hetBinh = Binh.C._hetGioLuot(), dongBinh = Binh.khung().querySelector('.cb-luot').textContent;
+    const theBinh = Binh.khung().querySelector('.cb-the[data-p="2"]').querySelector('span').textContent;
+    const [xTot, yTot] = Binh.C._tamO(o(2, 'd', 2));
+    Binh.C._chamBan(xTot, yTot);
+    const chiXem = Binh.C._chon() === o(2, 'd', 2) && Binh.C._chonXem();
+    Binh.C._chamBan(-500, -500);
+    await cho(300);
+    ok('Bình còn 10 giây: báo "Còn 10 giây!", đồng hồ đỏ; hết giờ: dòng dưới ghi máy đang đi giùm, thẻ ghi hết giờ, chạm quân chỉ để xem; máy Bình (ghế bậc hai) chưa tự đi giùm',
+       baoGap === 'Còn 10 giây!' && gap && hetBinh && dongBinh === 'Hết giờ — máy đang đi giùm bạn…' && theBinh === 'hết giờ' && chiXem && !may.lay(`coba/${ma5}/nuoc/${ke + 1}`),
+       `${baoGap} · ${gap} · ${hetBinh} · ${dongBinh} · ${theBinh} · ${chiXem}`);
+    Binh.C._phong().lech -= 26000; Binh.C._tichGio();
+    troiQua(26500, [An, Binh]);                                         // 31,5 giây từ lúc tới lượt Bình
+    An.C._tichGio();
+    await doi(() => may.lay(`coba/${ma5}/nuoc/${ke + 1}`) && [An, Binh].every(m => m.C._phong().ke >= ke + 2), 6000);
+    const giup = may.lay(`coba/${ma5}/nuoc/${ke + 1}`) || {};
+    await doi(() => /máy đã đi giùm bạn/.test(baoCua(Binh)), 3000);
+    ok('hết 30 giây: máy An (ghế số nhỏ nhất còn ở đây) đi giùm Đen đúng một nước, mang giờ máy chủ; ghế Đen vẫn là người; Bình được báo "máy đã đi giùm bạn"',
+       giup.P === 2 && typeof giup.luc === 'number' && !may.lay(`coba/${ma5}/may/2`) && Binh.C._van().nguoi[2] === 'nguoi' && /Hết giờ — máy đã đi giùm bạn nước này/.test(baoCua(Binh)),
+       `${JSON.stringify(giup)} · ${baoCua(Binh)}`);
+    await doi(() => [An, Binh].every(m => m.yen() && m.C._van().the.luot === 0 && m.C._phong().ke >= ke + 3), 8000);
+    for (const m of [An, Binh]) m.C._tichGio();
+    ok('Hổ đi xong lại tới An: đồng hồ Trắng lại 0:30 — giây mỗi nước tính lại từ đầu mỗi lượt; hai máy cùng thế cờ',
+       [An, Binh].every(m => /^0:(30|29)$/.test(gioThe(m, 0).textContent)) && khop([An, Binh]) && !An.C._hetGioLuot(), gioThe(An, 0).textContent);
+    for (const m of [An, Binh]) m.C._roiPhong();
+
+    await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An', gio: 'v5' });
+    const ma6 = An.C._phong().ma;
+    await doi(() => An.C._phong().cay);
+    Binh.C._vaoPhong(ma6);
+    await doi(() => Binh.C._phong() && Binh.C._phong().cay && /data-ngoi/.test(Binh.tin()));
+    Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
+    await Binh.C._ngoiGhe(2);
+    await doi(() => An.C._phong().cay.ghe && An.C._phong().cay.ghe[2] && /Bắt đầu/.test(An.tin()));
+    await An.C._batDauPhong();
+    await doi(() => [An, Binh].every(m => m.C._van() && m.C._van().ma === ma6 && m.yen()));
+    for (const m of [An, Binh]) m.C._tichGio();
+    ok('phút cả ván: thẻ của cả hai người có đồng hồ 5:00 (của người tới lượt thì chạy), thẻ Đỏ máy chơi thì không',
+       [An, Binh].every(m => /^(5:00|4:59)$/.test(gioThe(m, 0).textContent) && gioThe(m, 2).textContent === '5:00' && !gioThe(m, 2).hidden && gioThe(m, 1).hidden));
+    An.C._diNuoc(nuoc(An, 0, o(0, 'e', 2), o(0, 'e', 4)), 0);
+    await doi(() => [An, Binh].every(m => m.C._phong().ke === 1 && m.yen()));
+    troiQua(40000, [An, Binh]);                                         // Bình nghĩ 40 giây
+    Binh.C._diNuoc(nuoc(Binh, 2, o(2, 'e', 2), o(2, 'e', 4)), 2);
+    await doi(() => [An, Binh].every(m => m.yen() && m.C._phong().ke >= 3 && m.C._van().the.luot === 0 && may.lay(`coba/${ma6}/nuoc/1/luc`)), 8000);
+    for (const m of [An, Binh]) m.C._tichGio();
+    ok('Bình nghĩ 40 giây: đồng hồ Đen còn 4:20 trên cả hai máy — giờ của mỗi người cộng dồn, chỉ chạy lúc tới lượt mình',
+       [An, Binh].every(m => /^4:(19|20)$/.test(gioThe(m, 2).textContent)), `${gioThe(An, 2).textContent} / ${gioThe(Binh, 2).textContent}`);
+    troiQua(301500, [An, Binh]);                                        // An nghĩ quá 5 phút
+    for (const m of [An, Binh]) { m.C._phong().nhipCuoi = 0; m.C._kiemPhong(); }
+    An.C._tichGio();
+    await doi(() => may.lay(`coba/${ma6}/may/0`) && [An, Binh].every(m => m.C._van().nguoi[0] === 'may'), 5000);
+    await doi(() => /Bạn hết giờ/.test(baoCua(An)) && /An hết giờ/.test(baoCua(Binh)), 2000);
+    ok('An hết 5 phút: máy chơi thay ghế Trắng tới hết ván (Rùa — Hổ đã ở ghế Đỏ); An không có nút Tự đi tiếp; cả phòng được báo',
+       may.lay(`coba/${ma6}/may/0`) === 'rua' && An.C._viecPhong() === '' && /Bạn hết giờ — máy chơi thay bạn tới hết ván/.test(baoCua(An)) &&
+       /An hết giờ — máy chơi thay tới hết ván/.test(baoCua(Binh)), `${baoCua(An)} · ${baoCua(Binh)} · ${An.C._viecPhong()}`);
+    await doi(() => (may.lay(`coba/${ma6}/nuoc/3`) || {}).P === 0, 6000);
+    ok('máy chơi thay đi nước của Trắng ngay (máy Bình chạy — ghế An giờ là ghế máy)', (may.lay(`coba/${ma6}/nuoc/3`) || {}).P === 0);
+    for (const m of [An, Binh]) m.C._roiPhong();
+
+    /* người vào sau tính lại đồng hồ từ danh sách nước trên máy chủ */
+    may.datLech(0); lechMay = 0;
+    const t = L.theMoi(), dsNuoc = {}, T = Date.now() - 60000, nghi = [10000, 35000, 37000];
+    L.THU_TU.forEach((P, i) => { const m = L.nuocHopLe(t, P).find(n => !n.phong && !n.nhap); dsNuoc[i] = { P, tu: m.tu, toi: m.toi, phong: 0, nhap: 0, luc: T + nghi[i] }; L.sauNuoc(t, L.diNuoc(t, m)); });
+    const ghe = (id, ten) => ({ id, ten, thay: Date.now() });
+    may.gieo('coba/HHHHHH', { tao: T - 5000, chu: 0, kho: 0, gio: 'v5', batDau: T, ghe: { 0: ghe('aaaaaaaa1111', 'A'), 1: ghe('bbbbbbbb2222', 'B'), 2: ghe('cccccccc3333', 'C') }, nuoc: dsNuoc });
+    Chi.C._vaoPhong('HHHHHH');
+    await doi(() => Chi.C._van() && Chi.C._van().ma === 'HHHHHH' && Chi.C._phong().ke === 3);
+    Chi.C._tichGio();
+    const canTrang = 300000 - 10000 - (Date.now() - (T + 37000));
+    ok('người vào sau (đang xem) tính lại đồng hồ từ danh sách nước: Trắng nghĩ 10 giây, Đen 25, Đỏ 2 — Đen còn 4:35, Đỏ 4:58, Trắng đang chạy',
+       gioThe(Chi, 2).textContent === '4:35' && gioThe(Chi, 1).textContent === '4:58' && Math.abs(Chi.C._conGio(0) - canTrang) < 1500,
+       `${gioThe(Chi, 0).textContent} ${gioThe(Chi, 2).textContent} ${gioThe(Chi, 1).textContent}`);
+    Chi.C._roiPhong(); may.gieo('coba/HHHHHH', null);
+  }
+
   console.log('\n— Tải lại trang —');
   {
     await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An' });
