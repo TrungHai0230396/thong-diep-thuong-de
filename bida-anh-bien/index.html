@@ -40,7 +40,7 @@
   body{background:#121417}
   .bida{background:linear-gradient(rgba(14,16,19,.74),rgba(14,16,19,.9)),url(anh-bien.jpg) center 30%/cover no-repeat #121417}
   .bida .xn-dong{display:none}
-  .bida .bd-dau{padding-right:16px}
+  .bida .bd-dau{padding-right:calc(env(safe-area-inset-right,0px) + 16px);padding-left:calc(env(safe-area-inset-left,0px) + 16px)}
   .bida .bd-tin{background:rgba(8,9,11,.66)}
   .bida .bd-tin-trong{background:linear-gradient(rgba(44,48,55,.97),rgba(26,29,34,.97))}
   .bida .bd-bao,.bida .bd-xoay-bang{background:rgba(26,29,34,.95)}
@@ -54,8 +54,9 @@
   self.TDTD_BIDA_CHU_DE = {
     ten: 'Anh Biển', goi: 'anh Biển', tieuDe: 'Bàn bida của anh Biển',
     may: ['Ghẹ', 'Cua', 'Mực'],
-    ni: ['#a3a9ae', '#757b81'], bang: ['#9da3a9', '#878d93', '#60666c'], vienBang: 'rgba(238,242,246,.45)',
-    anhNi: 'anh-bien.jpg', anhNiMo: 0.22, anhNiCat: [0, 0.04, 1, 0.74],
+    /* nỉ xám đậm cỡ nỉ xanh của trò gốc: vạch ngắm trắng nổi rõ (≥ 3:1); xám sáng như ảnh thì vạch chỉ còn chừng 2:1 */
+    ni: ['#6f767c', '#474d53'], bang: ['#6a7177', '#596066', '#3e4449'], vienBang: 'rgba(225,232,238,.4)',
+    anhNi: 'anh-bien.jpg', anhNiMo: 0.22, anhNiCat: [0, 0.04, 1, 0.74], chuThayAnh: 'Anh Biển cúi người ngắm cú đánh trên bàn bida',
     chamBiChu: [30, 30, 32],
     link: true,
     loi: {

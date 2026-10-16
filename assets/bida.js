@@ -825,7 +825,7 @@ const TEN_MAY = ['Sóc', 'Cú', 'Cáo'];
 /* bàn tặng: trang nào đặt self.TDTD_BIDA_CHU_DE trước khi nạp tệp này (xem bida-anh-bien/index.html) thì trò mang tên
    người chơi, tên máy, màu nỉ, ảnh in mờ trên nỉ, màu chấm bi chủ, lời trêu, link mời riêng, pháo giấy khi thắng. Không
    đặt thì như cũ. { ten, goi (cách gọi trong câu), tieuDe, may: [ba tên], ni: [giữa, mép], bang: [ba màu băng], vienBang,
-     anhNi, anhNiMo, anhNiCat, chamBiChu: [r, g, b], link (link mời về chính trang này),
+     anhNi, anhNiMo, anhNiCat, chuThayAnh (alt của ảnh ở bảng chào), chamBiChu: [r, g, b], link (link mời về chính trang này),
      loi: { vao, chuoi, tam, loi, truot, thang, thua } } */
 const chuDe = () => (typeof self !== 'undefined' && self.TDTD_BIDA_CHU_DE) || null;
 const tenMay = () => (chuDe() && chuDe().may) || TEN_MAY;
@@ -1245,7 +1245,9 @@ function veCanh(t) {
   veDieuKhien();
   vePhaoGiay(t);
 }
-/* bàn tặng: pháo giấy màu các bi rơi xuống bàn khi thắng */
+/* bàn tặng: pháo giấy màu các bi rơi xuống bàn khi thắng. Máy đặt "giảm chuyển động" thì thôi (hình động trang trí, như các
+   chỗ khác của app) */
+const giamChuyenDong = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 let phao = null;
 function batPhaoGiay() {
   const ds = [];
@@ -1502,7 +1504,8 @@ function vanMoi(ch) {
   ngam.a = 0; ngam.b = 0;
   capNhatChu();
   denLuot();
-  if (van.cheDo === 'tap') bao(`Tập một mình: ${kieu} bi, đánh tuỳ thích. Rơi bi chủ thì đặt lại.`);
+  if (chuDe() && !docLuu().h) { ghiLuu({ h: 1 }); moHuongDan(); }     // bàn tặng: cách chơi lần đầu hiện lúc vào bàn (xem mo)
+  else if (van.cheDo === 'tap') bao(`Tập một mình: ${kieu} bi, đánh tuỳ thích. Rơi bi chủ thì đặt lại.`);
   else if (laMinh(van.the.luot)) bao(`${tenBan()} phá trước: kéo bi trắng để đặt, kéo trên bàn để ngắm, kéo thanh Lực xuống rồi thả để đánh.`);
 }
 function denLuot() {
@@ -1513,7 +1516,7 @@ function denLuot() {
     if (!van.hetVan) {
       van.hetVan = true;
       /* bàn tặng: thắng (hay dọn sạch bàn lúc tập) thì pháo giấy rơi trên bàn một lúc rồi mới hiện bảng hết ván */
-      if (chuDe() && (laMinh(the.thang) || van.so < 2)) { batPhaoGiay(); const v0 = van; setTimeout(() => { if (van === v0) ketThucVan(); }, 2300); }
+      if (chuDe() && (laMinh(the.thang) || van.so < 2) && !giamChuyenDong()) { batPhaoGiay(); const v0 = van; setTimeout(() => { if (van === v0) ketThucVan(); }, 2300); }
       else ketThucVan();
     }
     return;
@@ -1835,7 +1838,7 @@ function veSanh() {
       ${nutMo}
       <button type="button" class="bd-chu bd-roi">Rời phòng</button>`;
   }
-  if (html !== phong.sanhCu || tam.querySelector('.bd-tin').hidden) { phong.sanhCu = html; moTin(html); }
+  if (html !== phong.sanhCu || tam.querySelector('.bd-tin').hidden) { phong.sanhCu = html; moTin(html, 'sanh'); }
 }
 /* ---------- phòng mở: dòng ngắn trong /sanhbida/<mã> cho người tìm phòng (như sảnh cờ ba người) ---------- */
 function capNhatSanh(ep) {
@@ -2147,9 +2150,12 @@ function theoMaTrenDiaChi() {
 }
 
 /* ---------- bảng: ván mới, cách chơi, hết ván ---------- */
-function moTin(html) {
-  const h = tam.querySelector('.bd-tin');
-  h.querySelector('.bd-tin-trong').innerHTML = html; h.hidden = false;
+/* bảng mới mở từ đầu (trước đây đóng Cách chơi dài rồi mở bảng Ván mới thì bảng mới nằm ở chỗ cuộn cũ, mất ảnh và tiêu
+   đề); bảng cùng loại vẽ lại tại chỗ (phòng chờ: có người vào ra) thì giữ chỗ đang xem */
+function moTin(html, loai) {
+  const h = tam.querySelector('.bd-tin'), t = h.querySelector('.bd-tin-trong');
+  const cuon = loai && !h.hidden && h.dataset.loai === loai ? t.scrollTop : 0;
+  t.innerHTML = html; t.scrollTop = cuon; h.dataset.loai = loai || ''; h.hidden = false;
   tam.classList.add('bd-co-tin');
   moXoay(false);
 }
@@ -2208,7 +2214,7 @@ function moMan(man) {
     manDang = 'chinh';
     const loi = (k, tieu, phu) => `<button type="button" class="bd-lua" data-man="${k}"><span class="bd-lua-hinh">${HINH_LOI[k]}</span><span class="bd-lua-chu"><b>${tieu}</b><i>${phu}</i></span></button>`;
     const cd = chuDe();
-    html = `${cd ? `<div class="bd-chao"><img src="${esc(cd.anhNi)}" alt="${esc(cd.tieuDe)}"></div>` : ''}<p class="bd-tin-nho">${cd ? 'Quà tặng' : 'Ván mới'}</p><h2>${esc((cd && cd.tieuDe) || 'Bida lỗ')}</h2>
+    html = `${cd ? `<div class="bd-chao"><img src="${esc(cd.anhNi)}" alt="${esc(cd.chuThayAnh || cd.tieuDe)}"></div>` : ''}<p class="bd-tin-nho">${cd ? 'Quà tặng' : 'Ván mới'}</p><h2>${esc((cd && cd.tieuDe) || 'Bida lỗ')}</h2>
     ${loi('may', 'Đấu với máy', `8 bi với ${tenMay()[0]}, hay 9 bi với tới ba máy`)}
     ${loi('tap', 'Tập một mình', 'Làm quen lực, xoáy, không bắt lỗi')}
     ${MANG ? loi('tao', 'Tạo phòng, mời bạn', 'Mỗi người một máy — gửi link hay cho quét mã QR') + loi('vao', 'Vào phòng của bạn', 'Có mã 6 ký tự, hay link bạn gửi') +
@@ -2351,7 +2357,12 @@ function dungKhung() {
   addEventListener('hashchange', theoMaTrenDiaChi);
   addEventListener('keydown', (e) => {
     if (!tam || !tam.classList.contains('hien')) return;
-    if (e.key === 'Escape') { if (!tam.querySelector('.bd-xoay-bang').hidden) moXoay(false); else if (!tam.querySelector('.bd-tin').hidden && van) tatTin(); else dong(); return; }
+    if (e.key === 'Escape') {
+      if (!tam.querySelector('.bd-xoay-bang').hidden) moXoay(false);
+      else if (!tam.querySelector('.bd-tin').hidden && van) tatTin();
+      else if (!chuDe()) dong();                                       // bàn tặng: trang chỉ có trò này, đóng là còn trang trống
+      return;
+    }
     if (phim(e)) e.preventDefault();
   });
   addEventListener('resize', doCo);
@@ -2380,7 +2391,8 @@ function mo() {
   } else if (phong) { noiPhong(); datDiaChi(phong.ma); }
   else if (!van && MANG && luu && MANG.laMa(luu.ma)) vaoPhong(luu.ma, { id: luu.id, P: luu.P }, -1, true);   // mở lại sau khi tải lại trang
   else if (!van) {
-    if (!docLuu().h) { ghiLuu({ h: 1 }); moHuongDan(); }
+    /* lần đầu thì hiện cách chơi; bàn tặng thì món quà (ảnh, lời chào) ra trước, cách chơi đợi tới lúc vào bàn (vanMoi) */
+    if (!docLuu().h && !chuDe()) { ghiLuu({ h: 1 }); moHuongDan(); }
     else moCaiDat();
   }
   capNhatChu();

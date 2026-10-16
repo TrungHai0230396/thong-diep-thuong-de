@@ -38,7 +38,8 @@ const nut = (cls = '') => {
 let luu = {};
 global.document = { body: nut('body'), hidden: false, createElement: () => nut(), querySelector: () => null, querySelectorAll: () => [], addEventListener() {} };
 global.self = global; global.window = global;
-global.addEventListener = () => {}; global.removeEventListener = () => {};
+const nghe = {};                                       // giữ các hàm nghe phím để bài kiểm bấm Esc thật
+global.addEventListener = (k, f) => { (nghe[k] = nghe[k] || []).push(f); }; global.removeEventListener = () => {};
 global.localStorage = { getItem: (k) => (k in luu ? luu[k] : null), setItem: (k, v) => { luu[k] = String(v); }, removeItem: (k) => { delete luu[k]; } };
 global.requestAnimationFrame = () => 1; global.cancelAnimationFrame = () => {};
 global.devicePixelRatio = 1;
@@ -384,13 +385,42 @@ console.log('\n— Bàn tặng anh Biển (bida-anh-bien/) —');
   const og = kichJpg(path.join(goc, 'bida-anh-bien', 'og-1.jpg')), nen = kichJpg(path.join(goc, 'bida-anh-bien', 'anh-bien.jpg'));
   ok('ảnh xem trước 1200×630 dưới 300 KB, khớp thẻ og:image; ảnh nền có thật', og[0] === 1200 && og[1] === 630 && og[2] < 300000 &&
     trang.includes('content="https://thong-diep-thuong-de.vercel.app/bida-anh-bien/og-1.jpg"') && nen[0] > 0, og.join('×'));
+  /* trang không có hàng nút của app (chừa 104 px bên phải) nên tự chừa chỗ tai thỏ khi xoay ngang */
+  ok('đầu trang chừa chỗ tai thỏ hai bên khi xoay ngang', /\.bida \.bd-dau\{padding-right:calc\(env\(safe-area-inset-right,0px\) \+ 16px\);padding-left:calc\(env\(safe-area-inset-left,0px\) \+ 16px\)\}/.test(trang));
   const cd = global.TDTD_BIDA_CHU_DE = new Function(`return ${cauHinh[1]};`)();
-  const khung = document.body.children.find(c => c.className === 'bida'), tin = khung.querySelector('.bd-tin');
+  /* vạch ngắm trắng (rgba(255,255,255,.75)) phải nổi trên giữa mặt nỉ ít nhất 3:1 — mức WCAG cho hình cần thấy để chơi; nỉ xanh
+     của trò gốc chừng 3,1:1. Xám sáng như bàn trong ảnh (#a3a9ae) chỉ được chừng 2:1 */
+  const dSang = (c) => c.reduce((s, u, i) => { u /= 255; return s + [0.2126, 0.7152, 0.0722][i] * (u <= 0.03928 ? u / 12.92 : ((u + 0.055) / 1.055) ** 2.4); }, 0);
+  const tuongPhan = (hex) => { const n = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16)), v = n.map(u => 0.75 * 255 + 0.25 * u); return (dSang(v) + 0.05) / (dSang(n) + 0.05); };
+  ok('nỉ đủ đậm: vạch ngắm trắng nổi ít nhất 3:1 trên giữa mặt nỉ (xám sáng #a3a9ae thì không)', tuongPhan(cd.ni[0]) >= 3 && tuongPhan('#a3a9ae') < 3, tuongPhan(cd.ni[0]).toFixed(2) + ':1');
+
+  /* mở trang lần đầu như anh Biển: một bản trò mới, máy chưa lưu gì */
+  luu['tdtd.bida'] = '{}';
+  const soNghe = (nghe.keydown || []).length;
+  new Function(fs.readFileSync(path.join(goc, 'assets', 'bida.js'), 'utf8'))();
+  const B = global.TDTD_BIDA;
+  B.mo();
+  const khung = document.body.children.filter(c => c.className === 'bida').pop(), tin = khung.querySelector('.bd-tin'), trongTin = tin.querySelector('.bd-tin-trong');
   const loiBao = () => khung.querySelector('.bd-bao').textContent, coCau = (chu, ds) => ds.some(c => chu.includes(c));
+  const banPhim = (k) => nghe.keydown.slice(soNghe).forEach(f => f({ key: k, preventDefault() {} }));
+  ok('mở lần đầu: món quà ra trước — bảng chào có ảnh anh Biển, chữ thay ảnh nói đúng ảnh; chưa hiện bảng Cách chơi',
+    !tin.hidden && trongTin.innerHTML.includes('Quà tặng') && trongTin.innerHTML.includes(`alt="${cd.chuThayAnh}"`) && !trongTin.innerHTML.includes('Cách chơi') &&
+    JSON.parse(luu['tdtd.bida']).h === undefined);
+  B._vanMoi({ che: 'may', kieu: 9, soMay: 3, kho: 1 });
+  ok('vào bàn lần đầu mới hiện Cách chơi (một lần), không kèm lời báo đè lên', !tin.hidden && trongTin.innerHTML.includes('Cách chơi') &&
+    JSON.parse(luu['tdtd.bida']).h === 1 && khung.querySelector('.bd-bao').hidden);
+  trongTin.scrollTop = 319;                                    // đọc tới cuối bảng Cách chơi dài
+  B._moMan('chinh');
+  ok('đóng Cách chơi rồi mở bảng Ván mới: bảng mới mở từ đầu (thấy ảnh, tiêu đề), không giữ chỗ cuộn cũ', trongTin.scrollTop === 0);
   B._vanMoi({ che: 'may', kieu: 9, soMay: 3, kho: 1 });
   const v = B._van();
+  ok('vào bàn lần sau: không hiện lại Cách chơi, chỉ có lời báo ngắn', tin.hidden && /^Anh Biển phá trước/.test(loiBao()), loiBao().slice(0, 40));
   ok('chủ đề: người chơi là "Anh Biển", máy là Ghẹ, Cua, Mực; lượt ghi "Lượt anh Biển"', v.nguoi.map(x => x.ten).join() === 'Anh Biển,Ghẹ,Cua,Mực' && /^Lượt anh Biển/.test(B._chuLuot()), B._chuLuot());
   ok('link mời về chính trang tặng (…/bida-anh-bien/?phong=MÃ), không về trang bida chung', B._linkMoi('ABCDEF') === location.origin + location.pathname + '?phong=ABCDEF');
+  banPhim('Escape');
+  const conMo = khung.classList.contains('hien');
+  B._moMan('chinh'); banPhim('Escape');
+  ok('Esc không đóng trò (sau lưng là trang trống, không có nút quay lại); bảng đang mở thì Esc vẫn đóng bảng về bàn', conMo && khung.classList.contains('hien') && tin.hidden);
   B._baoKetQua({ P: 0, loi: 'cai', vao: [], tiep: false, ket: false }, 0);
   ok('anh Biển rơi bi chủ: lời báo lỗi kèm câu trêu "bi chủ đi tắm biển"', /^Lỗi: /.test(loiBao()) && coCau(loiBao(), cd.loi.tam), loiBao());
   for (const s of [1, 2, 3]) B._baoKetQua({ P: 0, loi: '', vao: [s], tiep: true, ket: false }, 0);
@@ -404,15 +434,24 @@ console.log('\n— Bàn tặng anh Biển (bida-anh-bien/) —');
   try { B._denLuot(); } finally { global.setTimeout = henCu; }
   const anTruoc = tin.hidden, cho = hen.some(h => h.ms >= 1500);
   hen.forEach(h => h.f());
-  const bang = tin.querySelector('.bd-tin-trong').innerHTML;
+  const bang = trongTin.innerHTML;
   ok('anh Biển thắng: pháo giấy rơi trên bàn, hơn giây sau mới hiện bảng "Anh Biển thắng!" kèm câu mừng',
     !!B._phao() && anTruoc && cho && !tin.hidden && bang.includes('Anh Biển thắng!') && coCau(bang, cd.loi.thang), bang.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 100));
   ok('dòng trạng thái lúc hết ván: "Hết ván — anh Biển thắng."', B._chuLuot() === 'Hết ván — anh Biển thắng.', B._chuLuot());
+  /* máy đặt "giảm chuyển động": pháo giấy là hình động trang trí, bỏ; bảng hết ván hiện ngay */
+  global.matchMedia = (q) => ({ matches: /prefers-reduced-motion: reduce/.test(q) });
+  B._vanMoi({ che: 'may', kieu: 9, soMay: 3, kho: 1 });
+  const p0 = B._phao(), v2 = B._van();
+  v2.the.thang = 0; v2.the.lyDo = '9dung'; v2.hetVan = false;
+  try { B._denLuot(); } finally { delete global.matchMedia; }
+  ok('máy đặt "giảm chuyển động": không bắn pháo giấy, bảng "Anh Biển thắng!" hiện ngay', B._phao() === p0 && !tin.hidden && trongTin.innerHTML.includes('Anh Biển thắng!'));
   delete global.TDTD_BIDA_CHU_DE;
   B._vanMoi({ che: 'may', kieu: 8, kho: 1 });
   B._baoKetQua({ P: 0, loi: '', vao: [2], tiep: true, ket: false }, 0);
   ok('trang chính (không chủ đề): vẫn "Bạn" và Sóc, không câu trêu, link mời về bida-lo/',
     B._van().nguoi.map(x => x.ten).join() === 'Bạn,Sóc' && loiBao() === 'Vào bi 2.' && /\/bida-lo\/\?phong=ABCDEF$/.test(B._linkMoi('ABCDEF')), loiBao());
+  banPhim('Escape');
+  ok('trang chính: Esc vẫn đóng trò như cũ (về bầu trời sao)', !khung.classList.contains('hien'));
   B.dong();
 }
 

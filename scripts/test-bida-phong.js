@@ -149,6 +149,8 @@ function mayKhach(ten, url) {
   ok('mã QR trong phòng chờ là link mời …/bida-lo/?phong=MÃ (trang chia sẻ riêng của bida)', coQR && !/<svg/.test(An.tin()));
   An.bam('.bd-chep-link'); await cho(20);
   ok('Chép link: chép đúng link mời', An.chep === `http://an/bida-lo/?phong=${ma}`, An.chep);
+  const trongAn = An.khung().querySelector('.bd-tin').querySelector('.bd-tin-trong');
+  trongAn.scrollTop = 120;                                    // An cuộn xuống xem ghế, nút
   Binh.C._vaoPhong(ma); Chi.C._vaoPhong(ma);
   await doi(() => Binh.C._phong().cay && Chi.C._phong().cay && /data-ngoi/.test(Binh.tin()));
   ok('người mở link: thấy An mời chơi bida, nút "Vào chơi ghế 2", ghế trống ghi "Chờ bạn"',
@@ -158,6 +160,7 @@ function mayKhach(ten, url) {
   const ban = [Binh, Chi].find(m => m.C._phong().P === 1), xem = ban === Binh ? Chi : Binh;
   ok('hai người cùng bấm ghế 2 một lúc: đúng một người được, người kia vẫn đang xem', !!ban && xem.C._phong().P === -1);
   await doi(() => /class="bd-batdau-phong">Bắt đầu/.test(An.tin()));
+  ok('phòng chờ vẽ lại khi có người vào: giữ chỗ An đang cuộn, không nhảy về đầu bảng', trongAn.scrollTop === 120, String(trongAn.scrollTop));
   ok('chủ phòng thấy bạn đã vào: Bắt đầu thành nút chính; người được mời thì chờ An bấm Bắt đầu', /Đủ người rồi/.test(An.tin()) && /Chờ An bấm Bắt đầu/.test(ban.tin()));
   await An.C._batDauPhong();
   await doi(() => ca.every(m => m.C._van() && m.C._van().cheDo === 'phong' && m.yen()));
