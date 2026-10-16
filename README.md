@@ -1955,6 +1955,17 @@ Người dùng: "làm tìm phòng trống không có mật khẩu để mọi ng
 
 Người dùng hỏi thêm: "trong app bạn nhắc đến cờ tải lên firebase chi vậy, ẩn mấy chú thích đó đi" — bỏ câu "Nước đi và tên gửi qua máy chủ Firebase của Google…" dưới nút Tạo phòng. `scripts/test-phong.js` thêm 1 bài (cùng 11 bài trên, giờ 69): không còn chữ nào nhắc Firebase hiện ra cho người chơi (bỏ ghi chú trong mã rồi mới tìm — bản đầu chỉ xét từng dòng nên lọt chữ nằm trong chuỗi HTML nhiều dòng).
 
+### Tìm phòng nhanh: một chạm là vào chơi
+
+Người dùng: "thêm 1 nút tìm phòng nhanh đi".
+
+- **Bảng Ván mới** có thêm *Tìm phòng nhanh* (hình tia chớp). Mục danh sách đổi tên thành *Xem phòng đang chờ* cho khỏi lẫn; màn danh sách cũng có nút *Tìm phòng nhanh* ở trên cùng, ngay dưới ô tên — gõ tên rồi bấm luôn.
+- **Một chạm**: đọc `/sanh`, chọn phòng mở sắp đủ người nhất (còn ít ghế trống nhất; bằng nhau thì phòng có chủ vừa báo còn ở đây), đọc lại phòng thật rồi ngồi luôn ghế trống đầu tiên theo thứ tự đi (Trắng → Đen → Đỏ), mang tên đã lưu; phòng chờ ghi "Phòng mở". Dòng danh sách đã cũ (phòng thật đủ người hay đã bắt đầu), hay ghế vừa bị người khác giành (luật không cho ghi đè ghế đã có người), thì thử phòng kế — tối đa 4 phòng.
+- **Không còn phòng nào**: tự tạo phòng mở theo cài đặt lần trước (quân, mức máy, luật), báo "Chưa có phòng nào đang chờ — đã tạo phòng mở, chờ người vào." — ai bấm tìm nhanh sau đó sẽ vào phòng này.
+- Mấy câu nhắc tới danh sách (phòng chờ của chủ phòng mở, màn Tạo phòng, lúc đổi riêng ↔ mở) giờ gọi đúng hai tên mới.
+
+`scripts/test-phong.js` thêm 4 bài (giờ 73): bảng Ván mới và màn danh sách có nút, không chữ nào còn gọi tên cũ; bấm tìm nhanh thì bỏ qua dòng của phòng đã đủ người, vào phòng còn 1 ghế chứ không vào phòng còn 2 ghế, ngồi đúng ghế trống còn lại với tên mình; vào đủ ba người thì phòng thôi hiện, người vào thấy "Phòng mở"; không còn phòng thì tự tạo phòng mở, có trong danh sách, có báo. Thử phá 5 chỗ (đảo thứ tự ưu tiên phòng, bỏ tự tạo phòng, bỏ dấu "phòng mở" sau khi vào, bỏ nút trên bảng Ván mới, đổi một câu về tên cũ) — bắt cả 5. Đã thử trên database thật với hai thẻ khác địa chỉ: thẻ thứ nhất bấm tìm nhanh lúc chưa có phòng nào → tự tạo phòng mở, có trong danh sách (còn 2 ghế); thẻ thứ hai gõ tên rồi bấm tìm nhanh → vào đúng phòng đó, ngồi ghế Đen, dòng danh sách còn 1 ghế, chủ phòng thấy tên người vào; chủ phòng rời thì dòng mất.
+
 ## Cấu trúc
 
 ```
@@ -2021,7 +2032,7 @@ assets/maqr.js             mã QR tự vẽ cho phòng chờ (ISO/IEC 18004, ki�
 scripts/test-maqr.js       12 kiểm thử mã QR: số liệu chuẩn, đọc ngược bằng bộ đọc riêng, sát sức chứa, 300 chữ ngẫu nhiên
 firebase-rules.json        luật bảo vệ database (dán vào thẻ Rules của Firebase)
 scripts/fb-gia.js          máy chủ giả của Firebase cho bài kiểm thử
-scripts/test-phong.js      69 kiểm thử chơi qua mạng: ba máy chung một phòng trên máy chủ giả, phòng chờ theo từng người xem
+scripts/test-phong.js      73 kiểm thử chơi qua mạng: ba máy chung một phòng trên máy chủ giả, phòng chờ theo từng người xem
 scripts/test-sokoban.js    60 kiểm thử Đẩy thùng sao: luật, bộ giải đối chiếu dò từng bước, bộ tạo, cả 100 màn, giao diện
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -2055,7 +2066,7 @@ node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
 node scripts/test-coba.js        # chạy 93 kiểm thử Cờ vua ba người
-node scripts/test-phong.js       # chạy 69 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
+node scripts/test-phong.js       # chạy 73 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
 node scripts/test-maqr.js        # chạy 12 kiểm thử mã QR
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
 node scripts/tao-man-sokoban.js tao ung-vien.jsonl 7 [4,5]   # tạo màn liên tục, 7 luồng, ghi mỗi màn một dòng (tuỳ chọn: chỉ số thùng này)

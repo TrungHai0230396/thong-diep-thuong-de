@@ -447,6 +447,55 @@ function mayKhach(ten, url) {
     ok('chủ phòng mở rời phòng: phòng thôi hiện trong danh sách', !dong(ma7));
   }
 
+  console.log('\n— Tìm phòng nhanh —');
+  {
+    /* Người dùng: "thêm 1 nút tìm phòng nhanh đi" — một chạm vào phòng mở sắp đủ người nhất, ngồi luôn ghế trống; không còn
+       phòng nào thì tự tạo phòng mở */
+    const Dung = mayKhach('Dũng', url);
+    Dung.C.mo();
+    const dong = (ma) => may.lay(`sanh/${ma}`);
+    Dung.C._moCaiDat();
+    const chon = Dung.tin();
+    Dung.bam('[data-man]', { man: 'tim' });
+    ok('bảng Ván mới có "Tìm phòng nhanh" và "Xem phòng đang chờ"; màn danh sách có nút tìm phòng nhanh ở trên; không chữ nào còn gọi tên cũ "Tìm phòng đang chờ"',
+       /data-man="nhanh"[\s\S]*Tìm phòng nhanh/.test(chon) && /Xem phòng đang chờ/.test(chon) && /class="cb-tim-nhanh">Tìm phòng nhanh/.test(Dung.tin()) &&
+       !/Tìm phòng đang chờ/.test(NGUON_COBA.replace(/\/\*[\s\S]*?\*\//g, '')));
+    Dung.C._moCaiDat();
+    await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An', mo: true });
+    const r1 = An.C._phong().ma;
+    await Chi.C._taoPhong({ mau: 0, kho: 0, ten: 'Chi', mo: true });
+    const r2 = Chi.C._phong().ma;
+    await doi(() => dong(r1) && dong(r2));
+    Binh.C._vaoPhong(r2);
+    await doi(() => Binh.C._phong() && Binh.C._phong().cay && /data-ngoi/.test(Binh.tin()));
+    Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
+    await Binh.C._ngoiGhe(2);
+    await doi(() => (dong(r2) || {}).trong === 1);
+    /* một dòng nói còn 1 ghế mà phòng thật đã đủ người (dòng cũ chưa kịp xoá), lại mới nhất nên được thử trước */
+    const g = (id, ten) => ({ id, ten, thay: Date.now() });
+    may.gieo('coba/FFFFFF', { tao: Date.now(), chu: 0, kho: 0, ghe: { 0: g('aaaaaaaa1111', 'A'), 1: g('bbbbbbbb2222', 'B'), 2: g('cccccccc3333', 'C') } });
+    may.gieo('sanh/FFFFFF', { tao: Date.now(), ten: 'Đầy', trong: 1, thay: Date.now() + 5000 });
+    Dung.khung().querySelector('.cb-o-ten').value = Dung.ten;          // ô tên điền sẵn tên đã lưu, như trên máy thật
+    Dung.bam('[data-man]', { man: 'nhanh' });
+    await doi(() => Dung.C._phong() && Dung.C._phong().P >= 0 && Dung.C._phong().cay);
+    const pd = Dung.C._phong();
+    ok('bấm "Tìm phòng nhanh": bỏ qua dòng của phòng đã đủ người, vào phòng còn 1 ghế (sắp đủ người hơn phòng còn 2 ghế), ngồi luôn ghế trống còn lại, mang tên mình',
+       !!pd && pd.ma === r2 && pd.P === 1 && may.lay(`coba/${r2}/ghe/1/id`) === pd.id && may.lay(`coba/${r2}/ghe/1/ten`) === 'Dũng', pd && `${pd.ma} ghế ${pd.P}`);
+    await doi(() => !dong(r2) && /Phòng mở/.test(Dung.tin()));
+    ok('vào xong phòng đủ ba người: phòng thôi hiện trong danh sách; Dũng thấy phòng chờ ghi "Phòng mở"', !dong(r2) && /Phòng mở/.test(Dung.tin()) && !!dong(r1));
+    for (const m of [Binh, Chi, Dung, An]) m.C._roiPhong();
+    may.gieo('sanh/FFFFFF', null); may.gieo('coba/FFFFFF', null);
+    await doi(() => !dong(r1));
+    Dung.C._moCaiDat();
+    Dung.khung().querySelector('.cb-o-ten').value = Dung.ten;
+    await Dung.C._timNhanh();
+    await doi(() => Dung.C._phong() && Dung.C._phong().cay && dong(Dung.C._phong().ma));
+    const pn = Dung.C._phong();
+    ok('không còn phòng nào đang chờ: tự tạo phòng mở (Dũng là chủ phòng), có trong danh sách, báo đã tạo phòng',
+       !!pn && pn.mo && pn.P === pn.cay.chu && (dong(pn.ma) || {}).ten === 'Dũng' && /đã tạo phòng mở/.test(Dung.khung().querySelector('.cb-bao').textContent));
+    Dung.C._roiPhong(); Dung.C.dong();
+  }
+
   console.log('\n— Tải lại trang —');
   {
     await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An' });

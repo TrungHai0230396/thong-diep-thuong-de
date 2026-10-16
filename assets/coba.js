@@ -1453,7 +1453,7 @@ function veSanh() {
     const nutMoi = trong.length ? nutMoiBan(laChu ? 'Gửi link mời' : 'Mời thêm bạn', 'Chép link mời', laChu && !ban) + nutQR() + khungQR() : '';
     const loi = !laChu ? (chuVang ? `${tenChu} đang vắng. Muốn chơi luôn thì bấm Bắt đầu, khỏi chờ.` : `Chờ ${tenChu} bấm Bắt đầu…`)
       : !trong.length ? 'Đủ ba người rồi.'
-      : `${ban ? `${ban} bạn đã vào, còn ${trong.length} ghế trống. ` : 'Chưa ai vào. '}${phong.mo ? 'Phòng đang hiện trong mục "Tìm phòng đang chờ", ai cũng vào được; bạn bè vẫn vào bằng link, mã.' : 'Bạn bè mở link, quét mã QR, hay nhập mã ở mục "Vào phòng của bạn".'}`;
+      : `${ban ? `${ban} bạn đã vào, còn ${trong.length} ghế trống. ` : 'Chưa ai vào. '}${phong.mo ? 'Phòng đang mở cho mọi người: ai bấm "Tìm phòng nhanh" hay "Xem phòng đang chờ" cũng vào được; bạn bè vẫn vào bằng link, mã.' : 'Bạn bè mở link, quét mã QR, hay nhập mã ở mục "Vào phòng của bạn".'}`;
     /* chủ phòng đổi phòng riêng ↔ phòng mở lúc nào cũng được (bạn bè không tới thì mở cho người lạ) */
     const nutMo = laChu && trong.length ? `<button type="button" class="cb-chu cb-doi-mo">${phong.mo ? 'Thôi cho người lạ vào' : 'Cho người lạ tìm thấy phòng này'}</button>` : '';
     html = `<p class="cb-tin-nho">${phong.mo || phong.tuSanh ? 'Phòng mở' : 'Phòng chờ'} · ${luatChu(cay)}</p>${dongMa()}${hangGhe(cay, minh)}
@@ -1493,7 +1493,7 @@ function doiPhongMo() {
   phong.mo = !phong.mo;
   ghiLuu({ phong: { ma: phong.ma, id: phong.id, P: phong.P, mo: phong.mo || undefined } });
   capNhatSanh(true);
-  bao(phong.mo ? 'Phòng đã hiện trong mục "Tìm phòng đang chờ" — ai cũng vào được.' : 'Phòng thôi hiện cho người lạ; bạn bè vẫn vào bằng link, mã.');
+  bao(phong.mo ? 'Phòng đã mở cho mọi người — ai tìm phòng cũng vào được.' : 'Phòng thôi hiện cho người lạ; bạn bè vẫn vào bằng link, mã.');
   veSanh();
 }
 /* màn Tìm phòng: đọc /sanh mỗi 4 giây lúc màn còn mở */
@@ -1509,17 +1509,51 @@ async function taiDsPhong() {
   const r = await MANG.goi('sanh', 'GET');
   if (!timPhong) return;
   if (manDang !== 'tim' || !tam || tam.querySelector('.cb-tin').hidden) { tatTimPhong(); return; }
-  const nay = Date.now(), ds = [];
-  for (const [ma, d] of Object.entries((r.ok && r.du && typeof r.du === 'object' && r.du) || {})) {
-    if (!MANG.laMa(ma) || !d || typeof d.thay !== 'number') continue;
-    if (nay - d.thay > 600000) { MANG.goi(`sanh/${ma}`, 'DELETE'); continue; }   // im quá 10 phút: dọn giùm
-    if (nay - d.thay > 90000 || !(d.trong >= 1)) continue;                         // chủ phòng đã tắt app, hay chuyển app khác
-    ds.push({ ma, ten: String(d.ten || 'Ai đó').slice(0, 20), trong: Math.min(2, d.trong), tq: d.luat === 'tq', tao: typeof d.tao === 'number' ? d.tao : d.thay });
-  }
-  ds.sort((a, b) => b.tao - a.tao);
+  const ds = locPhongMo(r.ok && r.du).sort((a, b) => b.tao - a.tao);
   Object.assign(timPhong, { ds, xong: true, loi: !r.ok });
   const k = tam.querySelector('.cb-tin .cb-ds-phong');
   if (k) k.innerHTML = dsPhongHtml();
+}
+/* các dòng còn sống trong /sanh: bỏ dòng im quá 90 giây (chủ phòng đã tắt app, hay chuyển app khác), dọn giùm dòng im quá
+   10 phút */
+function locPhongMo(du) {
+  const nay = Date.now(), ds = [];
+  for (const [ma, d] of Object.entries((du && typeof du === 'object' && du) || {})) {
+    if (!MANG.laMa(ma) || !d || typeof d.thay !== 'number') continue;
+    if (nay - d.thay > 600000) { MANG.goi(`sanh/${ma}`, 'DELETE'); continue; }
+    if (nay - d.thay > 90000 || !(d.trong >= 1)) continue;
+    ds.push({ ma, ten: String(d.ten || 'Ai đó').slice(0, 20), trong: Math.min(2, d.trong), tq: d.luat === 'tq', tao: typeof d.tao === 'number' ? d.tao : d.thay, thay: d.thay });
+  }
+  return ds;
+}
+/* tìm phòng nhanh. Người dùng: "thêm 1 nút tìm phòng nhanh đi". Một chạm: vào phòng mở sắp đủ người nhất (còn ít ghế trống
+   nhất, chủ phòng vừa báo còn ở đây), ngồi luôn ghế trống đầu tiên theo thứ tự đi; ghế vừa bị người khác giành, hay ván vừa
+   bắt đầu, thì thử phòng kế; không còn phòng nào thì tự tạo phòng mở theo cài đặt đã chọn rồi chờ người vào. */
+async function timNhanh() {
+  if (!MANG) return;
+  tatTimPhong();
+  const o = tam && tam.querySelector('.cb-o-ten');
+  if (o) ghiLuu({ ten: o.value.trim().slice(0, 20) });
+  moTin('<p class="cb-tin-nho">Tìm phòng nhanh</p><h2>Đang tìm phòng…</h2>');
+  const r = await MANG.goi('sanh', 'GET');
+  if (!r.ok) {
+    moTin('<p class="cb-tin-nho">Tìm phòng nhanh</p><h2>Chưa tìm được</h2><p>Kiểm tra mạng rồi thử lại.</p><button type="button" class="cb-moi">Quay lại</button>');
+    return;
+  }
+  for (const d of locPhongMo(r.du).sort((a, b) => a.trong - b.trong || b.thay - a.thay).slice(0, 4)) {
+    const p = await MANG.goi(`coba/${d.ma}`, 'GET'), cay = p.ok ? MANG.chuan(p.du) : null;
+    if (!cay || cay.batDau) continue;
+    const P = L.THU_TU.find(Q => !(cay.ghe && cay.ghe[Q]));
+    if (P === undefined) continue;
+    const id = MANG.idMoi(), g = await MANG.goi(`coba/${d.ma}/ghe/${P}`, 'PATCH', { id, ten: tenMinh() || TEN_MAU[P], thay: MANG.GIO });
+    if (!g.ok) continue;
+    vaoPhong(d.ma, { id, P });
+    if (phong && phong.ma === d.ma) phong.tuSanh = true;
+    return;
+  }
+  const c = docLuu();
+  await taoPhong({ mau: [0, 1, 2].includes(c.mau) ? c.mau : 0, kho: [0, 1, 2].includes(c.kho) ? c.kho : 1, ten: tenMinh(), luat: c.luat === 'tq' ? 'tq' : 'thuong', mo: true });
+  if (phong && phong.mo) bao('Chưa có phòng nào đang chờ — đã tạo phòng mở, chờ người vào.');
 }
 function dsPhongHtml() {
   if (!timPhong || !timPhong.xong) return '<p class="cb-meo">Đang tìm phòng…</p>';
@@ -2021,6 +2055,7 @@ const HINH_LOI = {
   tao: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3"/><path d="M3.5 19c.6-3 2.8-5 5.5-5s4.9 2 5.5 5"/><path d="M18 7.5v6M15 10.5h6"/></svg>',
   vao: '<svg viewBox="0 0 24 24"><circle cx="8" cy="15.5" r="3.5"/><path d="M10.5 13L19 4.5M16.2 7.3l2.4 2.4M14 9.5l1.9 1.9"/></svg>',
   tim: '<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5M8 10.5h5M10.5 8v5"/></svg>',
+  nhanh: '<svg viewBox="0 0 24 24"><path d="M13.5 3L5.5 13.5h6l-1.5 7.5 8-10.5h-6z"/></svg>',
 };
 let manDang = 'chinh';
 function moCaiDat() { moMan('chinh'); }
@@ -2044,13 +2079,15 @@ function moMan(man) {
   else if (man === 'tao' && MANG) html = `${lui}<p class="cb-tin-nho">Tạo phòng</p><h2>${moCho ? 'Phòng mở cho mọi người' : 'Mời bạn chơi cùng'}</h2>
     ${oTen(moCho ? 'Người khác thấy tên này trong danh sách' : 'Để bạn bè biết là ai')}${dongLuat}
     <p class="cb-nhan">Ai được vào</p><div class="cb-hang">${nut('Bạn bè có link', 0, !moCho, 'mo')}${nut('Mọi người', 1, moCho, 'mo')}</div>
-    <p class="cb-meo cb-trai">${moCho ? 'Phòng hiện trong mục "Tìm phòng đang chờ" — ai cũng vào được, không cần mã.' : 'Chỉ ai có link hay mã mới vào được.'}</p>
+    <p class="cb-meo cb-trai">${moCho ? 'Ai bấm "Tìm phòng nhanh" hay "Xem phòng đang chờ" cũng vào được, không cần mã.' : 'Chỉ ai có link hay mã mới vào được.'}</p>
     <p class="cb-nhan">Bạn cầm quân</p><div class="cb-hang">${quan}</div>
     <p class="cb-nhan">Ghế không ai vào thì máy chơi</p><div class="cb-hang">${muc}</div>
     <button type="button" class="cb-tao">Tạo phòng</button>
     <p class="cb-meo">Tạo xong có link và mã QR để mời.</p>`;
   else if (man === 'tim' && MANG) html = `${lui}<p class="cb-tin-nho">Tìm phòng</p><h2>Phòng đang chờ người</h2>
     ${oTen('Để trống thì gọi theo màu quân')}
+    <button type="button" class="cb-tim-nhanh">Tìm phòng nhanh</button>
+    <p class="cb-meo">Vào ngay phòng sắp đủ người; không có phòng nào thì tự tạo phòng mở, chờ người vào. Hay chọn một phòng:</p>
     <div class="cb-ds-phong">${dsPhongHtml()}</div>
     <p class="cb-meo">Phòng mở do người chơi tạo, ai cũng vào được. Danh sách tự làm mới.</p>
     <button type="button" class="cb-phu cb-tao-mo">Tạo phòng mở</button>`;
@@ -2065,7 +2102,8 @@ function moMan(man) {
     html = `<p class="cb-tin-nho">Ván mới</p><h2>Cờ vua ba người</h2>
     ${loi('may', 'Đấu với 2 máy', 'Chơi một mình với Hổ và Rùa')}
     ${MANG ? loi('tao', 'Tạo phòng, mời bạn', 'Mỗi người một máy — gửi link hay cho quét mã QR') + loi('vao', 'Vào phòng của bạn', 'Có mã 6 ký tự, hay link bạn gửi') +
-      loi('tim', 'Tìm phòng đang chờ', 'Vào chơi cùng người đang chờ — không cần mã') : ''}
+      loi('nhanh', 'Tìm phòng nhanh', 'Vào ngay phòng đang thiếu người, không có thì tự tạo phòng mở') +
+      loi('tim', 'Xem phòng đang chờ', 'Chọn phòng trong danh sách — không cần mã') : ''}
     <button type="button" class="cb-chu cb-tieng">${coTieng ? '🔊 Âm thanh đang bật' : '🔇 Âm thanh đang tắt'}</button>`;
   }
   moTin(html);
@@ -2118,6 +2156,7 @@ function bam(e) {
   if ((n = q('.cb-the'))) { baoMat(+n.dataset.p); return; }
   if (q('.cb-hoi')) { moHuongDan(); return; }
   if (q('.cb-moi')) { if (van && van.cheDo === 'phong' && phong) moPhongTT(); else moCaiDat(); return; }
+  if (q('.cb-tim-nhanh') || ((n = q('[data-man]')) && n.dataset.man === 'nhanh')) { amThanh(); timNhanh(); return; }
   if ((n = q('[data-man]'))) { moMan(n.dataset.man); return; }
   if (q('.cb-hoan')) { hoanTac(); return; }
   if (q('.cb-demo')) { batDemo(); return; }
@@ -2205,7 +2244,7 @@ self.TDTD_COBA = {
   _batDauPhong: () => batDauPhong(), _diNuoc: (m, P) => diNuoc(m, P), _roiPhong: () => roiPhong(), _vanNua: () => vanNua(), _theoTiep: (ma) => theoTiep(ma),
   _kiemPhong: () => kiemPhong(), _toiChayMay: () => toiChayMay(), _viecPhong: () => viecPhong(), _choMayThay: () => choMayThay(), _tuDiTiep: () => tuDiTiep(),
   _timNuocMang: (the, mv) => timNuocMang(the, mv), _moCaiDat: () => moCaiDat(), _laMinh: (P) => laMinh(P), _duongChon: () => duongChon,
-  _bam: (e) => bam(e), _trichMa: (s) => trichMa(s), _timPhong: () => timPhong, _taiDsPhong: () => taiDsPhong(), _capNhatSanh: (ep) => capNhatSanh(ep), _CAO: CAO, _MAU: MAU, _DA: DA,
+  _bam: (e) => bam(e), _trichMa: (s) => trichMa(s), _timNhanh: () => timNhanh(), _timPhong: () => timPhong, _taiDsPhong: () => taiDsPhong(), _capNhatSanh: (ep) => capNhatSanh(ep), _CAO: CAO, _MAU: MAU, _DA: DA,
   _vePhan: (c2, ...a) => { const cu = ctx; ctx = c2; try { vePhan(...a); } finally { ctx = cu; } }, _chonXem: () => chonXem, _xem: () => xem, _batXem: (tu) => batXem(tu), _chonXemQuan: (l) => chonXemQuan(l),
   _chamXem: (x, y) => chamXem(x, y), _thoatXem: () => thoatXem(), _baoMat: (P) => baoMat(P), _noi: (P, loai) => noi(P, loai),
 };
