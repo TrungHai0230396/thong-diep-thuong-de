@@ -105,16 +105,16 @@ process.exitCode = fail ? 1 : 0;
     duong: '<trò>', khung: '.<khung>', mun: 'TDTD_<TRÒ>', tieuDe: '<Tên trò — phụ đề>', tenApp: '<≤ 13 chữ, không trùng>', trang: '<thu-muc>/', nutCai: true },
 ```
 
-Giá trị trong nháy đơn, không có dấu `'` hay `{` `}` bên trong (SAO được đọc bằng regex). Muốn thanh địa chỉ là trang
-riêng (chép link ra chú thích) thì thêm `diaChiTrang: true` và đưa `'<thu-muc>/'` vào SHELL của sw.js; trò có mã
-phòng sau dấu # (cờ, bida) thì đừng bật — phần sau # đó là của trò.
+Giá trị trong nháy đơn, không có dấu `'` hay `{` `}` bên trong (SAO được đọc bằng regex). Lúc trò mở, thanh địa chỉ
+là `/<thu-muc>/` (app.js tự làm, không khai gì): nhớ đưa `'<thu-muc>/'` vào SHELL của sw.js. Trò có mã phòng thì đọc
+`?phong=MÃ` lúc `mo()` và ghi mã bằng `?phong=` — chép `maTrenDiaChi`, `datDiaChi` của coba.js.
 
 ## 3. index.html, sw.js, test-sao.js
 
 - `index.html`: `<script src="assets/<lõi>.js"></script>` rồi `<script src="assets/<trò>.js"></script>`, trước
   `caiapp.js`, `thongke.js`, `app.js` (lõi trước trò dùng nó).
-- `sw.js`: thêm `'assets/<lõi>.js', 'assets/<trò>.js'` vào `SHELL` (mất mạng vẫn mở được). Tăng `V` lúc commit
-  (nhieu-phien.md).
+- `sw.js`: thêm `'assets/<lõi>.js', 'assets/<trò>.js'` vào `SHELL` (mất mạng vẫn mở được), và `'<thu-muc>/'` vào nhóm
+  trang riêng cuối `SHELL` (tải lại lúc mất mạng ở thanh địa chỉ của trò). Tăng `V` lúc commit (nhieu-phien.md).
 - `scripts/test-sao.js`: thêm `'<lõi>.js', '<trò>.js'` vào mảng `TEP` (thứ tự như index.html) — test-sao chỉ thấy
   mô-đun được nạp từ đây.
 
@@ -147,8 +147,9 @@ Trong `scripts/lam-trang-chia-se.py`:
          alt='<chữ thay ảnh, ≥ 10 ký tự>', mo='<chữ của link khi tắt JavaScript>'),
 ```
 
-  Tuỳ chọn: `chuyen="…"` thay lệnh chuyển vào app (cờ, bida đọc `?phong=MÃ`; Ăn gì giữ `location.search`), `nhan=`
-  màu dòng tiêu đề thứ hai, `viet=False` (trang viết tay, không ghi đè).
+  Tuỳ chọn: `phong=True` cho trò có mã phòng (trang chuyển `?phong=MÃ` thành `#<trò>/MÃ`, giữ `?tro`, `?ngay` — xem
+  `chuyen_vao`), `chuyen="…"` thay hẳn lệnh chuyển (hiếm khi cần), `nhan=` màu dòng tiêu đề thứ hai, `viet=False`
+  (trang viết tay, không ghi đè).
 - Vẽ thử: `python3 scripts/lam-trang-chia-se.py <trò> --thu <thư mục scratchpad>` rồi mở ảnh xem. Ghi thật:
   `python3 scripts/lam-trang-chia-se.py <trò>`. Ảnh đã có thì không ghi đè: đổi hình thì tăng `so`, chạy lại, xoá ảnh
   cũ (icons/ cache một năm).
@@ -156,8 +157,8 @@ Trong `scripts/lam-trang-chia-se.py`:
   short_name = tenApp).
 
 Những gì test-sao.js đòi ở mỗi trang chia sẻ: `<title>` và `og:title` đúng `tieuDe`, không có chữ "Thông Điệp"; chuyển
-vào app bằng `location.replace('../#<trò>'` (hay `'../' + location.search + '#<trò>'`), không thẻ `http-equiv`
-refresh, có `href="../#<trò>"`; `og:url` là `https://thong-diep-thuong-de.vercel.app/<thu-muc>/`; `description` trùng
+vào app bằng JavaScript — test-sao chạy thật lệnh chuyển: không `?…` thì `../#<trò>`, `?tro=…&ngay=…` giữ nguyên, trò
+có phòng thì `?phong=MÃ` thành `#<trò>/MÃ` —, không thẻ `http-equiv` refresh, có `href="../#<trò>"`; `og:url` là `https://thong-diep-thuong-de.vercel.app/<thu-muc>/`; `description` trùng
 `og:description`, 60–230 ký tự, không trùng trò khác; `og:image:alt` ≥ 10 ký tự; ảnh có thật, đúng 1200×630, dưới
 300 KB. Manifest: id "/", start_url `?tro=<trò>`, scope là cả trang, biểu tượng như manifest chính.
 
@@ -171,5 +172,5 @@ trình duyệt những gì; chưa làm, chưa thử được gì. Thêm dòng tr
 ## 7. Kiểm
 
 `ban-do.py <trò>` (hết cảnh báo) → bài kiểm của trò → `scripts/test-sao.js` bằng Node 24 → soát trên trình duyệt cỡ
-điện thoại và máy tính (trinh-duyet.md): mở từ ngôi sao, đóng bằng ✕, Esc, Back, mở thẳng `#<trò>` và trang
-`/<thu-muc>/`, nút 🔗, nút Cài app không đè tiêu đề.
+điện thoại và máy tính (trinh-duyet.md): mở từ ngôi sao (thanh địa chỉ thành `/<thu-muc>/`), đóng bằng ✕, Esc, Back,
+mở thẳng `#<trò>` và trang `/<thu-muc>/`, tải lại khi đang mở, nút 🔗, nút Cài app không đè tiêu đề.

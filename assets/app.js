@@ -13,12 +13,12 @@ const { ymd, cardFor, newSeed } = self.TDTD;
      nhan : mô tả cho trình đọc màn hình, không hiện thành chữ
      hinh : 'sao5' | 'lap-lanh' | 'sao4' | 'hoa' | chuỗi path SVG riêng
      mo   : hàm chạy khi bấm vào
-     tieuDe, trang (không bắt buộc): tên riêng của trò, và trang riêng mang tên đó để chia sẻ link — xem linkTro()
+     tieuDe, trang (không bắt buộc): tên riêng của trò, và trang riêng mang tên đó để chia sẻ link — xem linkTro().
+       Lúc trò mở, thanh địa chỉ là chính trang này (…/an-gi/, …/bida-lo/?phong=MÃ) chứ không là …/#an-gi, nên chép
+       link từ thanh địa chỉ cũng ra tên và chú thích của trò; xem datDiaChiTrang(). Thêm trang thì thêm vào SHELL của sw.js
      tenApp (trò có trang thì phải có): tên dưới biểu tượng khi cài app từ trò này — ngắn, dưới biểu tượng iPhone chỉ
        hiện chừng 12 chữ; xem datTenGoiY(), scripts/lam-ke-khai.py
      nutCai (không bắt buộc): trò có nút "Cài app" riêng — người vào thẳng từ link không thấy trang chính; xem themNutCaiApp()
-     diaChiTrang (không bắt buộc, trò có trang): lúc trò mở, thanh địa chỉ là trang riêng (…/an-gi/) chứ không là
-       …/#an-gi, nên chép link từ thanh địa chỉ cũng ra tên và chú thích của trò; xem datDiaChiTrang()
    Bỏ một ngôi sao thì xoá dòng của nó, hoặc thêm bat: false.
    Các sao tự rải ngẫu nhiên, không bao giờ đè lên nhau, cũng không đè chữ.
    ───────────────────────────────────────────────────────────── */
@@ -73,7 +73,7 @@ const SAO = [
   { id: 'sao-bida', mau: '#a6e07c', hinh: 'bida', nhan: 'Bida lỗ: 8 bi và 9 bi, đấu với máy hay mỗi người một máy qua mạng',
     duong: 'bida', khung: '.bida', mun: 'TDTD_BIDA', tieuDe: 'Bida lỗ — 8 bi, 9 bi', tenApp: 'Bida lỗ', trang: 'bida-lo/', nutCai: true },
   { id: 'sao-angi', mau: '#ff8657', hinh: 'to', nhan: 'Ăn gì: vòng quay món ăn hợp bữa, hợp trời; ở nhà thì quay mâm mặn, canh, rau',
-    duong: 'an-gi', khung: '.angi', mun: 'TDTD_ANGI', tieuDe: 'Ăn gì?', tenApp: 'Ăn gì', trang: 'an-gi/', nutCai: true, diaChiTrang: true },
+    duong: 'an-gi', khung: '.angi', mun: 'TDTD_ANGI', tieuDe: 'Ăn gì?', tenApp: 'Ăn gì', trang: 'an-gi/', nutCai: true },
   { id: 'sao-buonlau', mau: '#ff6b6b', hinh: 'buonlau', nhan: 'Buôn lậu phố cổ: lẻn qua phố cổ giao hàng rồi trốn ra bến, hay làm hải quan lục soát; đấu với máy hay mỗi người một máy',
     duong: 'buon-lau', khung: '.buonlau', mun: 'TDTD_BUONLAU', tieuDe: 'Buôn lậu phố cổ', tenApp: 'Buôn lậu', trang: 'buon-lau-pho-co/', nutCai: true },
 ];
@@ -270,8 +270,8 @@ const coTro = (d) => !!d && SAO.some(s => s.duong === d && s.trang);
 const keKhaiCua = (d) => (coTro(d) ? SAO.find(s => s.duong === d).trang + 'app.webmanifest' : 'manifest.webmanifest');
 /* lúc mở trang: nho — trò của app (chỉ khi đang chạy như app đã cài); mo — trò mở ngay: ?tro, hay trò đã nhớ khi mở app.
    Địa chỉ đã có #trò, hay đây là tải lại trang, thì để theo địa chỉ. Riêng app mở với ?tro mà sau # là chính trò đó thì mở
-   trò từ đầu: iPhone lưu nguyên địa chỉ lúc "Thêm vào MH chính", có khi kèm mã phòng cờ (#co-ba-nguoi/MÃ) — không bỏ thì
-   lần nào mở app cũng vào lại một phòng đã tan. */
+   trò từ đầu: iPhone lưu nguyên địa chỉ lúc "Thêm vào MH chính", có khi kèm mã phòng (…/co-vua-ba-nguoi/?phong=MÃ, trang
+   riêng chuyển vào #co-ba-nguoi/MÃ) — không bỏ thì lần nào mở app cũng vào lại một phòng đã tan. */
 function troLucMo(o) {
   const q = new URLSearchParams(o.search || '').get('tro'), hop = coTro(q) ? q : null;
   const nho = o.laApp ? hop || (coTro(o.nho) ? o.nho : null) : null;
@@ -305,7 +305,7 @@ function datTenGoiY(d) {
   const m = document.querySelector('meta[name="apple-mobile-web-app-title"]'), ten = tenAppCua(d);
   if (m && m.getAttribute('content') !== ten) m.setAttribute('content', ten);
 }
-/* Đổi ?tro trên địa chỉ, giữ nguyên phần còn lại (?ngay=…, #trò/mã phòng). replaceState: không thêm bước Back. Địa chỉ
+/* Đổi ?tro trên địa chỉ, giữ nguyên phần còn lại (?ngay=…, ?phong=…). replaceState: không thêm bước Back. Địa chỉ
    trong trò giờ khác trang chủ cả phần trước dấu #, mà Back qua hai địa chỉ như thế Safari không báo hashchange — nên
    init nghe thêm popstate. */
 function datTroDiaChi(d) {
@@ -439,31 +439,43 @@ function taoCacSao() {
 }
 let NUT_SAO = [], saoDangMo = null, dangTheoDoi = null;
 
-/* Mỗi trò một địa chỉ riêng, gửi cho ai là họ mở thẳng vào trò đó.
-   Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và nút Back
-   của điện thoại đóng trò lại thay vì thoát hẳn khỏi app. */
+/* Mỗi trò một địa chỉ riêng, gửi cho ai là họ mở thẳng vào trò đó, và nút Back của điện thoại đóng trò lại thay vì
+   thoát hẳn khỏi app. Lúc trò mở, thanh địa chỉ là trang riêng của trò (…/bida-lo/) — xem datDiaChiTrang; #duong chỉ
+   còn là lối vào: trang riêng chuyển người mở vào /#duong, link cũ …/#duong vẫn mở đúng trò. */
 /* Thư mục của app (chỗ có index.html). index.html gắn thẻ <base> về đây ngay lúc mở trang, khi địa chỉ còn là trang
-   chủ, nên trò khai diaChiTrang đổi thanh địa chỉ sang trang riêng (/an-gi/) thì mọi đường dẫn tương đối (assets/…,
-   icons/…, data/…) vẫn tính từ thư mục app. */
+   chủ, nên thanh địa chỉ đổi sang trang riêng của trò (/an-gi/) thì mọi đường dẫn tương đối (assets/…, icons/…,
+   data/…) vẫn tính từ thư mục app. */
 const GOC_APP = (() => { try { return new URL('.', document.baseURI).pathname; } catch (e) { return location.pathname.replace(/[^/]*$/, ''); } })();
 const troTheoTrang = () => {
   const p = location.pathname;
-  return SAO.find(x => x.diaChiTrang && x.trang && (p === GOC_APP + x.trang || p + '/' === GOC_APP + x.trang)) || null;
+  return SAO.find(x => x.trang && (p === GOC_APP + x.trang || p + '/' === GOC_APP + x.trang)) || null;
 };
+/* bỏ ?phong= (mã phòng của trò) khỏi phần ?…, phần còn lại (?tro, ?ngay) để y nguyên */
+function boPhong(q) {
+  const p = new URLSearchParams(q);
+  if (!p.has('phong')) return q;
+  p.delete('phong');
+  const s = p.toString();
+  return s ? '?' + s : '';
+}
 function boDau() {
-  if (troTheoTrang()) history.replaceState(null, '', GOC_APP + location.search);
+  if (troTheoTrang()) history.replaceState(null, '', GOC_APP + boPhong(location.search));   // về trang chủ: không còn phòng
   else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
 }
-/* Trò khai diaChiTrang: thanh địa chỉ là trang riêng của trò, không có dấu #. Người dùng: "bỏ # đi để khi copy link nó
-   ra chú thích" — phần sau # không bao giờ được gửi lên máy chủ, nên chép …/#an-gi từ thanh địa chỉ (hay bấm chia sẻ
-   của trình duyệt) thì Zalo, Facebook chỉ thấy trang chủ. Trang riêng thì có tên, chú thích, ảnh của trò; mở nó ra là
-   chuyển về /#an-gi rồi tới đây đổi lại thành /an-gi/. Mở từ ngôi sao thì thêm một bước (Back là đóng trò, như #); mở
-   bằng link (#an-gi từ trang riêng, link cũ, app mở với ?tro) thì thay luôn, khỏi thêm bước Back. */
+/* Thanh địa chỉ là trang riêng của trò, không có dấu #. Người dùng: "bỏ # đi để khi copy link nó ra chú thích", rồi
+   "các trò chơi bạn xóa # hết đi, để copy có ghi chú" — phần sau # không bao giờ được gửi lên máy chủ, nên chép …/#bida
+   từ thanh địa chỉ (hay bấm chia sẻ của trình duyệt) thì Zalo, Facebook chỉ thấy trang chủ. Trang riêng thì có tên, chú
+   thích, ảnh của trò; mở nó ra là chuyển về /#bida rồi tới đây đổi lại thành /bida-lo/. Mã phòng sau dấu / (#bida/MÃ:
+   trang riêng chuyển ?phong=MÃ vào đó, link cũ cũng vậy) thành ?phong=MÃ — đúng link mời; trò đọc mã ở đó lúc mở, nên
+   moSao gọi hàm này TRƯỚC khi mở trò. Mở từ ngôi sao thì thêm một bước (Back là đóng trò); mở bằng link (#trò từ trang
+   riêng, link cũ, app mở với ?tro) thì thay luôn, khỏi thêm bước Back. */
 function datDiaChiTrang(s) {
-  const dich = GOC_APP + s.trang;
+  const dich = GOC_APP + s.trang, [d, ma] = location.hash.slice(1).split('/');
+  let q = location.search;
+  if (d === s.duong && ma) { const p = new URLSearchParams(q); p.set('phong', ma); q = '?' + p; }
   if (location.pathname === dich && !location.hash) return;
-  if (location.hash || location.pathname === dich) history.replaceState(null, '', dich + location.search);
-  else history.pushState(null, '', dich + location.search);
+  if (location.hash || location.pathname === dich) history.replaceState(null, '', dich + q);
+  else history.pushState(null, '', dich + q);
 }
 
 const TEN_GOC = document.title;
@@ -473,10 +485,10 @@ function moSao(s) {
   if (!m) return;
   if (saoDangMo && saoDangMo !== s) dongSao(true);
   saoDangMo = s;
+  if (s.trang) datDiaChiTrang(s);                    // địa chỉ trước, trò sau: trò có phòng đọc ?phong= lúc mo()
+  else if (location.hash.slice(1).split('/')[0] !== s.duong) location.hash = s.duong;   // trò chưa có trang riêng: #duong
   m.mo();
   if (s.tieuDe) document.title = s.tieuDe;          // tên thẻ trình duyệt, và tên khi chia sẻ bằng nút của trình duyệt
-  if (s.diaChiTrang && s.trang) datDiaChiTrang(s);
-  else if (location.hash.slice(1).split('/')[0] !== s.duong) location.hash = s.duong;   // #co-ba-nguoi/MÃ: phần sau / là của trò
   themNutChepLink(s);
   themNutCaiApp(s);
   datKeKhai(s.duong);                                // cài app lúc này thì mở app là vào thẳng trò này
@@ -575,7 +587,7 @@ function chepTay(chu, xong) {
 
 /* Địa chỉ đổi: do người dùng bấm Back, dán link mới, hay mở từ link gửi tới. */
 function theoDiaChi() {
-  const d = location.hash.slice(1).split('/')[0];          // phần sau dấu / (mã phòng cờ) để trò tự đọc
+  const d = location.hash.slice(1).split('/')[0];          // phần sau dấu / (mã phòng): datDiaChiTrang chuyển thành ?phong=
   const s = troTheoTrang() || SAO.find(x => x.duong === d);
   if (s) { if (saoDangMo !== s) moSao(s); }
   else if (saoDangMo) dongSao(true);

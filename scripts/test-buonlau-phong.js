@@ -71,7 +71,7 @@ function mayKhach(ten, url, luuSan) {
     location: { origin: 'http://' + ten.toLowerCase().replace(/[^a-z]/g, ''), pathname: '/', search: '', hash: '' },
     EventSource: class extends ES { constructor(u) { super(u); m.es = this; } },
   };
-  ctx.history = { state: null, replaceState: (_, __, u) => { const i = String(u).indexOf('#'); ctx.location.hash = i >= 0 ? String(u).slice(i) : ''; } };
+  ctx.history = { state: null, replaceState: (_, __, u) => { const v = new URL(String(u), ctx.location.origin + ctx.location.pathname); Object.assign(ctx.location, { pathname: v.pathname, search: v.search, hash: v.hash }); } };
   ctx.document = { body: nut('body'), hidden: false, createElement: () => nut(), querySelector: () => null, querySelectorAll: () => [], addEventListener() {} };
   ctx.addEventListener = () => {}; ctx.removeEventListener = () => {};
   ctx.requestAnimationFrame = (f) => setTimeout(() => f(dongHo += 5000), 1);
@@ -118,12 +118,25 @@ function mayKhach(ten, url, luuSan) {
   await doi(() => An.C._phong() && An.C._phong().cay);
   const ma = An.C._phong().ma;
   ok('An tạo phòng 2 người, ngồi ghế 1', An.C._phong().P === 0 && An.C._phong().cay.kieu === '1v1', ma);
+  /* người dùng: "các trò chơi bạn xóa # hết đi, để copy có ghi chú" — địa chỉ mang ?phong=MÃ (trang riêng của trò), không # */
+  ok('địa chỉ mang mã phòng ?phong=MÃ, không dấu #', An.ctx.location.search === '?phong=' + ma && !An.ctx.location.hash, An.ctx.location.search + An.ctx.location.hash);
   Binh.C._vaoPhong(ma);
   await doi(() => Binh.C._phong() && Binh.C._phong().cay);
   await Binh.C._ngoiGhe(1);
   await doi(() => An.C._phong().cay.ghe && An.C._phong().cay.ghe[1]);
   ok('Bình vào bằng mã, ngồi ghế 2', Binh.C._phong().P === 1 && !!An.C._phong().cay.ghe[1]);
   ok('link mời đi qua trang chia sẻ riêng của trò', An.C._linkMoi(ma) === `http://an/buon-lau-pho-co/?phong=${ma}` && An.C._trichMa(`http://an/buon-lau-pho-co/?phong=${ma}`) === ma);
+  {
+    /* chép thanh địa chỉ …/buon-lau-pho-co/?phong=MÃ gửi đi, hay tải lại trang: mã đọc ở ?phong */
+    const Khoa = mayKhach('Khoa', url);
+    Object.assign(Khoa.ctx.location, { pathname: '/buon-lau-pho-co/', search: '?tro=buon-lau&phong=' + ma });
+    Khoa.C.mo();
+    const docMa = !!Khoa.C._phong() && Khoa.C._phong().ma === ma && Khoa.C._phong().P === -1;
+    Khoa.C._roiPhong(); Khoa.C.dong(); if (Khoa.es) Khoa.es.close();
+    ok('mở trò ở …/buon-lau-pho-co/?phong=MÃ là vào đúng phòng đó (chưa giành ghế); rời phòng thì địa chỉ bỏ ?phong, giữ ?tro',
+       docMa && Khoa.ctx.location.pathname === '/buon-lau-pho-co/' && Khoa.ctx.location.search === '?tro=buon-lau' && !Khoa.ctx.location.hash,
+       Khoa.ctx.location.pathname + Khoa.ctx.location.search);
+  }
   await An.C._batDauPhong();
   await doi(() => An.C._van() && Binh.C._van());
   ok('bắt đầu: cả hai máy dựng trận hai hiệp, An làm tay buôn hiệp đầu', An.C._van().cheDo === 'phong' && An.C._ui().che === 'cua' && Binh.C._ui().che === 'cho');

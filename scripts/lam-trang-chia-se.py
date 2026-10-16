@@ -1036,32 +1036,27 @@ TRO = [
          moTa='Trắng, Đen, Đỏ trên bàn lục giác 96 ô. Tạo phòng mời bạn bè, mỗi người một máy, ghế trống thì máy chơi '
               'thay; hoặc đấu với hai máy. Luật Tam quốc: giết vua là chiếm cả đạo quân. Miễn phí, không cần tài khoản.',
          alt='Cờ vua ba người: bàn lục giác với quân Trắng, Đen, Đỏ', mo='Mở Cờ vua ba người',
-         # link mời vào phòng (…/co-vua-ba-nguoi/?phong=MÃ) thì chuyển thẳng vào phòng đó
-         chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#co-ba-nguoi' + (m ? '/' + m[1] : ''));"),
+         phong=True),   # link mời vào phòng (…/co-vua-ba-nguoi/?phong=MÃ) thì chuyển thẳng vào phòng đó
     dict(duong='bida', trang='bida-lo/', so=1, mau='#a6e07c', ve=ve_bida,
          tieuDe='Bida lỗ — 8 bi, 9 bi', tieu=('Bida lỗ', '8 bi · 9 bi'),
          dong=['Bi trượt, lăn, xoáy như bàn thật', 'Tạo phòng, mỗi người một máy', 'Hay đấu với máy Sóc, Cú, Cáo'],
          moTa='Bida lỗ 8 bi và 9 bi trên bàn 9 feet đúng cỡ: bi trượt rồi lăn, đánh đâm, kéo, đẩy, xoáy ngang như thật. Tạo '
               'phòng mời bạn bè, mỗi người một máy, ghế trống thì máy chơi thay; hoặc đấu với máy. Miễn phí, không cần tài khoản.',
          alt='Bida lỗ: tam giác 15 bi trên bàn nỉ xanh, bi chủ và cơ sắp phá', mo='Mở Bida lỗ',
-         # link mời vào phòng (…/bida-lo/?phong=MÃ) thì chuyển thẳng vào phòng đó
-         chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#bida' + (m ? '/' + m[1] : ''));"),
+         phong=True),   # địa chỉ của một ván ở quán (…/bida-lo/?phong=MÃ) thì chuyển thẳng vào ván đó
     dict(duong='an-gi', trang='an-gi/', so=2, mau='#ff8657', ve=ve_an_gi,
          tieuDe='Ăn gì?', tieu=('Ăn gì?', 'vòng quay món ăn'),
          dong=['Tám món hợp bữa, hợp trời, túi tiền', 'Ở nhà: quay mâm mặn, canh, rau', 'Cả nhóm cùng chọn, vòng quay quyết'],
          moTa='Trưa nay ăn gì, tối nay nấu gì? Quay một vòng tám món hợp bữa, hợp trời, hợp túi tiền. Ở nhà thì quay đủ mâm '
               'mặn, canh, rau kèm danh sách đi chợ. Đi đông thì cả nhóm cùng chọn, không ai phải quyết.',
-         alt='Ăn gì: vòng quay tám món, kim chỉ vào bún bò Huế', mo='Mở vòng quay Ăn gì',
-         # trò này để thanh địa chỉ là chính trang riêng (diaChiTrang trong app.js): giữ ?tro, ?ngay khi chuyển vào app
-         chuyen="location.replace('../' + location.search + '#an-gi');"),
+         alt='Ăn gì: vòng quay tám món, kim chỉ vào bún bò Huế', mo='Mở vòng quay Ăn gì'),
     dict(duong='buon-lau', trang='buon-lau-pho-co/', so=1, mau='#ff6b6b', ve=ve_buon_lau,
          tieuDe='Buôn lậu phố cổ', tieu=('Buôn lậu', 'phố cổ'),
          dong=['Lẻn qua phố, qua ngõ phố cổ Hà Nội', 'Giao 3 kiện hàng rồi trốn ra bến', 'Hay làm hải quan lần dấu chân'],
          moTa='Trốn tìm có dấu vết trên bản đồ thật của phố cổ Hà Nội: tay buôn lẻn qua phố, qua ngõ giao 3 kiện hàng rồi '
               'trốn ra bến, rải dấu chân giả; hải quan điều 3 lính lục soát. Đấu với máy, hay mỗi người một máy.',
          alt='Buôn lậu phố cổ: bản đồ phố cổ Hà Nội với đèn lồng mối hàng, lính hải quan và dấu chân tay buôn', mo='Mở Buôn lậu phố cổ',
-         # link mời vào phòng (…/buon-lau-pho-co/?phong=MÃ) thì chuyển thẳng vào phòng đó
-         chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#buon-lau' + (m ? '/' + m[1] : ''));"),
+         phong=True),   # link mời vào phòng (…/buon-lau-pho-co/?phong=MÃ) thì chuyển thẳng vào phòng đó
 ]
 
 
@@ -1130,9 +1125,21 @@ def ten_anh(tro):
     return 'og-%s-%d.jpg' % (tro['duong'], tro['so'])
 
 
+# Lệnh chuyển người mở trang vào app. Lúc trò mở, thanh địa chỉ là chính trang này (app.js datDiaChiTrang; người dùng:
+# "các trò chơi bạn xóa # hết đi, để copy có ghi chú"), nên tải lại hay mở link chép từ thanh địa chỉ đều qua đây: phần
+# ?… phải đi theo — ?tro (app cài trên iPhone mở lại đúng trò), ?ngay. Trò có phòng (phong=True): ?phong=MÃ thành
+# #trò/MÃ, kiểu mà app bản nào cũng đọc được, kể cả bản cũ còn nằm trong máy người dùng; app mới đổi lại thành ?phong=MÃ.
+def chuyen_vao(duong, phong=False):
+    if not phong:
+        return "location.replace('../' + location.search + '#%s');" % duong
+    return ("var q = location.search, m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(q); "
+            "q = q.replace(/[?&]phong=[^&]*/g, '').replace(/^&/, '?'); "
+            "location.replace('../' + q + '#%s' + (m ? '/' + m[1] : ''));" % duong)
+
+
 def viet_trang(tro):
     e = lambda s: html.escape(s, quote=True)
-    chuyen = tro.get('chuyen', "location.replace('../#%s');" % tro['duong'])
+    chuyen = tro.get('chuyen') or chuyen_vao(tro['duong'], tro.get('phong', False))
     noi_dung = TRANG.format(tieuDe=e(tro['tieuDe']), moTa=e(tro['moTa']), alt=e(tro['alt']), mo=e(tro['mo']), chuyen=chuyen,
                             mien=TEN_MIEN, trang=tro['trang'], duong=tro['duong'], mau=tro['mau'],
                             anh=TEN_MIEN + 'icons/' + ten_anh(tro))

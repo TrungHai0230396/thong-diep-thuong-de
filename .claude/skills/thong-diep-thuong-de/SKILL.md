@@ -41,8 +41,7 @@ nào, tệp nào, bài kiểm nào, số V của sw.js, ai đang sửa gì — t
   `scripts/fb-gia.js`.
 - **Đưa lên mạng**: push `main` lên GitHub là Vercel tự deploy, chừng một phút. `vercel.json` đặt cache (`icons/`
   cache một năm; index.html, sw.js, assets/, data/, manifest thì không cache). `.vercelignore` bỏ `scripts/`,
-  `README.md`, `DEPLOY.md`, `content/` — nhưng không bỏ `.claude/`: commit thư mục skill thì thêm `.claude/` vào
-  `.vercelignore` cho khỏi lên site.
+  `README.md`, `DEPLOY.md`, `content/`, `.claude/` (skill này không lên site).
 - **Tiếng Việt khắp nơi**: tên biến, hàm, chú thích, dòng thông báo của bài kiểm. Viết tiếp theo đúng giọng đó.
 
 ## Hợp đồng giữa app.js và một ngôi sao
@@ -54,11 +53,12 @@ Một dòng trong `SAO` (assets/app.js):
   duong: 'x', khung: '.x', mun: 'TDTD_X', tieuDe: 'Tên trò — phụ đề', tenApp: 'Tên ngắn', trang: 'thu-muc-x/', nutCai: true },
 ```
 
-- `duong`: địa chỉ `#x` (phần sau `/` là của trò, như mã phòng `#co-ba-nguoi/MÃ`). `khung`: lớp của khung trò.
+- `duong`: lối vào `#x` (link cũ, trang riêng chuyển vào; phần sau `/` là mã phòng `#co-ba-nguoi/MÃ`). `khung`: lớp của
+  khung trò.
   `mun`: tên mô-đun toàn cục. `tieuDe`: tên thẻ trình duyệt, tiêu đề trang chia sẻ, tên trong manifest (phần trước
   " — "). `tenApp`: tên dưới biểu tượng khi cài (≤ 13 chữ, không trùng trò khác —
-  test-sao kiểm). `trang`: thư mục trang chia sẻ. `nutCai: true` ở mọi trò.
-  `diaChiTrang: true` (tuỳ): lúc trò mở, thanh địa chỉ là `/<trang>` chứ không `#x` — xem dưới. `bat: false`: tạm ẩn.
+  test-sao kiểm). `trang`: thư mục trang chia sẻ — lúc trò mở cũng là thanh địa chỉ, nên phải có trong `SHELL` của
+  sw.js. `nutCai: true` ở mọi trò. `bat: false`: tạm ẩn.
 - Mỗi trò là một dòng `{ id: '…', … }` không lồng `{}`, giá trị trong nháy đơn: `test-sao.js`, `lam-ke-khai.py`,
   `ban-do.py` đều đọc SAO bằng regex.
 - Mô-đun trò: `self.TDTD_X = { mo, dong, …móc _x cho bài kiểm }`. `mo()` dựng khung lần đầu (`dungKhung`: một
@@ -68,9 +68,14 @@ Một dòng trong `SAO` (assets/app.js):
   vào khung nút 🔗 `#nut-chep-link` (top: safe-area + 14px, right: 58px) và nút "Cài app" `#nut-cai-app` (right: 100px;
   khung có thêm lớp `co-nut-cai`, thanh tiêu đề của trò phải chừa chỗ). Nút ✕ của trò: top safe-area + 14px, right
   16px, 34×34.
-- Địa chỉ: `theoDiaChi` mở trò theo `#duong`, Back đóng trò. Trò khai `diaChiTrang` thì `datDiaChiTrang` pushState
-  sang `/<trang>`; `index.html` gắn `<base>` về thư mục app lúc mở trang, và `GOC_APP` trong app.js là thư mục đó. Đang
-  ở trò như vậy thì đừng dựng đường dẫn từ `location.pathname`; dùng `GOC_APP` hay `new URL('x/', document.baseURI)`.
+- Địa chỉ: lúc trò mở, thanh địa chỉ là `/<trang>`, không dấu # (người dùng: chép link phải ra chú thích của trò).
+  `moSao` gọi `datDiaChiTrang` TRƯỚC `mo()` của trò: mở từ ngôi sao thì pushState (Back là đóng trò), mở bằng link
+  `#duong` thì replaceState; mã phòng `#duong/MÃ` thành `?phong=MÃ`. `theoDiaChi` nhận trò theo đường dẫn, rồi theo #.
+  Trò có phòng đọc mã bằng `maTrenDiaChi()` (`?phong=`, vẫn nhận `#duong/MÃ`), ghi bằng `datDiaChi()` (chỉ đổi
+  `?phong`) — mẫu trong coba.js. Trang riêng chuyển người mở vào `/?…#duong` (giữ `?tro`, `?ngay`; `?phong=MÃ` thành
+  `#duong/MÃ`). `index.html` gắn `<base>` về thư mục app lúc mở trang, `GOC_APP` trong app.js là thư mục đó: đừng
+  dựng đường dẫn từ `location.pathname`; dùng `GOC_APP` hay `new URL('x/', document.baseURI)`. README "Địa chỉ không
+  có dấu # — mọi trò".
 - Bài kiểm `scripts/test-sao.js` mở rồi đóng mọi trò trên DOM giả: `querySelector` tự sinh nút giả,
   `querySelectorAll` trả `[]`, `innerHTML` chỉ là chuỗi, `fetch` luôn hỏng, có thể không có `navigator`. Trò không
   được nổ ở đó: bọc `localStorage` trong try/catch, hỏi `typeof navigator` trước khi dùng.

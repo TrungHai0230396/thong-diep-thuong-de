@@ -2256,10 +2256,16 @@ const cacGhe = () => Array.from({ length: soGhe() }, (_, P) => P);
 function conO(P) { const g = gheCua(P); return !!g && (P === phong.P || (!!g.thay && gioMay() - g.thay < VANG)); }
 function tenGhe(P) { const g = gheCua(P); return (g && g.ten) || `Người ${P + 1}`; }
 const tenMinh = () => String(docLuu().ten || '').trim().slice(0, 20);
-const MA_DIA_CHI = /^#bida\/([A-HJ-NP-Z2-9]{6})$/;
-const dauThang = () => (typeof location !== 'undefined' && location.hash) || '';
-function datDiaChi(ma) {
-  try { history.replaceState(history.state, '', location.pathname + location.search + '#bida' + (ma ? '/' + ma : '')); } catch (e) {}
+/* Mã ván trên địa chỉ: …/bida-lo/?phong=MÃ (bàn tặng: …/bida-anh-bien/?phong=MÃ), chép thanh địa chỉ gửi nhau, hay tải lại
+   trang, là vào lại đúng ván (người dùng: "các trò chơi bạn xóa # hết đi, để copy có ghi chú"). app.js đổi #bida/MÃ của
+   link cũ, của trang riêng chuyển vào, thành ?phong=MÃ trước khi mở trò; #bida/MÃ vẫn đọc được, có cả hai thì # là cái mới. */
+const MA_DIA_CHI = /^#bida\/([A-HJ-NP-Z2-9]{6})$/, MA_TIM = /[?&]phong=([A-HJ-NP-Z2-9]{6})(?:&|$)/;
+const maTrenDiaChi = () => (typeof location === 'undefined' ? null : MA_DIA_CHI.exec(location.hash || '') || MA_TIM.exec(location.search || ''));
+function datDiaChi(ma) {                           // đổi ?phong, phần ?… còn lại (?tro, ?ngay) để y nguyên
+  try {
+    const q = (location.search || '').replace(/[?&]phong=[^&]*/g, '').replace(/^&/, '?');
+    history.replaceState(history.state, '', location.pathname + (ma ? (q ? q + '&' : '?') + 'phong=' + ma : q));
+  } catch (e) {}
 }
 /* hạt giống xếp bi của phòng: lấy từ mã phòng, máy nào cũng ra cùng một cách xếp */
 function hatPhong(ma) { let h = 2166136261; for (const c of String(ma)) h = Math.imul(h ^ c.charCodeAt(0), 16777619); return h >>> 1; }
@@ -2517,7 +2523,7 @@ function theoTiep(ma) {
 }
 function theoMaTrenDiaChi() {
   if (!tam || !tam.classList.contains('hien') || !MANG) return;
-  const m = MA_DIA_CHI.exec(dauThang());
+  const m = maTrenDiaChi();
   if (m && (!phong || phong.ma !== m[1])) { const l = docLuu().phong; vaoPhong(m[1], l && l.ma === m[1] ? { id: l.id, P: l.P } : null); }
 }
 
@@ -3203,7 +3209,7 @@ function mo() {
   doCo();
   taoTho();
   khoiBi();
-  const m = MANG && MA_DIA_CHI.exec(dauThang()), luu = docLuu().phong;
+  const m = MANG && maTrenDiaChi(), luu = docLuu().phong;
   if (m) {
     if (!phong || phong.ma !== m[1]) vaoPhong(m[1], luu && luu.ma === m[1] ? { id: luu.id, P: luu.P } : null);
     else noiPhong();

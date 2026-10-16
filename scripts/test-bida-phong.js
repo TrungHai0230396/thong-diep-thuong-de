@@ -73,7 +73,7 @@ function mayKhach(ten, url) {
     location: { origin: 'http://' + ten.toLowerCase().replace(/[^a-z]/g, ''), pathname: '/', search: '', hash: '' },
     EventSource: class extends ES { constructor(u) { super(u); m.es = this; } },
   };
-  ctx.history = { state: null, replaceState: (_, __, u) => { const i = String(u).indexOf('#'); ctx.location.hash = i >= 0 ? String(u).slice(i) : ''; } };
+  ctx.history = { state: null, replaceState: (_, __, u) => { const v = new URL(String(u), ctx.location.origin + ctx.location.pathname); Object.assign(ctx.location, { pathname: v.pathname, search: v.search, hash: v.hash }); } };
   ctx.document = { body: nut('body'), hidden: false, createElement: () => nut(), querySelector: () => null, querySelectorAll: () => [], addEventListener() {} };
   ctx.addEventListener = () => {}; ctx.removeEventListener = () => {};
   ctx.requestAnimationFrame = (f) => setTimeout(() => f(dongHo += 400), 2);
@@ -146,7 +146,7 @@ function mayKhach(ten, url) {
   await An.C._ngoiBanQuan('L1');
   await doi(() => An.C._phong() && An.C._phong().cay && /Đang chờ người vào bàn/.test(An.tin()));
   const ma = An.C._phong().ma, hai = [An, Binh];
-  ok('An ngồi bàn L1: ván có mã, An ghế 1 (phá trước), địa chỉ mang mã ván, máy nhớ ghế để mở lại', !!ma && An.C._phong().P === 0 && An.ctx.location.hash === '#bida/' + ma &&
+  ok('An ngồi bàn L1: ván có mã, An ghế 1 (phá trước), địa chỉ mang mã ván (?phong=MÃ, không dấu #), máy nhớ ghế để mở lại', !!ma && An.C._phong().P === 0 && An.ctx.location.search === '?phong=' + ma && !An.ctx.location.hash &&
      JSON.parse(An.luu['tdtd.bida']).phong.ma === ma && /Ghế 1 · phá trước/.test(An.tin()));
   await Binh.C._batQuan();
   await Binh.C._vaoBanQuan('L1');
@@ -547,6 +547,17 @@ function mayKhach(ten, url) {
     Chi.C._vaoPhong('RRRRRR');
     await doi(() => Chi.C._phong() === null && /Phòng riêng không còn/.test(Chi.bao()), 3000);
     ok('link phòng riêng kiểu cũ: không vào, về quán, báo chơi qua mạng giờ ở quán bida', Chi.C._phong() === null && /Phòng riêng không còn/.test(Chi.bao()) && /Chọn bàn/.test(Chi.tin()));
+    /* Người dùng: "các trò chơi bạn xóa # hết đi, để copy có ghi chú" — trong trò, thanh địa chỉ là …/bida-lo/?phong=MÃ; chép
+       gửi đi hay tải lại trang thì mã đọc ở đó */
+    const Giang = mayKhach('Giang', url);
+    Object.assign(Giang.ctx.location, { pathname: '/bida-lo/', search: '?phong=RRRRRR' });
+    Giang.C.mo();
+    const docMa = !!Giang.C._phong() && Giang.C._phong().ma === 'RRRRRR';
+    await doi(() => Giang.C._phong() === null && /Phòng riêng không còn/.test(Giang.bao()), 3000);
+    ok('mở trò ở …/bida-lo/?phong=MÃ (chép thanh địa chỉ): đọc mã ở ?phong; phòng riêng kiểu cũ thì về quán, địa chỉ bỏ ?phong, vẫn là trang riêng',
+       docMa && Giang.C._phong() === null && Giang.ctx.location.pathname === '/bida-lo/' && !/phong=/.test(Giang.ctx.location.search) && !Giang.ctx.location.hash,
+       Giang.ctx.location.pathname + Giang.ctx.location.search + Giang.ctx.location.hash);
+    Giang.C.dong();
   }
 
   for (const m of ca) m.C.dong();

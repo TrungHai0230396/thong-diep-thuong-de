@@ -74,7 +74,7 @@ function mayKhach(ten, url) {
     location: { origin: 'http://' + ten.toLowerCase(), pathname: '/', search: '', hash: '' },
     EventSource: class extends ES { constructor(u) { super(u); m.es = this; } },
   };
-  ctx.history = { replaceState: (_, __, u) => { const i = String(u).indexOf('#'); ctx.location.hash = i >= 0 ? String(u).slice(i) : ''; } };
+  ctx.history = { replaceState: (_, __, u) => { const v = new URL(String(u), ctx.location.origin + ctx.location.pathname); Object.assign(ctx.location, { pathname: v.pathname, search: v.search, hash: v.hash }); } };
   ctx.document = { body: nut('body'), hidden: false, createElement: () => nut(), querySelector: () => null, querySelectorAll: () => [], addEventListener() {} };
   ctx.addEventListener = () => {}; ctx.removeEventListener = () => {};
   ctx.requestAnimationFrame = (f) => setTimeout(() => f(performance.now() + 60000), 3);   // hình động xong ngay ở khung kế
@@ -149,7 +149,8 @@ function mayKhach(ten, url) {
   await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An' });
   const ma = An.C._phong() && An.C._phong().ma;
   await doi(() => An.C._phong().cay);
-  ok('An tạo phòng: có mã, ngồi Trắng, địa chỉ mang mã phòng, máy nhớ ghế để mở lại', !!ma && An.C._phong().P === 0 && An.ctx.location.hash === '#co-ba-nguoi/' + ma &&
+  ok('An tạo phòng: có mã, ngồi Trắng, địa chỉ mang mã phòng (?phong=MÃ, không dấu #), máy nhớ ghế để mở lại', !!ma && An.C._phong().P === 0 &&
+     An.ctx.location.search === '?phong=' + ma && !An.ctx.location.hash &&
      JSON.parse(An.luu['tdtd.coba']).phong.ma === ma && /Phòng chờ/.test(An.tin()));
   /* Người dùng: "chỗ tạo phòng vô phòng khó sài quá". Phòng chờ giờ đổi theo ai đang xem và đã có ai vào chưa */
   ok('chủ phòng lúc chưa ai vào: Gửi link mời là nút chính, Bắt đầu là nút phụ nằm dưới, nói rõ máy chơi thay 2 ghế; có nút hiện mã QR',
@@ -721,7 +722,24 @@ function mayKhach(ten, url) {
     const app = fs.readFileSync(path.join(goc, 'assets', 'app.js'), 'utf8'), sw = fs.readFileSync(path.join(goc, 'sw.js'), 'utf8');
     const html = fs.readFileSync(path.join(goc, 'index.html'), 'utf8'), trang = fs.readFileSync(path.join(goc, 'co-vua-ba-nguoi', 'index.html'), 'utf8');
     ok('địa chỉ #co-ba-nguoi/MÃ vẫn mở đúng trò (app.js chỉ xét phần trước dấu /)', /location\.hash\.slice\(1\)\.split\('\/'\)\[0\]/.test(app));
-    ok('link mời …/co-vua-ba-nguoi/?phong=MÃ chuyển thẳng vào phòng', /\[\?&\]phong=\(\[A-HJ-NP-Z2-9\]\{6\}\)/.test(trang) && trang.includes("location.replace('../#co-ba-nguoi' + (m ? '/' + m[1] : ''))"));
+    const chuyen = (q) => { let di = null; new Function('location', /<script>([\s\S]*?)<\/script>/.exec(trang)[1])({ search: q, replace: (u) => { di = u; } }); return di; };
+    ok('link mời …/co-vua-ba-nguoi/?phong=MÃ chuyển thẳng vào phòng (#co-ba-nguoi/MÃ, app bản nào cũng đọc được), giữ ?tro',
+       chuyen('?phong=RYXQQE') === '../#co-ba-nguoi/RYXQQE' && chuyen('?tro=co-ba-nguoi&phong=RYXQQE') === '../?tro=co-ba-nguoi#co-ba-nguoi/RYXQQE' &&
+       chuyen('?phong=RYXQQE&tro=co-ba-nguoi') === '../?tro=co-ba-nguoi#co-ba-nguoi/RYXQQE' && chuyen('') === '../#co-ba-nguoi',
+       [chuyen('?phong=RYXQQE'), chuyen('?tro=co-ba-nguoi&phong=RYXQQE'), chuyen('')].join(' | '));
+    /* Người dùng: "các trò chơi bạn xóa # hết đi, để copy có ghi chú" — lúc chơi, thanh địa chỉ là …/co-vua-ba-nguoi/?phong=MÃ;
+       chép nó gửi đi, hay tải lại trang, là vào đúng phòng */
+    const Dung = mayKhach('Dũng', url);
+    Object.assign(Dung.ctx.location, { pathname: '/co-vua-ba-nguoi/', search: '?tro=co-ba-nguoi&phong=' + ma });
+    Dung.C.mo();
+    const vaoDung = !!Dung.C._phong() && Dung.C._phong().ma === ma;
+    Dung.C._roiPhong();
+    ok('mở trò ở …/co-vua-ba-nguoi/?phong=MÃ là vào đúng phòng đó; rời phòng thì địa chỉ bỏ ?phong, giữ ?tro và trang riêng',
+       vaoDung && Dung.ctx.location.pathname === '/co-vua-ba-nguoi/' && Dung.ctx.location.search === '?tro=co-ba-nguoi' && !Dung.ctx.location.hash,
+       Dung.ctx.location.pathname + Dung.ctx.location.search + Dung.ctx.location.hash);
+    Dung.C.dong();
+    ok('link mời tính từ thư mục app (thẻ <base>), không từ thanh địa chỉ đang là trang riêng',
+       /const linkMoi = \(ma\) => gocApp\(\) \+ 'co-vua-ba-nguoi\/\?phong=' \+ ma/.test(NGUON_COBA) && /document\.baseURI/.test(NGUON_COBA));
     /* người dùng: "trong app bạn nhắc đến cờ tải lên firebase chi vậy, ẩn mấy chú thích đó đi" — chữ hiện cho người chơi không
        nhắc tên máy chủ (chỉ ghi chú trong mã mới nói) */
     const khongGhiChu = NGUON_COBA.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/[^\n]*/g, '$1');

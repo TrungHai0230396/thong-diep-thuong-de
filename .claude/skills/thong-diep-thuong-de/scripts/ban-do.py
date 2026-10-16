@@ -10,7 +10,7 @@ nằm ở đâu, và bắt luôn chỗ thiếu khi thêm hay đổi một ngôi 
 In ra: mỗi trò (id, #duong, khung, mô-đun, tệp định nghĩa mô-đun, các bài kiểm có nạp tệp đó, trang chia sẻ, manifest,
 ảnh xem trước); các mô-đun dùng chung; số V của sw.js ở thư mục làm việc, HEAD, origin; tệp chưa commit. Cuối cùng là
 danh sách CẢNH BÁO: tệp trong index.html mà thiếu trong SHELL của sw.js, trò chưa có trong TEP của test-sao.js, trang
-chia sẻ thiếu hay sai tên, trò khai diaChiTrang mà chưa cất sẵn trang riêng trong SHELL…
+chia sẻ thiếu hay sai tên, trang riêng (cũng là thanh địa chỉ lúc trò mở) chưa cất sẵn trong SHELL…
 """
 import json
 import re
@@ -39,7 +39,7 @@ def doc_sao():
         if lay('id'):
             ds.append({'id': lay('id'), 'duong': lay('duong'), 'khung': (lay('khung') or '').lstrip('.'), 'mun': lay('mun'),
                        'tieuDe': lay('tieuDe'), 'tenApp': lay('tenApp'), 'trang': lay('trang'), 'hinh': lay('hinh'),
-                       'mau': lay('mau'), 'diaChiTrang': bat('diaChiTrang'), 'nutCai': bat('nutCai'),
+                       'mau': lay('mau'), 'nutCai': bat('nutCai'),
                        'tat': bool(re.search(r'bat:\s*false', k))})
     return ds
 
@@ -100,7 +100,7 @@ def main(args):
         for t in dung:
             kiem |= set(bai_kiem_nap(t)) if len(ai_dung[t]) == 1 else ({'test-' + t} & ten_kiem)
         kiem = sorted(kiem)
-        dong = [f"#{s['duong']}" + (f"  → địa chỉ /{s['trang']} (diaChiTrang)" if s['diaChiTrang'] else ''),
+        dong = [f"#{s['duong']}" + (f"  → địa chỉ /{s['trang']}" if s['trang'] else ''),
                 f"khung .{s['khung']}, mô-đun {s['mun']} trong assets/{f}" + ('' if f in script else '  (KHÔNG có trong index.html!)'),
                 f"tên \"{s['tieuDe']}\", tên app \"{s['tenApp']}\", hình {s['hinh']}, màu {s['mau']}" + (', đang tắt (bat: false)' if s['tat'] else ''),
                 'lõi nó dùng: ' + (', '.join(dung) if dung else '(không)'),
@@ -116,7 +116,7 @@ def main(args):
             elif tieu != s['tieuDe']: canh.append(f"{s['id']}: <title> trang chia sẻ \"{tieu}\" ≠ tieuDe \"{s['tieuDe']}\" — chạy lại lam-trang-chia-se.py")
             if not co_mf: canh.append(f"{s['id']}: thiếu {s['trang']}app.webmanifest — chạy python3 scripts/lam-ke-khai.py")
             if anh and not (GOC / anh).exists(): canh.append(f"{s['id']}: ảnh xem trước {anh} không có")
-            if s['diaChiTrang'] and s['trang'] not in shell: canh.append(f"{s['id']}: diaChiTrang mà '{s['trang']}' chưa có trong SHELL của sw.js")
+            if s['trang'] not in shell: canh.append(f"{s['id']}: '{s['trang']}' (thanh địa chỉ lúc trò mở) chưa có trong SHELL của sw.js — mất mạng mà tải lại là hỏng")
         if f != '?' and f not in tep: canh.append(f"{s['id']}: assets/{f} chưa có trong TEP của scripts/test-sao.js")
         if f != '?' and f not in script: canh.append(f"{s['id']}: assets/{f} chưa có thẻ <script> trong index.html")
         for t in dung:                             # lõi thiếu thẻ script thì trò nổ lúc mở trên trang thật (test-sao không thấy)

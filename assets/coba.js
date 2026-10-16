@@ -1322,12 +1322,20 @@ function conO(P) { const g = gheCua(P); return !!g && (P === phong.P || (!!g.tha
 const khoaNuoc = (n) => `${n.P}.${n.tu}.${n.toi}.${n.phong || 0}.${n.nhap || 0}`;
 const tenMinh = () => String(docLuu().ten || '').trim().slice(0, 20);
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-/* link mời đi qua trang chia sẻ riêng (co-vua-ba-nguoi/), để Zalo, Messenger hiện tên và ảnh của trò */
-const linkMoi = (ma) => location.origin + location.pathname.replace(/[^/]*$/, '') + 'co-vua-ba-nguoi/?phong=' + ma;
-const MA_DIA_CHI = /^#co-ba-nguoi\/([A-HJ-NP-Z2-9]{6})$/;
-const dauThang = () => (typeof location !== 'undefined' && location.hash) || '';
-function datDiaChi(ma) {
-  try { history.replaceState(null, '', location.pathname + location.search + '#co-ba-nguoi' + (ma ? '/' + ma : '')); } catch (e) {}
+/* link mời đi qua trang chia sẻ riêng (co-vua-ba-nguoi/), để Zalo, Messenger hiện tên và ảnh của trò. Tính từ thư mục
+   app (index.html gắn thẻ <base> về đó), không từ thanh địa chỉ: lúc trò mở, thanh địa chỉ là chính trang riêng này */
+const gocApp = () => { try { if (typeof document !== 'undefined' && document.baseURI) return new URL('.', document.baseURI).href; } catch (e) {} return location.origin + location.pathname.replace(/[^/]*$/, ''); };
+const linkMoi = (ma) => gocApp() + 'co-vua-ba-nguoi/?phong=' + ma;
+/* Mã phòng trên địa chỉ: …/co-vua-ba-nguoi/?phong=MÃ, chép thanh địa chỉ là ra đúng link mời (người dùng: "các trò chơi
+   bạn xóa # hết đi, để copy có ghi chú"). app.js đổi #co-ba-nguoi/MÃ của link cũ, của trang riêng chuyển vào, thành
+   ?phong=MÃ trước khi mở trò; #co-ba-nguoi/MÃ vẫn đọc được, có cả hai thì # là cái mới gõ vào. */
+const MA_DIA_CHI = /^#co-ba-nguoi\/([A-HJ-NP-Z2-9]{6})$/, MA_TIM = /[?&]phong=([A-HJ-NP-Z2-9]{6})(?:&|$)/;
+const maTrenDiaChi = () => (typeof location === 'undefined' ? null : MA_DIA_CHI.exec(location.hash || '') || MA_TIM.exec(location.search || ''));
+function datDiaChi(ma) {                           // đổi ?phong, phần ?… còn lại (?tro, ?ngay) để y nguyên
+  try {
+    const q = (location.search || '').replace(/[?&]phong=[^&]*/g, '').replace(/^&/, '?');
+    history.replaceState(null, '', location.pathname + (ma ? (q ? q + '&' : '?') + 'phong=' + ma : q));
+  } catch (e) {}
 }
 
 async function taoPhong(ch) {
@@ -1955,7 +1963,7 @@ function vaoBangMa() {
 }
 function theoMaTrenDiaChi() {
   if (!tam || !tam.classList.contains('hien') || !MANG) return;
-  const m = MA_DIA_CHI.exec(dauThang());
+  const m = maTrenDiaChi();
   if (m && (!phong || phong.ma !== m[1])) { const l = docLuu().phong; vaoPhong(m[1], l && l.ma === m[1] ? { id: l.id, P: l.P } : null); }
 }
 
@@ -2352,7 +2360,7 @@ function mo() {
   tam.classList.add('hien');
   doCo();
   taoTho();
-  const m = MANG && MA_DIA_CHI.exec(dauThang()), luu = docLuu().phong;
+  const m = MANG && maTrenDiaChi(), luu = docLuu().phong;
   if (m) {
     if (!phong || phong.ma !== m[1]) vaoPhong(m[1], luu && luu.ma === m[1] ? { id: luu.id, P: luu.P } : null);
     else noiPhong();

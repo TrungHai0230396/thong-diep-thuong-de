@@ -10,7 +10,8 @@ Viết ngày 2026-10-16. Tệp, lõi, bài kiểm của mỗi trò thì chạy `
   `test-core.js`), `data/cards.json` 209 lá (dựng từ CSV `content/raw/` bằng `scripts/build-data.py`), `share.js` vẽ ảnh
   lá để chia sẻ / tải. `?ngay=YYYY-MM-DD` để xem thử ngày khác. README: "Nguyên tắc: không lưu lịch sử", "Bộ bài",
   "Chia sẻ ảnh", "Xem thử ngày khác".
-- **app.js** — `SAO`, `HINH_SAO`, rải sao không đè chữ, mở/đóng trò, định tuyến `#đường` (và `diaChiTrang`),
+- **app.js** — `SAO`, `HINH_SAO`, rải sao không đè chữ, mở/đóng trò, định tuyến (thanh địa chỉ là trang riêng
+  `/<trang>`, `#đường` chỉ là lối vào, mã phòng `?phong=MÃ` — README "Địa chỉ không có dấu # — mọi trò"),
   link chia sẻ (`linkTro`, nút 🔗), nút Cài app trong trò, manifest theo trò (`datKeKhai`), `?tro=` cho iPhone
   (`datTroDiaChi`), mở app vào thẳng trò đã cài (`vaoTroDaCai`, `tdtd.troCai`), tự nhận bản mới không tải lại giữa lúc
   dùng (`tuCapNhat`, `nenTaiLai`, `tdtd.taiLai`). Móc kiểm thử `TDTD_SAO`. README: "Mỗi trò một địa chỉ riêng",
@@ -67,20 +68,21 @@ Viết ngày 2026-10-16. Tệp, lõi, bài kiểm của mỗi trò thì chạy `
 - **Đẩy thùng sao** (`#day-thung`, `sokoban.js` + `mansoko.js` 100 màn XSB do `scripts/tao-man-sokoban.js` tạo) — bộ giải
   ít lần đẩy, ô chết, chấm sao theo số lần đẩy. `tdtd.soko`. `test-sokoban.js` (~nửa phút).
 - **Cờ vua ba người** (`#co-ba-nguoi`, `coba.js` + `phong.js`, `maqr.js`, máy nghĩ ở Worker) — bàn lục giác 96 ô, luật
-  Tam quốc, phòng qua mạng (`#co-ba-nguoi/MÃ`, link `…/co-vua-ba-nguoi/?phong=MÃ`), phòng mở, tìm phòng nhanh, đồng
+  Tam quốc, phòng qua mạng (địa chỉ và link mời `…/co-vua-ba-nguoi/?phong=MÃ`), phòng mở, tìm phòng nhanh, đồng
   hồ. `tdtd.coba`. test-coba, test-phong (Node 24, ba "máy" trên fb-gia.js), test-maqr. Nhiều mục con trong "## Cờ vua
   ba người".
 - **Bida lỗ** (`#bida`, `bida.js`, máy đánh ở Worker) — bàn 9 feet WPA, vật lý trượt–lăn–xoáy, 8 bi, 9 bi, đấu máy hay
-  qua mạng (nhánh `bida`, `sanhbida` của Firebase, `#bida/MÃ`). Vật lý là hàm tự chứa `function LOI()` đầu bida.js
+  qua mạng (nhánh `bida`, `sanhbida` của Firebase, `…/bida-lo/?phong=MÃ`). Vật lý là hàm tự chứa `function LOI()` đầu bida.js
   (không có tệp lõi riêng); Worker của máy đánh dựng từ `LOI.toString()`, nên trong `LOI` không được dùng biến nào ở
   ngoài — bài kiểm chạy trên Node không có Worker nên không bắt được, phải thử đấu máy trên trình duyệt. Vật lý phải
   tất định từng bit (chơi qua mạng máy nào cũng chạy lại từng cú; chỉ cộng trừ nhân chia, căn bậc hai). test-bida kiểm
   cả trang `bida-anh-bien/`. Thường có phiên đang làm bida: hỏi trước khi sửa. Có trang tặng riêng `bida-anh-bien/` (không phải ngôi
   sao; `scripts/lam-qua-bida.py`). `tdtd.bida`. test-bida, test-bida-phong (Node 24). README "## Bida lỗ".
-- **Ăn gì?** (`#an-gi`, địa chỉ `/an-gi/` nhờ `diaChiTrang`; `angi.js` + `monan.js`) — vòng quay tám món theo bữa (giờ
+- **Ăn gì?** (`#an-gi`, `/an-gi/`; `angi.js` + `monan.js`) — vòng quay tám món theo bữa (giờ
   máy), trời (Open-Meteo, chỉ khi đã có `tdtd.troi.noi` hay bấm lấy vị trí), miền, túi tiền, ngày rằm/mùng 1 (lịch âm);
   vòng quay công bằng (rút món theo diện tích rồi giải ngược ω0 của ma sát có lời giải đóng); cả nhóm chuyền máy (tim,
   gạch); mâm cơm ba món như máy xèng, đi chợ. Dữ liệu món là bảng dòng `|` trong `monan.js`. `tdtd.angi`.
   `test-angi.js` (chạy cả Node 16). Trang cũ `hom-nay-an-gi/` giữ cho link đã gửi. README "## Ăn gì".
-- **Buôn lậu phố cổ** (`#buon-lau`, `buonlau.js`, Worker, phòng qua mạng) — lúc viết đang được một phiên khác làm, chưa
-  commit; hỏi phiên đó hay đọc mục README của nó khi đã có. test-buonlau, test-buonlau-phong.
+- **Buôn lậu phố cổ** (`#buon-lau`, `/buon-lau-pho-co/`, `buonlau.js`, Worker, phòng qua mạng nhánh `buonlau`,
+  `sanhbuonlau`) — trốn tìm có dấu vết trên bản đồ phố cổ; bí mật của tay buôn không lên máy chủ (mã cam kết). README
+  "## Buôn lậu phố cổ". test-buonlau, test-buonlau-phong (Node 24).

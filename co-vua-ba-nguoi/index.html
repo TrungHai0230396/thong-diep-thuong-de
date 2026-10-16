@@ -21,7 +21,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://thong-diep-thuong-de.vercel.app/icons/og-co-ba-nguoi-2.jpg">
 <meta name="theme-color" content="#0d0b1a">
-<script>var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#co-ba-nguoi' + (m ? '/' + m[1] : ''));</script>
+<script>var q = location.search, m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(q); q = q.replace(/[?&]phong=[^&]*/g, '').replace(/^&/, '?'); location.replace('../' + q + '#co-ba-nguoi' + (m ? '/' + m[1] : ''));</script>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0d0b1a;color:#f4efe6;font:16px system-ui,sans-serif}a{color:#e9b3a8}</style>
 </head>
 <body>

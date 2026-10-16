@@ -255,10 +255,16 @@ console.log('\n— Chia sẻ link một trò —');
     ok(`${sao.trang}: có trang riêng, tiêu đề và og:title trùng tieuDe trong app.js, không nhắc tên app`,
        tieuDe === sao.tieuDe && og === sao.tieuDe && !/Thông Điệp/.test(html), `${tieuDe} / ${og}`);
     /* Không thẻ meta làm mới trang: Telegram đi theo nó về trang chủ và hiện tên app (người dùng gửi ảnh).
-       Tắt JavaScript thì còn link bấm tay. */
-    ok(`${sao.trang}: người mở được chuyển vào #${sao.duong} bằng JavaScript; không có thẻ refresh cho trình đọc link đi theo`,
-       (html.includes(`location.replace('../#${sao.duong}'`) || html.includes(`location.replace('../' + location.search + '#${sao.duong}'`))
-       && !/http-equiv/i.test(html) && html.includes(`href="../#${sao.duong}"`));
+       Tắt JavaScript thì còn link bấm tay. Lúc trò mở, thanh địa chỉ là chính trang này (app.js datDiaChiTrang), nên tải
+       lại hay mở link chép từ thanh địa chỉ cũng qua đây: ?tro (app cài trên iPhone mở lại đúng trò), ?ngay phải đi theo;
+       trò có phòng thì ?phong=MÃ thành #trò/MÃ — kiểu mà app bản nào cũng đọc được. Chạy thật lệnh chuyển của trang. */
+    const lenh = (/<script>([\s\S]*?)<\/script>/.exec(html) || [])[1] || '';
+    const chuyen = (q) => { let di = null; try { new Function('location', lenh)({ search: q, pathname: '/' + sao.trang, hash: '', replace: (u) => { di = u; } }); } catch (e) {} return di; };
+    const coPhong = /phong=/.test(lenh), vaoPhong = chuyen(`?tro=${sao.duong}&phong=ABCDEF`);
+    ok(`${sao.trang}: người mở được chuyển vào #${sao.duong} bằng JavaScript, giữ ?tro, ?ngay${coPhong ? ', ?phong=MÃ thành #' + sao.duong + '/MÃ' : ''}; không có thẻ refresh cho trình đọc link đi theo`,
+       chuyen('') === `../#${sao.duong}` && chuyen(`?tro=${sao.duong}&ngay=2026-12-25`) === `../?tro=${sao.duong}&ngay=2026-12-25#${sao.duong}` &&
+       (!coPhong || (vaoPhong === `../?tro=${sao.duong}#${sao.duong}/ABCDEF` && chuyen('?phong=ABCDEF') === `../#${sao.duong}/ABCDEF`))
+       && !/http-equiv/i.test(html) && html.includes(`href="../#${sao.duong}"`), [chuyen(''), chuyen(`?tro=${sao.duong}&ngay=2026-12-25`), coPhong ? vaoPhong : ''].join(' | '));
     ok(`${sao.trang}: og:url trỏ đúng chính trang này`, html.includes(`property="og:url" content="https://thong-diep-thuong-de.vercel.app/${sao.trang}"`));
     const moTa = (html.match(/name="description" content="([^"]*)"/) || [])[1] || '';
     const ogMoTa = (html.match(/property="og:description" content="([^"]*)"/) || [])[1];
@@ -544,39 +550,59 @@ console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò �
      ch.boHop === 2 && sauVao === 1 && vaoLai === 1, `${sauVao}, ${vaoLai}, ${ch.boHop}`);
 }
 
-console.log('\n— Trò khai diaChiTrang: thanh địa chỉ là trang riêng, không dấu # —');
+let choSW = Promise.resolve();
+console.log('\n— Thanh địa chỉ là trang riêng của trò, không dấu # —');
 {
-  /* Người dùng: "bỏ # đi để khi copy link nó ra chú thích". Chép …/#an-gi từ thanh địa chỉ thì Zalo chỉ thấy trang chủ
-     (phần sau # không bao giờ gửi lên máy chủ); trò khai diaChiTrang thì lúc đang mở, thanh địa chỉ là chính trang riêng. */
+  /* Người dùng: "bỏ # đi để khi copy link nó ra chú thích", rồi "các trò chơi bạn xóa # hết đi, để copy có ghi chú". Chép
+     …/#bida từ thanh địa chỉ thì Zalo chỉ thấy trang chủ (phần sau # không bao giờ gửi lên máy chủ); nên lúc trò mở, thanh
+     địa chỉ là chính trang riêng của trò, mã phòng là ?phong=MÃ. */
   const cat = (ten) => { const a = nguon.indexOf(`function ${ten}(`); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
   const catHang = (ten) => { const a = nguon.indexOf(`const ${ten} = `); return nguon.slice(a, nguon.indexOf('\n};\n', a) + 4); };
-  const dsTrang = [...khoiSao.matchAll(/\{ id: '([^']+)'[\s\S]*?\}/g)].map(m => m[0]).filter(k => /diaChiTrang: true/.test(k))
+  const dsTrang = [...khoiSao.matchAll(/\{ id: '([^']+)'[\s\S]*?\}/g)].map(m => m[0])
     .map(k => ({ duong: (k.match(/duong: '([^']+)'/) || [])[1], trang: (k.match(/trang: '([^']+)'/) || [])[1] }));
-  ok('có trò khai diaChiTrang, trò nào cũng có trang riêng', dsTrang.length >= 1 && dsTrang.every(t => t.trang), dsTrang.map(t => t.duong).join(', '));
+  ok(`cả ${dsTrang.length} trò đều có trang riêng để làm thanh địa chỉ`, dsTrang.length >= 17 && dsTrang.every(t => t.trang), dsTrang.filter(t => !t.trang).map(t => t.duong).join(', '));
+  ok('không còn cờ diaChiTrang: trò nào có trang riêng cũng vậy, trò mới khỏi phải nhớ', !/diaChiTrang:/.test(khoiSao));
   function trinh(url) {                            // trình duyệt giả: thanh địa chỉ và lịch sử
     const u = new URL(url), loc = { pathname: u.pathname, search: u.search, hash: u.hash }, ls = { day: 0, thay: 0 };
     const di = (d) => { const v = new URL(d, 'https://x.vercel.app' + loc.pathname); Object.assign(loc, { pathname: v.pathname, search: v.search, hash: v.hash }); };
     const history = { pushState: (a, b, d) => { ls.day++; di(d); }, replaceState: (a, b, d) => { ls.thay++; di(d); } };
-    const SAO = dsTrang.map(t => ({ ...t, diaChiTrang: true })).concat([{ duong: 'ho-sen', trang: 'ho-sen/' }]);
+    const SAO = dsTrang.concat([{ duong: 'tro-moi' }]);
     const f = new Function('location', 'history', 'SAO', 'GOC_APP',
-      `${catHang('troTheoTrang')}\n${cat('boDau')}\n${cat('datDiaChiTrang')}\nreturn { troTheoTrang, boDau, datDiaChiTrang };`)(loc, history, SAO, '/');
-    return { ...f, loc, ls, SAO, diaChi: () => loc.pathname + loc.search + loc.hash };
+      `${catHang('troTheoTrang')}\n${cat('boPhong')}\n${cat('boDau')}\n${cat('datDiaChiTrang')}\nreturn { troTheoTrang, boDau, datDiaChiTrang };`)(loc, history, SAO, '/');
+    return { ...f, loc, ls, SAO, sao: (d) => SAO.find(x => x.duong === d), diaChi: () => loc.pathname + loc.search + loc.hash };
   }
-  const t = dsTrang[0], a = trinh('https://x.vercel.app/');
-  a.datDiaChiTrang(a.SAO[0]);
+  const t = dsTrang.find(x => x.duong === 'ho-sen') || dsTrang[0], a = trinh('https://x.vercel.app/');
+  a.datDiaChiTrang(a.sao(t.duong));
   ok(`mở ${t.duong} từ ngôi sao: thanh địa chỉ là /${t.trang}, thêm một bước để Back là đóng trò`, a.diaChi() === '/' + t.trang && a.ls.day === 1 && a.ls.thay === 0, a.diaChi());
   const thieuGach = (() => { a.loc.pathname = '/' + t.trang.replace(/\/$/, ''); const r = a.troTheoTrang(); a.loc.pathname = '/' + t.trang; return r; })();
-  ok('đang ở trang riêng thì nhận ra trò theo đường dẫn, cả khi thiếu dấu / cuối', a.troTheoTrang() === a.SAO[0] && thieuGach === a.SAO[0]);
+  ok('đang ở trang riêng thì nhận ra trò theo đường dẫn, cả khi thiếu dấu / cuối', a.troTheoTrang() === a.sao(t.duong) && thieuGach === a.sao(t.duong));
+  const nhan = dsTrang.filter(x => { const b = trinh('https://x.vercel.app/' + x.trang); return b.troTheoTrang() !== b.sao(x.duong); });
+  ok('trang riêng nào cũng đưa về đúng trò của nó', !nhan.length, nhan.map(x => x.trang).join(', '));
   a.boDau();
   ok('đóng trò: về trang chủ, không còn đường dẫn của trò', a.diaChi() === '/' && a.troTheoTrang() === null, a.diaChi());
   const b = trinh(`https://x.vercel.app/?tro=${t.duong}&ngay=2026-12-25#${t.duong}`);
-  b.datDiaChiTrang(b.SAO[0]);
+  b.datDiaChiTrang(b.sao(t.duong));
   ok('mở từ trang chia sẻ (về /#trò, giữ ?tro, ?ngay): thay địa chỉ luôn, không thêm bước Back',
      b.diaChi() === `/${t.trang}?tro=${t.duong}&ngay=2026-12-25` && b.ls.day === 0 && b.ls.thay === 1, b.diaChi());
-  b.datDiaChiTrang(b.SAO[0]);
+  b.datDiaChiTrang(b.sao(t.duong));
   ok('gọi lại lúc địa chỉ đã đúng: không đụng tới lịch sử', b.ls.day === 0 && b.ls.thay === 1);
-  const c = trinh('https://x.vercel.app/#ho-sen');
-  ok('trò không khai diaChiTrang vẫn theo #; đóng thì bỏ #', c.troTheoTrang() === null && (c.boDau(), c.diaChi() === '/'));
+  const co = dsTrang.find(x => x.duong === 'co-ba-nguoi');
+  if (co) {
+    const c = trinh('https://x.vercel.app/?tro=co-ba-nguoi#co-ba-nguoi/ABCDEF');
+    c.datDiaChiTrang(c.sao('co-ba-nguoi'));
+    ok('mã phòng sau # (link cũ, trang chia sẻ chuyển vào) thành ?phong=MÃ trên trang riêng — đúng link mời, không thêm bước Back',
+       c.diaChi() === `/${co.trang}?tro=co-ba-nguoi&phong=ABCDEF` && c.ls.day === 0 && c.ls.thay === 1, c.diaChi());
+    c.boDau();
+    ok('đóng trò có phòng: về trang chủ, bỏ ?phong, giữ ?tro', c.diaChi() === '/?tro=co-ba-nguoi', c.diaChi());
+    const c2 = trinh('https://x.vercel.app/#co-ba-nguoi/ABCDEF');
+    c2.datDiaChiTrang(c2.sao('bida') || c2.sao('ho-sen'));
+    ok('mã sau # của trò KHÁC thì không mang sang', !/phong=/.test(c2.diaChi()), c2.diaChi());
+  }
+  const d = trinh('https://x.vercel.app/#tro-moi');
+  ok('trò chưa có trang riêng vẫn theo #; đóng thì bỏ #', d.troTheoTrang() === null && (d.boDau(), d.diaChi() === '/'));
+  const moSao = cat('moSao');
+  ok('mở trò: đổi địa chỉ TRƯỚC khi gọi mo() của trò — trò có phòng đọc ?phong= lúc mo()',
+     moSao.indexOf('datDiaChiTrang(s)') > 0 && moSao.indexOf('datDiaChiTrang(s)') < moSao.indexOf('m.mo()') && /if \(s\.trang\) datDiaChiTrang\(s\)/.test(moSao));
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const viTriBase = html.indexOf("createElement('base')"), viTriDuong = html.search(/(href|src)="(?!https?:)[^"#]/);
   ok('index.html gắn thẻ <base> về thư mục app, trước mọi đường dẫn tương đối', viTriBase > 0 && viTriBase < viTriDuong
@@ -584,12 +610,37 @@ console.log('\n— Trò khai diaChiTrang: thanh địa chỉ là trang riêng, k
   ok('app.js tính GOC_APP theo thẻ <base>; link trò tính từ GOC_APP chứ không từ thanh địa chỉ',
      /const GOC_APP = [^\n]*document\.baseURI/.test(nguon) && /function linkTro\(s\) \{\s*return location\.origin \+ GOC_APP/.test(nguon)
      && /function linkCaiApp\(\) \{\s*return saoDangMo \? linkTro\(saoDangMo\) : location\.origin \+ GOC_APP;/.test(nguon));
+  /* Trò dựng link từ location.pathname là sai khi thanh địa chỉ là trang riêng (…/co-vua-ba-nguoi/co-vua-ba-nguoi/…) */
+  const dungPath = TEP.filter(f => /location\.pathname\.replace\(\/\[\^\/\]\*\$\/, ''\) \+ '[a-z-]+\//.test(fs.readFileSync(path.join(__dirname, '..', 'assets', f), 'utf8')));
+  ok('không trò nào dựng link trang riêng từ thanh địa chỉ (location.pathname)', !dungPath.length, dungPath.join(', '));
   const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
-  ok('sw.js cất sẵn trang riêng của các trò đó: mất mạng mà tải lại ở trang riêng thì vẫn vào được app', dsTrang.every(x => sw.includes(`'${x.trang}'`)));
-  for (const x of dsTrang) {
-    const trang = fs.readFileSync(path.join(__dirname, '..', x.trang, 'index.html'), 'utf8');
-    ok(`${x.trang}: chuyển vào app giữ nguyên ?tro, ?ngay`, trang.includes(`location.replace('../' + location.search + '#${x.duong}')`));
-  }
+  const thieuSW = dsTrang.filter(x => !sw.includes(`'${x.trang}'`));
+  ok('sw.js cất sẵn trang riêng của mọi trò: mất mạng mà tải lại ở trang riêng thì vẫn vào được app', !thieuSW.length, thieuSW.map(x => x.trang).join(', '));
+  /* Service worker không đăng ký được trong khung Browser của app, nên chạy thật sw.js với kho và mạng giả: cài (cất SHELL),
+     rồi mở trang riêng có ?phong=, có mạng và mất mạng */
+  const xinSW = async () => {
+    const goc = 'https://x.vercel.app/', kho = new Map(), nghe = {};
+    let coMang = true;
+    const tim = (url, o) => { const u = new URL(url, goc); for (const [k, v] of kho) { const c = new URL(k); if (c.pathname === u.pathname && ((o && o.ignoreSearch) || c.search === u.search)) return v; } return undefined; };
+    const caches = {
+      open: async () => ({ addAll: async (ds) => ds.forEach(d => kho.set(new URL(d, goc).href, 'cất ' + new URL(d, goc).pathname)), put: async (r, res) => { kho.set(r.url, res.than); } }),
+      match: async (r, o) => tim(typeof r === 'string' ? r : r.url, o), keys: async () => [], delete: async () => true,
+    };
+    const fetch = async (r) => { if (!coMang) throw new TypeError('mất mạng'); const u = new URL(r.url); return { ok: true, than: 'mạng ' + u.pathname + u.search, clone() { return this; }, headers: { get: () => '' } }; };
+    new Function('self', 'caches', 'fetch', 'location', sw)({ addEventListener: (t, f) => { nghe[t] = f; }, skipWaiting: () => {}, clients: { claim: () => {} } }, caches, fetch, new URL(goc));
+    await new Promise(xong => nghe.install({ waitUntil: (p) => p.then(xong) }));
+    const xin = async (url, mode) => { let tra = null; nghe.fetch({ request: { method: 'GET', url: goc + url, mode }, respondWith: (p) => { tra = p; } }); const v = tra ? await tra : '(trình duyệt tự tải)'; return v && v.than ? v.than : v; };
+    const r = { coMang: await xin('bida-lo/?phong=ABCDEF&tro=bida', 'navigate'), tep: await xin('assets/app.js?v=2', 'cors'), la: await xin('trang-la/?phong=ABCDEF', 'navigate') };
+    coMang = false;
+    Object.assign(r, { matMang: await xin('co-vua-ba-nguoi/?phong=ABCDEF', 'navigate'), trangChu: await xin('?tro=ho-sen&ngay=2026-12-25', 'navigate'), daCatPhong: [...kho.keys()].some(k => /phong=/.test(k)), daCatTep: kho.has(goc + 'assets/app.js?v=2') });
+    return r;
+  };
+  choSW = xinSW().then((r) => {                   // việc async: in ở cuối, tổng kết đợi nó xong
+    console.log('\n— Service worker: trang riêng có ?phong=, ?tro=, có mạng và mất mạng —');
+    ok('sw.js: mở …/bida-lo/?phong=MÃ ra trang riêng đã cất (khớp bỏ qua ?…); mất mạng mà tải lại …/co-vua-ba-nguoi/?phong=MÃ vẫn ra trang riêng, không ra index.html',
+       r.coMang === 'cất /bida-lo/' && r.matMang === 'cất /co-vua-ba-nguoi/' && r.trangChu === 'cất /', JSON.stringify(r));
+    ok('sw.js: tệp khác vẫn khớp cả ?… (tải mạng rồi cất); không cất thêm một bản cho mỗi mã phòng', r.tep === 'mạng /assets/app.js?v=2' && r.daCatTep && !r.daCatPhong, JSON.stringify(r));
+  });
 }
 
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
@@ -677,7 +728,8 @@ let choBangCai = Promise.resolve();                  // bấm là việc async: 
   })();
 }
 
-choBangCai.catch((e) => ok('bài kiểm bảng cài app chạy hết', false, e.message)).then(() => {
+Promise.all([choSW.catch((e) => ok('bài kiểm service worker chạy hết', false, e.message)),
+             choBangCai.catch((e) => ok('bài kiểm bảng cài app chạy hết', false, e.message))]).then(() => {
   console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
   process.exit(fail ? 1 : 0);
 });

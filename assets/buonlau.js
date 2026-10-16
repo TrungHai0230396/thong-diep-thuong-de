@@ -1582,9 +1582,17 @@ const tenMinhLuu = () => String(docLuu().ten || '').trim().slice(0, 20);
 /* thư mục app: index.html gắn thẻ <base> về đó (trò khác có thể đổi thanh địa chỉ sang trang riêng của nó) */
 const gocApp = () => { try { if (typeof document !== 'undefined' && document.baseURI) return new URL('.', document.baseURI).href; } catch (e) {} return location.origin + location.pathname.replace(/[^/]*$/, ''); };
 const linkMoi = (ma) => gocApp() + 'buon-lau-pho-co/?phong=' + ma;
-const MA_DIA_CHI = /^#buon-lau\/([A-HJ-NP-Z2-9]{6})$/;
-const dauThang = () => (typeof location !== 'undefined' && location.hash) || '';
-function datDiaChi(ma) { try { history.replaceState(history.state, '', location.pathname + location.search + '#buon-lau' + (ma ? '/' + ma : '')); } catch (e) {} }
+/* Mã phòng trên địa chỉ: …/buon-lau-pho-co/?phong=MÃ, chép thanh địa chỉ là ra đúng link mời (người dùng: "các trò chơi
+   bạn xóa # hết đi, để copy có ghi chú"). app.js đổi #buon-lau/MÃ của link cũ, của trang riêng chuyển vào, thành
+   ?phong=MÃ trước khi mở trò; #buon-lau/MÃ vẫn đọc được, có cả hai thì # là cái mới gõ vào. */
+const MA_DIA_CHI = /^#buon-lau\/([A-HJ-NP-Z2-9]{6})$/, MA_TIM = /[?&]phong=([A-HJ-NP-Z2-9]{6})(?:&|$)/;
+const maTrenDiaChi = () => (typeof location === 'undefined' ? null : MA_DIA_CHI.exec(location.hash || '') || MA_TIM.exec(location.search || ''));
+function datDiaChi(ma) {                           // đổi ?phong, phần ?… còn lại (?tro, ?ngay) để y nguyên
+  try {
+    const q = (location.search || '').replace(/[?&]phong=[^&]*/g, '').replace(/^&/, '?');
+    history.replaceState(history.state, '', location.pathname + (ma ? (q ? q + '&' : '?') + 'phong=' + ma : q));
+  } catch (e) {}
+}
 
 /* ---------- SHA-256 (đồng bộ, tự viết theo FIPS 180-4 — crypto.subtle thì chỉ có kiểu bất đồng bộ) ---------- */
 const K256 = (() => {
@@ -2328,12 +2336,12 @@ function vaoBangMa() {
 }
 function theoMaTrenDiaChi() {
   if (!tam || !tam.classList.contains('hien') || !MANG) return;
-  const m = MA_DIA_CHI.exec(dauThang());
+  const m = maTrenDiaChi();
   if (m && (!phong || phong.ma !== m[1])) { const l = docLuu().phong; vaoPhong(m[1], l && l.ma === m[1] ? { id: l.id, P: l.P } : null); }
 }
 function moPhongLucMo() {
   if (!MANG) return false;
-  const m = MA_DIA_CHI.exec(dauThang()), luu = docLuu().phong;
+  const m = maTrenDiaChi(), luu = docLuu().phong;
   if (m) { if (!phong || phong.ma !== m[1]) vaoPhong(m[1], luu && luu.ma === m[1] ? { id: luu.id, P: luu.P } : null); else noiPhong(); return true; }
   if (phong) { noiPhong(); datDiaChi(phong.ma); return true; }
   if (!van && luu && MANG.laMa(luu.ma)) { vaoPhong(luu.ma, { id: luu.id, P: luu.P }, -1, true); return true; }
