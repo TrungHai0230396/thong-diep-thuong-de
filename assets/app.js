@@ -238,30 +238,53 @@ const ICO_BA_CHAM = '<b class="cai-cham">⋯</b>';
 
 /* ---------- mở app đã cài: vào thẳng trò đã cài ----------
    Người dùng hỏi "tải app trong mỗi game là vô app có tự động vô game không hay bay ra trang chủ", rồi chọn: vào thẳng trò
-   đã cài. Trang mở đầu của app lấy theo manifest lúc cài — Chrome trên Android mở start_url, Safari trên iPhone lúc "Thêm
-   vào MH chính" cũng lấy start_url của manifest chứ không lấy trang đang xem — nên bản trước cài từ trò nào cũng mở ra
-   trang chủ. Giờ đang ở trò nào thì gắn manifest riêng của trò đó (<trang>app.webmanifest, scripts/lam-ke-khai.py viết):
-   start_url ?tro=<duong>, cùng id "/" — vẫn một app. iPhone: app trên màn hình chính có kho lưu riêng, tách hẳn Safari
-   (WebKit làm vậy có chủ ý), nên chỉ trang mở đầu mang được trò sang. Android: app dùng chung kho lưu với Chrome, nên lúc
-   cài (appinstalled) ghi thêm trò đang mở — phòng khi Chrome cài theo manifest đã đọc từ trước. App mở với ?tro thì nhớ trò
-   đó vào kho của app; lần mở app sau (không phải tải lại trang) vào thẳng trò, bấm ✕ là về trang chủ. Trong app luôn gắn
-   manifest của trò đã cài, kẻo Chrome kiểm bản cập nhật đúng lúc đang ở trò khác rồi đổi trang mở đầu theo trò đó. */
+   đã cài. Trang mở đầu của app là thứ trình duyệt ghi lại lúc cài, mỗi nhà một kiểu:
+   - Chrome (Android, máy tính) mở start_url của manifest, và đọc lại manifest mỗi lần thẻ <link rel="manifest"> đổi. Nên
+     đang ở trò nào thì gắn manifest riêng của trò đó (<trang>app.webmanifest, scripts/lam-ke-khai.py viết): start_url
+     ?tro=<duong>, cùng id "/" — vẫn một app. App dùng chung kho lưu với Chrome, nên lúc cài (appinstalled) ghi thêm trò
+     đang mở — phòng khi Chrome cài theo manifest đã đọc từ trước. Trong app luôn gắn manifest của trò đã cài, kẻo Chrome
+     kiểm bản cập nhật đúng lúc đang ở trò khác rồi đổi trang mở đầu theo trò đó.
+   - Safari, và mọi trình duyệt trên iPhone, iPad (đều là WebKit), đọc manifest MỘT lần lúc tải trang rồi giữ tới khi rời
+     trang — thẻ <link> đổi sau đó không đọc lại (DocumentLoader::loadApplicationManifest của WebKit). Người dùng báo: "Sao
+     vô game thêm màn hình chính toàn ra trang chủ không vậy" — bản trước đổi manifest lúc vào trò thì Safari vẫn cầm
+     manifest trang chủ. Nên index.html không gắn manifest cho WebKit: không có manifest thì "Thêm vào MH chính" lưu địa
+     chỉ đang xem, và đang ở trò nào thì địa chỉ mang ?tro=<duong> (datTroDiaChi). App trên màn hình chính có kho lưu riêng,
+     tách hẳn Safari (WebKit làm vậy có chủ ý), nên chỉ địa chỉ mang được trò sang.
+   App mở với ?tro thì nhớ trò đó vào kho của app; lần mở app sau (không phải tải lại trang) vào thẳng trò, bấm ✕ là về
+   trang chủ. */
 const KHOA_TRO_CAI = 'tdtd.troCai';
 const coTro = (d) => !!d && SAO.some(s => s.duong === d && s.trang);
 const keKhaiCua = (d) => (coTro(d) ? SAO.find(s => s.duong === d).trang + 'app.webmanifest' : 'manifest.webmanifest');
 /* lúc mở trang: nho — trò của app (chỉ khi đang chạy như app đã cài); mo — trò mở ngay: ?tro, hay trò đã nhớ khi mở app.
-   Địa chỉ đã có #trò, hay đây là tải lại trang, thì để theo địa chỉ. */
+   Địa chỉ đã có #trò, hay đây là tải lại trang, thì để theo địa chỉ. Riêng app mở với ?tro mà sau # là chính trò đó thì mở
+   trò từ đầu: iPhone lưu nguyên địa chỉ lúc "Thêm vào MH chính", có khi kèm mã phòng cờ (#co-ba-nguoi/MÃ) — không bỏ thì
+   lần nào mở app cũng vào lại một phòng đã tan. */
 function troLucMo(o) {
   const q = new URLSearchParams(o.search || '').get('tro'), hop = coTro(q) ? q : null;
   const nho = o.laApp ? hop || (coTro(o.nho) ? o.nho : null) : null;
-  return { nho, mo: o.hash || o.taiLai ? null : hop || nho };
+  const troSauThang = (o.hash || '').slice(1).split('/')[0];
+  return { nho, mo: o.taiLai ? null : o.laApp && hop && troSauThang === hop ? hop : o.hash ? null : hop || nho };
 }
 const laApp = () => !!navigator.standalone || matchMedia('(display-mode: standalone)').matches;
 const docTroCai = () => { try { return localStorage.getItem(KHOA_TRO_CAI) || null; } catch (e) { return null; } };
 const ghiTroCai = (d) => { try { if (d) localStorage.setItem(KHOA_TRO_CAI, d); else localStorage.removeItem(KHOA_TRO_CAI); } catch (e) {} };
+/* Cài lúc này thì app mở vào đâu. Có manifest (Chrome): gắn manifest của trò. Không có (WebKit, xem index.html): địa chỉ
+   mang ?tro=<trò>. Trong app thì để địa chỉ yên — app đã cài rồi. */
 function datKeKhai(dangMo) {
-  const l = document.querySelector('link[rel="manifest"]'), href = keKhaiCua(laApp() ? docTroCai() : dangMo);
-  if (l && l.getAttribute('href') !== href) l.setAttribute('href', href);
+  const l = document.querySelector('link[rel="manifest"]'), app = laApp();
+  if (!l) { if (!app) datTroDiaChi(coTro(dangMo) ? dangMo : null); return; }
+  const href = keKhaiCua(app ? docTroCai() : dangMo);
+  if (l.getAttribute('href') !== href) l.setAttribute('href', href);
+}
+/* Đổi ?tro trên địa chỉ, giữ nguyên phần còn lại (?ngay=…, #trò/mã phòng). replaceState: không thêm bước Back. Địa chỉ
+   trong trò giờ khác trang chủ cả phần trước dấu #, mà Back qua hai địa chỉ như thế Safari không báo hashchange — nên
+   init nghe thêm popstate. */
+function datTroDiaChi(d) {
+  const p = new URLSearchParams(location.search);
+  if ((p.get('tro') || null) === d) return;
+  if (d) p.set('tro', d); else p.delete('tro');
+  const q = p.toString();
+  history.replaceState(history.state, '', location.pathname + (q ? '?' + q : '') + location.hash);
 }
 function vaoTroDaCai() {
   let taiLai = false;
@@ -605,6 +628,10 @@ async function init() {
   NUT_SAO = taoCacSao();
   datCacSao();
   addEventListener('hashchange', theoDiaChi);
+  /* Safari chỉ báo hashchange khi hai địa chỉ giống nhau phần trước dấu # (FrameLoader::loadInSameDocument). Trên iPhone
+     địa chỉ trong trò có thêm ?tro= (datTroDiaChi), nên Back từ trò về trang chủ chỉ có popstate — Back, Forward nào
+     Safari cũng báo popstate. Cả hai cùng tới thì theoDiaChi lần sau thấy đã đúng trò, không làm gì. */
+  addEventListener('popstate', theoDiaChi);
   vaoTroDaCai();                        // app đã cài từ một trò: mở là vào thẳng trò đó
   theoDiaChi();                         // mở thẳng vào trò nếu địa chỉ có sẵn
   addEventListener('resize', datLaiNgoiSao);

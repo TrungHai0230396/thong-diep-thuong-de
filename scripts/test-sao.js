@@ -355,8 +355,10 @@ console.log('\n— Nút Cài app trong mọi trò —');
 console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò đó —');
 {
   /* Người dùng hỏi "tải app trong mỗi game là vô app có tự động vô game không hay bay ra trang chủ", chọn: vào thẳng trò.
-     Trang mở đầu lấy theo manifest lúc cài (Chrome Android: start_url; Safari iPhone cũng lấy start_url của manifest),
-     nên mỗi trò có manifest riêng start_url ?tro=<duong>, cùng id "/"; app.js gắn manifest của trò đang mở. */
+     Chrome mở start_url của manifest và đọc lại manifest khi thẻ <link> đổi, nên mỗi trò có manifest riêng start_url
+     ?tro=<duong>, cùng id "/"; app.js gắn manifest của trò đang mở. Safari (iPhone) đọc manifest một lần lúc tải trang
+     rồi giữ — người dùng báo "vô game thêm màn hình chính toàn ra trang chủ" — nên với WebKit không gắn manifest, Safari
+     lưu địa chỉ đang xem, và địa chỉ trong trò mang ?tro=<duong>. */
   const goc = path.join(__dirname, '..'), mien = 'https://thong-diep-thuong-de.vercel.app/';
   const mf = JSON.parse(fs.readFileSync(path.join(goc, 'manifest.webmanifest'), 'utf8'));
   const tuyet = (u, ve) => new URL(u, ve).href;
@@ -381,21 +383,26 @@ console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò �
 
   /* chạy nguyên khối trong app.js trên một trình duyệt giả */
   const khoi = nguon.slice(nguon.indexOf("const KHOA_TRO_CAI = 'tdtd.troCai';"), nguon.indexOf('/* Link đưa ra ngoài'));
-  function moTrang({ url = mien, app = false, taiLai = false, kho = {}, dangMo = null } = {}) {
+  /* keKhai: trang có thẻ manifest (Chrome) hay không (Safari, mọi trình duyệt trên iPhone — xem index.html).
+     iphone: navigator.standalone như app mở từ màn hình chính iPhone. diaChiNay(): địa chỉ lúc này, sau mọi replaceState. */
+  function moTrang({ url = mien, app = false, iphone = false, taiLai = false, kho = {}, dangMo = null, keKhai = true } = {}) {
     const u = new URL(url), kq = { kho, link: 'manifest.webmanifest', diaChi: null, nghe: {} };
     const link = { getAttribute: () => kq.link, setAttribute: (k, v) => { kq.link = v; } };
+    const loc = { search: u.search, hash: u.hash, pathname: u.pathname };
     const moiTruong = {
-      SAO: DS, navigator: { standalone: false }, matchMedia: () => ({ matches: app }),
+      SAO: DS, navigator: { standalone: iphone }, matchMedia: () => ({ matches: app }),
       localStorage: { getItem: (k) => (k in kho ? kho[k] : null), setItem: (k, v) => { kho[k] = String(v); }, removeItem: (k) => { delete kho[k]; } },
-      document: { querySelector: (q) => (q === 'link[rel="manifest"]' ? link : null) },
-      location: { search: u.search, hash: u.hash, pathname: u.pathname },
-      history: { replaceState: (a, b, d) => { kq.diaChi = d; } },
+      document: { querySelector: (q) => (q === 'link[rel="manifest"]' && keKhai ? link : null) },
+      location: loc,
+      history: { state: null, replaceState: (a, b, d) => { kq.diaChi = d; const v = new URL(d, mien); Object.assign(loc, { search: v.search, hash: v.hash, pathname: v.pathname }); } },
       performance: { getEntriesByType: () => [{ type: taiLai ? 'reload' : 'navigate' }] },
       addEventListener: (ten, f) => { kq.nghe[ten] = f; },
     };
     const f = new Function(...Object.keys(moiTruong), 'saoDangMo',
       khoi + '\nvaoTroDaCai(); return { datKeKhai, troLucMo, keKhaiCua, datSao: (s) => { saoDangMo = s; } };');
     Object.assign(kq, f(...Object.values(moiTruong), dangMo));
+    kq.diaChiNay = () => loc.pathname + loc.search + loc.hash;
+    kq.datThang = (h) => { loc.hash = h; };          // như location.hash = … (moSao): đổi phần sau #, giữ ?tro
     return kq;
   }
   const co = moTrang({ url: mien + '?tro=co-ba-nguoi', app: true });
@@ -428,6 +435,79 @@ console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò �
   ok('gắn vào app: mở trò gọi datKeKhai(s.duong), mọi đường đóng trò (goNutTro) gọi datKeKhai(null), vaoTroDaCai chạy trước theoDiaChi',
      /themNutCaiApp\(s\);\s*datKeKhai\(s\.duong\);/.test(nguon) && /function goNutTro\(\) \{[\s\S]{0,300}datKeKhai\(null\);/.test(nguon) &&
      /vaoTroDaCai\(\);[^\n]*\n\s*theoDiaChi\(\);/.test(nguon));
+
+  /* iPhone: người dùng báo "Sao vô game thêm màn hình chính toàn ra trang chủ không vậy". WebKit đọc manifest một lần lúc
+     tải trang (DocumentLoader::loadApplicationManifest: đã có bộ tải thì trả bản cũ), nên đổi thẻ <link> khi vào trò không
+     tới được Safari. */
+  const html = fs.readFileSync(path.join(goc, 'index.html'), 'utf8');
+  const dau = html.slice(0, html.indexOf('</head>'));
+  const maKeKhai = (dau.match(/<script>([\s\S]*?)<\/script>/g) || []).map(s => s.slice(8, -9)).find(s => s.includes("rel = 'manifest'")) || '';
+  const gan = (ua, { cham = 0, webkit = false } = {}) => {
+    const them = [];
+    const win = webkit ? { GestureEvent: function () {} } : {};
+    try {
+      new Function('window', 'navigator', 'document', maKeKhai)(win, { userAgent: ua, maxTouchPoints: cham },
+        { createElement: () => ({}), head: { appendChild: (l) => them.push(l) } });
+    } catch (e) { return 'lỗi: ' + e.message; }
+    return them.length === 1 && them[0].rel === 'manifest' && them[0].href === 'manifest.webmanifest' ? 'co' : them.length ? 'hong' : 'khong';
+  };
+  const UA = {
+    safariIphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1',
+    chromeIphone: 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/126.0.6478.54 Mobile/15E148 Safari/604.1',
+    ipad: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15',
+    chromeAndroid: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+    samsung: 'Mozilla/5.0 (Linux; Android 14; SM-S921B) AppleWebKit/537.36 (KHTML, like Gecko) SamsungBrowser/26.0 Chrome/122.0.0.0 Mobile Safari/537.36',
+    chromeMac: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36',
+  };
+  const kqGan = {
+    safariIphone: gan(UA.safariIphone, { webkit: true }), chromeIphone: gan(UA.chromeIphone, { webkit: true }),
+    iphoneKhongDauHieu: gan(UA.safariIphone), ipad: gan(UA.ipad, { cham: 5 }), safariMac: gan(UA.ipad, { webkit: true }),
+    chromeAndroid: gan(UA.chromeAndroid), samsung: gan(UA.samsung), chromeMac: gan(UA.chromeMac),
+  };
+  ok('index.html không gắn sẵn manifest: đoạn mã đầu trang gắn cho Chrome Android, Samsung, Chrome máy tính; không gắn cho Safari, Chrome trên iPhone, iPad (tự xưng là Mac), Safari máy Mac',
+     !/<link[^>]*rel="manifest"/.test(html) && maKeKhai &&
+       ['chromeAndroid', 'samsung', 'chromeMac'].every(k => kqGan[k] === 'co') &&
+       ['safariIphone', 'chromeIphone', 'iphoneKhongDauHieu', 'ipad', 'safariMac'].every(k => kqGan[k] === 'khong'),
+     JSON.stringify(kqGan));
+  ok('tên dưới biểu tượng iPhone là "Thông Điệp" (như short_name, như bảng hướng dẫn "Mở Thông Điệp") — không có manifest thì Safari lấy tên thẻ, mà vào trò thì tên thẻ là tên trò',
+     (dau.match(/<meta name="apple-mobile-web-app-title" content="([^"]+)">/) || [])[1] === mf.short_name);
+
+  const ip = moTrang({ url: mien + '#co-ba-nguoi', keKhai: false });
+  ip.datKeKhai('co-ba-nguoi');
+  const trongTro = ip.diaChiNay();
+  ip.datKeKhai(null);
+  ok('iPhone, trong Safari: vào cờ thì địa chỉ thành /?tro=co-ba-nguoi#co-ba-nguoi ("Thêm vào MH chính" lưu địa chỉ này); về trang chủ thì bỏ ?tro',
+     trongTro === '/?tro=co-ba-nguoi#co-ba-nguoi' && ip.diaChiNay() === '/#co-ba-nguoi' && !('tdtd.troCai' in ip.kho), `${trongTro} → ${ip.diaChiNay()}`);
+  const ipTuNha = moTrang({ url: mien, keKhai: false });
+  ipTuNha.datThang('#ho-sen'); ipTuNha.datKeKhai('ho-sen');
+  ok('iPhone, mở trò từ trang chủ (ngôi sao): ?tro gắn vào đúng trò vừa mở', ipTuNha.diaChiNay() === '/?tro=ho-sen#ho-sen', ipTuNha.diaChiNay());
+  const ipPhong = moTrang({ url: mien + '?ngay=2026-10-16#co-ba-nguoi/ABCDEF', keKhai: false });
+  ipPhong.datKeKhai('co-ba-nguoi');
+  ok('iPhone: giữ nguyên mã phòng sau # và các tham số khác (?ngay=)', ipPhong.diaChiNay() === '/?ngay=2026-10-16&tro=co-ba-nguoi#co-ba-nguoi/ABCDEF', ipPhong.diaChiNay());
+  const ipLa = moTrang({ url: mien + '#khong-co', keKhai: false });
+  ipLa.datKeKhai('khong-co');
+  ok('iPhone: trò lạ thì không gắn ?tro', ipLa.diaChi === null && ipLa.diaChiNay() === '/#khong-co');
+  const ipLoad = moTrang({ url: mien + '?tro=co-ba-nguoi#co-ba-nguoi', keKhai: false });
+  ok('iPhone, tải lại trang trong Safari lúc đang ở cờ: chưa mở trò thì bỏ ?tro (theoDiaChi mở cờ rồi gắn lại), không nhớ gì',
+     ipLoad.diaChiNay() === '/#co-ba-nguoi' && !('tdtd.troCai' in ipLoad.kho), ipLoad.diaChiNay());
+
+  const ipApp = moTrang({ url: mien + '?tro=co-ba-nguoi#co-ba-nguoi', iphone: true, keKhai: false });
+  ipApp.datKeKhai('ho-sen'); ipApp.datKeKhai(null);
+  ok('iPhone, mở app từ màn hình chính (địa chỉ đã lưu): nhớ cờ, vào thẳng cờ; trong app mở trò khác, về trang chủ cũng không đổi địa chỉ',
+     ipApp.kho['tdtd.troCai'] === 'co-ba-nguoi' && ipApp.diaChiNay() === '/?tro=co-ba-nguoi#co-ba-nguoi', ipApp.diaChiNay());
+  const ipKhongThang = moTrang({ url: mien + '?tro=co-ba-nguoi', iphone: true, keKhai: false });
+  ok('iPhone bỏ phần sau # khi lưu (nếu có): ?tro vẫn vào thẳng cờ', ipKhongThang.diaChi === '/?tro=co-ba-nguoi#co-ba-nguoi' && ipKhongThang.kho['tdtd.troCai'] === 'co-ba-nguoi');
+  const ipPhongCu = moTrang({ url: mien + '?tro=co-ba-nguoi#co-ba-nguoi/ABCDEF', iphone: true, keKhai: false });
+  ok('thêm vào MH chính lúc đang trong phòng cờ: mở app vào thẳng cờ, bỏ mã phòng cũ (không thì lần nào mở app cũng vào lại phòng đã tan)',
+     ipPhongCu.diaChiNay() === '/?tro=co-ba-nguoi#co-ba-nguoi' && ipPhongCu.kho['tdtd.troCai'] === 'co-ba-nguoi', ipPhongCu.diaChiNay());
+  const ipPhongTaiLai = moTrang({ url: mien + '?tro=co-ba-nguoi#co-ba-nguoi/ABCDEF', iphone: true, taiLai: true, kho: { 'tdtd.troCai': 'co-ba-nguoi' } });
+  ok('app tải lại lúc đang trong phòng (app tự cập nhật bản mới): giữ phòng', ipPhongTaiLai.diaChi === null);
+  const ipTroKhac = moTrang({ url: mien + '?tro=co-ba-nguoi#ho-sen', app: true, kho: { 'tdtd.troCai': 'co-ba-nguoi' } });
+  ok('app mở với ?tro mà sau # là trò khác: vẫn để theo địa chỉ', ipTroKhac.diaChi === null);
+  ok('init nghe cả popstate: Back từ trò (địa chỉ có ?tro) về trang chủ thì Safari không báo hashchange, chỉ báo popstate',
+     /addEventListener\('hashchange', theoDiaChi\);[\s\S]{0,600}addEventListener\('popstate', theoDiaChi\);/.test(nguon));
+  ok('theoDiaChi gọi hai lần liền (popstate rồi hashchange) không mở, đóng trò lần nữa',
+     /function theoDiaChi\(\) \{[\s\S]{0,200}if \(s\) \{ if \(saoDangMo !== s\) moSao\(s\); \}\s*else if \(saoDangMo\) dongSao\(true\);/.test(nguon));
 }
 
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');

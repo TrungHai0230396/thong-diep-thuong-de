@@ -1932,7 +1932,7 @@ Người dùng: "làm UIUX quân cờ đẹp hơn được không". Tìm hiểu 
 Người dùng hỏi: "khi tải app trong mỗi game là vô app có tự động vô game không hay bay ra trang chủ". Bản trước: ra trang chủ, cài từ trò nào cũng vậy. Tìm hiểu: trang mở đầu của app lấy theo manifest lúc cài — Chrome trên Android mở `start_url` ([web.dev: WebAPK](https://web.dev/webapks/)); Safari trên iPhone lúc "Thêm vào MH chính" cũng lấy `start_url` của manifest chứ không lấy trang đang xem ([một báo lỗi của GitLab](https://gitlab.com/gitlab-org/gitlab/-/issues/427560) gặp đúng chuyện này). Manifest có `start_url: "."` nên app mở trang chủ. Người dùng chọn: vào thẳng trò đã cài (vẫn một app Thông Điệp; các lựa chọn khác là mỗi trò một app riêng có biểu tượng riêng, hay mở lại chỗ dùng lần trước).
 
 - **Mỗi trò một manifest** (`<trò>/app.webmanifest`, 14 tệp, viết bằng `scripts/lam-ke-khai.py` từ danh sách trò trong `assets/app.js`): giống hệt `manifest.webmanifest`, chỉ khác `start_url` = `/?tro=<trò>`. Cùng `id: "/"` (thêm vào manifest chính, trùng id ngầm định cũ nên app đã cài không bị coi là app khác), nên vẫn là một app — Chrome nhận ra là đã cài, không mời cài lần nữa. Vercel trả đúng kiểu `application/manifest+json`.
-- **Đang ở trò nào thì trang gắn manifest của trò đó**, về trang chủ thì manifest chính — cài lúc đang chơi cờ thì trang mở đầu của app là cờ.
+- **Đang ở trò nào thì trang gắn manifest của trò đó**, về trang chủ thì manifest chính — cài lúc đang chơi cờ thì trang mở đầu của app là cờ. (Safari không đọc lại manifest khi thẻ đổi, nên trên iPhone cách này không ăn — xem *Thêm vào MH chính trên iPhone* bên dưới.)
 - **iPhone**: app trên màn hình chính có kho lưu riêng, tách hẳn Safari ([WebKit làm vậy có chủ ý](https://bugs.webkit.org/show_bug.cgi?id=181849)), nên chỉ trang mở đầu mang được trò sang. **Android**: app dùng chung kho lưu với Chrome, nên lúc cài xong (sự kiện `appinstalled`, cài bằng nút Cài app hay menu Chrome) ghi thêm trò đang mở — phòng khi Chrome cài theo manifest đã đọc từ trước.
 - **App mở với `?tro=`** thì nhớ trò vào kho của app; lần mở app sau vào thẳng trò; bấm ✕ là về trang chủ. Tải lại trang (app tự cập nhật bản mới) thì giữ chỗ đang đứng, không tự mở lại trò. Trong app luôn gắn manifest của trò đã cài, kẻo Chrome kiểm bản cập nhật đúng lúc đang ở trò khác rồi đổi trang mở đầu theo trò đó. Link `?tro=<trò>` mở ngoài app cũng vào thẳng trò, nhưng không nhớ gì.
 - Ai đã cài trước bản này thì app vẫn mở trang chủ như cũ; gỡ biểu tượng rồi cài lại từ trong trò là được.
@@ -1976,6 +1976,19 @@ Người dùng: "khi ở cờ vua, chưa vô ván thì không bấm chia sẻ li
 
 `scripts/test-coba.js` thêm 1 bài (giờ 94): nút nằm trên bảng, bảng chừa đủ hàng nút (đọc vị trí và cỡ nút ngay trong CSS), bảng cao không quá chỗ còn lại. Thử phá 5 chỗ (bỏ nâng nút, nút ngang bảng, bảng không chừa hàng nút, chừa thiếu, bảng cao lại 88vh) — bắt cả 5. Đã thử trong trình duyệt ở cỡ điện thoại 375×812: bấm ngay tâm từng nút thì trúng nút; bấm nút chép link lúc bảng Ván mới đang mở thì gửi đúng link `…/co-vua-ba-nguoi/`, bảng vẫn mở; bảng Ván mới bắt đầu ở 120 px, Tạo phòng ở 81 px, Cách chơi (dài, cuộn) ở 58 px — đều dưới hàng nút (kết thúc ở 48 px).
 
+### Thêm vào MH chính trên iPhone: thêm từ trò nào thì mở app vào trò đó
+
+Người dùng báo: "Sao vô game thêm màn hình chính toàn ra trang chủ không vậy". Bản trước đổi thẻ `<link rel="manifest">` theo trò đang mở. Chrome đọc lại manifest mỗi lần thẻ đổi (`LinkManifest::Process` → `ManifestManager::DidChangeManifest` bỏ bản đã đọc), Safari thì không: WebKit tải manifest ngay khi gặp thẻ lúc dựng trang (`HTMLLinkElement::process`), rồi `DocumentLoader::loadApplicationManifest` thấy đã có bộ tải thì trả lại bản cũ cho tới khi rời trang ([mã WebKit](https://github.com/WebKit/WebKit/blob/main/Source/WebCore/loader/DocumentLoader.cpp)). Trang nào cũng mở từ `index.html` với manifest trang chủ (link của trò cũng chỉ chuyển về `/#trò`), nên "Thêm vào MH chính" ở đâu cũng lấy `start_url` của trang chủ. Mọi trình duyệt trên iPhone, iPad đều chạy WebKit, nên Chrome trên iPhone cũng vậy.
+
+- **WebKit không gắn manifest.** Thẻ manifest giờ do một đoạn mã đầu `index.html` gắn, chỉ cho trình duyệt không phải WebKit của Apple (nhận bằng `GestureEvent`, thêm chữ iPhone/iPad và iPad tự xưng là Mac cho chắc). Không có manifest thì Safari nhận "không có" (`_getApplicationManifestWithCompletionHandler` trả `nil`) và lưu địa chỉ đang xem — kiểu "Thêm vào MH chính" có từ trước khi có manifest. Biểu tượng, chạy toàn màn hình vẫn nhờ `apple-touch-icon`, `apple-mobile-web-app-capable`; thêm `apple-mobile-web-app-title` = "Thông Điệp", không thì Safari lấy tên thẻ — vào trò là tên trò.
+- **Địa chỉ trong trò mang `?tro=<trò>`** (chỉ khi không có manifest, ngoài app): `/?tro=co-ba-nguoi#co-ba-nguoi`, về trang chủ thì bỏ. Không trông vào phần sau `#` vì chưa chắc Safari giữ nó khi lưu; `?tro` thì app đã biết đọc — mở app với `?tro` là vào thẳng trò và nhớ trò.
+- **Nút Back.** Hai địa chỉ khác nhau cả phần trước `#` thì Safari không báo `hashchange` (`FrameLoader::loadInSameDocument`), nên Back từ trò về trang chủ sẽ không đóng trò. App nghe thêm `popstate` — Safari báo cho mọi lần Back, Forward từ 2010 ([WebKit bug 41372](https://bugs.webkit.org/show_bug.cgi?id=41372)). Thử trên trình duyệt thì Chromium cũng không báo `hashchange` trong trường hợp này.
+- **Thêm lúc đang trong phòng cờ**: địa chỉ lưu có cả mã phòng (`#co-ba-nguoi/MÃ`). Mở app từ biểu tượng (không phải tải lại) với `?tro` mà sau `#` là chính trò đó thì vào thẳng trò, bỏ mã phòng — không thì lần nào mở app cũng vào lại một phòng đã tan. Tải lại trang thì vẫn giữ phòng.
+- Android, máy tính giữ cách cũ (manifest đổi theo trò, địa chỉ không đổi).
+- Biểu tượng đã thêm trước bản này vẫn mở trang chủ: xoá biểu tượng, mở trò trong Safari (mở trang rồi đợi vài giây cho bản mới tự tải lại), rồi thêm lại.
+
+`scripts/test-sao.js` thêm 14 bài (giờ 223): `index.html` không còn thẻ manifest viết sẵn; đoạn mã đầu trang gắn manifest cho Chrome Android, Samsung, Chrome máy tính, không gắn cho Safari iPhone, Chrome iPhone, iPhone không có `GestureEvent`, iPad, Safari máy Mac; tên "Thông Điệp"; không manifest thì vào trò địa chỉ có `?tro`, giữ mã phòng và `?ngay=`, về trang chủ bỏ `?tro`, trò lạ không gắn, tải lại thì bỏ rồi gắn lại khi mở trò; mở app iPhone với `?tro` (có hay không phần sau `#`) thì vào thẳng trò và nhớ, trong app không đổi địa chỉ; thêm lúc đang trong phòng thì mở app bỏ mã phòng, tải lại thì giữ; `?tro` mà `#` là trò khác thì theo địa chỉ; init nghe `popstate`; `theoDiaChi` gọi hai lần không mở, đóng lại. Thử phá 8 chỗ: bắt cả 8. Đã thử trên trình duyệt: Chrome — đúng một thẻ manifest, vào cờ thì đổi sang manifest của cờ, Back thì về manifest chính, địa chỉ không đổi; giả Safari (gỡ thẻ manifest, chặn `hashchange` khi khác phần trước `#`) — bấm sao cờ thì địa chỉ `/?tro=co-ba-nguoi#co-ba-nguoi`, Back đóng cờ về `/` (không có `hashchange` nào, `popstate` đóng), Forward mở lại, cờ tự đóng thì về `/`; không lỗi console. Chưa thử được trên iPhone thật.
+
 ## Cấu trúc
 
 ```
@@ -1990,7 +2003,7 @@ sw.js, manifest.webmanifest, icons/     phần PWA, chạy offline, cài lên m�
 icons/og-*.jpg             ảnh xem trước 1200×630 của trang chia sẻ từng trò
 <trò>/index.html           trang chia sẻ riêng của từng trò (mua-chin/, ho-sen/, co-vua-ba-nguoi/…), sinh bởi scripts/lam-trang-chia-se.py
 scripts/lam-trang-chia-se.py  tạo trang chia sẻ và ảnh xem trước cho mọi trò, từ một bảng tên, mô tả, hình
-<trò>/app.webmanifest      manifest riêng của từng trò (start_url ?tro=<trò>): cài từ trò nào thì mở app vào thẳng trò đó
+<trò>/app.webmanifest      manifest riêng của từng trò (start_url ?tro=<trò>): cài từ trò nào thì mở app vào thẳng trò đó (Chrome; Safari không có manifest, địa chỉ trong trò mang ?tro)
 scripts/lam-ke-khai.py     viết các <trò>/app.webmanifest từ manifest.webmanifest và danh sách trò trong assets/app.js
 scripts/build-data.py      gộp hai CSV nguồn -> data/cards.json
 scripts/test-core.js       39 kiểm thử lõi
@@ -2009,7 +2022,7 @@ scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlie
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-chomsao.js    10 kiểm thử Nối sao thành chòm: tự nối đúng thứ tự nét, chạm để xong ngay, giảm chuyển động, xoay sau khi xong
-scripts/test-sao.js        209 kiểm thử vòng đời MỌI ngôi sao, trang chia sẻ từng trò, nút Cài app, mở app vào thẳng trò đã cài, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        223 kiểm thử vòng đời MỌI ngôi sao, trang chia sẻ từng trò, nút Cài app, mở app vào thẳng trò đã cài, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ

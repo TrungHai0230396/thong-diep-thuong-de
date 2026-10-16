@@ -6,9 +6,19 @@
 <title>Thông Điệp Của Thượng Đế</title>
 <meta name="description" content="Mỗi ngày một thông điệp. Nhận rồi thì để nó đi.">
 <meta name="theme-color" content="#0d0b1a">
-<link rel="manifest" href="manifest.webmanifest">
+<!-- Manifest chỉ gắn cho trình duyệt đọc lại manifest mỗi lần nó đổi (Chrome, Edge, Samsung…). Safari và mọi trình duyệt
+     trên iPhone, iPad (đều là WebKit) đọc manifest MỘT lần lúc tải trang rồi giữ luôn, nên app.js đổi manifest theo trò
+     cũng như không: "Thêm vào MH chính" vẫn lấy start_url của manifest trang chủ, app mở ra trang chủ. Không có manifest
+     thì Safari lưu đúng địa chỉ đang xem — app.js cho địa chỉ mang ?tro=<trò> lúc đang ở trong trò. GestureEvent chỉ
+     WebKit của Apple có (cả iPad tự xưng là Mac); chữ iPhone, iPad là phòng hờ. -->
+<script>(function () {
+  var ua = navigator.userAgent;
+  if ('GestureEvent' in window || /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)) return;
+  var l = document.createElement('link'); l.rel = 'manifest'; l.href = 'manifest.webmanifest'; document.head.appendChild(l);
+})();</script>
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Thông Điệp">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
