@@ -362,7 +362,9 @@ console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò �
   const goc = path.join(__dirname, '..'), mien = 'https://thong-diep-thuong-de.vercel.app/';
   const mf = JSON.parse(fs.readFileSync(path.join(goc, 'manifest.webmanifest'), 'utf8'));
   const tuyet = (u, ve) => new URL(u, ve).href;
-  const DS = [...khoiSao.matchAll(/duong:\s*'([^']+)'[^}]*?trang:\s*'([^']+)'/g)].map(m => ({ duong: m[1], trang: m[2] }));
+  const lay = (dong, k) => (dong.match(new RegExp(k + ":\\s*'([^']*)'")) || [])[1];
+  const DS = [...khoiSao.matchAll(/\{[^{}]*\}/g)].map(m => ({ duong: lay(m[0], 'duong'), trang: lay(m[0], 'trang'), tieuDe: lay(m[0], 'tieuDe'), tenApp: lay(m[0], 'tenApp') }))
+    .filter(t => t.duong && t.trang);
   const hong = [];
   for (const t of DS) {
     let m = null;
@@ -372,9 +374,10 @@ console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò �
     if (tuyet(m.start_url, ve) !== mien + '?tro=' + t.duong) hong.push(`${t.duong}: start_url ${m.start_url}`);
     if (tuyet(m.scope, ve) !== mien) hong.push(`${t.duong}: scope ${m.scope}`);
     if (JSON.stringify(m.icons.map(i => tuyet(i.src, ve))) !== JSON.stringify(mf.icons.map(i => tuyet(i.src, mien + 'manifest.webmanifest')))) hong.push(`${t.duong}: icons`);
-    for (const k of ['name', 'short_name', 'description', 'lang', 'display', 'orientation', 'background_color', 'theme_color']) if (m[k] !== mf[k]) hong.push(`${t.duong}: ${k}`);
+    for (const k of ['description', 'lang', 'display', 'orientation', 'background_color', 'theme_color']) if (m[k] !== mf[k]) hong.push(`${t.duong}: ${k}`);
+    if (m.short_name !== t.tenApp || m.name !== (t.tieuDe || '').split(' — ')[0]) hong.push(`${t.duong}: tên ${m.name} / ${m.short_name}`);
   }
-  ok(`manifest chính có id "/"; đủ ${DS.length} manifest riêng (mỗi trò một): cùng id "/" — vẫn một app —, start_url ?tro=<trò>, scope là cả trang, tên và biểu tượng như manifest chính`,
+  ok(`manifest chính có id "/"; đủ ${DS.length} manifest riêng (mỗi trò một): cùng id "/" — vẫn một app —, start_url ?tro=<trò>, scope là cả trang, biểu tượng như manifest chính, tên là tên trò (short_name = tenApp, name = tieuDe bỏ phần sau " — ")`,
      mf.id === '/' && DS.length >= 14 && !hong.length, hong.slice(0, 3).join('; '));
   const vc = JSON.parse(fs.readFileSync(path.join(goc, 'vercel.json'), 'utf8'));
   ok('Vercel trả manifest của trò đúng kiểu application/manifest+json, không cache lâu',
@@ -386,13 +389,15 @@ console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò �
   /* keKhai: trang có thẻ manifest (Chrome) hay không (Safari, mọi trình duyệt trên iPhone — xem index.html).
      iphone: navigator.standalone như app mở từ màn hình chính iPhone. diaChiNay(): địa chỉ lúc này, sau mọi replaceState. */
   function moTrang({ url = mien, app = false, iphone = false, taiLai = false, kho = {}, dangMo = null, keKhai = true } = {}) {
-    const u = new URL(url), kq = { kho, link: 'manifest.webmanifest', diaChi: null, nghe: {} };
+    const u = new URL(url), kq = { kho, link: 'manifest.webmanifest', ten: 'Thông Điệp', diaChi: null, nghe: {}, boHop: 0 };
     const link = { getAttribute: () => kq.link, setAttribute: (k, v) => { kq.link = v; } };
+    const theTen = { getAttribute: () => kq.ten, setAttribute: (k, v) => { kq.ten = v; } };
     const loc = { search: u.search, hash: u.hash, pathname: u.pathname };
     const moiTruong = {
       SAO: DS, navigator: { standalone: iphone }, matchMedia: () => ({ matches: app }),
       localStorage: { getItem: (k) => (k in kho ? kho[k] : null), setItem: (k, v) => { kho[k] = String(v); }, removeItem: (k) => { delete kho[k]; } },
-      document: { querySelector: (q) => (q === 'link[rel="manifest"]' && keKhai ? link : null) },
+      document: { querySelector: (q) => (q === 'link[rel="manifest"]' ? (keKhai ? link : null) : q === 'meta[name="apple-mobile-web-app-title"]' ? theTen : null) },
+      CA: { xoaNhacCai: () => { kq.boHop++; } },
       location: loc,
       history: { state: null, replaceState: (a, b, d) => { kq.diaChi = d; const v = new URL(d, mien); Object.assign(loc, { search: v.search, hash: v.hash, pathname: v.pathname }); } },
       performance: { getEntriesByType: () => [{ type: taiLai ? 'reload' : 'navigate' }] },
@@ -508,6 +513,34 @@ console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò �
      /addEventListener\('hashchange', theoDiaChi\);[\s\S]{0,600}addEventListener\('popstate', theoDiaChi\);/.test(nguon));
   ok('theoDiaChi gọi hai lần liền (popstate rồi hashchange) không mở, đóng trò lần nữa',
      /function theoDiaChi\(\) \{[\s\S]{0,200}if \(s\) \{ if \(saoDangMo !== s\) moSao\(s\); \}\s*else if \(saoDangMo\) dongSao\(true\);/.test(nguon));
+
+  /* Tên gợi ý: người dùng "khi bấm thêm màn hình chính luôn ra thông điệp, mỗi game bạn tự sửa lại tên gợi ý đó cho đúng" */
+  const tenDai = DS.filter(t => !t.tenApp || [...t.tenApp].length > 13);
+  const trungTen = DS.filter((t, i) => DS.findIndex(x => x.tenApp === t.tenApp) !== i);
+  ok('trò nào cũng có tên app riêng (tenApp), không quá 13 chữ — dưới biểu tượng iPhone chỉ hiện chừng 12 chữ (đo bằng phông Apple: dài cỡ "Authenticator" còn vừa) —, không trùng nhau',
+     DS.length >= 14 && !tenDai.length && !trungTen.length, tenDai.concat(trungTen).map(t => t.duong + ': ' + t.tenApp).join('; '));
+  ok('tên gốc "Thông Điệp" khớp cả ba chỗ: thẻ trong index.html, short_name của manifest chính, TEN_GOC_APP trong app.js',
+     (dau.match(/<meta name="apple-mobile-web-app-title" content="([^"]+)">/) || [])[1] === mf.short_name && nguon.includes(`const TEN_GOC_APP = '${mf.short_name}';`));
+  for (const keKhai of [false, true]) {
+    const t = moTrang({ url: mien, keKhai });
+    const luc0 = t.ten;
+    t.datThang('#co-ba-nguoi'); t.datKeKhai('co-ba-nguoi');
+    const trongCo = t.ten;
+    t.datKeKhai('khong-co');
+    const trongLa = t.ten;
+    t.datKeKhai(null);
+    ok(`${keKhai ? 'Chrome' : 'iPhone'}: thẻ tên gợi ý — vào cờ thì "Cờ ba người", trò lạ hay về trang chủ thì "Thông Điệp"`,
+       luc0 === 'Thông Điệp' && trongCo === 'Cờ ba người' && trongLa === 'Thông Điệp' && t.ten === 'Thông Điệp', `${luc0} → ${trongCo} → ${trongLa} → ${t.ten}`);
+  }
+  /* Android: Chrome bỏ hộp cài đã đưa khi manifest đổi (DidUpdateWebManifestURL → Stop → ResetBindings) rồi đưa hộp mới */
+  const ch = moTrang({ url: mien });
+  ch.datKeKhai('co-ba-nguoi');
+  const sauVao = ch.boHop;
+  ch.datKeKhai('co-ba-nguoi');
+  const vaoLai = ch.boHop;
+  ch.datKeKhai(null);
+  ok('Chrome: manifest đổi (vào trò, về trang chủ) thì bỏ hộp cài đang cất — hộp đó Chrome đã bỏ; manifest không đổi thì giữ',
+     ch.boHop === 2 && sauVao === 1 && vaoLai === 1, `${sauVao}, ${vaoLai}, ${ch.boHop}`);
 }
 
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
@@ -522,5 +555,72 @@ console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
   ok(`${can.length} #id mà app.js dùng đều có trong index.html`, !thieu.length, thieu.join(', '));
 }
 
-console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
-process.exit(fail ? 1 : 0);
+console.log('\n— Bảng cài app: nút "Cài app" bấm được, không bao giờ im —');
+let choBangCai = Promise.resolve();                  // bấm nút là việc async: tổng kết ở cuối tệp đợi nó xong
+{
+  /* Người dùng: "trên android bấm vô chữ cài app, app ko đc cài". Nút trong bảng mang cùng id với nút cài trên thanh trên
+     cùng (thêm 14/10), $() lấy trúng nút trên thanh, nút trong bảng không được gắn gì. Chạy nguyên moCaiApp trên một trang
+     giả, $() trả phần tử đầu tiên theo thứ tự trong trang — thanh trên cùng (index.html) đứng trước bảng. */
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const cat = (ten) => { const a = nguon.indexOf(`function ${ten}(`); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
+  const TEN = Object.fromEntries([...khoiSao.matchAll(/duong:\s*'([^']+)'[^}]*?tenApp:\s*'([^']+)'/g)].map(m => [m[1], m[2]]));
+  const idTrang = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
+  function moBang({ loai = 'nhacCai', hop = null, dangMo = null } = {}) {
+    const kq = { mo: [], dong: 0, bao: [], tt: null, bo: 0 };
+    const trang = Object.fromEntries([...idTrang].map(id => [id, { id, tu: 'trang' }]));
+    let bang = {};
+    const moiTruong = {
+      loaiCai: () => loai, linkCaiApp: () => 'https://thong-diep-thuong-de.vercel.app/co-vua-ba-nguoi/',
+      toast: (c) => kq.bao.push(c), esc: (c) => String(c), chepTay: () => {},
+      navigator: { userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/129.0.0.0 Mobile Safari/537.36', maxTouchPoints: 5 },
+      location: { host: 'thong-diep-thuong-de.vercel.app' }, ICO_CHIA_SE: '', ICO_THEM: '', ICO_BA_CHAM: '',
+      tenAppCua: (d) => TEN[d] || 'Thông Điệp', docTroCai: () => null, saoDangMo: dangMo,
+      CA: { cachChiaSe: () => ({ nut: 'thanhDuoi', bang: 'keo' }), laIpad: () => false, tenTrongApp: () => null,
+            linkSafari: () => null, linkChrome: () => null, nhacCai: () => hop, xoaNhacCai: () => { kq.bo++; hop = null; },
+            ghiTT: (t) => { kq.tt = t; }, docTT: () => null },
+      openSheet: (t, h) => {
+        kq.mo.push(h); bang = {};
+        for (const m of h.matchAll(/<(\w+)[^>]*\bid="([^"]+)"[^>]*>([^<]*)</g)) bang[m[2]] = { id: m[2], tu: 'bang', chu: m[3].trim() };
+      },
+      closeSheet: () => { kq.dong++; },
+      $: (s) => { const id = s.replace(/^#/, ''); return trang[id] || bang[id] || null; },
+    };
+    new Function(...Object.keys(moiTruong), cat('moCaiApp') + '\nmoCaiApp();')(...Object.values(moiTruong));
+    kq.nut = Object.values(bang).find(e => e.chu === 'Cài app');
+    return kq;
+  }
+  const hopCai = (chon) => ({ prompt: () => Promise.resolve({ outcome: chon }), userChoice: Promise.resolve({ outcome: chon, platform: 'web' }) });
+  const hopChet = () => ({ prompt: () => Promise.reject(new Error('The prompt() method was called on an event that is no longer valid.')), userChoice: new Promise(() => {}) });
+  const tay = (h) => /Cài đặt ứng dụng/.test(h || '');
+
+  const b0 = moBang({ hop: hopCai('accepted') });
+  ok('Android có hộp cài: nút "Cài app" trong bảng có id riêng (không trùng phần tử nào của index.html) và được gắn việc',
+     !!b0.nut && !idTrang.has(b0.nut.id) && typeof b0.nut.onclick === 'function', b0.nut ? b0.nut.id : 'không thấy nút');
+  choBangCai = (async () => {
+    if (b0.nut && b0.nut.onclick) await b0.nut.onclick();
+    ok('bấm "Cài app", người dùng đồng ý: gọi hộp cài của Chrome, đóng bảng, báo đang cài, nhớ đã cài',
+       b0.dong === 1 && b0.bao.includes('Đang cài app…') && b0.tt && b0.tt.daCai === true && b0.bo >= 1, JSON.stringify({ dong: b0.dong, bao: b0.bao }));
+    const b1 = moBang({ hop: hopCai('dismissed') });
+    if (b1.nut && b1.nut.onclick) await b1.nut.onclick();
+    ok('bấm "Cài app" rồi bấm Huỷ: đóng bảng, không báo gì', b1.dong === 1 && !b1.bao.length && !b1.tt);
+    const b2 = moBang({ hop: hopChet() });
+    if (b2.nut && b2.nut.onclick) await b2.nut.onclick();
+    ok('hộp cài đã chết (Chrome bỏ khi manifest đổi): không im — bảng chuyển sang cách cài bằng menu Chrome',
+       b2.mo.length === 2 && tay(b2.mo[1]) && b2.dong === 0, `${b2.mo.length} lần mở bảng`);
+    ok('bảng cài trên iPhone gọi đúng tên sẽ hiện dưới biểu tượng: trong cờ là "Cờ ba người", ở trang chủ là "Thông Điệp"',
+       /Mở <b>Cờ ba người<\/b> từ màn hình chính/.test(moBang({ loai: 'iosSafari', dangMo: { duong: 'co-ba-nguoi' } }).mo[0]) &&
+       /Mở <b>Thông Điệp<\/b> từ màn hình chính/.test(moBang({ loai: 'iosSafari' }).mo[0]));
+    const b4 = moBang({ hop: null, loai: 'nhacCai' });
+    if (b4.nut && b4.nut.onclick) await b4.nut.onclick();
+    ok('lúc bấm không còn hộp cài nào: cũng chuyển sang cách cài bằng menu', b4.mo.length === 2 && tay(b4.mo[1]));
+    const idApp = [...new Set([...nguon.matchAll(/id="([^"$]+)"/g)].map(m => m[1]))];
+    const trung = idApp.filter(id => idTrang.has(id));
+    ok('không id nào trong các bảng app.js dựng trùng id của index.html — trùng thì $() lấy phần tử của trang, nút trong bảng thành nút chết',
+       !trung.length, trung.join(', '));
+  })();
+}
+
+choBangCai.catch((e) => ok('bài kiểm bảng cài app chạy hết', false, e.message)).then(() => {
+  console.log(`\n${fail ? '✗' : '✓'} ${pass} đạt, ${fail} lỗi\n`);
+  process.exit(fail ? 1 : 0);
+});

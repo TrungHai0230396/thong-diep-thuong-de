@@ -14,6 +14,8 @@ const { ymd, cardFor, newSeed } = self.TDTD;
      hinh : 'sao5' | 'lap-lanh' | 'sao4' | 'hoa' | chuỗi path SVG riêng
      mo   : hàm chạy khi bấm vào
      tieuDe, trang (không bắt buộc): tên riêng của trò, và trang riêng mang tên đó để chia sẻ link — xem linkTro()
+     tenApp (trò có trang thì phải có): tên dưới biểu tượng khi cài app từ trò này — ngắn, dưới biểu tượng iPhone chỉ
+       hiện chừng 12 chữ; xem datTenGoiY(), scripts/lam-ke-khai.py
      nutCai (không bắt buộc): trò có nút "Cài app" riêng — người vào thẳng từ link không thấy trang chính; xem themNutCaiApp()
    Bỏ một ngôi sao thì xoá dòng của nó, hoặc thêm bat: false.
    Các sao tự rải ngẫu nhiên, không bao giờ đè lên nhau, cũng không đè chữ.
@@ -36,33 +38,33 @@ const HINH_SAO = {
 
 const SAO = [
   { id: 'sao-game', mau: '#8fd6c2', hinh: 'lap-lanh',  nhan: 'Mùa chín, đưa nắng qua cho trái chín',
-    duong: 'mua-chin',  khung: '.game',    mun: 'TDTD_GAME', tieuDe: 'Mùa Chín — đưa nắng cho trái chín', trang: 'mua-chin/', nutCai: true },
+    duong: 'mua-chin',  khung: '.game',    mun: 'TDTD_GAME', tieuDe: 'Mùa Chín — đưa nắng cho trái chín', tenApp: 'Mùa Chín', trang: 'mua-chin/', nutCai: true },
   { id: 'sao-hoadang', mau: '#f0a860', hinh: 'hoa',    nhan: 'Thả đèn hoa đăng, buông điều nặng lòng',
-    duong: 'tha-den',  khung: '.hoadang', mun: 'TDTD_HOADANG', tieuDe: 'Thả đèn hoa đăng', trang: 'tha-den-hoa-dang/', nutCai: true },
+    duong: 'tha-den',  khung: '.hoadang', mun: 'TDTD_HOADANG', tieuDe: 'Thả đèn hoa đăng', tenApp: 'Hoa đăng', trang: 'tha-den-hoa-dang/', nutCai: true },
   { id: 'sao-ho',   mau: '#7ec8e3', hinh: 'giot',      nhan: 'Hồ nước, có đàn ếch',
-    duong: 'ho-sen',   khung: '.ho',      mun: 'TDTD_HO', tieuDe: 'Hồ sen và đàn ếch', trang: 'ho-sen/', nutCai: true },
+    duong: 'ho-sen',   khung: '.ho',      mun: 'TDTD_HO', tieuDe: 'Hồ sen và đàn ếch', tenApp: 'Hồ sen', trang: 'ho-sen/', nutCai: true },
   { id: 'sao-tho',  mau: '#b8a8e8', hinh: 'tia',       nhan: 'Hộp thở, thở theo nhịp bốn',
-    duong: 'hoi-tho',   khung: '.hopho',   mun: 'TDTD_THO', tieuDe: 'Hộp thở — thở cho dịu lại', trang: 'hop-tho/', nutCai: true },
+    duong: 'hoi-tho',   khung: '.hopho',   mun: 'TDTD_THO', tieuDe: 'Hộp thở — thở cho dịu lại', tenApp: 'Hộp thở', trang: 'hop-tho/', nutCai: true },
   { id: 'sao-chom', mau: '#f2ead0', hinh: 'sao4',      nhan: 'Nối sao thành chòm',
-    duong: 'noi-sao',  khung: '.chomsao', mun: 'TDTD_CHOMSAO', tieuDe: 'Nối sao thành chòm', trang: 'noi-sao-thanh-chom/', nutCai: true },
+    duong: 'noi-sao',  khung: '.chomsao', mun: 'TDTD_CHOMSAO', tieuDe: 'Nối sao thành chòm', tenApp: 'Nối sao', trang: 'noi-sao-thanh-chom/', nutCai: true },
   { id: 'sao-troi', mau: '#aebff0', hinh: 'sao5',      nhan: 'Bầu trời thật đêm nay, ngay trên đầu bạn',
-    duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM', tieuDe: 'Bầu trời đêm nay', trang: 'bau-troi-dem-nay/', nutCai: true },
+    duong: 'troi-dem', khung: '.troidem', mun: 'TDTD_TROIDEM', tieuDe: 'Bầu trời đêm nay', tenApp: 'Bầu trời đêm', trang: 'bau-troi-dem-nay/', nutCai: true },
   { id: 'sao-phatam', mau: '#e8c37a', hinh: 'tia',     nhan: 'Luyện phát âm, xem miệng đặt lưỡi ở đâu',
-    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', trang: 'luyen-phat-am/', nutCai: true },
+    duong: 'phat-am',  khung: '.phatam',  mun: 'TDTD_PHATAM', tieuDe: 'Luyện phát âm tiếng Anh', tenApp: 'Phát âm', trang: 'luyen-phat-am/', nutCai: true },
   { id: 'sao-lich', mau: '#e58a7a', hinh: 'sao8',      nhan: 'Xem ngày tốt xấu, nên và không nên làm gì',
-    duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY', tieuDe: 'Xem ngày tốt xấu', trang: 'xem-ngay-tot-xau/', nutCai: true },
+    duong: 'xem-ngay', khung: '.xemngay', mun: 'TDTD_XEMNGAY', tieuDe: 'Xem ngày tốt xấu', tenApp: 'Xem ngày', trang: 'xem-ngay-tot-xau/', nutCai: true },
   { id: 'sao-so',   mau: '#b99ae8', hinh: 'sao6',      nhan: 'Thần số học: con số chủ đạo, biểu đồ ngày sinh',
-    duong: 'than-so',  khung: '.thanso',  mun: 'TDTD_THANSO', tieuDe: 'Thần số học', trang: 'than-so-hoc/', nutCai: true },
+    duong: 'than-so',  khung: '.thanso',  mun: 'TDTD_THANSO', tieuDe: 'Thần số học', tenApp: 'Thần số học', trang: 'than-so-hoc/', nutCai: true },
   { id: 'sao-ngu',  mau: '#f3dfa0', hinh: 'trang',     nhan: 'Nhạc ngủ: âm thanh và tần số ru ngủ, hẹn giờ tự tắt',
-    duong: 'nhac-ngu', khung: '.nhacngu', mun: 'TDTD_NGU', tieuDe: 'Nhạc ngủ — hẹn giờ tự tắt', trang: 'nhac-ngu/', nutCai: true },
+    duong: 'nhac-ngu', khung: '.nhacngu', mun: 'TDTD_NGU', tieuDe: 'Nhạc ngủ — hẹn giờ tự tắt', tenApp: 'Nhạc ngủ', trang: 'nhac-ngu/', nutCai: true },
   { id: 'sao-luanxa', mau: '#f2a7c3', hinh: 'sen',     nhan: 'Thiền luân xa: tụng chủng tử theo đàn tanpura và chuông xoay, qua bảy luân xa',
-    duong: 'thien-luan-xa', khung: '.luanxa', mun: 'TDTD_LUANXA', tieuDe: 'Thiền bảy luân xa', trang: 'thien-luan-xa/', nutCai: true },
+    duong: 'thien-luan-xa', khung: '.luanxa', mun: 'TDTD_LUANXA', tieuDe: 'Thiền bảy luân xa', tenApp: 'Thiền luân xa', trang: 'thien-luan-xa/', nutCai: true },
   { id: 'sao-laptrinh', mau: '#8fd0ff', hinh: 'khoi',  nhan: 'Robot thắp sao: 100 bài lập trình cho bé 6–10 tuổi',
-    duong: 'lap-trinh', khung: '.laptrinh', mun: 'TDTD_LAPTRINH', tieuDe: 'Robot thắp sao — lập trình cho bé', trang: 'robot-thap-sao/', nutCai: true },
+    duong: 'lap-trinh', khung: '.laptrinh', mun: 'TDTD_LAPTRINH', tieuDe: 'Robot thắp sao — lập trình cho bé', tenApp: 'Thắp sao', trang: 'robot-thap-sao/', nutCai: true },
   { id: 'sao-sokoban', mau: '#f2c46b', hinh: 'thung', nhan: 'Đẩy thùng sao: Sokoban 100 màn, đẩy thùng vào ổ cho sáng lên',
-    duong: 'day-thung', khung: '.sokoban', mun: 'TDTD_SOKOBAN', tieuDe: 'Đẩy thùng sao — Sokoban', trang: 'day-thung-sao/', nutCai: true },
+    duong: 'day-thung', khung: '.sokoban', mun: 'TDTD_SOKOBAN', tieuDe: 'Đẩy thùng sao — Sokoban', tenApp: 'Đẩy thùng', trang: 'day-thung-sao/', nutCai: true },
   { id: 'sao-coba', mau: '#e9b3a8', hinh: 'coba', nhan: 'Cờ vua ba người: Trắng, Đen, Đỏ trên bàn lục giác, đấu với 2 máy hay mỗi người một máy qua mạng',
-    duong: 'co-ba-nguoi', khung: '.coba', mun: 'TDTD_COBA', tieuDe: 'Cờ vua ba người', trang: 'co-vua-ba-nguoi/', nutCai: true },
+    duong: 'co-ba-nguoi', khung: '.coba', mun: 'TDTD_COBA', tieuDe: 'Cờ vua ba người', tenApp: 'Cờ ba người', trang: 'co-vua-ba-nguoi/', nutCai: true },
 ];
 
 
@@ -268,13 +270,29 @@ function troLucMo(o) {
 const laApp = () => !!navigator.standalone || matchMedia('(display-mode: standalone)').matches;
 const docTroCai = () => { try { return localStorage.getItem(KHOA_TRO_CAI) || null; } catch (e) { return null; } };
 const ghiTroCai = (d) => { try { if (d) localStorage.setItem(KHOA_TRO_CAI, d); else localStorage.removeItem(KHOA_TRO_CAI); } catch (e) {} };
-/* Cài lúc này thì app mở vào đâu. Có manifest (Chrome): gắn manifest của trò. Không có (WebKit, xem index.html): địa chỉ
-   mang ?tro=<trò>. Trong app thì để địa chỉ yên — app đã cài rồi. */
+/* Cài lúc này thì app mở vào đâu, mang tên gì. Có manifest (Chrome): gắn manifest của trò — trong đó có cả trang mở đầu
+   lẫn tên. Không có (WebKit, xem index.html): địa chỉ mang ?tro=<trò>. Trong app thì để địa chỉ yên — app đã cài rồi. */
 function datKeKhai(dangMo) {
+  datTenGoiY(dangMo);
   const l = document.querySelector('link[rel="manifest"]'), app = laApp();
   if (!l) { if (!app) datTroDiaChi(coTro(dangMo) ? dangMo : null); return; }
   const href = keKhaiCua(app ? docTroCai() : dangMo);
-  if (l.getAttribute('href') !== href) l.setAttribute('href', href);
+  if (l.getAttribute('href') === href) return;
+  l.setAttribute('href', href);
+  /* Manifest đổi thì Chrome bỏ hộp cài đã đưa (DidUpdateWebManifestURL: Stop → ResetBindings), kiểm lại rồi đưa hộp mới
+     (caiapp.js tự cất). Giữ hộp cũ thì bấm Cài app là gọi prompt() vào một hộp đã chết, không có gì hiện ra. */
+  if (CA) CA.xoaNhacCai();
+}
+/* Tên gợi ý lúc "Thêm vào MH chính" trên iPhone. Người dùng: "khi bấm thêm màn hình chính luôn ra thông điệp, mỗi game
+   bạn tự sửa lại tên gợi ý đó cho đúng". Không có manifest thì Safari lấy tên ở thẻ apple-mobile-web-app-title — thẻ
+   này Safari tự đọc từ trang (mã WebKit không đụng tới, không giữ như manifest) — nên đang ở trò nào thì thẻ mang tên
+   ngắn của trò đó (tenApp), về trang chủ thì "Thông Điệp". Chrome lấy tên trong manifest của trò (short_name = tenApp,
+   scripts/lam-ke-khai.py viết). */
+const TEN_GOC_APP = 'Thông Điệp';
+const tenAppCua = (d) => (coTro(d) && SAO.find(s => s.duong === d).tenApp) || TEN_GOC_APP;
+function datTenGoiY(d) {
+  const m = document.querySelector('meta[name="apple-mobile-web-app-title"]'), ten = tenAppCua(d);
+  if (m && m.getAttribute('content') !== ten) m.setAttribute('content', ten);
 }
 /* Đổi ?tro trên địa chỉ, giữ nguyên phần còn lại (?ngay=…, #trò/mã phòng). replaceState: không thêm bước Back. Địa chỉ
    trong trò giờ khác trang chủ cả phần trước dấu #, mà Back qua hai địa chỉ như thế Safari không báo hashchange — nên
@@ -322,7 +340,7 @@ function moCaiApp() {
     (c.bang === 'keo' ? 'Kéo xuống, chọn ' : `Bấm <b>Xem thêm</b>${c.bang === 'caHai' ? ' (hoặc kéo xuống)' : ''}, chọn `) +
       `<span class="cai-lien"><b>Thêm vào MH chính</b> ${ICO_THEM}</span>.`,
     `Bấm <b>Thêm</b>.`,
-    `Mở <b>Thông Điệp</b> từ màn hình chính.`]);
+    `Mở <b>${esc(tenAppCua(saoDangMo && saoDangMo.duong))}</b> từ màn hình chính.`]);   // đúng tên gợi ý lúc này (datTenGoiY)
   /* Trong Zalo, Facebook…: gọi đúng tên app, nút mở thẳng bằng Safari (iOS 17 trở lên) hay Chrome, rồi link để
      chép, rồi menu của chính app đó — như Nhớ Nha (EscapeInApp). */
   const tenApp = CA.tenTrongApp(ua) || 'ứng dụng này', iosApp = loai === 'trongAppIos';
@@ -334,8 +352,9 @@ function moCaiApp() {
       <p class="cai-luu">Không mở được thì bấm ${ICO_BA_CHAM} ở góc trên, chọn mở bằng trình duyệt. Mở được rồi thì bấm nút
         <b>?</b> → <b>Cài app vào điện thoại</b>.</p>`;
   const than = {
-    nhacCai: `<button class="primary wide" id="btn-cai">Cài app</button>`,
-    daCaiTrinhDuyet: `<p>App đã cài trên máy này. Mở <b>Thông Điệp</b> từ biểu tượng ngoài màn hình chính.</p>`,
+    nhacCai: `<button class="primary wide" id="btn-cai-ngay">Cài app</button>`,
+    /* Android: lúc cài, app ghi trò đang mở (appinstalled, dùng chung kho với Chrome) — tên dưới biểu tượng theo trò đó */
+    daCaiTrinhDuyet: `<p>App đã cài trên máy này. Mở <b>${esc(tenAppCua(docTroCai()))}</b> từ biểu tượng ngoài màn hình chính.</p>`,
     iosSafari: buocIos,
     iosKhac: buocIos +
       `<p class="cai-luu">Không thấy mục <b>Thêm vào MH chính</b>? Mở trang này bằng <b>Safari</b> rồi bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>.</p>
@@ -350,17 +369,21 @@ function moCaiApp() {
     mayTinh: `<p>Trên điện thoại, mở <b>${location.host}</b> rồi bấm nút <b>?</b> → <b>Cài app vào điện thoại</b>. Trên máy tính, Chrome và Edge có biểu tượng cài ở cuối thanh địa chỉ.</p>`,
   };
   than.trongApp = than.trongAppAndroid;
-  openSheet('Cài app vào điện thoại', `
+  const dau = `
     <div class="cai-dau"><img src="icons/icon-192.png" alt="" width="52" height="52">
       <p>Mở bằng một chạm từ màn hình chính, chạy toàn màn hình, mất mạng vẫn mở được. Không cần vào kho ứng dụng, không tốn dung lượng.</p></div>
-    ${than[loai] || than.mayTinh}`);
-  const nut = $('#btn-cai');
+    `;
+  openSheet('Cài app vào điện thoại', dau + (than[loai] || than.mayTinh));
+  /* Nút trong bảng mang id riêng. Bản trước nút này cũng mang id btn-cai, trùng nút cài trên thanh trên cùng (thêm ngày
+     14/10): $() lấy trúng nút trên thanh, nút "Cài app" trong bảng không được gắn gì — người dùng báo "trên android bấm
+     vô chữ cài app, app ko đc cài". Chrome không đưa hộp cài (hộp đã hết hạn, đã dùng) thì chỉ cách cài bằng menu. */
+  const nut = $('#btn-cai-ngay');
   if (nut) nut.onclick = async () => {
     const e = CA.nhacCai();
-    if (!e) { closeSheet(); return; }
-    e.prompt();
-    const { outcome } = await e.userChoice.catch(() => ({ outcome: 'dismissed' }));
-    CA.xoaNhacCai();
+    CA.xoaNhacCai();                                   // mỗi hộp cài chỉ gọi prompt() được một lần
+    let outcome = null;
+    if (e) try { await e.prompt(); ({ outcome } = await e.userChoice); } catch (loi) {}
+    if (!outcome) { openSheet('Cài app vào điện thoại', dau + than.androidTay); return; }
     closeSheet();
     if (outcome === 'accepted') { CA.ghiTT({ ...(CA.docTT() || {}), daCai: true }); toast('Đang cài app…'); }
   };
