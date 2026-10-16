@@ -2023,6 +2023,8 @@ Người dùng báo: "Trên android bấm vô chữ cài app, app ko đc cài". 
 - **Hộp cài đã chết.** Manifest đổi thì Chrome bỏ hộp cài đã đưa (`DidUpdateWebManifestURL` → `Stop` → `ResetBindings`), kiểm lại rồi đưa hộp mới ([mã Chromium](https://github.com/chromium/chromium/blob/main/components/webapps/browser/banners/app_banner_manager.cc)). Từ bản 15/10, vào trò là manifest đổi, nên app bỏ hộp đang cất ngay lúc đổi; hộp mới tới thì `caiapp.js` cất lại. Giữ hộp cũ thì bấm Cài app là gọi `prompt()` vào một hộp đã chết.
 - Bấm mà không có hộp, hay hộp báo lỗi, thì bảng chuyển sang hai bước cài bằng menu Chrome — không còn nút bấm mà im.
 
+Người dùng thử trên Android thật ngay sau khi đẩy lên: vẫn không phản ứng — máy còn chạy bản cũ đang cất sẵn (có bản mới lúc đang dùng dở thì app đợi rời trang mới tự tải lại). Mở lại trang thì bấm Cài app hiện hộp cài, cài được.
+
 ### Tên dưới biểu tượng theo trò
 
 Người dùng: "khi bấm thêm màn hình chính luôn ra thông điệp, mỗi game bạn tự sửa lại tên gợi ý đó cho đúng". Dưới biểu tượng iPhone chỉ hiện chừng 12 chữ, nên mỗi trò có một tên ngắn (`tenApp` trong danh sách `SAO`): Mùa Chín, Hoa đăng, Hồ sen, Hộp thở, Nối sao, Bầu trời đêm, Phát âm, Xem ngày, Thần số học, Nhạc ngủ, Thiền luân xa, Thắp sao, Đẩy thùng, Cờ ba người. Đo bằng phông của Apple (`system-ui` trên máy Mac, cỡ 12): dài nhất là "Thiền luân xa" (74,8). Apple vẫn hiện đủ "Authenticator" (76,7), còn "Find My iPhone" (86,6) thì phải rút thành "Find iPhone"; tên đủ như "Cờ vua ba người" (91,6), "Robot thắp sao" (85,7) sẽ bị cắt.
@@ -2032,6 +2034,16 @@ Người dùng: "khi bấm thêm màn hình chính luôn ra thông điệp, mỗ
 - Thêm từ trang chủ vẫn là "Thông Điệp".
 
 `scripts/test-sao.js` thêm 12 bài (giờ 235): tên ngắn đủ cho mọi trò, không quá 13 chữ, không trùng; "Thông Điệp" khớp ở `index.html`, manifest chính, `app.js`; thẻ tên đổi theo trò, trò lạ hay về trang chủ thì về "Thông Điệp" (cả trang có lẫn không có manifest); manifest của trò mang đúng tên; manifest đổi thì bỏ hộp cài cũ, không đổi thì giữ. Chạy nguyên `moCaiApp` trên trang giả mà `$()` lấy phần tử theo thứ tự trong trang: nút trong bảng có id riêng và được gắn việc; bấm, đồng ý thì gọi hộp cài, đóng bảng, báo, nhớ đã cài; bấm Huỷ thì đóng im; hộp chết hay không còn hộp thì chuyển sang cách cài bằng menu; bảng iPhone ghi đúng tên; không id nào trong các bảng `app.js` dựng trùng id của `index.html`. Thử phá 8 chỗ (đưa id nút về `btn-cai`, không bỏ hộp cũ, hộp chết thì đóng im, quên đổi tên, bảng iPhone ghi "Thông Điệp", manifest cờ tên cũ, tên quá dài, tên gốc lệch): bắt cả 8 — riêng đưa id về `btn-cai` thì 6 bài báo lỗi. Đã thử trên trình duyệt giả điện thoại Android: vào cờ thì tên gợi ý thành "Cờ ba người", manifest đổi sang của cờ (`short_name` "Cờ ba người", `name` "Cờ vua ba người"), hộp cài lúc mở trang bị bỏ; bấm thật nút Cài app trong trò lúc chưa có hộp mới thì bảng chỉ hai bước cài bằng menu; giả Chrome đưa hộp mới rồi bấm thật nút "Cài app" trong bảng thì hộp mới được gọi đúng một lần (hộp cũ không), bảng đóng, báo "Đang cài app…"; nút trên thanh trên cùng vẫn mở bảng như cũ; về trang chủ thì tên là "Thông Điệp"; không lỗi console. Chưa thử trên iPhone, Android thật.
+
+### Bấm "Cài app" trên Android là cài luôn
+
+Người dùng: "bấm vô chữ cài app là cài luôn bỏ cái popup giải thích đi". Máy có hộp cài của Chrome (Android: Chrome, Edge, Samsung…): bấm Cài app — nút trên thanh trên cùng, nút trong trò, hay mục ? → Cài app vào điện thoại — là gọi thẳng hộp cài của Chrome, không qua bảng giải thích.
+
+- `moCaiApp` giờ chỉ quyết định: đang trong app thì báo; có hộp cài thì `caiNgay`; còn lại mở `bangCai`, bảng các bước.
+- `caiNgay` gọi `prompt()` ngay trong lúc bấm, không `await` gì trước nó — Chrome chỉ cho `prompt()` đi cùng cử chỉ của người dùng (`ConsumeTransientUserActivation` trong `BeforeInstallPromptEvent::prompt`, [mã Chromium](https://github.com/chromium/chromium/blob/main/third_party/blink/renderer/modules/app_banner/before_install_prompt_event.cc)). Đang mở bảng Giới thiệu thì đóng trước. Hộp đã chết hay không còn hộp thì mới mở bảng hai bước cài bằng menu Chrome.
+- iPhone, iPad: Apple không có hộp cài nào cho trang web gọi, nên vẫn là bảng các bước Chia sẻ → Thêm vào MH chính. Trong Zalo, Facebook… vẫn là bảng mở bằng Chrome, Safari.
+
+`scripts/test-sao.js` (giờ 246, cùng 10 bài của sao Bida lỗ): mục bảng cài viết lại thành 8 bài, chạy nguyên `moCaiApp`, `caiNgay`, `bangCai` trên trang giả — có hộp cài thì bấm là gọi `prompt()` ngay trong lúc bấm, không mở bảng, đồng ý thì báo và nhớ đã cài; Huỷ thì im; hộp chết, hết hộp thì mở bảng cách cài bằng menu; đang mở bảng Giới thiệu thì đóng rồi gọi hộp; Android chưa có hộp và iPhone vẫn là bảng các bước (iPhone ghi đúng tên); không id nào trùng `index.html`. Thử phá 5 chỗ (Android vẫn mở bảng, có `await` trước `prompt()`, hộp chết thì im, không đóng bảng Giới thiệu, Huỷ mà vẫn báo): bắt cả 5. Đã thử trên trình duyệt giả Android, bấm thật: nút trên thanh trên cùng, nút Cài app trong cờ (sau khi manifest đổi, Chrome đưa hộp mới) và nút trong bảng Giới thiệu đều gọi thẳng hộp cài, không mở bảng, báo "Đang cài app…"; không có hộp thì bảng hai bước cài bằng menu; cài xong (Chrome báo `appinstalled` lúc ở cờ) bấm lại thì bảng ghi "App đã cài… Mở **Cờ ba người**"; không lỗi console. Chưa thử trên Android thật.
 
 ## Bida lỗ
 
@@ -2098,7 +2110,7 @@ scripts/lam-datlien.py     đổi bản đồ Natural Earth 1:110m thành datlie
 assets/mua.js              đọc dự báo mưa thành câu tiếng Việt: hàm thuần, không đụng mạng
 scripts/test-mua.js        58 kiểm thử phần đọc mưa, nặng nhất là bẫy lệch một tiếng
 scripts/test-chomsao.js    10 kiểm thử Nối sao thành chòm: tự nối đúng thứ tự nét, chạm để xong ngay, giảm chuyển động, xoay sau khi xong
-scripts/test-sao.js        235 kiểm thử vòng đời MỌI ngôi sao, trang chia sẻ từng trò, nút Cài app, bảng cài app, mở app vào thẳng trò đã cài, tự tải lại khi có bản mới, tệp lịch .ics
+scripts/test-sao.js        246 kiểm thử vòng đời MỌI ngôi sao, trang chia sẻ từng trò, nút Cài app, bảng cài app, mở app vào thẳng trò đã cài, tự tải lại khi có bản mới, tệp lịch .ics
 scripts/test-phatam.js     192 kiểm thử trò phát âm: nội dung, bài nghe, hình vẽ, hình động
 assets/dophatam.js         đo phát âm bằng âm học: hàm thuần, nhận mẫu âm thanh trả về kết quả
 scripts/test-dophatam.js   26 kiểm thử máy đo: tín hiệu dựng, tám giọng mẫu, chỗ ồn, nói nhỏ

@@ -326,9 +326,32 @@ function linkCaiApp() {
   return saoDangMo ? linkTro(saoDangMo) : location.origin + location.pathname;
 }
 
+/* Bấm Cài app: nút trên thanh trên cùng, nút trong trò, mục ? → Cài app vào điện thoại. Chrome có hộp cài thì cài luôn
+   — người dùng: "bấm vô chữ cài app là cài luôn bỏ cái popup giải thích đi". iPhone, trình duyệt trong Zalo, Facebook…
+   không có hộp cài nào trang web gọi được, nên ở đó vẫn là bảng các bước. */
 function moCaiApp() {
-  const loai = loaiCai(), link = linkCaiApp();
+  const loai = loaiCai();
   if (loai === 'daCai') { toast('Bạn đang dùng app rồi'); return; }
+  if (loai === 'nhacCai') { caiNgay(); return; }
+  bangCai(loai);
+}
+
+/* Gọi hộp cài của Chrome ngay trong lúc bấm: prompt() cần cử chỉ của người dùng, nên không await gì trước nó. Đang mở
+   bảng (mục ?) thì đóng lại cho hộp cài hiện trên trang. Hộp đã chết hay không còn hộp (Chrome bỏ hộp khi manifest đổi,
+   hộp đã dùng) thì mở bảng cách cài bằng menu Chrome — không để nút bấm mà im. */
+async function caiNgay() {
+  const e = CA.nhacCai();
+  CA.xoaNhacCai();                                   // mỗi hộp cài chỉ gọi prompt() được một lần
+  if (!$('#sheet-wrap').hidden) closeSheet();
+  let outcome = null;
+  if (e) try { await e.prompt(); ({ outcome } = await e.userChoice); } catch (loi) {}
+  if (!outcome) { bangCai('androidTay'); return; }
+  if (outcome === 'accepted') { CA.ghiTT({ ...(CA.docTT() || {}), daCai: true }); toast('Đang cài app…'); }
+}
+
+/* Bảng các bước, cho máy không có hộp cài: iPhone, iPad, trình duyệt trong Zalo, Facebook…, Android chưa đưa hộp cài. */
+function bangCai(loai) {
+  const link = linkCaiApp();
   const buoc = (ds) => `<ol class="cai-buoc">${ds.map((d, i) => `<li><span>${i + 1}</span><p>${d}</p></li>`).join('')}</ol>`;
   /* Các bước trên iPhone, iPad: giống hệt Nhớ Nha (nho-nha/src/ui/InstallSheet.tsx, ShareSteps) — nút Chia sẻ ở
      đâu, "Thêm vào MH chính" nằm sau "Xem thêm" hay phải kéo xuống, theo CA.cachChiaSe(). */
@@ -355,7 +378,6 @@ function moCaiApp() {
       <p class="cai-luu">Không mở được thì bấm ${ICO_BA_CHAM} ở góc trên, chọn mở bằng trình duyệt. Mở được rồi thì bấm nút
         <b>?</b> → <b>Cài app vào điện thoại</b>.</p>`;
   const than = {
-    nhacCai: `<button class="primary wide" id="btn-cai-ngay">Cài app</button>`,
     /* Android: lúc cài, app ghi trò đang mở (appinstalled, dùng chung kho với Chrome) — tên dưới biểu tượng theo trò đó */
     daCaiTrinhDuyet: `<p>App đã cài trên máy này. Mở <b>${esc(tenAppCua(docTroCai()))}</b> từ biểu tượng ngoài màn hình chính.</p>`,
     iosSafari: buocIos,
@@ -377,19 +399,6 @@ function moCaiApp() {
       <p>Mở bằng một chạm từ màn hình chính, chạy toàn màn hình, mất mạng vẫn mở được. Không cần vào kho ứng dụng, không tốn dung lượng.</p></div>
     `;
   openSheet('Cài app vào điện thoại', dau + (than[loai] || than.mayTinh));
-  /* Nút trong bảng mang id riêng. Bản trước nút này cũng mang id btn-cai, trùng nút cài trên thanh trên cùng (thêm ngày
-     14/10): $() lấy trúng nút trên thanh, nút "Cài app" trong bảng không được gắn gì — người dùng báo "trên android bấm
-     vô chữ cài app, app ko đc cài". Chrome không đưa hộp cài (hộp đã hết hạn, đã dùng) thì chỉ cách cài bằng menu. */
-  const nut = $('#btn-cai-ngay');
-  if (nut) nut.onclick = async () => {
-    const e = CA.nhacCai();
-    CA.xoaNhacCai();                                   // mỗi hộp cài chỉ gọi prompt() được một lần
-    let outcome = null;
-    if (e) try { await e.prompt(); ({ outcome } = await e.userChoice); } catch (loi) {}
-    if (!outcome) { openSheet('Cài app vào điện thoại', dau + than.androidTay); return; }
-    closeSheet();
-    if (outcome === 'accepted') { CA.ghiTT({ ...(CA.docTT() || {}), daCai: true }); toast('Đang cài app…'); }
-  };
   const chep = $('#btn-chep-cai');
   if (chep) chep.onclick = () => {
     const xong = () => toast(loai.startsWith('trongApp') ? `Đã chép link. Mở ${trinhDuyet}, dán vào ô địa chỉ.` : 'Đã chép link, dán vào trình duyệt nhé');

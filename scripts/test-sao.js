@@ -317,7 +317,7 @@ console.log('\n— Bảng cài app: link đưa ra Safari, Chrome giữ đúng tr
   ok('Mở bằng Chrome (Android) giữ nguyên trang phát âm', CA.linkChrome(tao(pa)).startsWith('intent://thong-diep-thuong-de.vercel.app/luyen-phat-am/#Intent;'), CA.linkChrome(tao(pa)));
   ok('trò không có trang riêng: link #trò cho Safari', tao(hd) === 'https://thong-diep-thuong-de.vercel.app/#tha-den');
   ok('không ở trò nào (mở từ nút ?): trang chính', tao(null) === 'https://thong-diep-thuong-de.vercel.app/');
-  ok('bảng cài app dùng đúng hàm này cho cả ba nút', /function moCaiApp\(\) \{\s*const loai = loaiCai\(\), link = linkCaiApp\(\);/.test(nguon) &&
+  ok('bảng cài app dùng đúng hàm này cho cả ba nút', /function bangCai\(loai\) \{\s*const link = linkCaiApp\(\);/.test(nguon) &&
      /CA\.linkSafari\(link\)/.test(nguon) && /CA\.linkChrome\(link\)/.test(nguon) && /writeText\(link\)/.test(nguon));
 }
 
@@ -555,20 +555,24 @@ console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');
   ok(`${can.length} #id mà app.js dùng đều có trong index.html`, !thieu.length, thieu.join(', '));
 }
 
-console.log('\n— Bảng cài app: nút "Cài app" bấm được, không bao giờ im —');
-let choBangCai = Promise.resolve();                  // bấm nút là việc async: tổng kết ở cuối tệp đợi nó xong
+console.log('\n— Bấm Cài app: Android cài luôn, máy khác mới có bảng các bước —');
+let choBangCai = Promise.resolve();                  // bấm là việc async: tổng kết ở cuối tệp đợi nó xong
 {
-  /* Người dùng: "trên android bấm vô chữ cài app, app ko đc cài". Nút trong bảng mang cùng id với nút cài trên thanh trên
-     cùng (thêm 14/10), $() lấy trúng nút trên thanh, nút trong bảng không được gắn gì. Chạy nguyên moCaiApp trên một trang
-     giả, $() trả phần tử đầu tiên theo thứ tự trong trang — thanh trên cùng (index.html) đứng trước bảng. */
+  /* Người dùng: "trên android bấm vô chữ cài app, app ko đc cài" (nút trong bảng trùng id với nút cài trên thanh trên cùng,
+     thành nút chết), rồi "bấm vô chữ cài app là cài luôn bỏ cái popup giải thích đi". Chạy nguyên moCaiApp, caiNgay, bangCai
+     trên một trang giả: $() trả phần tử đầu tiên theo thứ tự trong trang — các phần tử của index.html đứng trước bảng. */
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-  const cat = (ten) => { const a = nguon.indexOf(`function ${ten}(`); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
+  const cat = (ten) => { const a = nguon.search(new RegExp(`(async )?function ${ten}\\(`)); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
   const TEN = Object.fromEntries([...khoiSao.matchAll(/duong:\s*'([^']+)'[^}]*?tenApp:\s*'([^']+)'/g)].map(m => [m[1], m[2]]));
   const idTrang = new Set([...html.matchAll(/id="([^"]+)"/g)].map(m => m[1]));
-  function moBang({ loai = 'nhacCai', hop = null, dangMo = null } = {}) {
-    const kq = { mo: [], dong: 0, bao: [], tt: null, bo: 0 };
+  /* bangDangMo: đang mở một bảng khác (Giới thiệu) lúc bấm. goiNgay: số lần gọi prompt() ngay trong lúc bấm, trước mọi
+     await — Chrome đòi prompt() đi cùng cử chỉ của người dùng. */
+  function bam({ loai = 'nhacCai', hop = null, dangMo = null, bangDangMo = false } = {}) {
+    const kq = { mo: [], dong: 0, bao: [], tt: null, bo: 0, goi: 0 };
     const trang = Object.fromEntries([...idTrang].map(id => [id, { id, tu: 'trang' }]));
+    trang['sheet-wrap'].hidden = !bangDangMo;
     let bang = {};
+    if (hop) { const p = hop.prompt; hop.prompt = () => { kq.goi++; return p(); }; }
     const moiTruong = {
       loaiCai: () => loai, linkCaiApp: () => 'https://thong-diep-thuong-de.vercel.app/co-vua-ba-nguoi/',
       toast: (c) => kq.bao.push(c), esc: (c) => String(c), chepTay: () => {},
@@ -579,40 +583,44 @@ let choBangCai = Promise.resolve();                  // bấm nút là việc as
             linkSafari: () => null, linkChrome: () => null, nhacCai: () => hop, xoaNhacCai: () => { kq.bo++; hop = null; },
             ghiTT: (t) => { kq.tt = t; }, docTT: () => null },
       openSheet: (t, h) => {
-        kq.mo.push(h); bang = {};
+        kq.mo.push(h); trang['sheet-wrap'].hidden = false; bang = {};
         for (const m of h.matchAll(/<(\w+)[^>]*\bid="([^"]+)"[^>]*>([^<]*)</g)) bang[m[2]] = { id: m[2], tu: 'bang', chu: m[3].trim() };
       },
-      closeSheet: () => { kq.dong++; },
+      closeSheet: () => { kq.dong++; trang['sheet-wrap'].hidden = true; },
       $: (s) => { const id = s.replace(/^#/, ''); return trang[id] || bang[id] || null; },
     };
-    new Function(...Object.keys(moiTruong), cat('moCaiApp') + '\nmoCaiApp();')(...Object.values(moiTruong));
-    kq.nut = Object.values(bang).find(e => e.chu === 'Cài app');
+    new Function(...Object.keys(moiTruong), cat('moCaiApp') + cat('caiNgay') + cat('bangCai') + '\nmoCaiApp();')(...Object.values(moiTruong));
+    kq.goiNgay = kq.goi;
+    kq.xong = new Promise(r => setTimeout(r, 0));      // hộp cài giả trả lời ngay: một vòng là xong mọi await
     return kq;
   }
   const hopCai = (chon) => ({ prompt: () => Promise.resolve({ outcome: chon }), userChoice: Promise.resolve({ outcome: chon, platform: 'web' }) });
   const hopChet = () => ({ prompt: () => Promise.reject(new Error('The prompt() method was called on an event that is no longer valid.')), userChoice: new Promise(() => {}) });
   const tay = (h) => /Cài đặt ứng dụng/.test(h || '');
 
-  const b0 = moBang({ hop: hopCai('accepted') });
-  ok('Android có hộp cài: nút "Cài app" trong bảng có id riêng (không trùng phần tử nào của index.html) và được gắn việc',
-     !!b0.nut && !idTrang.has(b0.nut.id) && typeof b0.nut.onclick === 'function', b0.nut ? b0.nut.id : 'không thấy nút');
   choBangCai = (async () => {
-    if (b0.nut && b0.nut.onclick) await b0.nut.onclick();
-    ok('bấm "Cài app", người dùng đồng ý: gọi hộp cài của Chrome, đóng bảng, báo đang cài, nhớ đã cài',
-       b0.dong === 1 && b0.bao.includes('Đang cài app…') && b0.tt && b0.tt.daCai === true && b0.bo >= 1, JSON.stringify({ dong: b0.dong, bao: b0.bao }));
-    const b1 = moBang({ hop: hopCai('dismissed') });
-    if (b1.nut && b1.nut.onclick) await b1.nut.onclick();
-    ok('bấm "Cài app" rồi bấm Huỷ: đóng bảng, không báo gì', b1.dong === 1 && !b1.bao.length && !b1.tt);
-    const b2 = moBang({ hop: hopChet() });
-    if (b2.nut && b2.nut.onclick) await b2.nut.onclick();
-    ok('hộp cài đã chết (Chrome bỏ khi manifest đổi): không im — bảng chuyển sang cách cài bằng menu Chrome',
-       b2.mo.length === 2 && tay(b2.mo[1]) && b2.dong === 0, `${b2.mo.length} lần mở bảng`);
-    ok('bảng cài trên iPhone gọi đúng tên sẽ hiện dưới biểu tượng: trong cờ là "Cờ ba người", ở trang chủ là "Thông Điệp"',
-       /Mở <b>Cờ ba người<\/b> từ màn hình chính/.test(moBang({ loai: 'iosSafari', dangMo: { duong: 'co-ba-nguoi' } }).mo[0]) &&
-       /Mở <b>Thông Điệp<\/b> từ màn hình chính/.test(moBang({ loai: 'iosSafari' }).mo[0]));
-    const b4 = moBang({ hop: null, loai: 'nhacCai' });
-    if (b4.nut && b4.nut.onclick) await b4.nut.onclick();
-    ok('lúc bấm không còn hộp cài nào: cũng chuyển sang cách cài bằng menu', b4.mo.length === 2 && tay(b4.mo[1]));
+    const b0 = bam({ hop: hopCai('accepted') });
+    await b0.xong;
+    ok('Android có hộp cài: bấm Cài app là gọi hộp cài của Chrome ngay trong lúc bấm, không mở bảng giải thích; đồng ý thì báo đang cài, nhớ đã cài',
+       b0.goiNgay === 1 && !b0.mo.length && b0.bao.includes('Đang cài app…') && b0.tt && b0.tt.daCai === true && b0.bo >= 1,
+       JSON.stringify({ goiNgay: b0.goiNgay, moBang: b0.mo.length, bao: b0.bao }));
+    const b1 = bam({ hop: hopCai('dismissed') });
+    await b1.xong;
+    ok('bấm Cài app rồi bấm Huỷ: không mở bảng, không báo gì', b1.goi === 1 && !b1.mo.length && !b1.bao.length && !b1.tt);
+    const b2 = bam({ hop: hopChet() });
+    await b2.xong;
+    ok('hộp cài đã chết (Chrome bỏ khi manifest đổi): không im — mở bảng cách cài bằng menu Chrome', b2.mo.length === 1 && tay(b2.mo[0]), `${b2.mo.length} lần mở bảng`);
+    const b3 = bam({ hop: null });
+    await b3.xong;
+    ok('lúc bấm không còn hộp cài nào: mở bảng cách cài bằng menu', b3.mo.length === 1 && tay(b3.mo[0]));
+    const b4 = bam({ hop: hopCai('accepted'), bangDangMo: true });
+    await b4.xong;
+    ok('đang mở bảng Giới thiệu (mục ?) mà bấm "Cài app vào điện thoại": đóng bảng rồi gọi hộp cài ngay', b4.dong === 1 && b4.goiNgay === 1 && !b4.mo.length);
+    const b5 = bam({ loai: 'androidTay' });
+    ok('Android chưa đưa hộp cài: bảng các bước cài bằng menu', b5.mo.length === 1 && tay(b5.mo[0]));
+    ok('iPhone vẫn là bảng các bước (Apple không cho trang web tự cài), ghi đúng tên sẽ hiện dưới biểu tượng: trong cờ "Cờ ba người", ở trang chủ "Thông Điệp"',
+       /Mở <b>Cờ ba người<\/b> từ màn hình chính/.test(bam({ loai: 'iosSafari', dangMo: { duong: 'co-ba-nguoi' } }).mo[0]) &&
+       /Mở <b>Thông Điệp<\/b> từ màn hình chính/.test(bam({ loai: 'iosSafari' }).mo[0]));
     const idApp = [...new Set([...nguon.matchAll(/id="([^"$]+)"/g)].map(m => m[1]))];
     const trung = idApp.filter(id => idTrang.has(id));
     ok('không id nào trong các bảng app.js dựng trùng id của index.html — trùng thì $() lấy phần tử của trang, nút trong bảng thành nút chết',
