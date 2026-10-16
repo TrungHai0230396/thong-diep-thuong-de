@@ -1743,3 +1743,152 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
   border:1px solid rgba(255,190,140,.3);color:#ffe3cf;font-size:13.5px;line-height:1.45;text-align:center;pointer-events:none}
 @media (prefers-reduced-motion:reduce){.ag-kq,.ag-bang{animation:none}.ag-mieng,.ag-chu{transition:none}}
 @media (max-width:359px){.ag-hang button{font-size:11.5px}.ag-tieude{font-size:28px}}
+
+/* ---------- Buôn lậu phố cổ (assets/buonlau.js) ---------- */
+.buonlau{position:fixed;inset:0;z-index:30;display:none;flex-direction:column;color:#f3eee4;
+  background:radial-gradient(120% 80% at 50% 30%,#1b2140 0%,#0e1226 60%,#090b18 100%);
+  padding-bottom:env(safe-area-inset-bottom,0px);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.buonlau.hien{display:flex}
+.bl-dau{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 12px) 104px 4px 16px;min-height:50px}
+.bl-dau button{flex:none;width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
+  color:#f3eee4;font:inherit;font-size:16px;cursor:pointer}
+.bl-ten{flex:1;min-width:0;margin:0;line-height:1.3}
+.bl-ten b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:21px;font-weight:600;color:#ffd98a}
+.bl-ten span{display:block;font-size:12.5px;color:rgba(243,238,228,.62);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-nguoi{display:flex;gap:6px;padding:2px 12px 4px}
+.bl-nguoi:empty{display:none}
+.bl-the{flex:1;min-width:0;padding:5px 8px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);transition:border-color .2s,background .2s}
+.bl-the b{display:flex;align-items:center;gap:5px;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-vai{flex:none;font-style:normal;font-size:13px}
+.bl-the span{display:block;font-size:11px;color:rgba(243,238,228,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-the em{display:flex;align-items:center;gap:3px;margin-top:3px;font-style:normal}
+.bl-the em i{width:9px;height:9px;border-radius:2px;border:1.5px solid var(--mau);opacity:.75}
+.bl-the em i.bl-co{background:var(--mau);opacity:1}
+.bl-the em small{margin-left:4px;font-size:10.5px;color:rgba(243,238,228,.62)}
+.bl-the.bl-dang{border-color:var(--mau);background:rgba(255,255,255,.08)}
+.bl-xau,.bl-tot{margin-left:4px;font-size:10.5px;font-weight:600}
+.bl-xau{color:#ff8a7a}
+.bl-tot{color:#8fe0a8}
+.bl-dem{flex:none;height:3px;margin:0 14px 2px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden}
+.bl-dem i{display:block;width:0;height:100%;background:linear-gradient(90deg,#3b4a8a,#c9a462 80%,#ffd98a);transition:width .6s}
+.bl-canh{position:relative;flex:1 1 0;min-height:220px;overflow:hidden}
+.bl-ban{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:pointer}
+/* bản đồ */
+.bl-vien path{fill:none;stroke:#05060d;stroke-opacity:.8;stroke-width:26;stroke-linecap:round}
+.bl-pho path{fill:none;stroke:#c9a462;stroke-opacity:.6;stroke-width:9;stroke-linecap:round}
+.bl-ngo path{fill:none;stroke:#ef9a76;stroke-opacity:.85;stroke-width:6;stroke-dasharray:14 11;stroke-linecap:round}
+.bl-loi path{fill:none;stroke:#9aa3c4;stroke-opacity:.5;stroke-width:5;stroke-dasharray:2 12;stroke-linecap:round}
+.bl-ban text{font-family:"Be Vietnam Pro",system-ui,-apple-system,sans-serif;pointer-events:none}
+.bl-tp{font-size:26px;fill:#e9d7a8;fill-opacity:.45;text-anchor:middle}
+.bl-tp-ngo{fill:#f2b394;fill-opacity:.55;font-style:italic}
+.bl-nga{fill:#f4efe6;fill-opacity:.85}
+.bl-nga-ngo{fill:#ef9a76}
+.bl-nga-moi{fill:#ffcf6a}
+.bl-nga-ben{fill:#7ec8e3}
+.bl-mui{fill:none;stroke:#aab3d4;stroke-opacity:.85;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}
+.bl-cua{fill:#2a3050;stroke:#aab3d4;stroke-width:3}
+.bl-n-moi,.bl-n-ben,.bl-n-cua,.bl-n-oqc,.bl-k,.bl-dau text,.bl-linh text{paint-order:stroke;stroke:#0b0e1c;stroke-linejoin:round}
+.bl-n-moi{font-size:32px;font-weight:600;fill:#ffd27a;stroke-width:7px}
+.bl-n-ben{font-size:27px;fill:#9fd6f0;text-anchor:middle;stroke-width:6px}
+.bl-n-cua{font-size:25px;fill:#c3c9e2;stroke-width:6px}
+.bl-n-oqc{font-size:27px;font-style:italic;fill:#e9d7a8;stroke-width:6px}
+.bl-song{font-size:34px;letter-spacing:.3em;fill:#7ab6d8;fill-opacity:.45;font-style:italic;text-anchor:middle}
+.bl-ho{font-size:28px;fill:#9fd6f0;fill-opacity:.7;text-anchor:middle;font-style:italic}
+/* lớp động */
+.bl-nghi{fill:#ff5a4a;fill-opacity:.17}
+.bl-tam{fill:#ffd27a;fill-opacity:.14}
+.bl-x{stroke:#aab3d4;stroke-opacity:.6;stroke-width:4;stroke-linecap:round}
+.bl-k{font-size:22px;font-weight:700;fill:#ffd27a;text-anchor:middle;stroke-width:5px}
+.bl-k-kin{fill-opacity:.7}
+.bl-dau text{font-size:22px;font-weight:700;fill:#fff;text-anchor:middle;stroke-width:5px}
+.bl-dau-gia use{opacity:.5}
+.bl-dau-gia text{fill:#ffb39a}
+.bl-dau-lo text{fill:#ffe08a}
+.bl-cham{fill:none;stroke-width:5;animation:bl-nhip 1.2s ease-in-out infinite}
+.bl-cham-di{stroke:#8fe0a8}
+.bl-cham-cua{stroke:#ffd27a}
+.bl-cham-gia{stroke:#ffa36a;stroke-dasharray:8 7}
+.bl-cham-linh{stroke:#8fc6ff}
+.bl-cham-soat{stroke:#ff6a5a;stroke-dasharray:9 7}
+.bl-chon-di{fill:#8fe0a8;fill-opacity:.25;stroke:#8fe0a8;stroke-width:6}
+.bl-chon-gia{fill:#ffa36a;fill-opacity:.25;stroke:#ffa36a;stroke-width:5;stroke-dasharray:8 6}
+.bl-chon-soat{fill:#ff6a5a;fill-opacity:.25;stroke:#ff6a5a;stroke-width:6}
+.bl-soat-sung{fill:none;stroke:#ffe08a;stroke-width:6;transform-box:fill-box;transform-origin:center;animation:bl-sung 1.1s ease-out 2}
+@keyframes bl-nhip{0%,100%{stroke-opacity:.95}50%{stroke-opacity:.3}}
+@keyframes bl-sung{0%{transform:scale(.6);stroke-opacity:1}100%{transform:scale(2.4);stroke-opacity:0}}
+.bl-linh circle{stroke:#0b0e1c;stroke-width:4}
+.bl-linh-minh circle{stroke:#fff}
+.bl-linh-chon circle{stroke:#ffe08a;stroke-width:8}
+.bl-linh text{font-size:22px;font-weight:700;fill:#fff;text-anchor:middle;stroke-width:5px}
+.bl-linh-cu{fill:none;stroke:#8fc6ff;stroke-width:4;stroke-dasharray:6 6;stroke-opacity:.75}
+.bl-tb circle{stroke:#0b0e1c;stroke-width:4}
+.bl-tb-bat circle{fill:#8a2a24}
+.bl-tb-thoat{opacity:.6}
+@media (prefers-reduced-motion:reduce){.bl-cham,.bl-soat-sung{animation:none}.bl-dem i{transition:none}}
+.bl-bao{position:absolute;left:50%;top:8px;z-index:10;transform:translateX(-50%);width:max-content;max-width:86%;margin:0;padding:8px 14px;border-radius:12px;
+  background:rgba(14,18,38,.95);border:1px solid rgba(255,214,120,.4);font-size:13.5px;line-height:1.45;text-align:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.45)}
+/* dưới bản đồ */
+.bl-duoi{flex:none;padding:6px 14px 10px;border-top:1px solid rgba(255,255,255,.08)}
+.bl-luot{margin:0 0 6px;min-height:38px;font-size:13.5px;line-height:1.45;text-align:center;color:rgba(243,238,228,.88)}
+.bl-luot b{color:#ffd98a;font-weight:600}
+.bl-xem{display:inline-block;padding:1px 8px;border-radius:9px;background:rgba(255,255,255,.08);font-size:12.5px;color:#f3e2b8}
+.bl-nghi-chu{color:rgba(243,238,228,.7);font-style:italic}
+.bl-chip{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:6px}
+.bl-chip:empty{display:none}
+.bl-chon-chip{height:32px;padding:0 12px;border-radius:16px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.05);color:#f3eee4;font:inherit;font-size:13px;cursor:pointer}
+.bl-chon-chip.bl-bat{border-color:#8fe0a8;background:rgba(143,224,168,.16);color:#c9f5d6}
+.bl-ghi{font-size:12.5px;color:rgba(243,238,228,.6)}
+.bl-nut{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.bl-nut button{height:42px;padding:0 14px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#f3eee4;
+  font:inherit;font-size:14.5px;cursor:pointer}
+.bl-nut button:disabled{opacity:.4;cursor:default}
+.bl-nut .bl-chinh{border:0;background:linear-gradient(#ffd77a,#e9a93a);color:#2a1a00;font-weight:700}
+.bl-nut .bl-bat{border-color:#ffa36a;background:rgba(255,163,106,.16);color:#ffd6bf}
+.bl-nhat{display:block;width:100%;margin-top:6px;padding:4px 6px;border:0;background:none;color:rgba(243,238,228,.55);font:inherit;font-size:12px;line-height:1.45;text-align:center;cursor:pointer}
+.bl-nhat span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bl-nk-bat{color:#ff8a7a}
+.bl-nk-dau{color:#ffd27a}
+.bl-nk-giao{color:#9fd6f0}
+.bl-nk-thoat{color:#8fe0a8}
+.bl-nk-minh{color:#f3e2b8}
+.bl-nk-het{color:#ffd98a}
+/* bảng chọn, cách chơi, kết quả */
+.bl-tin{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top,0px) + 58px) 20px calc(env(safe-area-inset-bottom,0px) + 20px);background:rgba(6,8,18,.74)}
+.bl-tin-trong{width:100%;max-width:420px;max-height:100%;overflow:auto;padding:22px 20px;border-radius:20px;background:linear-gradient(#1f2546,#141831);
+  border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 50px rgba(0,0,0,.5);text-align:center}
+.bl-tin h2{margin:4px 0 12px;font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:#ffd98a}
+.bl-tin p{margin:0 0 10px;font-size:14.5px;line-height:1.55;color:rgba(243,238,228,.9);text-align:left}
+.bl-tin p b{color:#ffe2a6;font-weight:600}
+.bl-tin .bl-tin-nho{margin:0;text-align:center;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:rgba(243,238,228,.5)}
+.bl-tin .bl-meo{font-size:13px;color:rgba(243,238,228,.66);text-align:center}
+.bl-tin .bl-nhan{margin:12px 0 6px;font-size:12.5px;color:rgba(243,238,228,.6);text-align:center}
+.bl-tin button{display:block;width:100%;min-height:46px;margin:8px 0 0;border-radius:14px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);
+  color:#f3eee4;font:inherit;font-size:15px;cursor:pointer}
+.bl-tin .bl-chinh,.bl-tin .bl-batdau{border:0;background:linear-gradient(#ffd77a,#e9a93a);color:#2a1a00;font-weight:700}
+.bl-tin .bl-lua{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:10px 14px;text-align:left}
+.bl-tin .bl-lua b{font-size:15px;font-weight:600;color:#ffe2a6}
+.bl-tin .bl-lua i{font-size:12.5px;font-style:normal;color:rgba(243,238,228,.62)}
+.bl-tin .bl-lui{width:auto;min-height:32px;margin:0 0 6px;padding:0 10px;border:0;background:none;color:rgba(243,238,228,.65);font-size:13.5px}
+.bl-tin .bl-chu{min-height:36px;border:0;background:none;color:rgba(243,238,228,.62);font-size:13.5px}
+.bl-hang{display:flex;flex-wrap:wrap;gap:6px}
+.bl-tin .bl-chon{flex:1;width:auto;min-width:80px;margin:0;padding:8px 10px;line-height:1.3}
+.bl-tin .bl-chon small{display:block;font-size:11.5px;color:rgba(243,238,228,.6)}
+.bl-tin .bl-chon.bl-bat{border-color:#ffd77a;background:rgba(255,215,122,.15)}
+.bl-chao svg{display:block;width:170px;height:96px;margin:0 auto 4px}
+.bl-nk p{margin:0 0 6px;font-size:13px}
+.buonlau .xn-dong,.buonlau .nut-link,.buonlau .nut-cai{z-index:10}
+.co-nut-cai .bl-dau{padding-right:204px}
+@media (max-width:479px){
+  .co-nut-cai .bl-dau{padding-top:calc(env(safe-area-inset-top,0px) + 54px);padding-right:14px}
+}
+@media (min-width:720px){
+  .bl-duoi{max-width:640px;margin:0 auto;width:100%}
+}
+@media (max-height:720px){
+  .bl-luot{min-height:0;font-size:13px}
+  .bl-nut button{height:38px}
+  .bl-nhat span:not(:last-child){display:none}
+}
+.bl-vet{fill:none;stroke-width:5;stroke-opacity:.55;stroke-dasharray:3 10;stroke-linecap:round;stroke-linejoin:round}
+/* ---------- hết Buôn lậu phố cổ ---------- */

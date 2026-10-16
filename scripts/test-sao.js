@@ -61,7 +61,7 @@ global.performance = { now: () => Date.now() };
 /* Nạp mọi tệp trò, đúng thứ tự như index.html. */
 const TEP = ['core.js', 'game.js', 'share.js', 'lantern.js', 'pond.js', 'breath.js',
              'constellation.js', 'nghe.js', 'mua.js',
-             'astro.js', 'saosang.js', 'nightsky.js', 'datlien.js', 'vutru.js', 'toancanh.js', 'lich.js', 'almanac.js', 'sohoc.js', 'thanso.js', 'rungu.js', 'nhacngu.js', 'luanxa.js', 'thienluanxa.js', 'baicode.js', 'laptrinh.js', 'mansoko.js', 'sokoban.js', 'phong.js', 'maqr.js', 'coba.js', 'bida.js', 'monan.js', 'angi.js', 'amvi.js', 'khauhinh.js', 'dophatam.js', 'ipa.js'];
+             'astro.js', 'saosang.js', 'nightsky.js', 'datlien.js', 'vutru.js', 'toancanh.js', 'lich.js', 'almanac.js', 'sohoc.js', 'thanso.js', 'rungu.js', 'nhacngu.js', 'luanxa.js', 'thienluanxa.js', 'baicode.js', 'laptrinh.js', 'mansoko.js', 'sokoban.js', 'phong.js', 'maqr.js', 'coba.js', 'bida.js', 'monan.js', 'angi.js', 'buonlau.js', 'amvi.js', 'khauhinh.js', 'dophatam.js', 'ipa.js'];
 for (const t of TEP) new Function(fs.readFileSync(path.join(__dirname, '..', 'assets', t), 'utf8'))();
 
 /* Danh sách ngôi sao đọc THẲNG từ app.js, để thêm sao mới là bài kiểm tự biết. */

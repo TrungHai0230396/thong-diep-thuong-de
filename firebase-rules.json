@@ -129,6 +129,87 @@
         },
         "$khac": { ".validate": false }
       }
+    },
+    "buonlau": {
+      "$ma": {
+        ".read": "$ma.matches(/^[A-HJ-NP-Z2-9]{6}$/)",
+        ".write": "$ma.matches(/^[A-HJ-NP-Z2-9]{6}$/) && (!data.exists() || (!newData.exists() && (data.child('tao').val() < now - 86400000 || data.child('xong').val() < now - 300000)))",
+        ".validate": "newData.hasChildren(['tao', 'chu', 'kieu', 'kho', 'truoc', 'ghe'])",
+        "tao": { ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() === now)" },
+        "kieu": { ".validate": "newData.val() === '1v1' || newData.val() === '2v2'" },
+        "chu": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= (newData.parent().child('kieu').val() === '2v2' ? 3 : 1)" },
+        "kho": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2" },
+        "truoc": { ".validate": "newData.val() === 0 || newData.val() === 1" },
+        "ghe": {
+          "$P": {
+            ".validate": "$P.matches(/^[0-3]$/) && (root.child('buonlau/' + $ma + '/kieu').val() === '2v2' || newData.parent().parent().child('kieu').val() === '2v2' || $P.matches(/^[01]$/)) && newData.hasChild('id')",
+            "id": {
+              ".write": "!data.exists() && !root.child('buonlau/' + $ma + '/batDau').exists()",
+              ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,16}$/)"
+            },
+            "ten": { ".write": true, ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
+            "thay": { ".write": true, ".validate": "newData.val() === now" },
+            "$khac": { ".validate": false }
+          }
+        },
+        "batDau": { ".write": "!data.exists()", ".validate": "newData.val() === now" },
+        "may": {
+          "$P": { ".write": true, ".validate": "$P.matches(/^[0-3]$/) && newData.val() === true" }
+        },
+        "nuoc": {
+          "$n": {
+            ".write": "!data.exists() && root.child('buonlau/' + $ma + '/batDau').exists()",
+            ".validate": "$n.matches(/^[0-9]{1,4}$/) && newData.hasChildren(['P', 'h', 'l', 'k']) && (newData.child('l').val() === 'tb' ? !newData.hasChild('o') && !newData.hasChild('s') : newData.hasChildren(['o', 's']) && !newData.hasChild('c') && !newData.hasChild('t') && !newData.hasChild('v') && !newData.hasChild('b'))",
+            "P": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3" },
+            "h": { ".validate": "newData.val() === 0 || newData.val() === 1" },
+            "l": { ".validate": "newData.val() === 'tb' || newData.val() === 'hq'" },
+            "k": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 30" },
+            "c": { ".validate": "newData.isString() && newData.val().matches(/^[0-9a-f]{16}$/)" },
+            "t": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 60" },
+            "v": { ".validate": "newData.val() === 1" },
+            "b": { ".validate": "newData.val() === 1" },
+            "o": { ".validate": "newData.isString() && newData.val().matches(/^[0-9]{1,2}(,[0-9]{1,2}){2,3}$/)" },
+            "s": { ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 60" },
+            "$khac": { ".validate": false }
+          }
+        },
+        "dap": {
+          "$id": {
+            ".write": "!data.exists() && root.child('buonlau/' + $ma + '/batDau').exists()",
+            ".validate": "$id.matches(/^[01]-[0-9]{1,2}-[01]$/) && newData.hasChildren(['r', 'g'])",
+            "r": { ".validate": "newData.val() === 'b' || newData.val() === 't' || newData.val() === 'x' || (newData.isNumber() && newData.val() >= 0 && newData.val() <= 40)" },
+            "g": { ".validate": "newData.isNumber() && newData.val() >= -1 && newData.val() <= 60" },
+            "$khac": { ".validate": false }
+          }
+        },
+        "mo": {
+          "$id": {
+            ".write": "!data.exists() && root.child('buonlau/' + $ma + '/batDau').exists()",
+            ".validate": "$id.matches(/^[01]-[01]$/) && newData.hasChildren(['m', 'd', 'f', 'g'])",
+            "m": { ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,40}$/)" },
+            "d": { ".validate": "newData.isString() && newData.val().length <= 200 && newData.val().matches(/^[0-9,]*$/)" },
+            "f": { ".validate": "newData.isString() && newData.val().length <= 60 && newData.val().matches(/^[0-9:,]*$/)" },
+            "g": { ".validate": "newData.isString() && newData.val().length <= 60 && newData.val().matches(/^[0-9:,]*$/)" },
+            "$khac": { ".validate": false }
+          }
+        },
+        "xong": { ".write": "!data.exists()", ".validate": "newData.val() === now" },
+        "tiep": { ".write": "!data.exists()", ".validate": "newData.isString() && newData.val().matches(/^[A-HJ-NP-Z2-9]{6}$/)" },
+        "$khac": { ".validate": false }
+      }
+    },
+    "sanhbuonlau": {
+      ".read": true,
+      "$ma": {
+        ".write": "$ma.matches(/^[A-HJ-NP-Z2-9]{6}$/) && (!newData.exists() || (root.child('buonlau/' + $ma).exists() && !root.child('buonlau/' + $ma + '/batDau').exists()))",
+        ".validate": "newData.hasChildren(['tao', 'ten', 'trong', 'kieu', 'thay'])",
+        "tao": { ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() === now)" },
+        "ten": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
+        "trong": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 3" },
+        "kieu": { ".validate": "newData.val() === '1v1' || newData.val() === '2v2'" },
+        "thay": { ".validate": "newData.val() === now" },
+        "$khac": { ".validate": false }
+      }
     }
   }
 }

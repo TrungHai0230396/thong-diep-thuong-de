@@ -856,6 +856,100 @@ def ve_an_gi(v, tro):
     v.tron(cx, cy - R - 27, 4.2, fill=(90, 47, 18))
 
 
+# bản đồ chép từ assets/buonlau.js (bố cục BX, BY; danh sách ngã DINH; phố, ngõ CANH): đúng các ngã phố của trò
+def doc_buon_lau():
+    nguon = open(os.path.join(GOC, 'assets', 'buonlau.js'), encoding='utf-8').read()
+    so = lambda ten: [int(x) for x in re.search(r'const %s = \[([^\]]*)\]' % ten, nguon).group(1).split(',')]
+    bx, by = so('BX'), so('BY')
+    khoi_dinh = nguon[nguon.index('const DINH = ['):nguon.index('];', nguon.index('const DINH = ['))]
+    dinh = re.findall(r"\['(\w+)', \d+, \d+, '([^']*)'(?:, '(\w+)')?\]", khoi_dinh)
+    khoi_canh = nguon[nguon.index('const CANH = ['):nguon.index('];', nguon.index('const CANH = ['))]
+    canh = [(a, b, int(l or 0)) for a, b, l in re.findall(r"\['(\w+)', '(\w+)', '[^']*'(?:, (\d))?\]", khoi_canh)]
+    so_dinh = {k: i for i, (k, _, _) in enumerate(dinh)}
+    return bx, by, dinh, canh, so_dinh
+
+
+def ve_buon_lau(v, tro):
+    bx, by, dinh, canh, so = doc_buon_lau()
+    X0, Y0, k = 300, 468, 0.665                        # khoảng bản đồ cắt ra: quanh Hàng Buồm, Mã Mây, Tạ Hiện, Hàng Bạc
+    P = lambda key: (640 + (bx[so[key]] - X0) * k, 100 + (by[so[key]] - Y0) * k)
+    hop = (640, 100, 1130, 515)
+    lop = Image.new('RGB', v.im.size, (17, 22, 44)); g = Ve(lop)
+    g.toa(lambda q: q.tron(860, 300, 230, fill=255), (40, 48, 92), .55, 90)
+    bo = [(836, 412), (860, 570), (946, 850), (1004, 945), (1024, 1257)]
+    mx = lambda x, y: (640 + (x - X0) * k, 100 + (y - Y0) * k)
+    g.da_giac([mx(*bo[0])] + [mx(*p) for p in bo] + [(1200, 700), (1200, 0), mx(bo[0][0], -200)], fill=(20, 52, 78))
+    for i in range(6):                                 # gợn sóng
+        x, y = 1080 + (i % 2) * 22, 140 + i * 66
+        g.net([(x, y), (x + 9, y - 5), (x + 18, y), (x + 27, y - 5)], (122, 182, 216, 90), 2.5)
+    for a, b, l in canh:                               # viền tối dưới phố
+        if l != 2 and a in so and b in so: g.net([P(a), P(b)], (5, 6, 13), 15)
+    for a, b, l in canh:
+        if a not in so or b not in so: continue
+        if l == 0: g.net([P(a), P(b)], (201, 164, 98), 5.5)
+        elif l == 1:                                   # ngõ: nét đứt
+            (x1, y1), (x2, y2) = P(a), P(b)
+            n = max(1, int(math.hypot(x2 - x1, y2 - y1) / 13))
+            for t in range(n):
+                if t % 2: continue
+                g.net([(x1 + (x2 - x1) * t / n, y1 + (y2 - y1) * t / n), (x1 + (x2 - x1) * (t + 1) / n, y1 + (y2 - y1) * (t + 1) / n)], (239, 154, 118), 3.6)
+    for key, ten, loai in dinh:
+        if loai == 'vao': continue
+        x, y = P(key)
+        g.tron(x, y, 5.5 if loai else 4.5, fill=(255, 207, 106) if loai == 'moi' else (126, 200, 227) if loai == 'ben' else (244, 239, 230))
+    for key, ten, loai in dinh:                        # mối: đèn lồng đỏ, tên vàng
+        if loai != 'moi': continue
+        x, y = P(key)
+        g.toa(lambda q: q.tron(x, y - 20, 16, fill=255), (255, 150, 70), .5, 9)
+        g.elip(x, y - 20, 10, 12.5, fill=(226, 73, 47))
+        g.net([(x - 10, y - 20), (x + 10, y - 20)], (255, 207, 106, 150), 1.6)
+        g.hcn((x - 5, y - 34, x + 5, y - 31), 1, fill=(58, 42, 28)); g.hcn((x - 5, y - 9, x + 5, y - 6), 1, fill=(58, 42, 28))
+        g.chu((x + 14, y - 22), ten, ft(19), (255, 210, 122), 'lm', 4, (11, 14, 28))
+    for key, ten, loai in dinh:                        # bến: thuyền trên sông
+        if loai != 'ben': continue
+        x, y = P(key)
+        if not (hop[0] - 10 < x and x + 140 < hop[2] and hop[1] < y < hop[3] - 30): continue
+        g.da_giac([(x + 22, y + 2), (x + 62, y + 2), (x + 56, y + 9), (x + 28, y + 9)], fill=(107, 74, 44))
+        g.net([(x + 42, y + 2), (x + 42, y - 18)], (201, 180, 138), 2)
+        g.da_giac([(x + 43, y - 17), (x + 55, y), (x + 43, y)], fill=(217, 199, 154))
+        g.chu((x + 26, y + 26), ten, ft(16), (159, 214, 240), 'lm', 3, (11, 14, 28))
+    # đường tay buôn đã đi (của người chơi thấy được): khắc 4 Đào Duy Từ → ngõ Đào Duy Từ → khắc 5 Tạ Hiện → khắc 6 Tạ Hiện – Lương Ngọc Quyến
+    vet = ['mm1', 'ddt', 'th1', 'th2']
+    pts = [P(x) for x in vet]
+    for i in range(len(pts) - 1):
+        (x1, y1), (x2, y2) = pts[i], pts[i + 1]
+        for t in range(0, 10, 2):
+            g.net([(x1 + (x2 - x1) * t / 10, y1 + (y2 - y1) * t / 10), (x1 + (x2 - x1) * (t + 1) / 10, y1 + (y2 - y1) * (t + 1) / 10)], (242, 184, 75, 170), 3)
+    def dau(x, y, so_, mau=(242, 184, 75)):
+        for dx, dy, r1, r2, gc in ((-4, -2, 3.2, 5.4, -12), (4.5, -5, 3.2, 5.4, 12)):
+            g.da_giac(elip_xoay(x + dx, y + dy, r1, r2, gc, 16), fill=mau)
+        g.chu((x, y + 15), str(so_), ft(15), (255, 255, 255), 'mm', 3, (11, 14, 28))
+    for key, so_ in (('mm1', 3), ('ddt', 4), ('th1', 5)):
+        x, y = P(key); dau(x - (44 if key == 'th1' else 20), y - 4, so_)
+    # hải quan vừa soát trúng dấu khắc 5: vòng sáng
+    x, y = P('th1')
+    g.tron(x, y, 24, outline=(255, 224, 138), w=3.5)
+    g.tron(x, y, 34, outline=(255, 224, 138, 110), w=2)
+    # tay buôn đang đứng (gánh hàng), lính quanh đó
+    x, y = P('th2')
+    g.toa(lambda q: q.tron(x, y, 26, fill=255), (242, 184, 75), .45, 12)
+    g.tron(x, y, 17, fill=(242, 184, 75), outline=(11, 14, 28), w=2.5)
+    g.net([(x - 12, y - 3), (x + 12, y - 3)], (255, 255, 255), 2.2)
+    g.da_giac([(x - 14, y + 1), (x - 8, y + 1), (x - 9, y + 6), (x - 13, y + 6)], fill=(255, 255, 255)); g.da_giac([(x + 8, y + 1), (x + 14, y + 1), (x + 13, y + 6), (x + 9, y + 6)], fill=(255, 255, 255))
+    g.tron(x, y - 1, 2.6, fill=(255, 255, 255)); g.net([(x, y + 1), (x, y + 8)], (255, 255, 255), 2)
+    for key, so_ in (('hb', 1), ('mm3', 2)):
+        x, y = P(key)
+        g.tron(x, y, 16, fill=(90, 167, 240), outline=(11, 14, 28), w=2.5)
+        g.da_giac([(x - 9, y + 1), (x - 7, y - 5), (x + 7, y - 5), (x + 9, y + 1)], fill=(255, 255, 255))
+        g.net([(x - 12, y + 2), (x + 12, y + 2)], (255, 255, 255), 2.5)
+        g.chu((x, y + 25), str(so_), ft(14), (255, 255, 255), 'mm', 3, (11, 14, 28))
+    mat = Image.new('L', v.im.size, 0)
+    ImageDraw.Draw(mat).rounded_rectangle([hop[0] * S, hop[1] * S, hop[2] * S, hop[3] * S], radius=22 * S, fill=255)
+    v.toa(lambda q: q.hcn((hop[0], hop[1] + 8, hop[2], hop[3] + 8), 22, fill=255), (0, 0, 0), .55, 16)
+    v.im.paste(lop, (0, 0), mat)
+    v.hcn(hop, 22, outline=(255, 255, 255, 40), w=1.5)
+
+
 # ======================================================================================================
 #  BẢNG CÁC TRÒ — tieuDe phải trùng assets/app.js; mô tả là "chú thích" riêng của từng trò
 # ======================================================================================================
@@ -960,6 +1054,14 @@ TRO = [
          alt='Ăn gì: vòng quay tám món, kim chỉ vào bún bò Huế', mo='Mở vòng quay Ăn gì',
          # trò này để thanh địa chỉ là chính trang riêng (diaChiTrang trong app.js): giữ ?tro, ?ngay khi chuyển vào app
          chuyen="location.replace('../' + location.search + '#an-gi');"),
+    dict(duong='buon-lau', trang='buon-lau-pho-co/', so=1, mau='#ff6b6b', ve=ve_buon_lau,
+         tieuDe='Buôn lậu phố cổ', tieu=('Buôn lậu', 'phố cổ'),
+         dong=['Lẻn qua phố, qua ngõ phố cổ Hà Nội', 'Giao 3 kiện hàng rồi trốn ra bến', 'Hay làm hải quan lần dấu chân'],
+         moTa='Trốn tìm có dấu vết trên bản đồ thật của phố cổ Hà Nội: tay buôn lẻn qua phố, qua ngõ giao 3 kiện hàng rồi '
+              'trốn ra bến, rải dấu chân giả; hải quan điều 3 lính lục soát. Đấu với máy, hay mỗi người một máy.',
+         alt='Buôn lậu phố cổ: bản đồ phố cổ Hà Nội với đèn lồng mối hàng, lính hải quan và dấu chân tay buôn', mo='Mở Buôn lậu phố cổ',
+         # link mời vào phòng (…/buon-lau-pho-co/?phong=MÃ) thì chuyển thẳng vào phòng đó
+         chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#buon-lau' + (m ? '/' + m[1] : ''));"),
 ]
 
 

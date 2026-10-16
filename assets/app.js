@@ -38,6 +38,7 @@ const HINH_SAO = {
   bida:      'M12 2.4a9.6 9.6 0 1 1 0 19.2a9.6 9.6 0 1 1 0-19.2zM10.4 5.9a4.3 4.3 0 1 0 0 8.6a4.3 4.3 0 1 0 0-8.6zM10.4 7.7a1.25 1.25 0 1 1 0 2.5a1.25 1.25 0 1 1 0-2.5zM10.4 10.2a1.45 1.45 0 1 1 0 2.9a1.45 1.45 0 1 1 0-2.9z',
   sen:       'M12 3.2c1.9 2.3 2.9 4.7 2.9 7.2 0 2.6-1 4.8-2.9 6.9-1.9-2.1-2.9-4.3-2.9-6.9 0-2.5 1-4.9 2.9-7.2zM2.6 9.6c3 .1 5.4 1.3 7 3.6 1 1.4 1.5 3 1.7 4.6-2.6-.1-4.8-1.1-6.4-2.9-1.3-1.5-2.1-3.3-2.3-5.3zM21.4 9.6c-3 .1-5.4 1.3-7 3.6-1 1.4-1.5 3-1.7 4.6 2.6-.1 4.8-1.1 6.4-2.9 1.3-1.5 2.1-3.3 2.3-5.3zM4.5 18.8c2.3 1.3 4.8 2 7.5 2s5.2-.7 7.5-2c-2.2.6-4.7.9-7.5.9s-5.3-.3-7.5-.9z',
   to:        'M2.6 10.6h18.8a9.4 8.2 0 0 1-18.8 0zM8.6 19.4h6.8l-.9 2.1H9.5zM10.75 9.13L19.15 1.13 20.05 2.07 11.65 10.07zM13.44 9.32L21.84 3.12 22.56 4.08 14.16 10.28z',
+  buonlau:   'M12 1.4l5.4 4.6H6.6zM1.6 6.8h20.8v1.5H1.6zM4.1 8.3h1v4h-1zM18.9 8.3h1v4h-1zM1.4 12.3h6.4l-1.1 6.9H2.5zM16.2 12.3h6.4l-1.1 6.9h-4.2z',
 };
 
 const SAO = [
@@ -73,6 +74,8 @@ const SAO = [
     duong: 'bida', khung: '.bida', mun: 'TDTD_BIDA', tieuDe: 'Bida lỗ — 8 bi, 9 bi', tenApp: 'Bida lỗ', trang: 'bida-lo/', nutCai: true },
   { id: 'sao-angi', mau: '#ff8657', hinh: 'to', nhan: 'Ăn gì: vòng quay món ăn hợp bữa, hợp trời; ở nhà thì quay mâm mặn, canh, rau',
     duong: 'an-gi', khung: '.angi', mun: 'TDTD_ANGI', tieuDe: 'Ăn gì?', tenApp: 'Ăn gì', trang: 'an-gi/', nutCai: true, diaChiTrang: true },
+  { id: 'sao-buonlau', mau: '#ff6b6b', hinh: 'buonlau', nhan: 'Buôn lậu phố cổ: lẻn qua phố cổ giao hàng rồi trốn ra bến, hay làm hải quan lục soát; đấu với máy hay mỗi người một máy',
+    duong: 'buon-lau', khung: '.buonlau', mun: 'TDTD_BUONLAU', tieuDe: 'Buôn lậu phố cổ', tenApp: 'Buôn lậu', trang: 'buon-lau-pho-co/', nutCai: true },
 ];
 
 
