@@ -4,7 +4,8 @@
      { ".sv": "timestamp" } được thay bằng giờ máy chủ; luật từ chối thì trả 401 { "error": "Permission denied" }.
    - Luồng sự kiện (Accept: text/event-stream): mở ra là "put" cả cây ở "/", sau đó "put" / "patch" kèm đường dẫn
      tính từ chỗ đang nghe; khoá số liền nhau trả về thành mảng.
-   - Luật: chép đúng firebase-rules.json, viết tay cho các đường phòng cờ dùng (chỗ nào khác thì từ chối).
+   - Luật: chép đúng firebase-rules.json, viết tay cho các đường phòng cờ dùng (chỗ nào khác thì từ chối): coba/<mã> là
+     phòng, sanh/<mã> là danh sách phòng mở (ai cũng đọc được cả danh sách).
    Chạy riêng: node scripts/fb-gia.js [cổng] */
 'use strict';
 const http = require('http');
@@ -96,6 +97,20 @@ function taoMay(cong = 0) {
     return false;
   }
 
+  /* sanh/<mã>: dòng của một phòng mở. v là dòng sau khi ghi (null là xoá — ai cũng xoá được, để dọn dòng đã im); viet là
+     các khoá vừa ghi (luật .validate của khoá chỉ xét khoá được ghi; PUT là ghi hết) */
+  function choGhiSanh(ma, v, viet, nay) {
+    if (!LA_MA.test(ma)) return false;
+    if (v == null) return true;
+    const r = lay(['coba', ma]), cu = lay(['sanh', ma]);
+    if (!r || 'batDau' in r || typeof v !== 'object') return false;
+    for (const k of Object.keys(v)) if (!['tao', 'ten', 'trong', 'luat', 'thay'].includes(k)) return false;
+    if (!['tao', 'ten', 'trong', 'thay'].every(k => k in v)) return false;
+    const dung = { tao: (x) => typeof x === 'number' && (cu ? x === cu.tao : x === nay), ten: (x) => typeof x === 'string' && x.length >= 1 && x.length <= 20,
+      trong: (x) => so(x, 1, 2), luat: (x) => x === 'tq', thay: (x) => x === nay };
+    return viet.every(k => dung[k](v[k]));
+  }
+
   function guiSuKien(duongGhi, loai, du) {
     for (const n of nghe) {
       const L = tach(n.duong), W = tach(duongGhi);
@@ -116,7 +131,7 @@ function taoMay(cong = 0) {
     let than = '';
     const tu = (ma, du) => { res.writeHead(ma, Object.assign({ 'Content-Type': 'application/json' }, cors)); res.end(JSON.stringify(du)); };
     const khong = () => { tuChoi++; if (process.env.FB_GIA_KE) console.log('  [từ chối]', req.method, duong, than.slice(0, 120)); tu(401, { error: 'Permission denied' }); };
-    const doc = k[0] === 'coba' && k.length >= 2 && LA_MA.test(k[1]);
+    const doc = (k[0] === 'coba' && k.length >= 2 && LA_MA.test(k[1])) || k[0] === 'sanh';
     if (req.method === 'GET') {
       if (!doc) return khong();
       if ((req.headers.accept || '').includes('text/event-stream')) {
@@ -133,6 +148,18 @@ function taoMay(cong = 0) {
     req.on('end', () => {
       let gt = null;
       if (req.method !== 'DELETE') { try { gt = JSON.parse(than); } catch (e) { return tu(400, { error: 'Invalid data' }); } }
+      if (k[0] === 'sanh' && k.length === 2) {
+        const nay = bayGio(), ma = k[1], cu = lay(['sanh', ma]);
+        let v, viet;
+        if (req.method === 'DELETE') { v = null; viet = []; }
+        else if (req.method === 'PUT') { v = giaiGio(gt, nay); viet = v && typeof v === 'object' ? Object.keys(v) : []; }
+        else if (req.method === 'PATCH') { if (!gt || typeof gt !== 'object') return tu(400, { error: 'Invalid data' }); viet = Object.keys(gt); v = Object.assign({}, cu || {}, giaiGio(gt, nay)); }
+        else return tu(405, { error: 'Method not allowed' });
+        if (!choGhiSanh(ma, v, viet, nay)) return khong();
+        dat(k, v);
+        guiSuKien(duong, 'put');
+        return tu(200, v);
+      }
       if (k[0] !== 'coba' || k.length < 2) return khong();
       const nay = bayGio(), ma = k[1], trong = k.slice(2);
       if (req.method === 'PATCH') {

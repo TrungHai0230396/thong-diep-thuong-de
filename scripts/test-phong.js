@@ -359,6 +359,94 @@ function mayKhach(ten, url) {
     ok('phòng quá một ngày: dọn luôn (luật cho xoá), báo phòng đã đóng', may.lay('coba/QQQQQQ') === null && /đã đóng/.test(xem.tin()));
   }
 
+  console.log('\n— Phòng mở: ai cũng tìm thấy, vào chơi không cần mã —');
+  {
+    /* Người dùng: "làm tìm phòng trống không có mật khẩu để mọi người tự vô chơi nữa" */
+    const dong = (ma) => may.lay(`sanh/${ma}`);
+    await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An' });
+    const maRieng = An.C._phong().ma;
+    await doi(() => An.C._phong().cay && /Phòng chờ/.test(An.tin()));
+    await cho(60);
+    ok('phòng riêng (mặc định): không hiện trong danh sách phòng mở', !dong(maRieng) && !/Phòng mở/.test(An.tin()));
+    An.C._roiPhong();
+    await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An', mo: true });
+    const ma5 = An.C._phong().ma;
+    await doi(() => dong(ma5) && /Phòng mở/.test(An.tin()));
+    const d0 = dong(ma5);
+    ok('tạo phòng mở: một dòng trong /sanh — tên chủ phòng, còn 2 ghế, dấu giờ máy chủ; phòng chờ ghi "Phòng mở", có nút thôi cho người lạ vào',
+       !!d0 && d0.ten === 'An' && d0.trong === 2 && typeof d0.tao === 'number' && typeof d0.thay === 'number' && !('luat' in d0) && /cb-doi-mo/.test(An.tin()), JSON.stringify(d0));
+    Binh.C._moCaiDat(); Binh.bam('[data-man]', { man: 'tim' });
+    await doi(() => Binh.C._timPhong() && Binh.C._timPhong().xong);
+    const ds = (Binh.C._timPhong() || { ds: [] }).ds;
+    ok('Bình mở "Tìm phòng đang chờ": thấy phòng của An còn 2 ghế; phòng riêng không có trong danh sách',
+       ds.some(d => d.ma === ma5 && d.ten === 'An' && d.trong === 2) && !ds.some(d => d.ma === maRieng), JSON.stringify(ds));
+    Binh.bam('[data-phongmo]', { phongmo: ma5 });
+    await doi(() => Binh.C._phong() && Binh.C._phong().ma === ma5 && /data-ngoi/.test(Binh.tin()));
+    ok('chạm phòng: vào thẳng, không cần mã — thấy "Phòng của An", chọn quân để vào; thôi đọc danh sách',
+       /Phòng của An/.test(Binh.tin()) && /Phòng mở/.test(Binh.tin()) && !Binh.C._timPhong());
+    Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
+    An.C._phong().nhipCuoi = Date.now();                               // hoãn nhịp "còn ở đây" của An: số ghế phải đổi ngay khi có người vào
+    await Binh.C._ngoiGhe(2);
+    await doi(() => (dong(ma5) || {}).trong === 1, 2000);
+    ok('Bình vào ghế: dòng của phòng còn 1 ghế, đổi ngay (không đợi nhịp báo còn ở đây); phòng chờ của Bình vẫn ghi "Phòng mở"',
+       (dong(ma5) || {}).trong === 1 && /Phòng mở/.test(Binh.tin()));
+    Chi.C._moCaiDat(); Chi.bam('[data-man]', { man: 'tim' });
+    await doi(() => Chi.C._timPhong() && Chi.C._timPhong().xong && Chi.C._timPhong().ds.some(d => d.ma === ma5));
+    const dc = (Chi.C._timPhong() || { ds: [] }).ds.find(d => d.ma === ma5);
+    Chi.bam('[data-phongmo]', { phongmo: ma5 });
+    await doi(() => Chi.C._phong() && Chi.C._phong().ma === ma5 && /data-ngoi/.test(Chi.tin()));
+    Chi.khung().querySelector('.cb-o-ten').value = Chi.ten;
+    await Chi.C._ngoiGhe(1);
+    await doi(() => !dong(ma5));
+    ok('Chi thấy còn 1 ghế, vào nốt: đủ ba người thì phòng thôi hiện trong danh sách', !!dc && dc.trong === 1 && !dong(ma5));
+    for (const m of [Binh, Chi]) m.C._roiPhong();
+    An.C._roiPhong();
+
+    /* luật: chỉ phòng có thật, chưa bắt đầu; đúng khuôn; ai cũng xoá được dòng (dọn dòng đã im) */
+    const sv = { '.sv': 'timestamp' }, ghi = (ma, cach, du) => fetch(`${url}/sanh/${ma}.json`, { method: cach, body: du === undefined ? undefined : JSON.stringify(du) }).then(r => r.status);
+    const kq = [await ghi('ZZZZZZ', 'PUT', { tao: sv, ten: 'Lạ', trong: 2, thay: sv }), await ghi(maRieng, 'PUT', { tao: sv, trong: 2, thay: sv }),
+      await ghi(maRieng, 'PUT', { tao: sv, ten: 'X', trong: 3, thay: sv }), await ghi(maRieng, 'PUT', { tao: sv, ten: 'X', trong: 2, thay: sv, la: 1 }),
+      await ghi(maRieng, 'PUT', { tao: sv, ten: 'X', trong: 2, thay: sv, luat: 'khac' }), await ghi(maRieng, 'PUT', { tao: 5, ten: 'X', trong: 2, thay: sv }),
+      await ghi(maRieng, 'PUT', { tao: sv, ten: 'X', trong: 2, thay: sv }), await ghi(maRieng, 'DELETE')];
+    ok('luật: dòng của phòng không có thật, thiếu tên, ghế trống 3, khoá lạ, luật lạ, giờ giả đều bị chặn; dòng đúng khuôn thì ghi được; ai cũng xoá được',
+       kq.join() === '401,401,401,401,401,401,200,200', kq.join());
+    may.gieo(`sanh/${maRieng}`, { tao: Date.now() - 200000, ten: 'Cũ', trong: 2, thay: Date.now() - 120000 });
+    may.gieo('sanh/QQQQQQ', { tao: Date.now() - 900000, ten: 'Lâu', trong: 2, thay: Date.now() - 700000 });
+    Binh.C._moCaiDat(); Binh.bam('[data-man]', { man: 'tim' });
+    await doi(() => Binh.C._timPhong() && Binh.C._timPhong().xong);
+    await doi(() => !may.lay('sanh/QQQQQQ'), 1500);
+    const ds2 = (Binh.C._timPhong() || { ds: [] }).ds;
+    ok('danh sách bỏ dòng im quá 90 giây (chủ phòng đã tắt app), dọn giùm dòng im quá 10 phút',
+       !ds2.some(d => d.ma === maRieng) && !ds2.some(d => d.ma === 'QQQQQQ') && !may.lay('sanh/QQQQQQ') && !!dong(maRieng));
+    Binh.C._moCaiDat();
+    may.gieo(`sanh/${maRieng}`, null);
+
+    /* chủ phòng đổi phòng riêng ↔ phòng mở; bắt đầu ván, rời phòng thì xoá dòng */
+    await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An', luat: 'tq' });
+    const ma6 = An.C._phong().ma;
+    await doi(() => An.C._phong().cay && /cb-doi-mo/.test(An.tin()));
+    An.bam('.cb-doi-mo');
+    await doi(() => dong(ma6));
+    const moLai = dong(ma6);
+    An.bam('.cb-doi-mo');
+    await doi(() => !dong(ma6));
+    ok('phòng riêng bấm "Cho người lạ tìm thấy": hiện trong danh sách (phòng Tam quốc ghi luat tq); bấm lần nữa: thôi hiện',
+       !!moLai && moLai.luat === 'tq' && !dong(ma6));
+    An.bam('.cb-doi-mo');
+    await doi(() => dong(ma6));
+    await An.C._batDauPhong();
+    await doi(() => !dong(ma6) && An.C._van() && An.C._van().ma === ma6);
+    ok('bắt đầu ván (máy chơi thay ghế trống): phòng thôi hiện; luật chặn ghi lại dòng cho phòng đã bắt đầu',
+       !dong(ma6) && await ghi(ma6, 'PUT', { tao: sv, ten: 'An', trong: 2, thay: sv }) === 401);
+    An.C._roiPhong();
+    await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An', mo: true });
+    const ma7 = An.C._phong().ma;
+    await doi(() => dong(ma7));
+    An.C._roiPhong();
+    await doi(() => !dong(ma7));
+    ok('chủ phòng mở rời phòng: phòng thôi hiện trong danh sách', !dong(ma7));
+  }
+
   console.log('\n— Tải lại trang —');
   {
     await An.C._taoPhong({ mau: 0, kho: 0, ten: 'An' });
@@ -384,6 +472,11 @@ function mayKhach(ten, url) {
     const html = fs.readFileSync(path.join(goc, 'index.html'), 'utf8'), trang = fs.readFileSync(path.join(goc, 'co-vua-ba-nguoi', 'index.html'), 'utf8');
     ok('địa chỉ #co-ba-nguoi/MÃ vẫn mở đúng trò (app.js chỉ xét phần trước dấu /)', /location\.hash\.slice\(1\)\.split\('\/'\)\[0\]/.test(app));
     ok('link mời …/co-vua-ba-nguoi/?phong=MÃ chuyển thẳng vào phòng', /\[\?&\]phong=\(\[A-HJ-NP-Z2-9\]\{6\}\)/.test(trang) && trang.includes("location.replace('../#co-ba-nguoi' + (m ? '/' + m[1] : ''))"));
+    /* người dùng: "trong app bạn nhắc đến cờ tải lên firebase chi vậy, ẩn mấy chú thích đó đi" — chữ hiện cho người chơi không
+       nhắc tên máy chủ (chỉ ghi chú trong mã mới nói) */
+    const khongGhiChu = NGUON_COBA.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^|\s)\/\/[^\n]*/g, '$1');
+    const chuoiFirebase = khongGhiChu.split('\n').filter(l => /Firebase/i.test(l));
+    ok('không còn chữ nào nhắc Firebase hiện ra cho người chơi', !chuoiFirebase.length, chuoiFirebase.join(' | ').slice(0, 160));
     ok('phong.js, maqr.js nạp trước coba.js, có trong bộ nhớ chạy offline; service worker không chen vào Firebase',
        ['phong.js', 'maqr.js'].every(t => html.indexOf('assets/' + t) > 0 && html.indexOf('assets/' + t) < html.indexOf('assets/coba.js') && sw.includes(`'assets/${t}'`)) &&
        /firebasedatabase\.app'\)\) return;/.test(sw));

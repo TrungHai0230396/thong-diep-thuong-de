@@ -1941,6 +1941,20 @@ Người dùng hỏi: "khi tải app trong mỗi game là vô app có tự độ
 
 Sửa kèm: dòng chữ của ngôi sao cờ ba người còn ghi "3 người chung máy" (đã bỏ từ khi có chơi qua mạng), giờ ghi "mỗi người một máy qua mạng".
 
+### Phòng mở: tìm phòng đang chờ, vào chơi không cần mã
+
+Người dùng: "làm tìm phòng trống không có mật khẩu để mọi người tự vô chơi nữa". Phòng riêng vẫn như cũ — mã 6 ký tự như mật khẩu, luật Firebase không cho ai liệt kê các phòng.
+
+- **Tạo phòng** có thêm "Ai được vào": *Bạn bè có link* (mặc định, như cũ) hay *Mọi người*. Chủ phòng đổi được ngay trong phòng chờ ("Cho người lạ tìm thấy phòng này" / "Thôi cho người lạ vào") — bạn bè không tới thì mở cho người lạ.
+- **Bảng Ván mới** có thêm *Tìm phòng đang chờ*: danh sách phòng mở — "Phòng của An · Luật thường · còn 2 ghế · vừa tạo" — tự làm mới mỗi 4 giây; chạm là vào thẳng phòng chờ (ghi "Phòng mở · Phòng của An"), chọn quân là chơi. Chưa có phòng nào thì có nút *Tạo phòng mở*.
+- **Cách làm**: chủ phòng mở ghi một dòng ngắn vào `/sanh/<mã>` — tên, luật, số ghế trống, dấu giờ — sửa ngay khi có người vào, báo "còn ở đây" cùng nhịp với ghế của mình; vào đủ người, bắt đầu ván, đổi về phòng riêng hay chủ phòng rời đi thì xoá dòng. Chủ phòng tắt app thì dòng thôi hiện sau 90 giây; người tìm phòng dọn giùm dòng đã im quá 10 phút; chủ phòng quay lại thì máy tự ghi lại dòng.
+- **Luật Firebase** thêm `sanh`: ai cũng đọc được cả danh sách (chỉ danh sách này); ghi dòng chỉ khi phòng có thật và chưa bắt đầu, đúng khuôn (tên 1–20 chữ, ghế trống 1–2, luật chỉ "tq", giờ là giờ máy chủ, không khoá lạ); ai cũng xoá được dòng (để dọn dòng đã im). Người dùng cho cập nhật bằng Chrome của họ; đã xuất bản rồi gửi 16 yêu cầu thật: đọc danh sách được; dòng cho phòng không có thật, thiếu tên, ghế trống 3, khoá lạ, giờ giả đều bị chặn; dòng đúng khuôn ghi được, sửa vài khoá được; dòng đã mất mà chỉ sửa vài khoá thì bị chặn (nên máy ghi lại cả dòng); phòng đã bắt đầu bị chặn; `/coba` vẫn không liệt kê được.
+- Giới hạn biết trước: ai biết mã một phòng riêng thì cũng ghi được dòng cho phòng đó (không có tài khoản nên luật không biết ai là chủ phòng) — nhưng biết mã thì vốn đã vào được phòng.
+
+`scripts/fb-gia.js` (máy chủ giả) làm thêm luật `sanh`. `scripts/test-phong.js` thêm 11 bài: phòng riêng không hiện; phòng mở có dòng đúng; người khác thấy trong danh sách, chạm là vào, thấy "Phòng của An"; có người vào thì số ghế đổi ngay; đủ người thì thôi hiện; luật chặn đúng 6 kiểu ghi bậy; bỏ dòng im 90 giây, dọn dòng im 10 phút; đổi riêng ↔ mở; bắt đầu ván thì thôi hiện và luật chặn ghi lại; chủ phòng rời thì thôi hiện. Thử phá 8 chỗ: lần đầu lọt 1 (số ghế không đổi ngay mà vẫn qua, vì nhịp báo còn ở đây 5 giây sau cũng sửa) — bài kiểm hoãn nhịp đó lại, giờ bắt cả 8. Đã thử trên database thật với hai thẻ khác địa chỉ: tạo phòng mở, thẻ kia thấy trong Tìm phòng, chạm vào, ngồi ghế Đen thì dòng còn 1 ghế, chủ phòng rời thì dòng mất; giữa chừng phiên dừng qua đêm, dòng cũ được dọn, chủ phòng mở lại thẻ thì dòng tự hiện lại.
+
+Người dùng hỏi thêm: "trong app bạn nhắc đến cờ tải lên firebase chi vậy, ẩn mấy chú thích đó đi" — bỏ câu "Nước đi và tên gửi qua máy chủ Firebase của Google…" dưới nút Tạo phòng. `scripts/test-phong.js` thêm 1 bài (cùng 11 bài trên, giờ 69): không còn chữ nào nhắc Firebase hiện ra cho người chơi (bỏ ghi chú trong mã rồi mới tìm — bản đầu chỉ xét từng dòng nên lọt chữ nằm trong chuỗi HTML nhiều dòng).
+
 ## Cấu trúc
 
 ```
@@ -2007,7 +2021,7 @@ assets/maqr.js             mã QR tự vẽ cho phòng chờ (ISO/IEC 18004, ki�
 scripts/test-maqr.js       12 kiểm thử mã QR: số liệu chuẩn, đọc ngược bằng bộ đọc riêng, sát sức chứa, 300 chữ ngẫu nhiên
 firebase-rules.json        luật bảo vệ database (dán vào thẻ Rules của Firebase)
 scripts/fb-gia.js          máy chủ giả của Firebase cho bài kiểm thử
-scripts/test-phong.js      57 kiểm thử chơi qua mạng: ba máy chung một phòng trên máy chủ giả, phòng chờ theo từng người xem
+scripts/test-phong.js      69 kiểm thử chơi qua mạng: ba máy chung một phòng trên máy chủ giả, phòng chờ theo từng người xem
 scripts/test-sokoban.js    60 kiểm thử Đẩy thùng sao: luật, bộ giải đối chiếu dò từng bước, bộ tạo, cả 100 màn, giao diện
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -2041,7 +2055,7 @@ node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
 node scripts/test-coba.js        # chạy 93 kiểm thử Cờ vua ba người
-node scripts/test-phong.js       # chạy 57 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
+node scripts/test-phong.js       # chạy 69 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
 node scripts/test-maqr.js        # chạy 12 kiểm thử mã QR
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
 node scripts/tao-man-sokoban.js tao ung-vien.jsonl 7 [4,5]   # tạo màn liên tục, 7 luồng, ghi mỗi màn một dòng (tuỳ chọn: chỉ số thùng này)

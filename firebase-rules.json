@@ -43,6 +43,19 @@
         "tiep": { ".write": "!data.exists()", ".validate": "newData.isString() && newData.val().matches(/^[A-HJ-NP-Z2-9]{6}$/)" },
         "$khac": { ".validate": false }
       }
+    },
+    "sanh": {
+      ".read": true,
+      "$ma": {
+        ".write": "$ma.matches(/^[A-HJ-NP-Z2-9]{6}$/) && (!newData.exists() || (root.child('coba/' + $ma).exists() && !root.child('coba/' + $ma + '/batDau').exists()))",
+        ".validate": "newData.hasChildren(['tao', 'ten', 'trong', 'thay'])",
+        "tao": { ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() === now)" },
+        "ten": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
+        "trong": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 2" },
+        "luat": { ".validate": "newData.val() === 'tq'" },
+        "thay": { ".validate": "newData.val() === now" },
+        "$khac": { ".validate": false }
+      }
     }
   }
 }

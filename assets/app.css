@@ -1401,6 +1401,13 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .cb-tin .cb-hai button{flex:1;min-width:0;margin-top:0}
 .cb-tin .cb-hai button.cb-chep-link{flex:0 0 38%}
 .cb-o-link{margin:4px 0 2px;font-size:13px;-webkit-user-select:text;user-select:text}
+/* Tìm phòng: danh sách phòng mở */
+.cb-ds-phong{display:flex;flex-direction:column;gap:8px;margin:12px 0 6px}
+.cb-tin button.cb-phong-mo{display:flex;flex-direction:column;align-items:flex-start;gap:3px;height:auto;min-height:58px;margin-top:0;padding:10px 14px;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eef1ff;text-align:left;font-weight:400}
+.cb-tin button.cb-phong-mo:hover{border-color:rgba(255,215,120,.6);background:rgba(255,215,120,.1)}
+.cb-phong-mo b{font-size:16px;font-weight:600;color:#ffe6a6}
+.cb-phong-mo small{font-size:12.5px;color:rgba(238,241,255,.7)}
 .cb-vaochoi i{width:16px;height:16px;border-radius:50%;box-shadow:0 0 0 2px rgba(0,0,0,.25)}
 .cb-o-ma-to{width:100%;height:56px;font-size:24px;text-align:center;letter-spacing:.22em}
 @media (max-height:600px){
