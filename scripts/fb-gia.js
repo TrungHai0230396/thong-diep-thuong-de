@@ -128,14 +128,22 @@ function taoMay(cong = 0) {
      đúng ba khoá P, d (chữ số và dấu phẩy), kq (thêm dấu chấm, hai chấm, chấm phẩy). Thêm: luat (0, 1, 3 băng), dich (5, 10,
      15, 25 điểm), duoi/P (mời người ở ghế P ra vì quá 3 phút không đánh: { n số cú lúc đó, luc giờ máy chủ }, ghi một lần,
      sau khi bắt đầu). Không còn phòng riêng, phòng mở (sanhbida), máy chơi thay (may/P) */
-  const KHOA_BIDA = ['tao', 'chu', 'kieu', 'so', 'kho', 'pha', 'ghe', 'batDau', 'cu', 'xong', 'tiep', 'luat', 'dich', 'ban', 'duoi'];
+  /* Thêm (người dùng: "người vô bàn trước có quyền đồng ý cho người kia vô chơi hay không, cho chọn đội, chơi 3 4 người nữa, có
+     chế độ chơi bài nữa"): so 2–4 (3, 4 người chỉ 9 bi, bida bài; 4 người đánh đôi doi: true thì 8 bi, 3 bi cũng được), kieu 52
+     (bida bài, bàn lỗ) với la (3, 5, 7 lá); xin/<id> = { ten, P, thay } người xin vào, duyet/<id> = true/false chủ bàn trả lời —
+     ghế chỉ giành được khi duyet/<id của mình> = true (ván nữa thì phòng mới ghi sẵn duyet cho người cùng bàn) */
+  const KHOA_BIDA = ['tao', 'chu', 'kieu', 'so', 'kho', 'pha', 'ghe', 'batDau', 'cu', 'xong', 'tiep', 'luat', 'dich', 'ban', 'duoi', 'doi', 'la', 'xin', 'duyet'];
+  const soHopLe = (r) => typeof r.so === 'number' && r.so >= 2 && r.so <= 4 && (r.so === 2 || r.kieu === 9 || r.kieu === 52 || (r.so === 4 && r.doi === true));
   function hopLeBida(r, nay) {
     if (!r || typeof r !== 'object' || Object.keys(r).some(k => !KHOA_BIDA.includes(k))) return false;
-    if (r.tao !== nay || ![8, 9, 3].includes(r.kieu) || r.so !== 2) return false;
+    if (r.tao !== nay || ![8, 9, 3, 52].includes(r.kieu) || !soHopLe(r)) return false;
+    if ('doi' in r && !(r.doi === true && r.so === 4 && (r.kieu === 8 || r.kieu === 3))) return false;
+    if ('la' in r && !(r.kieu === 52 && [3, 5, 7].includes(r.la))) return false;
     if (!(typeof r.ban === 'string' && /^[LP][1-8]$/.test(r.ban) && (r.ban[0] === 'P') === (r.kieu === 3))) return false;
-    if (('luat' in r && ![0, 1, 3].includes(r.luat)) || ('dich' in r && ![5, 10, 15, 25].includes(r.dich)) || 'duoi' in r) return false;
-    if (!so(r.kho, 0, 2) || !so(r.chu, 0, 1) || !so(r.pha, 0, 1) || !r.ghe || typeof r.ghe !== 'object') return false;
-    return Object.keys(r.ghe).every(P => /^[01]$/.test(P) && hopLeGhe(r.ghe[P], nay));
+    if (('luat' in r && ![0, 1, 3].includes(r.luat)) || ('dich' in r && ![5, 10, 15, 25].includes(r.dich)) || 'duoi' in r || 'xin' in r) return false;
+    if ('duyet' in r && !(r.duyet && typeof r.duyet === 'object' && Object.keys(r.duyet).every(id => /^[a-z0-9]{8,16}$/.test(id) && typeof r.duyet[id] === 'boolean'))) return false;
+    if (!so(r.kho, 0, 2) || !so(r.chu, 0, r.so - 1) || !so(r.pha, 0, r.so - 1) || !r.ghe || typeof r.ghe !== 'object') return false;
+    return Object.keys(r.ghe).every(P => /^[0-3]$/.test(P) && hopLeGhe(r.ghe[P], nay));
   }
   function choGhiBida(ma, k, gt, nay) {
     if (!LA_MA.test(ma)) return false;
@@ -151,19 +159,26 @@ function taoMay(cong = 0) {
       if (a === 'tiep') return !('tiep' in r) && typeof gt === 'string' && LA_MA.test(gt);
       return false;
     }
+    if (a === 'xin' && k.length === 2) {
+      if (!/^[a-z0-9]{8,16}$/.test(b) || 'batDau' in r) return false;
+      if (gt == null) return true;
+      const ks = gt && typeof gt === 'object' ? Object.keys(gt) : null;
+      return !!ks && ks.every(x => ['ten', 'P', 'thay'].includes(x)) && typeof gt.ten === 'string' && gt.ten.length >= 1 && gt.ten.length <= 20 && gt.thay === nay && (!('P' in gt) || so(gt.P, 0, 3));
+    }
+    if (a === 'duyet' && k.length === 2) return /^[a-z0-9]{8,16}$/.test(b) && !('batDau' in r) && (gt == null || typeof gt === 'boolean');
     if (a === 'duoi' && k.length === 2) {
-      return /^[01]$/.test(b) && !(r.duoi && b in r.duoi) && 'batDau' in r && !!gt && typeof gt === 'object' && Object.keys(gt).length === 2 &&
+      return /^[0-3]$/.test(b) && !(r.duoi && b in r.duoi) && 'batDau' in r && !!gt && typeof gt === 'object' && Object.keys(gt).length === 2 &&
         typeof gt.n === 'number' && gt.n >= 0 && gt.n <= 9999 && gt.luc === nay;
     }
     if (a === 'cu' && k.length === 2) {
       if (!/^[0-9]{1,4}$/.test(b) || (r.cu && b in r.cu) || !('batDau' in r) || !gt || typeof gt !== 'object') return false;
       const ks = Object.keys(gt);
-      return ks.length === 3 && ['P', 'd', 'kq'].every(x => ks.includes(x)) && so(gt.P, 0, 1) &&
+      return ks.length === 3 && ['P', 'd', 'kq'].every(x => ks.includes(x)) && so(gt.P, 0, 3) &&
         typeof gt.d === 'string' && gt.d.length <= 80 && /^[-0-9,]+$/.test(gt.d) && typeof gt.kq === 'string' && gt.kq.length <= 400 && /^[-0-9.,:;]+$/.test(gt.kq);
     }
-    if (a === 'ghe' && k.length === 3 && /^[01]$/.test(b)) {
+    if (a === 'ghe' && k.length === 3 && /^[0-3]$/.test(b)) {
       const g = (r.ghe && r.ghe[b]) || {};
-      if (c === 'id') return !('id' in g) && !('batDau' in r) && typeof gt === 'string' && /^[a-z0-9]{8,16}$/.test(gt);
+      if (c === 'id') return !('id' in g) && !('batDau' in r) && typeof gt === 'string' && /^[a-z0-9]{8,16}$/.test(gt) && !!(r.duyet && r.duyet[gt] === true);
       if (c === 'ten') return typeof gt === 'string' && gt.length >= 1 && gt.length <= 20;
       if (c === 'thay') return gt === nay;
     }
@@ -176,9 +191,10 @@ function taoMay(cong = 0) {
     const phongCu = cu && typeof cu.ma === 'string' && LA_MA.test(cu.ma) ? lay(['bida', cu.ma]) : null;
     if (cu && !(cu.thay < nay - 180000 || (moi && moi.ma === cu.ma) || !phongCu || typeof phongCu.xong === 'number')) return false;
     if (moi == null) return true;
-    if (typeof moi !== 'object' || Object.keys(moi).some(k => !['ma', 'kieu', 'so', 'thay', 'choi', 'ten', 'luat', 'dich', 'xem'].includes(k)) || !['ma', 'kieu', 'so', 'thay'].every(k => k in moi)) return false;
-    const dung = { ma: (x) => typeof x === 'string' && LA_MA.test(x), kieu: (x) => (ban[0] === 'L' ? x === 8 || x === 9 : x === 3), so: (x) => x === 2, thay: (x) => x === nay,
-      choi: (x) => typeof x === 'boolean', luat: (x) => ban[0] === 'P' && [0, 1, 3].includes(x), dich: (x) => ban[0] === 'P' && [5, 10, 15, 25].includes(x), ten: (x) => !!x && typeof x === 'object' && Object.keys(x).every(P => /^[01]$/.test(P) && typeof x[P] === 'string' && x[P].length >= 1 && x[P].length <= 20) };
+    if (typeof moi !== 'object' || Object.keys(moi).some(k => !['ma', 'kieu', 'so', 'thay', 'choi', 'ten', 'luat', 'dich', 'xem', 'doi', 'la'].includes(k)) || !['ma', 'kieu', 'so', 'thay'].every(k => k in moi)) return false;
+    const dung = { ma: (x) => typeof x === 'string' && LA_MA.test(x), kieu: (x) => (ban[0] === 'L' ? x === 8 || x === 9 || x === 52 : x === 3), so: (x) => [2, 3, 4].includes(x), thay: (x) => x === nay,
+      doi: (x) => typeof x === 'boolean', la: (x) => ban[0] === 'L' && [3, 5, 7].includes(x),
+      choi: (x) => typeof x === 'boolean', luat: (x) => ban[0] === 'P' && [0, 1, 3].includes(x), dich: (x) => ban[0] === 'P' && [5, 10, 15, 25].includes(x), ten: (x) => !!x && typeof x === 'object' && Object.keys(x).every(P => /^[0-3]$/.test(P) && typeof x[P] === 'string' && x[P].length >= 1 && x[P].length <= 20) };
     return viet.every(k => dung[k](moi[k]));
   }
 

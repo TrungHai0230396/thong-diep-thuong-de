@@ -119,9 +119,9 @@ function mayKhach(ten, url) {
     const luat = JSON.parse(fs.readFileSync(path.join(goc, 'firebase-rules.json'), 'utf8')).rules, ph = luat.bida && luat.bida.$ma;
     ok('luật có nhánh bida (ván ở một bàn) và quan (16 bàn); không còn phòng mở (sanhbida), máy chơi thay (may); không ai liệt kê được các ván',
       !!ph && !!luat.quan && !luat.sanhbida && !ph.may && !('.read' in luat.bida));
-    ok('ván mới phải thuộc một bàn trong quán (khoá ban), hai ghế; bàn lỗ chỉ 8, 9 bi, bàn phăng chỉ 3 bi',
-      ph['.validate'].includes("(data.exists() || newData.hasChild('ban'))") && ph.so['.validate'] === 'newData.val() === 2' && /beginsWith\('P'\)/.test(ph.ban['.validate']) &&
-      ph.ghe.$P['.validate'].includes('/^[01]$/'));
+    ok('ván mới phải thuộc một bàn trong quán (khoá ban), 2–4 ghế (3, 4 người: 9 bi, bida bài; 4 đánh đôi: 8 bi, 3 bi); bàn lỗ 8, 9 bi, bài; bàn phăng 3 bi; ghế chỉ giành được khi chủ bàn đã đồng ý',
+      ph['.validate'].includes("(data.exists() || newData.hasChild('ban'))") && ph.so['.validate'].includes('newData.val() >= 2 && newData.val() <= 4') && /beginsWith\('P'\)/.test(ph.ban['.validate']) &&
+      ph.ghe.$P['.validate'].includes('/^[0-3]$/') && /duyet\/' \+ newData\.val\(\)\)\.val\(\) === true/.test(ph.ghe.$P.id['.write']) && !!ph.xin && !!ph.duyet && !!ph.doi && !!ph.la);
     ok('cú đánh chỉ ghi một lần, sau khi bắt đầu; ghế chỉ giành một lần, trước khi bắt đầu; khoá lạ bị chặn',
        /!data\.exists\(\) && root\.child\('bida\/' \+ \$ma \+ '\/batDau'\)\.exists\(\)/.test(ph.cu.$n['.write']) &&
        /^!data\.exists\(\) && !root/.test(ph.ghe.$P.id['.write']) && ph.$khac['.validate'] === false && ph.cu.$n.$khac['.validate'] === false);
@@ -131,14 +131,29 @@ function mayKhach(ten, url) {
     const sv = { '.sv': 'timestamp' }, ghe = { 0: { id: 'abcdefgh1234', ten: 'X', thay: sv } };
     const tao = (ma, du) => fetch(`${url}/bida/${ma}.json`, { method: 'PUT', body: JSON.stringify(du) }).then(r => r.status);
     const goc_ = { tao: sv, chu: 0, kieu: 8, so: 2, kho: 0, pha: 0, ghe }, voi = (them) => Object.assign({}, goc_, them);
-    const kq = [await tao('AAAAAA', goc_), await tao('AAAAAB', voi({ kieu: 9, so: 3, ban: 'L1' })), await tao('AAAAAC', voi({ kieu: 3, ban: 'L2' })),
+    const kq = [await tao('AAAAAA', goc_), await tao('AAAAAB', voi({ kieu: 8, so: 3, ban: 'L1' })), await tao('AAAAAC', voi({ kieu: 3, ban: 'L2' })),
       await tao('AAAAAD', voi({ ban: 'P1' })), await tao('AAAAAE', voi({ ban: 'L9' })), await tao('AAAAAF', voi({ ban: 'L1', la: 1 })),
       await tao('AAAAAG', voi({ tao: 5, ban: 'L1' })), await tao('AAAAAH', voi({ kieu: 9, kho: 1, pha: 1, ban: 'L1' }))];
-    ok('máy chủ giả làm đúng luật: ván không thuộc bàn nào (phòng riêng), ba ghế, bàn lỗ mà 3 bi, bàn phăng mà 8 bi, bàn ngoài 16 bàn, khoá lạ, giờ giả đều bị chặn; ván 9 bi hai ghế ở bàn L1 thì tạo được',
+    ok('máy chủ giả làm đúng luật: ván không thuộc bàn nào (phòng riêng), 8 bi ba ghế, bàn lỗ mà 3 bi, bàn phăng mà 8 bi, bàn ngoài 16 bàn, khoá lạ, giờ giả đều bị chặn; ván 9 bi hai ghế ở bàn L1 thì tạo được',
        kq.join() === '401,401,401,401,401,401,401,200', kq.join());
-    may.gieo('bida/AAAAAH', null);
+    const kq2 = [await tao('AAAAAJ', voi({ so: 4, ban: 'L2' })), await tao('AAAAAK', voi({ so: 4, doi: true, ban: 'L2' })), await tao('AAAAAL', voi({ kieu: 9, so: 3, ban: 'L3' })),
+      await tao('AAAAAM', voi({ kieu: 52, so: 3, la: 5, ban: 'L4' })), await tao('AAAAAN', voi({ kieu: 52, so: 2, la: 4, ban: 'L5' })), await tao('AAAAAP', voi({ kieu: 52, ban: 'P2' })),
+      await tao('AAAAAQ', voi({ kieu: 9, so: 4, doi: true, ban: 'L6' }))];
+    ok('máy chủ giả: 8 bi bốn ghế mà không đánh đôi, bida bài 4 lá, bida bài ở bàn phăng, 9 bi đánh đôi đều bị chặn; 8 bi bốn ghế đánh đôi, 9 bi ba ghế, bida bài 5 lá ba ghế thì tạo được',
+       kq2.join() === '401,200,200,200,401,401,401', kq2.join());
+    const xin = (ma, id, du, cach = 'PUT') => fetch(`${url}/bida/${ma}/${id}.json`, { method: cach, body: JSON.stringify(du) }).then(r => r.status);
+    const kq3 = [await xin('AAAAAK', 'ghe/1', { id: 'zzzzzzzz9', ten: 'Lạ', thay: sv }, 'PATCH'), await xin('AAAAAK', 'xin/zzzzzzzz9', { ten: 'Lạ', P: 1, thay: sv }),
+      await xin('AAAAAK', 'duyet/zzzzzzzz9', true), await xin('AAAAAK', 'ghe/1', { id: 'zzzzzzzz9', ten: 'Lạ', thay: sv }, 'PATCH')];
+    ok('máy chủ giả: chưa được chủ bàn đồng ý thì không giành ghế được; xin vào, được đồng ý rồi thì giành được', kq3.join() === '401,200,200,200', kq3.join());
+    for (const m of ['AAAAAH', 'AAAAAK', 'AAAAAL', 'AAAAAM']) may.gieo(`bida/${m}`, null);
   }
 
+  /* xin vào bàn rồi chủ bàn đồng ý (người dùng: "người vô bàn trước có quyền đồng ý cho người kia vô chơi hay không") */
+  const vaoDuocDuyet = async (m, ban, chu, P = -1) => {
+    await m.C._vaoBanQuan(ban, P);
+    await doi(() => m.C._phong() && chu.C._phong() && chu.C._phong().cay && chu.C._phong().cay.xin && chu.C._phong().cay.xin[m.C._phong().id], 6000);
+    chu.C._duyetXin(m.C._phong().id, true);
+  };
   console.log('\n— Một bàn: ngồi, vào, đánh — hai máy luôn cùng một thế bàn —');
   for (const m of ca) m.khung().querySelector('.bd-o-ten').value = m.ten;    // ô "Tên của bạn" trên bảng bàn (app điền sẵn tên đã lưu)
   An.C._moMan('quan');
@@ -149,7 +164,7 @@ function mayKhach(ten, url) {
   ok('An ngồi bàn L1: ván có mã, An ghế 1 (phá trước), địa chỉ mang mã ván (?phong=MÃ, không dấu #), máy nhớ ghế để mở lại', !!ma && An.C._phong().P === 0 && An.ctx.location.search === '?phong=' + ma && !An.ctx.location.hash &&
      JSON.parse(An.luu['tdtd.bida']).phong.ma === ma && /Ghế 1 · phá trước/.test(An.tin()));
   await Binh.C._batQuan();
-  await Binh.C._vaoBanQuan('L1');
+  await vaoDuocDuyet(Binh, 'L1', An);
   await doi(() => hai.every(m => m.C._van() && m.C._van().cheDo === 'phong' && m.C._van().ma === ma && m.yen()), 8000);
   ok('Bình vào bàn: ván bắt đầu ngay, cùng một cách xếp bi (hạt giống lấy từ mã ván), lượt An phá; mỗi máy chỉ đánh được ghế của mình',
     khop(hai) && An.C._van().the.luot === 0 && An.C._laMinh(0) && Binh.C._laMinh(1) && !An.C._laMinh(1) && !Binh.C._laMinh(0));
@@ -236,37 +251,46 @@ function mayKhach(ten, url) {
     const hinh = An.C._quan().hinh;
     ok('quán mới: 16 bàn trống; màn quán vẽ đủ 16 bàn, mỗi bàn một sofa; chạm vào giữa bàn hay sofa của bàn nào ra đúng bàn đó', An.C._demQuan().trong === 16 && /16 bàn trống/.test(An.C._chuQuan()) &&
       new Set(hinh.map(h => h.ban)).size === 16 && hinh.every(h => An.C._banTai(h.tam[0], h.tam[1]) === h.ban), An.C._chuQuan());
+    /* người dùng: "Quán bida cho to full đi đừng làm popup, khi chọn bàn thì ở background vẫn là quán chứ" */
+    const lopQuan = An.khung().querySelector('.bd-quan'), tinAn = An.khung().querySelector('.bd-tin');
+    ok('quán phủ kín khung trò, không nằm trong bảng tin: lớp quán hiện, bảng tin ẩn', An.C._quanHien() && lopQuan.hidden === false && tinAn.hidden === true);
     const dsNut = An.khung().querySelector('.bd-quan-ds').innerHTML;
     An.bam('[data-quanban]', { quanban: 'L3' });
     ok('hàng nút 16 bàn dưới hình (bàn xa nhỏ khó chạm, người dùng bàn phím): đủ 16 nút, mỗi nút đọc được tên bàn, trạng thái; bấm L3 mở đúng bảng bàn L3',
       (dsNut.match(/data-quanban=/g) || []).length === 16 && dsNut.includes('aria-label="Bàn L3, bida lỗ, trống"') && dsNut.includes('aria-label="Bàn P8, bida 3 bi, trống"') &&
       /Bàn L3 · bida lỗ/.test(An.tin()) && /Bàn trống/.test(An.tin()));
+    ok('bảng bàn L3 hiện đè lên quán: quán vẫn hiện ở sau', tinAn.hidden === false && An.C._quanHien() && lopQuan.hidden === false && An.C._quan().ban === 'L3');
+    An.bam('[data-man]', { man: 'quan' });
+    const veQuanDuoc = tinAn.hidden === true && An.C._quanHien();
+    An.bam('[data-quanban]', { quanban: 'L3' });
+    ok('bấm "‹ Về quán" trên bảng bàn: bảng tắt, còn quán; chạm lại L3 thì bảng hiện lại', veQuanDuoc && tinAn.hidden === false && /Bàn trống/.test(An.tin()));
     luuKieu(An, { kieuBan: 8 });
     await An.C._ngoiBanQuan('L3');
     await doi(() => An.C._phong() && An.C._phong().cay && /Đang chờ người vào bàn/.test(An.tin()));
     const maL3 = An.C._phong().ma, L3 = may.lay('quan/L3');
-    ok('An ngồi bàn L3 (8 bi): quan/L3 trỏ tới phòng mới mang bàn L3, An chờ người', !!L3 && L3.ma === maL3 && L3.kieu === 8 && may.lay(`bida/${maL3}/ban`) === 'L3');
+    ok('An ngồi bàn L3 (8 bi): quan/L3 trỏ tới phòng mới mang bàn L3, An chờ người; quán vẫn ở sau bảng chờ', !!L3 && L3.ma === maL3 && L3.kieu === 8 && may.lay(`bida/${maL3}/ban`) === 'L3' &&
+      An.C._quanHien() && tinAn.hidden === false);
     await Binh.C._batQuan();
     ok('Bình xem quán: bàn L3 có An chờ, còn 15 bàn trống', Binh.C._trangBan('L3') === 'cho' && Binh.C._demQuan().trong === 15);
     const chan = [await ghiBan('L3', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 2, thay: sv }), await ghiBan('L3', 'DELETE'), await ghiBan('L9', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 2, thay: sv }),
-      await ghiBan('P1', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 2, thay: sv }), await ghiBan('L1', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 3, thay: sv }),
+      await ghiBan('P1', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 2, thay: sv }), await ghiBan('L1', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 5, thay: sv }),
       await ghiBan('L1', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 2, thay: 5 }), await ghiBan('L1', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 2, thay: sv, la: 1 }),
       await ghiBan('L1', 'PUT', { ma: 'BBBBBB', kieu: 8, so: 2, thay: sv, luat: 1 }), await ghiBan('P1', 'PUT', { ma: 'BBBBBB', kieu: 3, so: 2, thay: sv, dich: 7 })];
-    ok('luật quán: giành hay xoá bàn đang có người, bàn ngoài 16 bàn, bàn phăng mà 8 bi, 3 người, giờ giả, khoá lạ, bàn lỗ ghi luật băng, số điểm lạ đều bị chặn',
+    ok('luật quán: giành hay xoá bàn đang có người, bàn ngoài 16 bàn, bàn phăng mà 8 bi, 5 người, giờ giả, khoá lạ, bàn lỗ ghi luật băng, số điểm lạ đều bị chặn',
       chan.join() === '401,401,401,401,401,401,401,401,401', chan.join());
     const ghiXem = (b, id, cach, du) => fetch(`${url}/quan/${b}/xem/${id}.json`, { method: cach, body: du === undefined ? undefined : JSON.stringify(du) }).then(r => r.status);
     const kqXem = [await ghiXem('L8', 'abcdefgh1', 'PUT', sv), await ghiXem('L3', 'abc', 'PUT', sv), await ghiXem('L3', 'abcdefgh1', 'PUT', 5),
       await ghiXem('L3', 'abcdefgh1', 'PUT', sv), await ghiXem('L3', 'abcdefgh1', 'DELETE')];
     ok('luật sofa xem (quan/<bàn>/xem/<id>): bàn trống, id sai khuôn, giờ giả đều bị chặn; bàn đang có người thì ngồi sofa được, đứng dậy (xoá) được',
       kqXem.join() === '401,401,401,200,200', kqXem.join());
-    await Binh.C._vaoBanQuan('L3');
+    await vaoDuocDuyet(Binh, 'L3', An);
     await doi(() => [An, Binh].every(m => m.C._van() && m.C._van().cheDo === 'phong' && m.C._van().ma === maL3 && m.yen()), 8000);
     const L3b = may.lay('quan/L3');
-    ok('Bình vào bàn: tự ngồi ghế 2, ván bắt đầu ngay (An phá); bàn ghi đang chơi, đủ hai tên', !!L3b && L3b.choi === true && L3b.ten[0] === 'An' && L3b.ten[1] === 'Bình' &&
-      khop([An, Binh]) && An.C._van().the.luot === 0, JSON.stringify(L3b));
+    ok('Bình vào bàn: tự ngồi ghế 2, ván bắt đầu ngay (An phá); bàn ghi đang chơi, đủ hai tên; vào ván thì lớp quán ẩn, thôi hỏi quán', !!L3b && L3b.choi === true && L3b.ten[0] === 'An' && L3b.ten[1] === 'Bình' &&
+      khop([An, Binh]) && An.C._van().the.luot === 0 && !An.C._quanHien() && !Binh.C._quanHien() && !An.C._quan().hen && lopQuan.hidden === true, JSON.stringify(L3b));
     await Chi.C._batQuan();
     Chi.C._moMan('quan');                                              // màn quán dựng hàng nút theo dữ liệu vừa tải
-    const nutL3 = (/<button[^>]*data-quanban="L3"[^>]*>/.exec(Chi.tin()) || [''])[0];
+    const nutL3 = (/<button[^>]*data-quanban="L3"[^>]*>/.exec(Chi.khung().querySelector('.bd-quan-ds').innerHTML) || [''])[0];
     ok('nút bàn L3 trên màn quán của Chi: xám "đang chơi", đọc được tên hai người', /bd-quan-choi/.test(nutL3) && nutL3.includes('đang chơi: An và Bình'), nutL3);
     Chi.C._moBanQuan('L3');
     ok('Chi xem bàn L3: đang chơi, không có nút ngồi hay vào', Chi.C._trangBan('L3') === 'choi' && /Bàn đang chơi/.test(Chi.tin()) && !/bd-ngoiban|bd-vaoban/.test(Chi.tin()));
@@ -318,7 +342,7 @@ function mayKhach(ten, url) {
     await An.C._batQuan();
     An.C._moBanQuan('P5');
     ok('An chạm bàn P5: thấy Chi đang chờ, bàn đánh bida 3 bi, 1 băng, tới 5 điểm — biết trước khi vào', /Chi đang chờ người/.test(An.tin()) && /Bida 3 bi, 1 băng, tới 5 điểm/.test(An.tin()));
-    await An.C._vaoBanQuan('P5');
+    await vaoDuocDuyet(An, 'P5', Chi);
     const maP5 = Chi.C._phong().ma, hai = [Chi, An];
     await doi(() => hai.every(m => m.C._van() && m.C._van().ma === maP5 && m.yen()), 8000);
     /* Dũng (máy thứ tư) ngồi sofa xem bàn P5 — người dùng: "ai ngồi ghế sofa bàn nào thì có thể xem bàn đó, tất cả ngồi ghế
@@ -467,7 +491,7 @@ function mayKhach(ten, url) {
     await Chi.C._ngoiBanQuan('P6');
     await doi(() => Chi.C._phong() && Chi.C._phong().cay && (may.lay('quan/P6') || {}).ma === Chi.C._phong().ma);
     await Binh.C._batQuan();
-    await Binh.C._vaoBanQuan('P6');
+    await vaoDuocDuyet(Binh, 'P6', Chi);
     const maP6 = Chi.C._phong().ma, hai3 = [Chi, Binh];
     await doi(() => hai3.every(m => m.C._van() && m.C._van().ma === maP6 && m.yen()), 8000);
     const het6a = await danhHet(hai3, 0);
@@ -478,6 +502,8 @@ function mayKhach(ten, url) {
     await doi(() => Chi.C._phong() && Chi.C._phong().ma !== maP6 && Chi.C._phong().cay && (may.lay('quan/P6') || {}).ma === Chi.C._phong().ma);
     const maP6c = Chi.C._phong().ma;
     await Binh.C._vanNua();
+    await doi(() => Binh.C._phong() && Binh.C._phong().ma === maP6c && Chi.C._phong().cay.xin && Chi.C._phong().cay.xin[Binh.C._phong().id], 6000);
+    Chi.C._duyetXin(Binh.C._phong().id, true);                         // Chi ở lại chờ người mới: Bình xin vào, Chi đồng ý
     await doi(() => hai3.every(m => m.C._van() && m.C._van().ma === maP6c && m.yen()), 8000);
     ok('hết ván ở P6: Chi bấm Ở lại bàn trước, Bình bấm Chơi ván nữa sau — Bình vào luôn phòng Chi đang chờ ở P6, ván mới bắt đầu',
       het6a.lech === 0 && hai3.every(m => m.C._van() && m.C._van().ma === maP6c) && (may.lay('quan/P6') || {}).ma === maP6c && may.lay('quan/P6').choi === true,
@@ -501,7 +527,7 @@ function mayKhach(ten, url) {
     await An.C._ngoiBanQuan('L5');
     await doi(() => An.C._phong() && An.C._phong().cay && (may.lay('quan/L5') || {}).ma === An.C._phong().ma);
     await Binh.C._batQuan();
-    await Binh.C._vaoBanQuan('L5');
+    await vaoDuocDuyet(Binh, 'L5', An);
     const maL5 = An.C._phong().ma;
     await doi(() => [An, Binh].every(m => m.C._van() && m.C._van().ma === maL5 && m.yen()), 8000);
     Binh.C._roiPhong();                                                // Bình tắt app: không ghi gì, máy Bình thôi canh bàn
@@ -533,6 +559,178 @@ function mayKhach(ten, url) {
     may.gieo('quan', null);
   }
 
+  console.log('\n— Quán: chủ bàn duyệt người vào, bàn 3 người, đánh đôi 4 người, bida bài —');
+  {
+    /* người dùng: "Người vô bàn trước có quyền đồng ý cho người kia vô chơi hay không, cho chọn đội, chơi 3 4 nười nữa, có chế độ chơi bài nữa" */
+    for (const m of ca) if (m.C._phong()) m.C._roiPhong();
+    may.gieo('quan', null);
+    for (const m of ca) m.khung().querySelector('.bd-o-ten').value = m.ten;
+    const luuK = (m, o) => { m.luu['tdtd.bida'] = JSON.stringify(Object.assign(JSON.parse(m.luu['tdtd.bida'] || '{}'), o)); };
+    const Dung = mayKhach('Dũng', url);
+    Dung.C.mo(); Dung.khung().querySelector('.bd-o-ten').value = 'Dũng';
+    luuK(An, { kieuBan: 9, soBanL: 3 });
+    An.C._moMan('quan'); await An.C._taiQuan();
+    await An.C._ngoiBanQuan('L7');
+    await doi(() => An.C._phong() && An.C._phong().cay && /Đang chờ người vào bàn/.test(An.tin()));
+    let ma7 = An.C._phong().ma;
+    ok('An ngồi bàn L7, chọn 9 bi 3 người: ván ghi 3 ghế, bàn trong quán cũng ghi 3 người', may.lay(`bida/${ma7}/so`) === 3 && (may.lay('quan/L7') || {}).so === 3);
+    await Binh.C._batQuan();
+    Binh.C._moBanQuan('L7');
+    const coNutXin = /Xin vào chơi với An/.test(Binh.tin()) && /chủ bàn/.test(Binh.tin()) && /9 bi, 3 người/.test(Binh.tin());
+    await Binh.C._vaoBanQuan('L7');
+    await doi(() => An.C._phong().cay.xin && An.C._phong().cay.xin[Binh.C._phong().id] && /bd-duyet/.test(An.tin()) && /Đang chờ An đồng ý/.test(Binh.tin()), 6000);
+    ok('Bình chạm bàn L7: nút "Xin vào chơi"; xin rồi thì chờ An đồng ý, chưa ngồi ghế nào; An thấy "Bình xin vào" với nút Đồng ý, Không',
+      coNutXin && /Bình<\/b> xin vào/.test(An.tin()) && !may.lay(`bida/${ma7}/ghe/1`));
+    An.C._duyetXin(Binh.C._phong().id, false);
+    await doi(() => Binh.C._phong() === null && /chưa đồng ý/.test(Binh.bao()), 4000);
+    ok('An bấm Không: Bình về quán, báo An chưa đồng ý; ghế vẫn trống', Binh.C._phong() === null && /chưa đồng ý/.test(Binh.bao()) && !may.lay(`bida/${ma7}/ghe/1`));
+    await vaoDuocDuyet(Binh, 'L7', An);
+    await doi(() => Binh.C._phong() && Binh.C._phong().P >= 0, 6000);
+    ok('xin lại, An đồng ý: Bình ngồi ghế 2; chưa đủ 3 người nên chưa bắt đầu', Binh.C._phong().P === 1 && !may.lay(`bida/${ma7}/batDau`) && (may.lay('quan/L7') || {}).choi !== true);
+    await Chi.C._batQuan();
+    await Chi.C._vaoBanQuan('L7');
+    await doi(() => [An, Binh].every(m => m.C._phong().cay.xin && m.C._phong().cay.xin[Chi.C._phong().id]), 6000);
+    const idChi = Chi.C._phong().id;
+    Binh.C._duyetXin(idChi, true);
+    await new Promise(r => setTimeout(r, 400));
+    ok('chỉ chủ bàn mới duyệt: Bình (đã ngồi, không phải chủ bàn) không thấy nút Đồng ý, gọi duyệt cũng không ghi gì; Chi vẫn chờ',
+      !/bd-duyet/.test(Binh.tin()) && may.lay(`bida/${ma7}/duyet/${idChi}`) == null && Chi.C._phong().P < 0);
+    An.C._duyetXin(idChi, true);
+    const ba = [An, Binh, Chi];
+    await doi(() => ba.every(m => m.C._van() && m.C._van().ma === ma7 && m.yen()), 8000);
+    ok('Chi được đồng ý, đủ 3 người: ván 9 bi ba người bắt đầu ngay, ba máy cùng thế bàn', khop(ba) && An.C._van().so === 3 && (may.lay('quan/L7') || {}).choi === true);
+    await Dung.C._batQuan();
+    Dung.C._moBanQuan('L7');
+    ok('Dũng chạm bàn L7 đang chơi ba người: sofa bốn chỗ, hai người chờ lượt ngồi đó, còn 2 chỗ cho người xem', /Sofa bàn này còn 2 chỗ/.test(Dung.tin()) && /An – Bình – Chi/.test(Dung.tin()),
+      Dung.tin().replace(/<[^>]+>/g, ' ').slice(0, 300));
+    let ke = 0;
+    for (let i = 0; i < 3 && An.C._van().the.thang < 0; i++) {
+      const t = An.C._van().the, m = ba.find(x => x.C._phong().P === t.luot);
+      m.C._danhCu(cuNhe(m), t.luot); ke++;
+      await doi(() => yenHet(ba, ke), 8000);
+    }
+    ok('ba người đánh qua lại: ba máy luôn khớp', khop(ba) && An.C._van().the.thang < 0, `${ke} cú`);
+    await doi(() => ba.every(m => m.yen()));
+    /* Chơi ván nữa ở bàn ba người (giả như ván vừa hết: ghi xong như máy nào hết ván cũng ghi — khỏi phải đánh tới bi 9) */
+    await fetch(`${url}/bida/${ma7}/xong.json`, { method: 'PUT', body: JSON.stringify({ '.sv': 'timestamp' }) });
+    await doi(() => ba.every(m => m.C._phong().cay && m.C._phong().cay.xong), 4000);
+    const idBinh = Binh.C._phong().id;
+    await An.C._vanNua();
+    await doi(() => may.lay(`bida/${ma7}/tiep`) && An.C._phong() && An.C._phong().ma === may.lay(`bida/${ma7}/tiep`), 6000);
+    const ma7b = may.lay(`bida/${ma7}/tiep`), q7 = may.lay('quan/L7') || {};
+    ok('Chơi ván nữa ở bàn ba người: phòng mới vẫn 9 bi, 3 ghế; Bình và Chi được duyệt sẵn (khỏi xin lại); bàn L7 trỏ sang phòng mới, giữ chỗ cả ba người',
+      may.lay(`bida/${ma7b}/so`) === 3 && may.lay(`bida/${ma7b}/kieu`) === 9 && may.lay(`bida/${ma7b}/duyet/${idBinh}`) === true && may.lay(`bida/${ma7b}/duyet/${idChi}`) === true &&
+      q7.ma === ma7b && q7.so === 3 && q7.choi === true && Object.keys(q7.ten || {}).length === 3, JSON.stringify(q7));
+    Binh.C._theoTiep(ma7b); Chi.C._theoTiep(ma7b);
+    await doi(() => ba.every(m => m.C._van() && m.C._van().ma === ma7b && m.yen()), 8000);
+    ok('Bình, Chi bấm Vào ván mới: ngồi lại đúng ghế cũ, ván mới bắt đầu ngay, người kế (Bình) phá; ba máy khớp',
+      Binh.C._phong().P === 1 && Chi.C._phong().P === 2 && An.C._van().the.luot === 1 && An.C._van().the.pha === true && khop(ba), `lượt ${An.C._van().the.luot}`);
+    ma7 = ma7b; ke = 0;
+    await Chi.C._roiBanQuan();
+    const hai = [An, Binh];
+    await doi(() => hai.every(m => m.C._van().ra && m.C._van().ra.has(2)), 4000);
+    let quaChi = true;
+    for (let i = 0; i < 4 && An.C._van().the.thang < 0; i++) {
+      if (An.C._van().the.luot === 2) quaChi = false;
+      const t = An.C._van().the, m = hai.find(x => x.C._phong().P === t.luot);
+      if (!m) { quaChi = false; break; }
+      m.C._danhCu(cuNhe(m), t.luot); ke++;
+      await doi(() => yenHet(hai, ke), 8000);
+    }
+    ok('Chi bỏ ngang giữa ván 3 người: ván không hết, An và Bình đánh tiếp, tới lượt Chi thì bỏ qua; hai máy vẫn khớp; bàn vẫn của An',
+      quaChi && khop(hai) && An.C._van().the.thang < 0 && An.C._van().the.luot !== 2 && Chi.C._phong() === null && (may.lay('quan/L7') || {}).ma === ma7, `${ke} cú, lượt ${An.C._van().the.luot}`);
+    await Binh.C._roiBanQuan();
+    await doi(() => An.C._van().the.thang === 0 && An.C._van().the.lyDo === 'duoi', 4000);
+    ok('Bình cũng bỏ ngang: còn mỗi An, An thắng', An.C._van().the.thang === 0 && An.C._van().the.lyDo === 'duoi');
+    await An.C._roiBanQuan();
+    /* đánh đôi 8 bi ở L8: bốn người, chọn ghế là chọn đội */
+    const bon = [An, Binh, Chi, Dung];
+    luuK(An, { kieuBan: 8, soBanL: 4 });
+    An.C._moMan('quan'); await An.C._taiQuan();
+    await An.C._ngoiBanQuan('L8');
+    await doi(() => An.C._phong() && An.C._phong().cay && /Đang chờ người vào bàn/.test(An.tin()));
+    const ma8 = An.C._phong().ma;
+    await Binh.C._batQuan();
+    Binh.C._moBanQuan('L8');
+    const nutDoi = /Xin vào ghế 2 · Đội B/.test(Binh.tin()) && /Xin vào ghế 3 · Đội A/.test(Binh.tin()) && /Xin vào ghế 4 · Đội B/.test(Binh.tin());
+    ok('An ngồi bàn L8, chọn 8 bi 4 người: ván ghi đánh đôi; người vào thấy mỗi ghế trống một nút, kèm đội (ghế 1, 3 đội A — ghế 2, 4 đội B)',
+      may.lay(`bida/${ma8}/doi`) === true && may.lay(`bida/${ma8}/so`) === 4 && nutDoi);
+    await vaoDuocDuyet(Binh, 'L8', An, 3);                                // chọn ghế không theo thứ tự: ghế 4 (đội B)
+    await doi(() => Binh.C._phong() && Binh.C._phong().P === 3, 6000);
+    await Chi.C._batQuan();
+    await vaoDuocDuyet(Chi, 'L8', An, 2);
+    await doi(() => Chi.C._phong() && Chi.C._phong().P === 2, 6000);
+    await Dung.C._batQuan();
+    await vaoDuocDuyet(Dung, 'L8', An, 1);
+    await doi(() => bon.every(m => m.C._van() && m.C._van().ma === ma8 && m.yen()), 8000);
+    ok('đủ bốn người, mỗi người đúng ghế mình chọn: ván đánh đôi bắt đầu, bốn máy cùng thế bàn', khop(bon) && An.C._van().the.doi === true && Dung.C._phong().P === 1 && Binh.C._phong().P === 3 && Chi.C._phong().P === 2 &&
+      /Đội B/.test(Binh.khung().querySelector('.bd-nguoi').innerHTML));
+    An.C._danhCu({ dx: 1, dy: 0.003, v: 8.4, a: 0, b: -0.15, cx: L.KE_DAU - 0.05, cy: L.RONG / 2 }, 0);
+    ke = 1;
+    await doi(() => yenHet(bon, ke), 8000);
+    for (let i = 0; i < 3 && An.C._van().the.thang < 0; i++) {
+      const t = An.C._van().the, m = bon.find(x => x.C._phong().P === t.luot);
+      m.C._danhCu(cuNhe(m), t.luot); ke++;
+      await doi(() => yenHet(bon, ke), 8000);
+    }
+    const nh = An.C._van().the.nhom;
+    ok('đánh đôi đánh qua lại: bốn máy luôn khớp; đã chia nhóm thì hai người một đội chung một nhóm bi', khop(bon) && (nh.every(g => g === 0) || (nh[0] === nh[2] && nh[1] === nh[3] && nh[0] !== nh[1])),
+      `${ke} cú, nhóm ${JSON.stringify(nh)}`);
+    /* Chi (ghế 3, đội A) về quán giữa ván: như ngoài quán, An đánh luôn lượt của Chi, lượt vẫn xen đội A, B, A, B */
+    await doi(() => bon.every(m => m.yen()));
+    await Chi.C._roiBanQuan();
+    const ba2 = [An, Binh, Dung];
+    await doi(() => ba2.every(m => m.C._van().ra && m.C._van().ra.has(2)), 4000);
+    ok('Chi bỏ ngang giữa ván đánh đôi: ván chưa hết, ba máy còn lại cùng biết Chi đã ra', An.C._van().the.thang < 0 && ba2.every(m => m.C._van().ra.has(2)) &&
+      /đã rời bàn/.test(Binh.khung().querySelector('.bd-nguoi').innerHTML));
+    let lanThay = 0, thayDung = false, chuBinh = '', theAn = '';
+    for (let i = 0; i < 12 && An.C._van().the.thang < 0; i++) {
+      const luot = An.C._van().the.luot, m = ba2.find(x => x.C._laMinh(luot));
+      if (!m) break;
+      if (luot === 2) {
+        if (++lanThay === 2) break;                                    // lần thứ hai tới lượt của Chi: thử mời ra (dưới)
+        thayDung = m === An && !Binh.C._laMinh(2) && !Dung.C._laMinh(2);
+        chuBinh = Binh.khung().querySelector('.bd-luot').textContent; theAn = An.khung().querySelector('.bd-nguoi').innerHTML;
+      }
+      m.C._danhCu(cuNhe(m), luot); ke++;
+      await doi(() => yenHet(ba2, ke), 8000);
+    }
+    ok('tới lượt của Chi thì An đánh thay (máy An cầm cơ, máy Bình, Dũng thì không); Bình thấy "An đang đánh thay Chi"; thẻ của An ghi "đánh thay Chi"; ba máy vẫn khớp',
+      lanThay === 2 && thayDung && /An đang đánh thay Chi/.test(chuBinh) && /đánh thay Chi/.test(theAn) && khop(ba2) && An.C._van().the.thang < 0, `${chuBinh} | lượt ${An.C._van().the.luot}`);
+    /* lượt của Chi mà An (người đánh thay) quá 3 phút không đánh: mời An ra — không phải ghế của Chi đã về — đội A hết người */
+    Binh.C._kiemBanQuan();
+    Binh.C._phong().luotTu = Date.now() - 181000;
+    Binh.C._kiemBanQuan();
+    await doi(() => may.lay(`bida/${ma8}/duoi/0`) && [Binh, Dung].every(m => m.C._van().the.thang >= 0), 4000);
+    const theDung = Dung.khung().querySelector('.bd-nguoi').innerHTML;
+    await doi(() => /Đội B thắng/.test(Dung.tin()) && /Bạn đã rời bàn/.test(An.tin()), 4000);
+    ok('lượt của Chi mà An quá 3 phút không đánh: máy Bình mời An ra; đội A hết người, đội B thắng — máy Dũng ghi "thắng" cho cả Bình lẫn Dũng, báo "Đội B thắng"; An thấy "Bạn đã rời bàn"',
+      (may.lay(`bida/${ma8}/duoi/0`) || {}).n === ke && [1, 3].includes(Dung.C._van().the.thang) && (theDung.match(/thắng/g) || []).length === 2 &&
+      /Đội B thắng/.test(Dung.tin()) && /Bạn đã rời bàn/.test(An.tin()), theDung.replace(/<[^>]+>/g, ' '));
+    for (const m of [An, Binh, Dung]) await m.C._roiBanQuan();
+    /* bida bài ở L6: mỗi người chỉ thấy bài của mình */
+    may.gieo('quan', null);
+    luuK(An, { kieuBan: 52, soBanL: 2, laBan: 5 });
+    An.C._moMan('quan'); await An.C._taiQuan();
+    await An.C._ngoiBanQuan('L6');
+    await doi(() => An.C._phong() && An.C._phong().cay && /Đang chờ người vào bàn/.test(An.tin()));
+    const ma6 = An.C._phong().ma;
+    await Binh.C._batQuan();
+    await vaoDuocDuyet(Binh, 'L6', An);
+    const hai6 = [An, Binh];
+    await doi(() => hai6.every(m => m.C._van() && m.C._van().ma === ma6 && m.yen()), 8000);
+    const baiAn = An.khung().querySelector('.bd-bai').innerHTML, baiBinh = Binh.khung().querySelector('.bd-bai').innerHTML, tB = An.C._van().the;
+    ok('bida bài ở quán (5 lá): ván ghi kiểu 52, mỗi máy hiện đúng 5 lá của chính mình, bài hai người khác nhau, thế bài hai máy như nhau',
+      may.lay(`bida/${ma6}/kieu`) === 52 && may.lay(`bida/${ma6}/la`) === 5 && /Bài của bạn/.test(baiAn) && (baiAn.match(/class="bd-la/g) || []).length === 5 &&
+      (baiBinh.match(/class="bd-la/g) || []).length === 5 && baiAn !== baiBinh && JSON.stringify(tB.bai) === JSON.stringify(Binh.C._van().the.bai));
+    An.C._danhCu({ dx: 1, dy: 0.003, v: 8.4, a: 0, b: -0.15, cx: L.KE_DAU - 0.05, cy: L.RONG / 2 }, 0);
+    await doi(() => yenHet(hai6, 1), 8000);
+    ok('phá bida bài qua mạng: hai máy cùng thế bàn, cùng bài trên tay mỗi người', khop(hai6) && JSON.stringify(An.C._van().the.bai) === JSON.stringify(Binh.C._van().the.bai));
+    for (const m of hai6) await m.C._roiBanQuan();
+    Dung.C.dong();
+    may.gieo('quan', null);
+  }
+
   console.log('\n— Phòng không có, phòng quá hạn —');
   {
     Chi.C._vaoPhong('ZZZZZZ');
@@ -546,7 +744,7 @@ function mayKhach(ten, url) {
     may.gieo('bida/RRRRRR', { tao: Date.now(), chu: 0, kieu: 8, so: 2, kho: 0, pha: 0, ghe: { 0: { id: 'abcdefgh1234', ten: 'Cũ', thay: Date.now() } } });
     Chi.C._vaoPhong('RRRRRR');
     await doi(() => Chi.C._phong() === null && /Phòng riêng không còn/.test(Chi.bao()), 3000);
-    ok('link phòng riêng kiểu cũ: không vào, về quán, báo chơi qua mạng giờ ở quán bida', Chi.C._phong() === null && /Phòng riêng không còn/.test(Chi.bao()) && /Chọn bàn/.test(Chi.tin()));
+    ok('link phòng riêng kiểu cũ: không vào, về quán, báo chơi qua mạng giờ ở quán bida', Chi.C._phong() === null && /Phòng riêng không còn/.test(Chi.bao()) && Chi.C._quanHien());
     /* Người dùng: "các trò chơi bạn xóa # hết đi, để copy có ghi chú" — trong trò, thanh địa chỉ là …/bida-lo/?phong=MÃ; chép
        gửi đi hay tải lại trang thì mã đọc ở đó */
     const Giang = mayKhach('Giang', url);

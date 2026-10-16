@@ -442,6 +442,36 @@ console.log('\n— Bida 3 bi (bida phăng) —');
   ok('máy bida 3 bi (Vừa): thế dễ thì đánh được cú chạm đủ hai bi, nghĩ trong vài giây', kqMay.hai && Date.now() - t0 < 15000, `${Date.now() - t0} ms`);
 }
 
+console.log('\n— Đánh đôi (bốn người, hai đội) —');
+{
+  /* người dùng: "cho chọn đội" — ghế 1, 3 là đội A, ghế 2, 4 là đội B; ngồi xen nhau nên lượt tự xen đội */
+  const d8 = L.theMoi(8, 4, 1, 0, { doi: true }), k8 = L.theMoi(8, 4, 1, 0), ba = L.theMoi(8, 3, 1, 0, { doi: true }), d9 = L.theMoi(9, 4, 1, 0, { doi: true });
+  ok('đánh đôi chỉ có ở 8 bi, 3 bi, đúng bốn người: ghế 1, 3 đội A, ghế 2, 4 đội B; không đánh đôi thì mỗi người một phe',
+    d8.doi === true && !k8.doi && !ba.doi && !d9.doi && [0, 1, 2, 3].map(P => L.doiCua(d8, P)).join() === '0,1,0,1' && [0, 1, 2, 3].map(P => L.doiCua(k8, P)).join() === '0,1,2,3');
+  const mo = theDat(8, [[0, 0.5, 0.6], [2, 1.0, 0.6], [3, 1.4, 0.9], [11, 1.2, 0.3], [8, 2, 1]], { so: 4, doi: true, nhom: [0, 0, 0, 0], loiLien: [0, 0, 0, 0], luot: 1 });
+  const nhan = L.apCu(mo, null, kqGia(mo, [[2, 3]], { dau: 2 }));
+  ok('8 bi: ghế 2 vào bi trơn trước thì cả đội B (ghế 2, 4) nhận trơn, cả đội A nhận sọc; ghế 2 đánh tiếp', nhan.the.nhom.join() === '2,1,2,1' && nhan.the.luot === 1 && nhan.bao.nhomMoi);
+  const truot = L.apCu(nhan.the, null, kqGia(nhan.the, [], { dau: 3 }));
+  const vaoSoc = L.apCu(truot.the, null, kqGia(truot.the, [[11, 0]], { dau: 11 }));
+  ok('ghế 2 không vào bi thì tới ghế 3 (đội A); ghế 3 vào bi sọc — bi của đội mình — thì đánh tiếp', truot.the.luot === 2 && !truot.bao.loi && vaoSoc.the.luot === 2 && !vaoSoc.bao.loi);
+  ok('hết bi sọc thì cả ghế 1 lẫn ghế 3 (đội A) phải đánh bi 8; đội B còn bi trơn thì chưa', L.denBi8(vaoSoc.the, 0) && L.denBi8(vaoSoc.the, 2) && !L.denBi8(vaoSoc.the, 1) && !L.denBi8(vaoSoc.the, 3));
+  const thang8 = L.apCu(vaoSoc.the, { lo: 3 }, kqGia(vaoSoc.the, [[8, 3]], { dau: 8 }));
+  ok('ghế 3 đưa bi 8 vào đúng lỗ: ghế 3 thắng, tức đội A thắng', thang8.the.thang === 2 && thang8.the.lyDo === '8dung' && L.doiCua(thang8.the, thang8.the.thang) === 0);
+  /* 3 bi: đội A bi trắng, đội B bi vàng, điểm cộng chung cả đội */
+  const P3 = B.L3, kq3 = (the, them) => Object.assign({ dau: 2, bang: false, soBang: 0, vao: [], ra: [], cuoi: the.bi.map(q => (q ? [q[0], q[1]] : null)), hai: true, bangHai: 0 }, them);
+  const c = Object.assign(P3.theMoi(3, 4, 1, 0, { doi: true, luat: 0, dich: 5 }), { pha: false });
+  ok('3 bi đánh đôi: điểm hai ô (hai đội); ghế 1, 3 đánh bi trắng, ghế 2, 4 bi vàng', c.doi === true && c.diem.length === 2 &&
+    [0, 1, 2, 3].map(P => P3.caCua(Object.assign({}, c, { luot: P }))).join() === '0,1,0,1');
+  const an3 = P3.apCu(Object.assign({}, c, { luot: 2, diem: [3, 4] }), {}, kq3(c, {}));
+  const truot4 = P3.apCu(Object.assign({}, c, { luot: 3, diem: [3, 4] }), {}, kq3(c, { hai: false, bangHai: -1 }));
+  ok('ghế 3 ăn điểm thì cộng vào đội A, đánh tiếp; ghế 4 trượt thì tới ghế 1', an3.the.diem.join() === '4,4' && an3.the.luot === 2 && truot4.the.luot === 0 && truot4.the.diem.join() === '3,4');
+  const du = P3.apCu(Object.assign({}, c, { luot: 3, diem: [3, 4] }), {}, kq3(c, {}));
+  ok('ghế 4 ăn điểm thứ năm của đội B: ghế 4 thắng, tức đội B', du.the.thang === 3 && du.the.lyDo === 'du' && P3.doiCua(du.the, 3) === 1);
+  const k3 = P3.theMoi(3, 4, 1, 2, { doi: true }), k4 = P3.theMoi(3, 4, 1, 3, { doi: true });
+  ok('ghế 3 khai cuộc: bi trắng (bi đội A) ở chỗ khai cuộc, bi vàng ở chấm đầu bàn; ghế 4 khai cuộc thì ngược lại', k3.luot === 2 && k3.bi[0][1] < k3.bi[1][1] && k3.bi[1][1] === P3.RONG / 2 &&
+    k4.luot === 3 && k4.bi[1][1] < k4.bi[0][1] && k4.bi[0][1] === P3.RONG / 2);
+}
+
 console.log('\n— Máy đánh —');
 {
   /* cú thẳng dễ: bi đích cách lỗ góc 30 cm */

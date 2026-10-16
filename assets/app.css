@@ -1464,12 +1464,36 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .bd-la i{font-size:12px;font-style:normal}
 .bd-la small{font-size:8.5px;color:#555}
 .bd-la-do{color:#c4261d}
-.bd-quan-cv{display:block;width:100%;height:min(56vh,460px);margin:8px 0 4px;border-radius:14px;background:#15110e;cursor:pointer;touch-action:manipulation}
-.bd-quan-ds{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;margin:6px 0 2px}
-.bd-tin .bd-quan-ds button.bd-quan-o{display:block;width:100%;height:30px;margin:0;padding:0;border:1px solid transparent;border-radius:8px;font-size:12px;font-weight:700;color:#fff;background:#2a2a30}
-.bd-tin .bd-quan-ds button.bd-quan-trong{background:#187a4b;border-color:rgba(255,215,110,.85)}
-.bd-tin .bd-quan-ds button.bd-quan-cho{background:#a8650f}
-.bd-tin .bd-quan-ds button.bd-quan-choi{color:rgba(255,255,255,.7)}
+/* quán bida phủ kín khung trò (người dùng: "Quán bida cho to full đi đừng làm popup"): đầu, hình quán, hàng nút 16 bàn; bảng một
+   bàn hiện đè lên, nền mờ nhẹ cho quán vẫn thấy ở sau */
+.bd-quan{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);
+  background:linear-gradient(#120e0b,#2b2018)}
+.bd-quan[hidden]{display:none}
+.bd-quan-dau{display:flex;align-items:center;gap:10px;padding:calc(env(safe-area-inset-top,0px) + 12px) 104px 4px 16px;min-height:52px}
+.bd-quan-dau button{flex:none;width:36px;height:36px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
+  color:#eef1ff;font:inherit;font-size:16px;cursor:pointer}
+.bd-quan-dau .bd-quan-lui{font-size:24px;line-height:1}
+.bd-quan-ten{flex:1;min-width:0;margin:0;line-height:1.3}
+.bd-quan-ten b{display:block;font-family:"Cormorant Garamond",Georgia,serif;font-size:21px;font-weight:600;color:#ffe2a0}
+.bd-quan-ten span{display:block;font-size:12.5px;color:rgba(238,241,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:lining-nums}
+.bd-quan-khung{position:relative;flex:1 1 0;min-height:200px}
+.bd-quan-cv{position:absolute;inset:0;display:block;width:100%;height:100%;cursor:pointer;touch-action:manipulation}
+.bd-quan-duoi{flex:none;padding:4px 12px 10px}
+.bd-quan-ds{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;max-width:640px;margin:0 auto}
+.bd-quan-ds button.bd-quan-o{display:block;width:100%;height:32px;margin:0;padding:0;border:1px solid transparent;border-radius:8px;font:inherit;font-size:12px;font-weight:700;
+  color:#fff;background:#2a2a30;cursor:pointer}
+.bd-quan-ds button.bd-quan-trong{background:#187a4b;border-color:rgba(255,215,110,.85)}
+.bd-quan-ds button.bd-quan-cho{background:#a8650f}
+.bd-quan-ds button.bd-quan-choi{color:rgba(255,255,255,.7)}
+.bd-quan-meo{margin:6px 0 0;font-size:12px;line-height:1.4;color:rgba(238,241,255,.55);text-align:center}
+.bida.bd-o-quan .bd-tin{background:rgba(4,10,9,.42)}
+@media (max-width:640px){
+  .bida.bd-o-quan .bd-tin{align-items:flex-end}
+}
+@media (min-width:900px){                       /* màn rộng: bảng của bàn nằm phía bên kia quán, bàn đang chọn vẫn thấy */
+  .bida.bd-o-quan .bd-tin[data-ben="phai"]{justify-content:flex-end;padding-right:max(24px,5vw)}
+  .bida.bd-o-quan .bd-tin[data-ben="trai"]{justify-content:flex-start;padding-left:max(24px,5vw)}
+}
 .bd-xem-bai{width:100%;height:40px;border-radius:10px;border:1px dashed rgba(255,215,110,.55);background:rgba(255,215,110,.08);color:#ffe6a6;font:inherit;font-size:13.5px;cursor:pointer}
 .bd-the.bd-dang{border-color:rgba(255,214,120,.8);background:rgba(255,214,120,.1)}
 .bd-the.bd-dang span{color:#ffe6a6}
@@ -1506,9 +1530,9 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .bd-nut .bd-xoay.bd-bat{border-color:#ffd77a;background:rgba(255,215,120,.18)}
 /* nút đóng, chép link, Cài app nằm trên bảng của trò (như cờ ba người) */
 .bida .xn-dong,.bida .nut-link,.bida .nut-cai{z-index:10}
-.co-nut-cai .bd-dau{padding-right:204px}
+.co-nut-cai .bd-dau,.co-nut-cai .bd-quan-dau{padding-right:204px}
 @media (max-width:479px){
-  .co-nut-cai .bd-dau{padding-top:calc(env(safe-area-inset-top,0px) + 54px);padding-right:14px}
+  .co-nut-cai .bd-dau,.co-nut-cai .bd-quan-dau{padding-top:calc(env(safe-area-inset-top,0px) + 54px);padding-right:14px}
 }
 .bd-tin{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;
   padding:calc(env(safe-area-inset-top,0px) + 58px) 20px calc(env(safe-area-inset-bottom,0px) + 20px);background:rgba(4,10,9,.72)}
@@ -1556,6 +1580,10 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .bd-ghe-o small{font-size:11px;line-height:1.3;color:rgba(238,241,255,.55);text-align:center}
 .bd-ghe-trong{border-style:dashed;opacity:.7}
 .bd-ghe-minh{border-color:rgba(255,215,120,.6);background:rgba(255,215,120,.1)}
+/* chủ bàn duyệt người xin vào: mỗi người một dòng, tên bên trái, Đồng ý / Không nhỏ bên phải */
+.bd-tin .bd-xin{display:flex;align-items:center;gap:6px;margin-top:8px;padding:8px 8px 8px 12px;border-radius:12px;border:1px solid rgba(255,215,120,.4);background:rgba(255,215,120,.1)}
+.bd-tin .bd-xin span{flex:1;min-width:0;font-size:13.5px;line-height:1.3;color:#eef1ff;text-align:left;overflow-wrap:anywhere}
+.bd-tin .bd-xin button.bd-duyet{flex:none;width:auto;height:36px;margin:0;padding:0 12px;border-radius:10px;font-size:14px}
 @media (max-height:640px){
   .bd-dau{min-height:44px;padding-top:calc(env(safe-area-inset-top,0px) + 6px)}
   .bd-nguoi{padding:0 12px 2px}

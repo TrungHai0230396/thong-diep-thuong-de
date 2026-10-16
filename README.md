@@ -2373,7 +2373,28 @@ Mở link phòng riêng cũ (`#bida/MÃ` của phòng không có bàn) thì khô
 
 Đã xem trên trình duyệt cỡ điện thoại (375 px) và máy tính, với dữ liệu quán dựng sẵn: đủ 16 bàn, nhãn đọc được, ghế cạnh bàn, người ngồi chờ, người cầm cơ đứng đánh; chạm bàn hay nút bàn ra đúng bảng của bàn đó; bảng Ván mới chỉ còn bốn lối.
 
-**Còn phải xuất bản luật Firebase** cho phần mới: nhánh `quan` (cả `quan/<bàn>/xem` cho sofa); trong `bida` thêm kiểu 3, `luat`, `dich`, `ban` (ván mới phải có), `duoi`, chỉ hai ghế, bỏ `may`; bỏ nhánh `sanhbida`. Database thật lúc viết: `bida`, `sanhbida` đọc được (bản luật trước đã lên), `quan` trả 401. Chưa xuất bản thì quán báo "Máy chủ chưa cho xem quán", bida 3 bi qua mạng chưa tạo được phòng. Đấu máy, chơi chung, tập một mình chạy được ngay.
+Luật Firebase của phần trên (nhánh `quan`, sofa xem, kiểu 3, `luat`, `dich`, `ban`, `duoi`) đã xuất bản cùng commit `2aaa9b5`.
+
+### Chủ bàn duyệt, bàn 3–4 người, đánh đôi, bida bài ở quán
+
+Người dùng: "Người vô bàn trước có quyền đồng ý cho người kia vô chơi hay không, cho chọn đội, chơi 3 4 người nữa, có chế độ chơi bài nữa".
+
+- **Chủ bàn duyệt.** Người ngồi bàn trống trước là chủ bàn. Người vào sau bấm "Xin vào chơi" (đánh đôi thì "Xin vào ghế N · Đội X"), máy ghi `bida/<mã>/xin/<id>` 20 giây một lần và hiện "Đang chờ X đồng ý"; chủ bàn thấy từng người xin, bấm Đồng ý hay Không, máy ghi `duyet/<id>`. Không đồng ý thì người kia về quán, có lời báo. Máy chủ cũng canh, không chỉ ẩn nút: ghế chỉ giành được khi `duyet/<id của mình>` là true. Không có đăng nhập, nên ai cũng ghi được `duyet`; chỉ máy chủ bàn hiện nút. Ván nữa thì phòng mới ghi sẵn `duyet` cho người cùng bàn, khỏi xin lại. Máy chủ còn luật cũ (chưa có `xin`, `duyet`) thì ghi xin bị chặn, máy ngồi thẳng như trước, khỏi kẹt chờ mãi.
+- **3–4 người**: 9 bi, bida bài chơi 2–4 người; 8 bi, 3 bi chơi hai người, hay bốn người đánh đôi. Chủ bàn chọn lúc ngồi bàn trống, đủ người là bắt đầu. Bàn 3–4 người có người bỏ ngang (về quán, hay quá 3 phút không đánh) thì chỉ người đó ra khỏi ván, mấy người còn lại đánh tiếp, tới lượt người đã ra thì bỏ qua; còn một người (một đội) là thắng.
+- **Đánh đôi**: ghế 1, 3 đội A, ghế 2, 4 đội B, ngồi xen nên lượt tự xen đội; chọn ghế là chọn đội. 8 bi cả đội chung một nhóm bi, hết nhóm thì cả hai phải đánh bi 8; 3 bi đội A bi trắng, đội B bi vàng, điểm cộng chung. Đội thắng thì cả hai người cùng thắng (tiếng, thẻ, bảng hết ván ghi "Đội B thắng"). Một người trong đội về giữa ván thì người còn lại đánh luôn lượt của bạn mình (như ngoài quán, bạn về trước thì mình cầm cơ cho cả đội), thẻ ghi "đánh thay Chi"; quá 3 phút không đánh thì người bị mời ra là người đánh thay, không phải ghế đã về.
+- **Bida bài ở quán**: chọn số lá (3, 5, 7); máy nào cũng chỉ thấy bài trên tay mình, máy khác chỉ thấy số lá.
+- Sofa bốn chỗ: người chờ lượt ngồi trước, còn chỗ là của người xem (bàn ba người còn 2 chỗ xem, bốn người còn 1).
+
+### Quán phủ kín màn hình, trang trí quán
+
+Người dùng: "Quán bida cho to full đi đừng làm popup, khi chọn bàn thì ở background vẫn là quán chứ"; "về quán (nhường bàn) — bỏ chữ về quán đi"; rồi gửi bốn ảnh cả nhóm đi chơi: "trang trí lại bàn luôn nha, thiết kế đẹp lên, treo hình lên, đồng hồ treo tường … đừng có ghi là của anh Biển".
+
+- Quán là một lớp riêng phủ kín khung trò (`.bd-quan`, dưới bảng tin): đầu (quay lại, tên, số bàn, nút ? cách vào bàn), hình quán co vừa cả hai chiều, hàng nút 16 bàn. Chạm bàn thì bảng của bàn hiện đè lên, nền chỉ mờ nhẹ, bàn đang chọn sáng viền; điện thoại thì bảng hiện từ dưới lên (hình quán sát trên), màn rộng thì bảng nằm phía bên kia quán so với bàn đang chọn. Chạm ra ngoài bảng, Esc, "‹ Về quán" là về quán. Ngồi chờ ở bàn (kể cả mở lại trang, ván nữa, ở lại bàn) thì sau bảng chờ vẫn là quán, mình ngồi sofa bàn mình; vào ván thì lớp quán ẩn, thôi hỏi máy chủ. Đóng trò cũng thôi hỏi quán (trước đây đóng trò lúc đang ở quán thì máy vẫn hỏi 4 giây một lần). Nút rời bàn lúc chờ là "Nhường bàn"; đang chờ chủ bàn đồng ý thì "Thôi, không xin nữa".
+- Trang trí (vẽ trên canvas, không thêm thư viện): hai tường bên và tường sau, chân tường ốp gỗ, giấy dán sọc, phào trần; tường sau treo bốn khung vàng có đèn rọi — bàn tặng (`bida-anh-bien/`, người dùng: "treo ở bida anh Biển thôi") treo bốn ảnh người dùng gửi (`bida-anh-bien/tuong-1…4.jpg`, thu còn 420 px, tổng chừng 160 KB, khai ở `anhTuong` của chủ đề, tải lúc mở quán), trang chính treo tranh bi vẽ sẵn (bi 8, 9, 1, 3) — đồng hồ treo tường chạy theo giờ máy, biển tên hai khu, giá cơ ở hai đầu. Bàn: khung gỗ có vân sáng, nỉ sáng ở giữa dưới đèn, chấm ngắm trên khung, miệng lỗ bọc da, đèn ba chụp, bi trên bàn (bàn chưa chơi xếp sẵn tam giác 15 bi, bàn đang chơi bi rải rác cố định theo bàn, bàn phăng ba bi). Không có chữ nào ghi quán của ai. Ảnh treo tường là ảnh thật của người dùng và bạn bè: ai mở quán ở trang bàn tặng cũng thấy.
+
+**Bài kiểm**: `scripts/test-bida.js` 161 bài (thêm đánh đôi: đội theo ghế, nhóm bi chung, bi 8 của cả đội, điểm 3 bi theo đội, khai cuộc ghế 3, 4); `scripts/test-bida-phong.js` 89 bài (thêm: chủ bàn từ chối rồi đồng ý, người không phải chủ bàn không duyệt được, bàn 9 bi ba người tới lúc hai người bỏ ngang, chơi ván nữa ba người được duyệt sẵn, đánh đôi bốn máy chọn ghế không theo thứ tự, đánh thay khi bạn cùng đội về, mời người đánh thay ra, đội thắng cả hai cùng thắng, bida bài mỗi máy một tay bài, sofa còn 2 chỗ khi bàn ba người, quán phủ kín và bảng bàn đè lên quán); `scripts/test-sao.js` 285 bài. Lần này chưa thử phá: người dùng bảo bớt thử để đẩy lên cho nhanh.
+
+**Luật Firebase mới chưa xuất bản** (lúc viết): `bida/<mã>` thêm `so` 2–4, `doi`, `la`, kiểu 52, `xin`, `duyet`, ghế 0–3, ghế chỉ giành được khi đã được duyệt; `quan/<bàn>` thêm kiểu 52, `so` 2–4, `doi`, `la`. Chưa xuất bản thì bàn hai người vẫn chơi như cũ (không có bước duyệt), còn bàn 3–4 người, đánh đôi, bida bài, ván nữa ở quán bị máy chủ chặn.
 
 ## Ăn gì
 

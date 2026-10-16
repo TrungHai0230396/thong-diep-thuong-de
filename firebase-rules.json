@@ -66,16 +66,18 @@
         ".write": "$ma.matches(/^[A-HJ-NP-Z2-9]{6}$/) && (!data.exists() || (!newData.exists() && (data.child('tao').val() < now - 86400000 || data.child('xong').val() < now - 300000)))",
         ".validate": "newData.hasChildren(['tao', 'chu', 'kieu', 'so', 'kho', 'pha', 'ghe']) && (data.exists() || newData.hasChild('ban'))",
         "tao": { ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() === now)" },
-        "kieu": { ".validate": "newData.val() === 8 || newData.val() === 9 || newData.val() === 3" },
-        "so": { ".validate": "newData.val() === 2" },
+        "kieu": { ".validate": "newData.val() === 8 || newData.val() === 9 || newData.val() === 3 || newData.val() === 52" },
+        "so": { ".validate": "newData.isNumber() && newData.val() >= 2 && newData.val() <= 4 && (newData.val() === 2 || newData.parent().child('kieu').val() === 9 || newData.parent().child('kieu').val() === 52 || (newData.val() === 4 && newData.parent().child('doi').val() === true))" },
+        "doi": { ".validate": "newData.val() === true && newData.parent().child('so').val() === 4 && (newData.parent().child('kieu').val() === 8 || newData.parent().child('kieu').val() === 3)" },
+        "la": { ".validate": "newData.parent().child('kieu').val() === 52 && (newData.val() === 3 || newData.val() === 5 || newData.val() === 7)" },
         "chu": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < newData.parent().child('so').val()" },
         "pha": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() < newData.parent().child('so').val()" },
         "kho": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2" },
         "ghe": {
           "$P": {
-            ".validate": "$P.matches(/^[01]$/) && newData.hasChild('id')",
+            ".validate": "$P.matches(/^[0-3]$/) && newData.hasChild('id')",
             "id": {
-              ".write": "!data.exists() && !root.child('bida/' + $ma + '/batDau').exists()",
+              ".write": "!data.exists() && !root.child('bida/' + $ma + '/batDau').exists() && root.child('bida/' + $ma + '/duyet/' + newData.val()).val() === true",
               ".validate": "newData.isString() && newData.val().matches(/^[a-z0-9]{8,16}$/)"
             },
             "ten": { ".write": true, ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
@@ -88,7 +90,7 @@
           "$n": {
             ".write": "!data.exists() && root.child('bida/' + $ma + '/batDau').exists()",
             ".validate": "$n.matches(/^[0-9]{1,4}$/) && newData.hasChildren(['P', 'd', 'kq'])",
-            "P": { ".validate": "newData.isNumber() && (newData.val() === 0 || newData.val() === 1)" },
+            "P": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3" },
             "d": { ".validate": "newData.isString() && newData.val().length <= 80 && newData.val().matches(/^[-0-9,]+$/)" },
             "kq": { ".validate": "newData.isString() && newData.val().length <= 400 && newData.val().matches(/^[-0-9.,:;]+$/)" },
             "$khac": { ".validate": false }
@@ -99,10 +101,23 @@
         "luat": { ".validate": "newData.val() === 0 || newData.val() === 1 || newData.val() === 3" },
         "dich": { ".validate": "newData.val() === 5 || newData.val() === 10 || newData.val() === 15 || newData.val() === 25" },
         "ban": { ".validate": "newData.isString() && newData.val().matches(/^[LP][1-8]$/) && (newData.val().beginsWith('P') === (newData.parent().child('kieu').val() === 3))" },
+        "xin": {
+          "$id": {
+            ".write": "!root.child('bida/' + $ma + '/batDau').exists()",
+            ".validate": "$id.matches(/^[a-z0-9]{8,16}$/) && newData.hasChildren(['ten', 'thay'])",
+            "ten": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" },
+            "P": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3" },
+            "thay": { ".validate": "newData.val() === now" },
+            "$khac": { ".validate": false }
+          }
+        },
+        "duyet": {
+          "$id": { ".write": "!root.child('bida/' + $ma + '/batDau').exists()", ".validate": "$id.matches(/^[a-z0-9]{8,16}$/) && newData.isBoolean()" }
+        },
         "duoi": {
           "$P": {
             ".write": "!data.exists() && root.child('bida/' + $ma + '/batDau').exists()",
-            ".validate": "$P.matches(/^[01]$/) && newData.hasChildren(['n', 'luc'])",
+            ".validate": "$P.matches(/^[0-3]$/) && newData.hasChildren(['n', 'luc'])",
             "n": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999" },
             "luc": { ".validate": "newData.val() === now" },
             "$khac": { ".validate": false }
@@ -117,13 +132,15 @@
         ".write": "$ban.matches(/^[LP][1-8]$/) && (!data.exists() || data.child('thay').val() < now - 180000 || newData.child('ma').val() === data.child('ma').val() || !root.child('bida/' + data.child('ma').val()).exists() || root.child('bida/' + data.child('ma').val() + '/xong').exists())",
         ".validate": "newData.hasChildren(['ma', 'kieu', 'so', 'thay'])",
         "ma": { ".validate": "newData.isString() && newData.val().matches(/^[A-HJ-NP-Z2-9]{6}$/)" },
-        "kieu": { ".validate": "($ban.beginsWith('L') && (newData.val() === 8 || newData.val() === 9)) || ($ban.beginsWith('P') && newData.val() === 3)" },
-        "so": { ".validate": "newData.val() === 2" },
+        "kieu": { ".validate": "($ban.beginsWith('L') && (newData.val() === 8 || newData.val() === 9 || newData.val() === 52)) || ($ban.beginsWith('P') && newData.val() === 3)" },
+        "so": { ".validate": "newData.isNumber() && newData.val() >= 2 && newData.val() <= 4" },
+        "doi": { ".validate": "newData.isBoolean()" },
+        "la": { ".validate": "$ban.beginsWith('L') && (newData.val() === 3 || newData.val() === 5 || newData.val() === 7)" },
         "thay": { ".validate": "newData.val() === now" },
         "choi": { ".validate": "newData.isBoolean()" },
         "luat": { ".validate": "$ban.beginsWith('P') && (newData.val() === 0 || newData.val() === 1 || newData.val() === 3)" },
         "dich": { ".validate": "$ban.beginsWith('P') && (newData.val() === 5 || newData.val() === 10 || newData.val() === 15 || newData.val() === 25)" },
-        "ten": { "$P": { ".validate": "$P.matches(/^[01]$/) && newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" } },
+        "ten": { "$P": { ".validate": "$P.matches(/^[0-3]$/) && newData.isString() && newData.val().length >= 1 && newData.val().length <= 20" } },
         "xem": {
           "$id": { ".write": true, ".validate": "$id.matches(/^[a-z0-9]{8,16}$/) && newData.val() === now" }
         },
