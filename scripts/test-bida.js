@@ -8,8 +8,10 @@ const fs = require('fs');
 const path = require('path');
 const goc = path.join(__dirname, '..');
 
+const chuVien = [];                                            // chữ vẽ có viền (số đứng thẳng trên bi)
 const ve2d = new Proxy({}, {
   get: (_, k) => {
+    if (k === 'strokeText') return (s) => chuVien.push(String(s));
     if (k === 'createLinearGradient' || k === 'createRadialGradient') return () => ({ addColorStop() {} });
     if (k === 'measureText') return () => ({ width: 10 });
     if (k === 'createImageData') return (w, h) => ({ width: w, height: h, data: new Uint8ClampedArray(w * h * 4) });
@@ -273,6 +275,173 @@ console.log('\n— Luật 9 bi —');
   ok('bi 9 vào ngay cú phá (chạm bi 1 trước): thắng luôn', pha9.the.thang === 3 && pha9.the.lyDo === '9pha');
 }
 
+console.log('\n— Bi bay: nâng cơ, nhảy, văng khỏi bàn —');
+{
+  /* người dùng: "trong thực tế có đánh bi bay ra ngoài nữa, bạn mô phỏng cách đánh đó đc ko". Số đối chiếu: hồi bi–bàn 0,6, ma
+     sát 0,2 (Dr. Dave TP B.10); luật WPA 2025: 2.6, 3.1, 3.5, 4.3g, 4.7, 4.8d, 5.6 */
+  const sinD = (d) => Math.round(Math.sin(d * Math.PI / 180) * 1000) / 1000;
+  const chay = (viTri, cu) => { const mp = L.moPhong(viTri, cu), cao = {}; let k = 0; while (!mp.xong && k++ < 40000) { L.buoc(mp); for (const b of mp.bi) if (b.tt >= 0) cao[b.so] = Math.max(cao[b.so] || 0, b.z); } return { mp, kq: L.ketQua(mp), cao }; };
+  const motBi = (x, y) => { const v = rong(); v[0] = [x, y]; return v; };
+  /* 1. cú nhảy: số đo khớp phép tính tay */
+  const n30 = chay(motBi(0.4, RONG / 2), { dx: 1, dy: 0, v: 4, a: 0, b: 0, nang: sinD(30) });
+  const cham1 = n30.mp.sk.find(e => e.k === 4 && e.a === 0), vz0 = 0.6 * 4 * 0.5, vh = 4 * Math.sqrt(1 - 0.25) - 0.2 * 1.6 * 2;
+  ok('nâng cơ 30°, bi chủ 4 m/s: nảy cao (0,6·v·sinθ)²/2g ≈ 7,3 cm, chạm bàn lần đầu cách vₙ·2v_z/g ≈ 69 cm', Math.abs(n30.cao[0] - vz0 * vz0 / 19.62) < 0.003 &&
+    Math.abs(cham1.x - 0.4 - vh * 2 * vz0 / 9.81) < 0.02, `${(n30.cao[0] * 100).toFixed(1)} cm, ${((cham1.x - 0.4) * 100).toFixed(0)} cm`);
+  const ngang = L.danh(motBi(0.4, RONG / 2), { dx: 1, dy: 0, v: 4, a: 0, b: 0 });
+  ok('cơ ngang: bi không rời mặt bàn; mã cú vẫn đúng tám trường, mã kết quả năm phần như bản cũ', !L.chayHet(L.moPhong(motBi(0.4, RONG / 2), { dx: 1, dy: 0, v: 4, a: 0, b: 0 })).sk.some(e => e.k >= 4) &&
+    L.maCu({ dx: 1, dy: 0, v: 4, a: 0, b: 0 }).split(',').length === 8 && L.maKq(ngang).split(';').length === 5);
+  /* 2. nhảy qua bi chắn */
+  const chan = () => { const v = motBi(0.4, RONG / 2); v[3] = [0.7, RONG / 2]; v[5] = [1.2, RONG / 2]; return v; };
+  ok('bi chắn cách 30 cm: cơ ngang thì đụng bi chắn; nâng 45° đánh 4 m/s thì bay qua, chạm bi đích phía sau', L.danh(chan(), { dx: 1, dy: 0, v: 4, a: 0, b: 0 }).dau === 3 &&
+    L.danh(chan(), { dx: 1, dy: 0, v: 4, a: 0, b: 0, nang: sinD(45) }).dau === 5);
+  /* 3. bi bay đập từ trên xuống: bi bị đập nảy lên */
+  const x1 = L.chayHet(L.moPhong(motBi(0.4, RONG / 2), { dx: 1, dy: 0, v: 5, a: 0, b: 0, nang: sinD(35) })).sk.find(e => e.k === 4 && e.a === 0).x;
+  const dap = (() => { const v = motBi(0.4, RONG / 2); v[2] = [x1 - 0.005, RONG / 2]; return chay(v, { dx: 1, dy: 0, v: 5, a: 0, b: 0, nang: sinD(35) }); })();
+  ok('bi chủ bay rơi trúng đầu bi khác: bi bị ép xuống mặt đá rồi nảy lên', dap.kq.dau === 2 && dap.cao[2] > 0.01, `${(dap.cao[2] * 100).toFixed(1)} cm`);
+  /* 4. tới băng khi đang bay */
+  const cao = L.danh(motBi(DAI - 0.9, RONG / 2), { dx: 1, dy: 0, v: 6, a: 0, b: 0, nang: sinD(45) });
+  const thap = L.danh(motBi(DAI - 0.4, RONG / 2), { dx: 1, dy: 0, v: 3, a: 0, b: 0, nang: sinD(10) });
+  ok('bay tới băng cao hơn mũi băng: vượt thành bàn, bay khỏi bàn; nảy thấp tới băng: bật lại như thường', cao.ra.join() === '0' && !cao.cuoi[0] && !thap.ra.length && !!thap.cuoi[0]);
+  let vang = null;
+  for (const d of [25, 30]) for (const vv of [5, 6]) if (!vang) {
+    const e = L.chayHet(L.moPhong(motBi(0.6, RONG / 2), { dx: 1, dy: 0, v: vv, a: 0, b: 0, nang: sinD(d) })).sk.find(x => x.k === 4 && x.a === 0);
+    const v = motBi(0.6, RONG / 2); v[6] = [Math.min(e.x - 0.01, DAI - R - 0.03), RONG / 2];
+    const kq = L.danh(v, { dx: 1, dy: 0, v: vv, a: 0, b: 0, nang: sinD(d) });
+    if (kq.ra.includes(6)) vang = `${d}° ${vv} m/s`;
+  }
+  ok('bi mục tiêu sát băng bị bi chủ nhảy đè lên: nảy lên, tới băng khi đang bay, văng khỏi bàn', !!vang, vang || '');
+  /* mép băng cao su lún, ăn lực: bi chủ nảy thấp lao vào băng không vọt cả mét (bản đầu hồi 0,9 như mặt băng: vọt 90 cm) */
+  const vot = chay(motBi(0.4, RONG / 2), { dx: 1, dy: 0, v: 9, a: 0, b: 0, nang: sinD(10) });
+  ok('phá mạnh nâng 10°: bi chủ nảy thấp tới băng, có vọt lên nhưng không quá 60 cm', vot.cao[0] < 0.6 && vot.cao[0] > 0.03, `${(vot.cao[0] * 100).toFixed(0)} cm`);
+  /* 5. thành gỗ, lỗ */
+  const trenGo = (vx, z, vz) => { const mp = L.moPhong(motBi(0.5, 0.3), { dx: 0, dy: 1, v: 0.3, a: 0, b: 0 }), b = mp.bi[0]; Object.assign(b, { x: DAI + 0.05, y: 0.6, z, vz, vx, vy: 0, tt: 3 }); return L.ketQua(L.chayHet(mp)); };
+  const nayVao = trenGo(-0.9, 0.06, -0.4), lanVao = trenGo(-0.6, 0.0445, -0.05), lanRa = trenGo(0.5, 0.0445, -0.05);
+  ok('rơi lên thành gỗ rồi nảy hay lăn vào lại bàn: vẫn trong cuộc (WPA 2.6); lăn ra phía ngoài: bay khỏi bàn',
+    !!nayVao.cuoi[0] && !nayVao.ra.length && !!lanVao.cuoi[0] && !lanVao.ra.length && !lanRa.cuoi[0] && lanRa.ra.join() === '0');
+  const loGoc = L.danh(motBi(DAI - 0.35, RONG - 0.35), { dx: 0.7071, dy: 0.7071, v: 3, a: 0, b: 0, nang: sinD(25) });
+  ok('bay thấp ngang miệng lỗ: rơi vào lỗ', loGoc.vao.length === 1 && loGoc.vao[0][0] === 0 && loGoc.vao[0][1] === 3);
+  /* 6. massé: cơ dựng 55°, đánh lệch trái — bi chạy cong sang trái */
+  /* đo độ lệch ngang trước lần chạm băng đầu (sau đó xoáy trái làm bi bật lệch, cơ ngang cũng vậy) */
+  const lech = (cu) => { const mp = L.moPhong(motBi(0.6, RONG / 2), cu); let k = 0, y = RONG / 2; while (!mp.xong && !mp.sk.some(e => e.k === 2) && k++ < 40000) { y = mp.bi[0].y; L.buoc(mp); } return y - RONG / 2; };
+  const masse = lech({ dx: 1, dy: 0, v: 2.5, a: -0.4, b: 0, nang: sinD(55) }), thang = lech({ dx: 1, dy: 0, v: 2.5, a: -0.4, b: 0 });
+  ok('massé: cơ dựng mà đánh lệch trái thì bi chạy cong sang trái; cơ ngang thì đi thẳng (tới lần chạm băng đầu)', masse > 0.1 && Math.abs(thang) < 1e-9, `${(masse * 100).toFixed(0)} cm`);
+  /* 7. đơn định, mã hoá */
+  const phaNang = { dx: 1, dy: 0.01, v: 9, a: 0, b: 0.2, nang: sinD(12) }, vt = L.theMoi(8, 2, 123, 0).bi;
+  const kqA = L.danh(vt, phaNang), kqB = L.danh(vt, L.docCu(L.maCu(phaNang)));
+  ok('cú nâng cơ đơn định từng bit; mã cú chín trường (nâng cơ phần nghìn), mã kết quả có thêm phần bi bay ra, đọc lại y hệt',
+    L.maKq(kqA) === L.maKq(kqB) && L.maCu(phaNang).split(',')[8] === '208' && kqA.ra.length > 0 && L.maKq(L.docKq(L.maKq(kqA))) === L.maKq(kqA) && L.docKq(L.maKq(kqA)).ra.join() === kqA.ra.join());
+  const goc = L.maCu({ dx: 1, dy: 0, v: 4, a: 0, b: 0 });
+  ok('chặn mã sai khuôn: nâng 0 hay quá 60° (sin > 0,866); bi bay ra mà vẫn còn vị trí trên bàn', !L.docCu(goc + ',0') && !L.docCu(goc + ',867') && !!L.docCu(goc + ',866') &&
+    !L.docKq(L.maKq(ngang) + ';0'));
+  const t8 = theDat(8, [[0, 0.5, 0.6], [3, 1.0, 0.3], [8, 2, 1]]);
+  const kqRa = (the, ra, them = {}) => { const k = kqGia(the, [], them); k.ra = ra; for (const x of ra) k.cuoi[x] = null; return k; };
+  const mat = Object.assign(kqGia(t8, [], { dau: 3 }), { ra: [] }); mat.cuoi[3] = null;
+  ok('kết quả từ máy khác: bi biến mất mà không vào lỗ cũng không bay ra thì không nhận; bay ra thì nhận', !L.kqHopLe(t8, null, mat) && L.kqHopLe(t8, null, kqRa(t8, [3], { dau: 3 })));
+  /* 8. luật WPA */
+  const ra3 = L.apCu(t8, null, kqRa(t8, [3], { dau: 3 }));
+  ok('8 bi: đánh bi 3 bay khỏi bàn — lỗi, bi 3 ra khỏi cuộc (không đặt lại), người kế đặt bi chủ', ra3.bao.loi === 'ra' && !ra3.the.bi[3] && ra3.the.luot === 1 && ra3.the.tuDo === 1 && ra3.bao.ra.join() === '3');
+  const ra8 = L.apCu(t8, null, kqRa(t8, [8], { dau: 3 }));
+  ok('8 bi: bi 8 bay khỏi bàn (không phải lúc phá) — thua ván (WPA 4.8d)', ra8.the.thang === 1 && ra8.the.lyDo === '8ra');
+  const t8p = Object.assign(theDat(8, [[0, 0.5, 0.6], [3, 1.0, 0.3], [8, 2, 1]]), { pha: true });
+  const pha8 = L.apCu(t8p, null, kqRa(t8p, [8], { dau: 3, soBang: 6 }));
+  ok('8 bi: bi 8 bay ra lúc phá — lỗi, đặt lại bi 8 ở chấm chân bàn (WPA 4.3g)', pha8.the.thang < 0 && pha8.bao.loi === 'ra' && pha8.bao.datLai === 8 && pha8.bao.datLaiRa && !!pha8.the.bi[8]);
+  const t9 = theDat(9, [[0, 0.5, 0.6], [1, 1.0, 0.3], [9, 2, 1]], { so: 2 });
+  const ra9 = L.apCu(t9, null, kqRa(t9, [9], { dau: 1 }));
+  ok('9 bi: bi 9 bay khỏi bàn — lỗi, đặt lại bi 9 (WPA 5.6), chưa ai thắng', ra9.the.thang < 0 && ra9.bao.loi === 'ra' && ra9.bao.datLai === 9 && !!ra9.the.bi[9] && ra9.the.luot === 1);
+  const caiRa = L.apCu(t8, null, kqRa(t8, [0], { dau: 3 }));
+  ok('bi chủ bay khỏi bàn — lỗi, người kế được đặt bi chủ ở đâu cũng được (WPA 3.1)', caiRa.bao.loi === 'caiRa' && !caiRa.the.bi[0] && caiRa.the.tuDo === 1 && caiRa.the.luot === 1);
+}
+
+console.log('\n— Bida bài —');
+{
+  /* người dùng: "cho chế độ chơi bài nữa" */
+  const t = L.theMoi(52, 3, 77, 0, 5), t2 = L.theMoi(52, 3, 77, 0, 5), ca = [].concat(...t.bai, t.noc);
+  ok('chia bài: bộ 52 lá đủ, không trùng; mỗi người 5 lá, còn 37 lá làm nọc; cùng hạt giống chia y hệt; 15 bi trên bàn',
+    ca.length === 52 && new Set(ca).size === 52 && t.bai.every(b => b.length === 5) && t.noc.length === 37 && JSON.stringify(t.bai) === JSON.stringify(t2.bai) &&
+    t.bi.filter((q, k) => k && q).length === 15);
+  ok('chia 3 hay 7 lá theo chọn', L.theMoi(52, 2, 5, 0, 3).bai.every(b => b.length === 3) && L.theMoi(52, 4, 5, 0, 7).bai.every(b => b.length === 7));
+  /* thế tự dựng: bài cố định */
+  const dung = (bai, them = {}) => { const th = L.theMoi(52, bai.length, 9, 0, 5); th.bai = bai.map(b => b.slice()); th.pha = false; th.tuDo = 0; return Object.assign(th, them); };
+  const la = (so, chat = 0) => chat * 13 + so - 1;               // lá số so, chất chat
+  const th = dung([[la(3), la(7), la(11, 2)], [la(7, 1), la(5)], [la(9), la(12)]]);
+  ok('chạm bi nào trước cũng được; bi nên đánh của người 1 là bi trùng lá (3, 7, 11) cùng bi mồi 14, 15', L.biDich(th, 0).length === 15 && L.biNen(th, 0).join() === '3,7,11,14,15');
+  const vao7 = L.apCu(th, null, kqGia(th, [[7, 2]], { dau: 7 }));
+  ok('vào bi 7: mình hạ lá 7, người 2 cũng cầm lá 7 thì hạ luôn; mình đánh tiếp', !vao7.bao.loi && vao7.bao.tiep && vao7.the.luot === 0 &&
+    vao7.the.bai[0].length === 2 && vao7.the.bai[1].length === 1 && vao7.bao.ha.length === 2);
+  const vao5 = L.apCu(th, null, kqGia(th, [[5, 1]], { dau: 5 }));
+  ok('chỉ vào bi 5 của người 2: người 2 hạ lá 5, mình mất lượt (không phạt)', !vao5.bao.loi && !vao5.bao.tiep && vao5.the.luot === 1 && vao5.the.bai[1].length === 1 && vao5.bao.phat < 0);
+  const moi = L.apCu(th, null, kqGia(th, [[14, 0]], { dau: 14 }));
+  ok('vào bi mồi 14: không ai hạ lá, mình đánh tiếp', moi.bao.tiep && moi.the.luot === 0 && moi.the.bai.every((b, Q) => b.length === th.bai[Q].length));
+  const loi = L.apCu(th, null, kqGia(th, [[7, 2], [0, 3]], { dau: 7 }));
+  ok('lỗi (bi chủ rơi lỗ cùng bi 7): bi 7 đặt lại, không ai hạ lá, mình rút thêm một lá phạt, người kế đặt bi chủ', loi.bao.loi === 'cai' && !!loi.the.bi[7] &&
+    loi.the.bai[0].length === 4 && loi.the.bai[1].length === 2 && loi.bao.phat >= 0 && loi.the.luot === 1 && loi.the.tuDo === 1);
+  const chet = dung([[la(3)], [la(5)]]); chet.bi[2] = null; chet.bi[4] = null; chet.noc = [la(2, 1), la(4, 3), la(6, 2), la(8)];
+  const rut = L.apCu(chet, null, kqGia(chet, [], { dau: -1 }));
+  ok('lá phạt chỉ rút lá mà bi còn trên bàn (lá 2, 4 của bi đã xuống lỗ thì bỏ)', rut.bao.loi === 'khong' && L.soLa(rut.bao.phat) === 6 && rut.the.noc.length === 1);
+  const het = dung([[la(3)], [la(5), la(3, 1)], [la(9)]]);
+  const thang = L.apCu(het, null, kqGia(het, [[3, 0]], { dau: 3 }));
+  ok('hạ lá cuối cùng: thắng ngay ("hạ hết bài")', thang.the.thang === 0 && thang.the.lyDo === 'baiHet');
+  const giup = dung([[la(3), la(4)], [la(5)], [la(9)]]);
+  const ke = L.apCu(giup, null, kqGia(giup, [[5, 0]], { dau: 5 }));
+  ok('vào bi giúp người khác hạ lá cuối: người đó thắng', ke.the.thang === 1 && ke.the.lyDo === 'baiKe');
+  /* máy: bi dễ vào ngang nhau thì đánh bi của mình, không giúp người khác */
+  const may = dung([[la(3)], [la(5)]]);
+  may.bi = new Array(16).fill(null); may.bi[0] = [1.27, 0.5]; may.bi[3] = [0.6, 0.25]; may.bi[5] = [1.94, 0.25]; may.bi[14] = [1.27, 1.1];
+  const cuMay = L.timCu(may, 0, 2, L.mulberry32(3)), kqMay = L.danh(L.viTriDanh(may, cuMay), cuMay);
+  ok('máy chơi bida bài: chọn đánh bi trùng lá của nó (3), không vào bi 5 giúp người kia', kqMay.dau === 3 && !kqMay.vao.some(v => v[0] === 5), `chạm ${kqMay.dau}, vào ${kqMay.vao.map(v => v[0])}`);
+  let tm = L.theMoi(52, 3, 31, 0, 3), k2 = 0, sai = 0;
+  while (tm.thang < 0 && k2++ < 200) { const c = L.docCu(L.maCu(L.timCu(tm, tm.luot, 1))); if (!L.cuHopLe(tm, c)) { sai++; break; } tm = L.apCu(tm, c, L.danh(L.viTriDanh(tm, c), c)).the; }
+  ok('ba máy đấu nhau hết một ván bida bài 3 lá: cú nào cũng hợp lệ, có người hạ hết bài', tm.thang >= 0 && !sai && /^bai/.test(tm.lyDo), `${k2} cú (${tm.lyDo})`);
+}
+
+console.log('\n— Bida 3 bi (bida phăng) —');
+{
+  /* người dùng: "chế độ chơi bida 3 bi nữa". Quy cách UMB: bàn 2,84 × 1,42 m, bi 61,5 mm, mũi băng 37 mm; khai cuộc (USBA theo chấm
+     UMB): bi đỏ ở chấm chân bàn, bi đối thủ ở chấm đầu bàn, bi người khai cuộc cách chấm đó 18,25 cm, phải chạm bi đỏ trước */
+  const P3 = B.L3;
+  ok('bàn phăng: 2,84 × 1,42 m, bi 61,5 mm, không lỗ, bốn băng liền', P3.PHANG && P3.DAI === 2.84 && P3.RONG === 1.42 && Math.abs(P3.D - 0.0615) < 1e-12 && P3.LO.length === 0 && P3.BANG.length === 4);
+  const t = P3.theMoi(3, 2, 1, 0, { luat: 3, dich: 5 });
+  ok('khai cuộc: bi đỏ ở chấm chân bàn, bi vàng (đối thủ) ở chấm đầu bàn, bi trắng cách đó 18,25 cm; 3 băng, chơi tới 5',
+    t.bi[2][0] === P3.CHAM_CHAN[0] && t.bi[1][0] === P3.KE_DAU && t.bi[1][1] === P3.RONG / 2 && Math.abs(t.bi[0][1] - (P3.RONG / 2 - 0.1825)) < 1e-9 && t.luat === 3 && t.dich === 5 && !t.bi[3]);
+  const t2 = P3.theMoi(3, 2, 1, 1, {});
+  ok('ghế 2 khai cuộc thì bi vàng ở chỗ khai cuộc, bi trắng ở chấm đầu bàn; mặc định tự do, tới 10 điểm', t2.bi[1][1] < t2.bi[0][1] && t2.bi[0][1] === P3.RONG / 2 && t2.luat === 0 && t2.dich === 10);
+  /* luật, với kết quả dựng tay */
+  const kq3 = (the, them) => Object.assign({ dau: 2, bang: false, soBang: 0, vao: [], ra: [], cuoi: the.bi.map(q => (q ? [q[0], q[1]] : null)), hai: true, bangHai: 0 }, them);
+  const tt = (luat, them = {}) => Object.assign(P3.theMoi(3, 2, 1, 0, { luat, dich: 5 }), { pha: false }, them);
+  const a = P3.apCu(tt(0), {}, kq3(tt(0), {}));
+  ok('tự do: bi chủ chạm cả hai bi là ăn điểm, đánh tiếp', a.bao.diem && a.the.diem[0] === 1 && a.the.luot === 0);
+  const b0 = P3.apCu(tt(1), {}, kq3(tt(1), { bangHai: 0 })), b1 = P3.apCu(tt(1), {}, kq3(tt(1), { bangHai: 1 }));
+  ok('1 băng: chưa chạm băng trước bi thứ hai thì không ăn (mất lượt); chạm một băng thì ăn', !b0.bao.diem && b0.the.luot === 1 && b1.bao.diem && b1.the.luot === 0);
+  const c2 = P3.apCu(tt(3), {}, kq3(tt(3), { bangHai: 2 })), c3 = P3.apCu(tt(3), {}, kq3(tt(3), { bangHai: 3 }));
+  ok('3 băng: hai băng chưa ăn; ba băng mới ăn', !c2.bao.diem && c3.bao.diem);
+  const truot = P3.apCu(tt(0), {}, kq3(tt(0), { hai: false, bangHai: -1 }));
+  ok('chỉ chạm một bi: trượt, mất lượt', !truot.bao.diem && !truot.bao.loi && truot.the.luot === 1);
+  const pha = P3.apCu(Object.assign(tt(0), { pha: true }), {}, kq3(tt(0), { dau: 1 }));
+  ok('khai cuộc chạm bi vàng trước: lỗi, không tính điểm, mất lượt', pha.bao.loi === 'do' && !pha.bao.diem && pha.the.luot === 1);
+  const raDo = (() => { const th = tt(0), k = kq3(th, { hai: false, ra: [2] }); k.cuoi[2] = null; return P3.apCu(th, {}, k); })();
+  ok('bi đỏ bay khỏi bàn: lỗi, mất lượt, đặt lại bi đỏ ở chấm chân bàn', raDo.bao.loi === 'ra' && raDo.the.luot === 1 && raDo.the.bi[2][0] === P3.CHAM_CHAN[0]);
+  const gan = P3.apCu(tt(0, { diem: [4, 2] }), {}, kq3(tt(0), {}));
+  ok('đủ điểm (5) thì thắng', gan.the.thang === 0 && gan.the.lyDo === 'du');
+  /* vật lý: một cú thật chạm bi đỏ rồi bi vàng */
+  /* quét 360 hướng ở cùng một thế: đánh bằng bi trắng, rồi đổi chỗ trắng–vàng và đánh bằng bi vàng — phải ra y như nhau */
+  const quet = (ca) => { const vt = new Array(16).fill(null), kia = 1 - ca; vt[ca] = [0.9, 0.5]; vt[2] = [1.5, 0.6]; vt[kia] = [1.62, 0.75]; let n = 0, mot = null;
+    for (let k = 0; k < 360; k++) { const g = k * Math.PI / 180, kq = P3.danh(vt, { dx: Math.cos(g), dy: Math.sin(g), v: 2.4, a: 0, b: 0.2, ca }); if (kq.hai) { n++; if (!mot) mot = kq; } } return { n, mot }; };
+  const qTrang = quet(0), qVang = quet(1);
+  ok('cú thật: quét 360 hướng có cú bi chủ chạm đủ hai bi (đỏ trước rồi bi kia, hay ngược lại); đánh bằng bi vàng ở thế đổi chỗ ra đúng y như vậy',
+    qTrang.n > 0 && qTrang.n === qVang.n && [1, 2].includes(qTrang.mot.dau) && qTrang.mot.bangHai >= 0, `${qTrang.n} hướng`);
+  /* mã hoá: bi vàng đánh thẳng vào bi trắng — chạm đầu là bi 0 (bàn lỗ thì bi 0 là chính bi chủ, không thể có). Trước đây máy
+     nhận đọc hỏng cú này rồi bỏ qua, hai máy lệch nhau cả ván */
+  const vtV = new Array(16).fill(null); vtV[1] = [0.9, 0.5]; vtV[0] = [1.5, 0.5]; vtV[2] = [1.6, 1.1];
+  const kqV = P3.danh(vtV, { dx: 1, dy: 0, v: 2, a: 0, b: 0, ca: 1 }), chuV = P3.maKq(kqV);
+  ok('bida 3 bi: cú bi vàng chạm bi trắng trước mã hoá rồi đọc lại y hệt (đủ bảy phần); bàn lỗ thì chạm đầu bi 0 vẫn không nhận',
+    kqV.dau === 0 && chuV.split(';').length === 7 && !!P3.docKq(chuV) && P3.docKq(chuV).dau === 0 && P3.maKq(P3.docKq(chuV)) === chuV && L.docKq(L.maKq(L.danh(L.viTriDanh(L.theMoi(8, 2, 1, 0), { dx: 1, dy: 0, v: 3, a: 0, b: 0, cx: 0.5, cy: 0.635 }), { dx: 1, dy: 0, v: 3, a: 0, b: 0, cx: 0.5, cy: 0.635 })).replace(/^\d+;/, '0;')) === null, chuV);
+  /* máy: thế dễ thì tìm được cú ăn điểm */
+  const de = Object.assign(P3.theMoi(3, 2, 3, 0, { luat: 0, dich: 5 }), { pha: false });
+  de.bi[0] = [0.9, 0.5]; de.bi[2] = [1.5, 0.6]; de.bi[1] = [1.62, 0.75];
+  const t0 = Date.now(), cuMay = P3.timCu(de, 0, 1, P3.mulberry32(5)), kqMay = P3.danh(P3.viTriDanh(de, cuMay), cuMay);
+  ok('máy bida 3 bi (Vừa): thế dễ thì đánh được cú chạm đủ hai bi, nghĩ trong vài giây', kqMay.hai && Date.now() - t0 < 15000, `${Date.now() - t0} ms`);
+}
+
 console.log('\n— Máy đánh —');
 {
   /* cú thẳng dễ: bi đích cách lỗ góc 30 cm */
@@ -358,12 +527,113 @@ console.log('\n— Giao diện —');
   ok('tập một mình: một ghế, không có máy, cú nào cũng của bạn', B._van().so === 1 && B._laMinh(0) && /Tập một mình/.test(B._chuLuot()));
   B._vanMoi({ che: 'may', kieu: 9, soMay: 3, kho: 0 });
   ok('9 bi với ba máy: bốn ghế, ba máy Sóc, Cú, Cáo', B._van().so === 4 && B._van().nguoi.slice(1).map(x => x.ten).join() === 'Sóc,Cú,Cáo');
-  const ma = B._trichMa;
-  ok('ô nhập mã nhận mã trần, link mời …/bida-lo/?phong=MÃ, link #bida/MÃ; mã sai khuôn thì không',
-    ['ryxqqe', ' RYX-QQE ', 'https://thong-diep-thuong-de.vercel.app/bida-lo/?phong=RYXQQE', 'http://localhost:5179/#bida/RYXQQE'].every(x => ma(x) === 'RYXQQE') && ['ABCDE0', 'RYXQQ', ''].every(x => ma(x) === ''));
   const nguon = fs.readFileSync(path.join(goc, 'assets', 'bida.js'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
   ok('không chữ nào nhắc Firebase hiện ra cho người chơi (chỉ có trong ghi chú)', !/firebase/i.test(nguon.replace(/TDTD_PHONG|sanhbida|bida\//g, '')));
+  /* người dùng: "những lúc ko thấy số, ko biết bi số mấy luôn" */
+  B._vanMoi({ che: 'may', kieu: 9, soMay: 1, kho: 1 });
+  chuVien.length = 0; B._veCanh(0);
+  const soYen = chuVien.slice().sort((a, b) => a - b).join();
+  const vs = B._van(), ns = B._ngam(), cs = B._viTriHien()[0], ms = vs.the.bi[1];
+  ns.goc = Math.atan2(ms[1] - cs[1], ms[0] - cs[0]); ns.luc = 0.8; B._banCu();
+  chuVien.length = 0; const dangLan = !!B._dang(); B._veCanh(0);
+  const soLan = chuVien.length;
+  B._tuaHet();
+  /* nâng cơ trong bảng Xoáy */
+  B._vanMoi({ che: 'tap', kieu: 8 });
+  B._datNang(35);
+  const nn = B._ngam(); nn.luc = 0.5; nn.duKhoa = ''; B._capNhatDuDoan();
+  const du = nn.du, coDuong = !!(du && du.duong && du.duong.length > 10 && du.chamBan && du.chamBan.length >= 1);
+  B._datNang(99); const kep = B._ngam().nang;
+  B._datNang(35); nn.luc = 0.4; B._banCu();
+  const cuBay = B._dang() && B._dang().cu;
+  B._tuaHet();
+  ok('nâng cơ 35°: đường ngắm vẽ đường bay và chỗ bi chạm bàn; tối đa 60°; cú đánh mang sin 35° (phần nghìn); lượt sau cơ về nằm ngang',
+    coDuong && kep === 60 && !!cuBay && cuBay.nang === 0.574 && B._ngam().nang === 0, `${coDuong} ${kep} ${cuBay && cuBay.nang} ${B._ngam().nang}`);
+  ok('bi đứng yên: số đứng thẳng trên từng bi (cả chín bi, không vẽ cho bi chủ); bi đang lăn thì thôi', soYen === '1,2,3,4,5,6,7,8,9' && dangLan && soLan === 0, soYen);
   ok('chỉ lưu đúng một mục tdtd.bida: cài đặt và phòng đang ở, không lưu ván', Object.keys(luu).every(k => k === 'tdtd.bida') && !/"bi"|"the"/.test(luu['tdtd.bida']));
+  B.dong();
+}
+
+console.log('\n— Chơi chung một máy (2–4 người chuyền tay) —');
+{
+  /* người dùng: "cho chơi 3,4 người 1 bàn nữa" */
+  const bamNut = (sel) => B._bam({ target: { closest: (s) => (s === sel ? {} : null) } });
+  const tinTrong = () => document.body.children.filter(c => c.className === 'bida').pop().querySelector('.bd-tin').querySelector('.bd-tin-trong').innerHTML;
+  const baoChu = () => document.body.children.filter(c => c.className === 'bida').pop().querySelector('.bd-bao').textContent;
+  B._vanMoi({ che: 'chung', kieu: 9, so: 4, ten: ['An', 'Bình', '', 'Dũng'] });
+  const v = B._van();
+  ok('9 bi bốn người chung một máy: đủ bốn ghế, tên đã gõ (để trống thì "Người 3"), không ghế nào là máy, ai cũng đánh được trên máy này',
+    v.cheDo === 'chung' && v.nguoi.map(x => x.ten).join() === 'An,Bình,Người 3,Dũng' && [0, 1, 2, 3].every(P => B._laMinh(P)) && !B._mayNgam());
+  ok('dòng trạng thái gọi đúng tên người đang đánh', /^Lượt An · phá/.test(B._chuLuot()), B._chuLuot());
+  v.the.luot = 1;
+  B._baoKetQua({ P: 0, loi: '', vao: [], tiep: false, ket: false }, 0);
+  const baoTrot = baoChu();
+  v.the.luot = 2;
+  B._baoKetQua({ P: 1, loi: 'cai', vao: [], tiep: false, ket: false }, 1);
+  ok('hết lượt thì gọi người kế cầm máy ("Tới lượt Bình."); phạm lỗi thì gọi tên người được đặt bi chủ', baoTrot === 'Tới lượt Bình.' && /Người 3 được đặt bi chủ\.$/.test(baoChu()), baoChu());
+  v.the.thang = 3; v.the.lyDo = '9dung';
+  ok('hết ván: "Hết ván — Dũng thắng.", bảng hết ván ghi "Dũng thắng!"', B._chuLuot() === 'Hết ván — Dũng thắng.' && (B._ketThucVan(), /Dũng thắng!/.test(tinTrong())), B._chuLuot());
+  bamNut('.bd-lai');
+  const v2 = B._van();
+  ok('"Ván mới, như cũ": giữ bốn người với tên, người kế phá (Bình)', v2 !== v && v2.cheDo === 'chung' && v2.nguoi.map(x => x.ten).join() === 'An,Bình,Người 3,Dũng' && /^Lượt Bình/.test(B._chuLuot()), B._chuLuot());
+  B._vanMoi({ che: 'chung', kieu: 8, so: 4, ten: ['An', 'Bình'] });
+  ok('8 bi chung một máy: luôn hai người', B._van().so === 2 && B._van().nguoi.map(x => x.ten).join() === 'An,Bình');
+  luu['tdtd.bida'] = JSON.stringify(Object.assign(JSON.parse(luu['tdtd.bida'] || '{}'), { kieu: 9, soChung: 4, tenChung: ['Lan', 'Minh'] }));
+  B._moMan('chinh');
+  const coLoi = tinTrong().includes('Chơi chung một máy');
+  B._moMan('chung');
+  const o = (tinTrong().match(/data-tenchung="\d"/g) || []).length;
+  ok('bảng Ván mới có lối "Chơi chung một máy"; màn đó nhớ số người, tên đã gõ (ô trống gợi "Người 3")', coLoi && o === 4 && /value="Lan"/.test(tinTrong()) && /placeholder="Người 3"/.test(tinTrong()) && /Bắt đầu — Lan phá trước/.test(tinTrong()));
+  bamNut('.bd-batdau-chung');
+  ok('bấm Bắt đầu: vào ván 9 bi bốn người với tên đã nhớ', B._van().cheDo === 'chung' && B._van().nguoi.map(x => x.ten).join() === 'Lan,Minh,Người 3,Người 4');
+  B.dong();
+}
+
+console.log('\n— Bida 3 bi trên màn hình —');
+{
+  B._vanMoi({ che: 'may', kieu: 3, kho: 1, luat: 3, dich: 5 });
+  const v = B._van();
+  ok('đấu máy 3 bi: đổi sang lõi bàn phăng, hai người, dòng trạng thái ghi bi trắng 0/5, chạm bi đỏ trước', B._L().PHANG && v.so === 2 && /bi trắng · 0\/5 · chạm bi đỏ trước/.test(B._chuLuot()), B._chuLuot());
+  B._vanMoi({ che: 'may', kieu: 8, kho: 1 });
+  ok('vào lại 8 bi: về lõi bàn lỗ', !B._L().PHANG && B._van().the.bi.filter((q, k) => k && q).length === 15);
+  B._vanMoi({ che: 'chung', kieu: 3, ten: ['An', 'Bình'], luat: 0, dich: 5 });
+  const vc = B._van();
+  vc.the.pha = false; vc.the.luot = 1; B._denLuot();
+  const n = B._ngam(); n.luc = 0.4; B._banCu();
+  ok('chơi chung 3 bi: tới lượt người thứ hai thì bi chủ là bi vàng (cú đánh mang bi 1)', B._caHien() === 1 && !!B._dang() && B._dang().cu.ca === 1);
+  B._tuaHet();
+  B._vanMoi({ che: 'may', kieu: 8, kho: 1 });
+}
+
+console.log('\n— Bida bài trên màn hình —');
+{
+  const khung = document.body.children.filter(c => c.className === 'bida').pop(), bai = khung.querySelector('.bd-bai');
+  const bamNut = (sel) => B._bam({ target: { closest: (x) => (x === sel ? {} : null) } });
+  B._vanMoi({ che: 'may', kieu: 52, soMay: 2, kho: 1, la: 3 });
+  const v = B._van();
+  ok('đấu với hai máy, 3 lá: ba người, dải bài hiện 3 lá của mình, dòng trạng thái "còn 3 lá", thẻ máy ghi số lá', v.so === 3 && v.the.bai[0].length === 3 && !bai.hidden &&
+    (bai.innerHTML.match(/class="bd-la/g) || []).length === 3 && /còn 3 lá/.test(B._chuLuot()) && /3 lá/.test(khung.querySelector('.bd-nguoi').innerHTML), B._chuLuot());
+  const s0 = L.soLa(v.the.bai[0][0]);
+  v.the.luot = 0;
+  B._baoKetQua({ P: 0, loi: '', vao: [s0], tiep: true, ket: false, ha: [[0, s0, 1]], phat: -1, datLaiDs: [] }, 0);
+  ok('lời báo khi hạ lá: "Bạn hạ lá …"', new RegExp(`^Vào bi ${s0}\\. Bạn hạ lá`).test(khung.querySelector('.bd-bao').textContent), khung.querySelector('.bd-bao').textContent);
+  bamNut('.bd-lai');
+  ok('"Ván mới, như cũ": vẫn bida bài 3 lá', B._van().kieu === 52 && B._van().the.bai.every(b => b.length === 3));
+  B._vanMoi({ che: 'chung', kieu: 52, so: 3, ten: ['An', 'Bình', 'Chi'], la: 5 });
+  const up = bai.innerHTML;
+  bamNut('.bd-xem-bai');
+  const lat = bai.innerHTML;
+  const vc = B._van(); vc.the.luot = 1; B._denLuot();
+  ok('chơi chung một máy: bài người đang đánh úp, chạm mới lật; sang lượt người kế thì úp lại', /An: chạm để xem bài \(5 lá\)/.test(up) && (lat.match(/class="bd-la/g) || []).length === 5 &&
+    /Bình: chạm để xem bài/.test(bai.innerHTML));
+  luu['tdtd.bida'] = JSON.stringify(Object.assign(JSON.parse(luu['tdtd.bida'] || '{}'), { kieu: 52 }));
+  const tin = () => khung.querySelector('.bd-tin').querySelector('.bd-tin-trong').innerHTML;
+  B._moMan('may'); const may = tin(); B._moMan('chung'); const chungM = tin(); B._moMan('tap'); const tap = tin(); B._moMan('chinh'); const chinh = tin();
+  ok('bảng chọn: "Bida bài" có ở đấu với máy, chơi chung; không có ở tập một mình', /data-kieu="52"/.test(may) && /data-sola="5"/.test(may) &&
+    /data-kieu="52"/.test(chungM) && !/data-kieu="52"/.test(tap));
+  /* người dùng: "bỏ chức năng tạo phòng đi, vì tôi muốn giới hạn 16 bàn này thôi" */
+  ok('bảng Ván mới: chơi qua mạng chỉ còn Vào quán bida — không còn tạo phòng, vào bằng mã, tìm phòng nhanh, xem phòng đang chờ',
+    /data-man="quan"/.test(chinh) && !/data-man="(tao|vao|nhanh|tim)"/.test(chinh) && !/Tạo phòng|Vào phòng|Tìm phòng|phòng đang chờ/.test(chinh));
   B.dong();
 }
 
@@ -416,7 +686,6 @@ console.log('\n— Bàn tặng anh Biển (bida-anh-bien/) —');
   const v = B._van();
   ok('vào bàn lần sau: không hiện lại Cách chơi, chỉ có lời báo ngắn', tin.hidden && /^Anh Biển phá trước/.test(loiBao()), loiBao().slice(0, 40));
   ok('chủ đề: người chơi là "Anh Biển", máy là Ghẹ, Cua, Mực; lượt ghi "Lượt anh Biển"', v.nguoi.map(x => x.ten).join() === 'Anh Biển,Ghẹ,Cua,Mực' && /^Lượt anh Biển/.test(B._chuLuot()), B._chuLuot());
-  ok('link mời về chính trang tặng (…/bida-anh-bien/?phong=MÃ), không về trang bida chung', B._linkMoi('ABCDEF') === location.origin + location.pathname + '?phong=ABCDEF');
   banPhim('Escape');
   const conMo = khung.classList.contains('hien');
   B._moMan('chinh'); banPhim('Escape');
@@ -448,8 +717,8 @@ console.log('\n— Bàn tặng anh Biển (bida-anh-bien/) —');
   delete global.TDTD_BIDA_CHU_DE;
   B._vanMoi({ che: 'may', kieu: 8, kho: 1 });
   B._baoKetQua({ P: 0, loi: '', vao: [2], tiep: true, ket: false }, 0);
-  ok('trang chính (không chủ đề): vẫn "Bạn" và Sóc, không câu trêu, link mời về bida-lo/',
-    B._van().nguoi.map(x => x.ten).join() === 'Bạn,Sóc' && loiBao() === 'Vào bi 2.' && /\/bida-lo\/\?phong=ABCDEF$/.test(B._linkMoi('ABCDEF')), loiBao());
+  ok('trang chính (không chủ đề): vẫn "Bạn" và Sóc, không câu trêu',
+    B._van().nguoi.map(x => x.ten).join() === 'Bạn,Sóc' && loiBao() === 'Vào bi 2.', loiBao());
   banPhim('Escape');
   ok('trang chính: Esc vẫn đóng trò như cũ (về bầu trời sao)', !khung.classList.contains('hien'));
   B.dong();

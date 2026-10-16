@@ -2121,6 +2121,8 @@ Người dùng: "Làm thêm 1 ngôi sao game bida lỗ đi, muti người chơi 
 
 **Chơi qua mạng** (`bida/<mã>` và `sanhbida/<mã>` trên cùng database với cờ, luật ở `firebase-rules.json`): phòng giữ kiểu (8/9), số ghế (8 bi 2; 9 bi 2–4), mức máy, ghế phá; ghế giành một lần trước khi bắt đầu; mỗi cú `cu/<n>` = { P, d, kq } ghi một lần, chỉ sau khi bắt đầu, đúng khuôn chữ số. Máy nào cũng đọc lần lượt từ đầu; cú sai lượt, sai luật, kết quả không khớp thế bàn (bi đã vào lỗ sống lại, bi biến mất mà không vào lỗ) thì máy nào cũng bỏ qua như nhau. Mình đánh thì máy mình chạy hết cú ngay (vài mili giây) để có kết quả, ghi lên rồi mới cho bi lăn; máy khác thấy cơ quay tới hướng đánh, kéo lui, thọc, bi lăn theo cùng phép tính, xong đặt bi đúng theo kết quả ghi. Ghế trống lúc bắt đầu thì máy (Sóc, Cú, Cáo) chơi thay, máy của người ngồi ghế số nhỏ nhất còn ở đây nghĩ giùm; tới lượt người vắng quá một phút thì người khác bấm được "Cho máy đánh thay", người đó quay lại bấm "Tự đánh tiếp". Ván nữa thì ghế kế phá (luân phiên phá). Hạt giống xếp bi lấy từ mã phòng. Phòng mở, tìm phòng nhanh, dọn phòng sau 5 phút, phòng quá một ngày: như cờ ba người. Link mời `…/bida-lo/?phong=MÃ` qua trang chia sẻ riêng (Zalo, Messenger hiện tên và ảnh của bida).
 
+(Phòng riêng, link mời, mã QR, phòng mở, tìm phòng nhanh và máy chơi thay ở đoạn trên đã bỏ: chơi qua mạng giờ chỉ ở quán bida 16 bàn — xem "Chỉ còn quán" bên dưới. Phần ghi cú, đọc lại cú, bỏ qua cú sai vẫn như vậy.)
+
 **Máy đánh**: liệt kê các cú vào được (bi đích × lỗ × ba chỗ ngắm trong miệng lỗ) mà đường bi đích tới lỗ và đường bi chủ tới chỗ chạm đều trống, góc cắt dưới 78°, không quẹt mỏm; mỗi cú thử vài lực, vài kiểu xoáy, **chạy mô phỏng thật** rồi chấm: vào bi không lỗi thì cộng thế bi chủ cho cú sau (cú dễ nhất từ chỗ bi chủ dừng), thắng/thua là ±1000, lỗi thì trừ theo việc người kế được đặt bi. Không có cú nào ổn thì đánh phòng thủ: chạm bi hợp lệ thật nhẹ ở năm độ dày rồi chọn chỗ bi chủ dừng làm người kế khó đánh nhất. Được đặt bi chủ thì thử các chỗ sau các cú vào được. Ba mức: **Dễ** ngắm lệch nhiều (σ 1,6°), không tính thế bi chủ; **Vừa** (σ 0,6°) có đẩy, kéo; **Khó** (σ 0,18°) thêm xoáy nhẹ, thử lại cú tốt nhất với tay lệch ±0,25–0,5°, cú nào lệch là trượt thì bớt điểm. Nghĩ ở Web Worker dựng từ chính mã lõi, trung bình 0,1–0,3 giây một cú.
 
 **Giao diện**: màn hình đứng thì bàn dựng dọc, đầu bàn (chỗ phá) ở dưới; màn hình ngang thì bàn nằm ngang — cả hai là phép quay, không lật gương, xoáy phải vẫn là phải. **Bi vẽ từng điểm ảnh**: mỗi bi là một quả cầu có hướng (quaternion) quay đúng theo vận tốc góc của vật lý — bi lăn thì số lăn theo, đánh đâm thì số đứng yên trên mặt bi đang trượt; số in hai mặt, bi sọc có dải màu, bi chủ có sáu chấm đỏ để thấy xoáy; ánh sáng, bóng loáng, độ phủ mép tính sẵn theo cỡ bi. Bàn gỗ, nỉ sáng giữa, băng cắt theo mặt hàm, lỗ khoét vào khung, chấm ngắm. **Ngắm**: kéo ngón tay trên bàn, cơ chĩa theo; vuốt dải gân bên trái để ngắm mịn. **Đánh**: kéo thanh Lực bên phải xuống rồi thả (kéo ngược lên hết là thôi), cơ kéo lui theo lực; lực ra tốc độ theo bình phương cho nhẹ tay chỉnh được mịn (0,2–9 m/s). **Xoáy**: nút Xoáy mở bi chủ to, chấm đỏ là chỗ đầu cơ chạm, vòng đứt nét là nửa bán kính (ra ngoài là trượt cơ), ghi "Đâm / Kéo / Đẩy, xoáy trái / phải". **Đường ngắm**: bóng bi chủ ở chỗ chạm đầu tiên, vạch đậm là hướng bi đích, vạch đứt là hướng bi chủ **sau khi xoáy ăn** (5/7·v' + 2/7·R·(ω × z) — đẩy thì bi chủ chạy theo, kéo thì giật lùi, chứ không chỉ vẽ đường vuông góc); chạm sai bi thì vòng đỏ gạch chéo. Được đặt bi chủ thì kéo bi trắng (sau vạch thì tô vùng được đặt). Bàn phím máy tính: ← → xoay, ↑ ↓ lực, cách để đánh. Cú dài thì tự tua dần (sau 2,5 giây nhanh 1,5 lần, sau 5 giây 2,2 lần), chạm bàn để tua nhanh 4 lần. Âm thanh tạo bằng Web Audio: cơ thọc, bi chạm bi to nhỏ theo lực, bi đập băng, bi rơi lỗ, lỗi, vào bi, thắng.
@@ -2133,7 +2135,245 @@ Người dùng: "Làm thêm 1 ngôi sao game bida lỗ đi, muti người chơi 
 
 Đã thử trên trình duyệt cỡ điện thoại và máy tính: phá, máy đánh, đặt bi chủ, chọn xoáy, chọn lỗ bi 8, 9 bi bốn người; hai thẻ khác kho lưu chơi chung một phòng trên máy chủ giả — vào phòng bằng link, Bắt đầu, cú của người này hiện bên kia với cơ quay tới hướng đánh rồi bi lăn, hai bên cùng một thế bàn.
 
-**Còn phải xuất bản luật Firebase** (nhánh `bida`, `sanhbida` trong `firebase-rules.json`) thì mới chơi qua mạng được trên database thật; đấu với máy, tập một mình chạy được ngay.
+**Luật Firebase** nhánh `bida`, `sanhbida` (trong `firebase-rules.json`) đã xuất bản: chơi qua mạng chạy trên database thật.
+
+### Số bi đọc được lúc bàn yên
+
+Người dùng: "những lúc ko thấy số, ko biết bi số mấy luôn". Bi vẽ là quả cầu quay thật, nên có lúc số nằm dưới đáy hay sát mép. Lúc bàn yên, mỗi bi (trừ bi chủ) hiện thêm số **đứng thẳng** ngay trên bi: chữ trắng, viền tối, đọc được trên mọi màu bi. Lúc bi lăn thì số này tắt để thấy bi quay. Bida 3 bi không có số nên không vẽ.
+
+### Chơi chung một máy, 2–4 người
+
+Người dùng: "cho chơi 3,4 người 1 bàn nữa có". Màn **Chơi chung một máy** cho chọn:
+
+- kiểu chơi: 8 bi hai người; 9 bi và bida bài hai tới bốn người; bida 3 bi hai người;
+- số người;
+- tên từng người: nhớ cho lần sau, để trống thì gọi Người 1, Người 2…
+
+Cả bàn chuyền tay một máy, đổi lượt thì báo "Tới lượt X". Bida bài chơi chung thì bài trên tay úp lại: người tới lượt bấm **Xem bài** mới thấy bài của mình, người khác không nhìn trộm được. 9 bi bốn người qua mạng (mỗi người một máy) thì có từ trước.
+
+### Bi bay: đánh nhảy, bi văng khỏi bàn
+
+Người dùng: "trong thực tế có đanh bi bay ra ngoài nữa, bạn mô phỏng cách đánh đó đc ko".
+
+**Đánh nhảy**: thanh **Nâng cơ** (0–60°, mỗi nấc 5°) nằm trong bảng Xoáy; trên máy tính thì dùng PageUp / PageDown. Cơ nâng góc θ chia lực làm hai phần:
+
+- phần dọc theo cơ đẩy bi chạy;
+- phần chúc xuống ép bi vào mặt đá. Bi nảy lên với hệ số hồi 0,6; ma sát nỉ lúc nảy ăn bớt xoáy.
+
+Cơ dựng mà đánh lệch trái phải thì trục xoáy nghiêng theo hướng đánh, bi chạy cong (massé).
+
+**Bi đang bay** chạy bằng bước nhỏ 1/2400 giây, xét chồng lấn sau mỗi bước, vì bay thì hiếm và ngắn nên khỏi giải phương trình:
+
+- va bi khác trong không trung (ba chiều);
+- chạm mép mũi băng: bật lại yếu, hồi 0,3;
+- rơi lên mặt gỗ thành bàn: đủ đà thì văng ra ngoài, yếu thì lăn ngược vào;
+- rơi trúng miệng lỗ;
+- bay khỏi bàn.
+
+Bi chỉ chạm nỉ khi đang rơi xuống, nên bi bị đánh không "đáp" ngay lúc mới rời mặt bàn.
+
+**Đường ngắm** khi cơ nâng vẽ cả đường bay và chỗ bi chạm bàn. Nút Xoáy hiện số độ đang nâng. Mỗi lượt cơ tự về ngang.
+
+**Luật** theo WPA 2025:
+
+- bi chủ bay khỏi bàn là lỗi, người kế được đặt bi chủ (3.1);
+- đánh bi khác bay khỏi bàn là lỗi; bi đó ra khỏi cuộc, không đặt lại (3.5);
+- 8 bi: bi 8 bay ra lúc phá thì đặt lại (4.3g), ngoài lúc phá là thua (4.8d);
+- 9 bi: bi 9 bay ra thì đặt lại ở chấm chân bàn (5.6).
+
+**Mã hoá**: cú cơ ngang vẫn đúng tám trường như bản cũ, chỉ cú nâng cơ mới có trường thứ chín (sinθ, phần nghìn). Kết quả cũng chỉ thêm phần thứ sáu (bi bay khỏi bàn) khi có bi bay ra. Máy bản cũ và bản mới vẫn đọc được cú của nhau.
+
+### Bida bài
+
+Người dùng: "cho chế độ chơi bài nữa". Luật bida bài mỗi quán một kiểu, app lấy phần chung:
+
+- **Bài và bi**: bộ 52 lá; lá số r ứng với bi r (A là 1, J 11, Q 12, K 13); bi 14, 15 là bi mồi.
+- **Chia bài**: xào theo hạt giống, chia mỗi người 3, 5 hay 7 lá; còn lại làm nọc.
+- **Đánh**: chạm bi nào trước cũng được. Bi số 1–13 vào lỗ thì ai cầm lá số đó hạ hết lá đó.
+- **Lượt**: hạ được lá của mình, hay vào bi mồi, thì đánh tiếp.
+- **Lỗi** (bi chủ rơi lỗ hay bay ra, không chạm bi nào, đánh bi bay khỏi bàn): bi vào lỗ và bi bay ra đều đặt lại; người đánh rút một lá phạt từ nọc (bỏ qua lá của bi đã xuống lỗ); người kế đặt bi chủ.
+- **Thắng**: ai hết bài trước thì thắng, xét người đánh trước rồi lần lượt theo vòng. Vào bi giúp người khác hết bài thì người đó thắng ("ăn ké").
+
+**Trên màn hình**:
+
+- dải bài trên tay nằm trên bàn, dưới hàng tên người chơi; lá ♦ ♥ đỏ;
+- bi trùng lá trên tay có vòng vàng, máy cũng nhắm bi đó trước;
+- dòng trạng thái ghi "còn N lá";
+- lời báo ai hạ lá nào, ai bị phạt lá nào.
+
+Bida bài chơi với máy hay chơi chung một máy; qua mạng chưa có.
+
+### Bida 3 bi (bida phăng)
+
+Người dùng: "chế độ chơi bida 3 bi nữa". Bàn 10 feet theo UMB: mặt bàn 2,84 × 1,42 m, bi 61,5 mm, mũi băng cao 37 mm, không lỗ, nỉ xanh dương. Ba bi: trắng (ghế 1), vàng (ghế 2), đỏ.
+
+**Lõi**: `LOI({ phang: true })` là một bản lõi riêng (bàn không lỗ, bốn băng liền), chạy chung mọi phép tính với bàn lỗ. Web Worker dựng cả hai bản.
+
+**Khai cuộc** theo USBA/UMB:
+
+- bi đỏ ở chấm chân bàn;
+- bi của đối thủ ở chấm đầu bàn;
+- bi người khai cuộc trên vạch đầu bàn, cách chấm đó 18,25 cm;
+- cú khai cuộc phải chạm bi đỏ trước, chạm bi kia trước là lỗi.
+
+**Luật chơi** (chọn được):
+
+- **tự do**: bi chủ chạm đủ hai bi là ăn một điểm;
+- **1 băng**: chạm ít nhất một băng trước bi thứ hai;
+- **3 băng**: ít nhất ba băng trước bi thứ hai.
+
+Ăn điểm thì đánh tiếp; chơi tới 5, 10, 15 hay 25 điểm. Bi bay khỏi bàn là lỗi, mất lượt, đặt lại bi đó: bi đỏ về chấm chân bàn, bi chủ về chấm đầu bàn (chấm bận thì chấm giữa, rồi chấm kia).
+
+**Kết quả** mỗi cú ghi thêm phần thứ bảy: bi chủ chạm đủ hai bi chưa, có bao nhiêu băng trước bi thứ hai. Máy nào cũng đọc phần đó để cộng điểm như nhau.
+
+**Máy đánh** chạy mô phỏng thật rồi chấm cú. Hướng thử có hai loại:
+
+- ngắm thẳng vào từng bi với độ dày từ −0,95 tới 0,95 đường kính, như người ngắm ăn mỏng, ăn dày;
+- quét đều cả vòng, để có cú đánh băng trước.
+
+Mỗi cú được chấm, từ cao xuống thấp:
+
+- ăn điểm;
+- chạm đủ hai bi mà thiếu băng (cộng theo số băng);
+- **suýt ăn**: chạm được một bi rồi lướt sát bi còn lại, lúc lướt qua đã đủ số băng luật đòi — càng sát càng cao;
+- chạm được bi.
+
+Mức Dễ thử ít hướng × vài lực × một kiểu xoáy, thử hết. Vừa và Khó tìm hai vòng:
+
+- **vòng 1**: mọi hướng (Vừa 144 hướng quét đều, Khó 270) với một lực, một kiểu xoáy. Khó chơi 3 băng thì hai kiểu, xoáy trái và xoáy phải, vì đường đi 3 băng ăn theo xoáy ngang;
+- **vòng 2**: các hướng cao điểm nhất (Vừa 20, Khó 36) thử đủ lực, đủ kiểu xoáy.
+
+Sau đó, chưa có cú ăn điểm thì nhích mấy cú tốt nhất ±0,5°, ±1°. Có cú ăn điểm thì chọn **cú chắc tay**: thử lệch −0,8° … 0,8°, lấy cú có dải lệch liền nhau vẫn ăn dài nhất, rồi ngắm vào giữa dải. Cuối cùng tay lệch chút như người, tuỳ mức.
+
+Bản đầu thử mọi hướng × mọi lực × mọi xoáy: mức Khó chạy 2 700 lần mô phỏng, nghĩ 3,5–4,8 giây một cú trên máy tính, điện thoại còn lâu hơn mấy lần. Hai vòng còn 800–1 100 lần, chừng 1–2 giây; Vừa dưới 1 giây. Tỉ lệ ăn điểm vẫn như cũ:
+
+| Mức, luật | Bản đầu | Hai vòng |
+|---|---|---|
+| Vừa, tự do (40 thế ngẫu nhiên) | 23 | 24 |
+| Vừa, 1 băng | 21 | 23 |
+| Vừa, 3 băng | 14 | 15 |
+| Khó, tự do (100 thế ngẫu nhiên) | 92 | 93 |
+| Khó, 1 băng | 83 | 89 |
+| Khó, 3 băng | 69 | 70 |
+
+Lúc máy nghĩ, dòng trạng thái ghi "Sóc đang ngắm…".
+
+### Quán bida: 16 bàn, giữ bàn
+
+Người dùng: "Cái chỗ vào phòng cho là có 8 bàn bida 3 bi, 8 bàn bi da lỗ như 1 quán thực tế á, làm 3d / full hết thì ko cho vô nữa / tính toán cách giữ bàn vd sao 3p ko đánh là bị kích ra để người khác vô".
+
+**Vào quán**: mục **Vào quán bida** trong bảng Ván mới. Quán vẽ nhìn nghiêng từ trên cao:
+
+- sàn gỗ;
+- bên trái 8 bàn lỗ (L1–L8, nỉ xanh lá), bên phải 8 bàn phăng (P1–P8, nỉ xanh dương);
+- mỗi bàn có thân, chân, đèn treo hắt vàng lên mặt nỉ;
+- mỗi bàn một **sofa bốn chỗ** dọc cạnh dài, quay mặt vào bàn: dãy ngoài kê sát tường, dãy trong kê ở lối giữa hai khu (người dùng: "ai vô chờ thì có 1 người ngồi ghế chẳng hạng, làm như 1 quán bida người đời thật á", rồi "ý là ghế sofa ngồi chờ á, 1 ghế đc 3 4. người ngồi giống ngoài thật á");
+- bàn có người chờ bạn thì người đó ngồi chỗ đầu sofa;
+- bàn đang chơi thì một người cầm cơ đứng đánh phía không có sofa, cơ chọc xuống mặt nỉ; người kia ngồi chỗ đầu sofa chờ lượt. Quán không biết lượt thật của ai, nên hai người đổi nhau mỗi 15 giây cho quán có không khí;
+- ba chỗ sau của sofa là cho **người xem** (xem mục dưới);
+- áo cam là ghế 1, áo xanh là ghế 2, áo xám là người xem; người vẽ to hơn thật một chút cho dễ thấy trên điện thoại.
+
+Khung tự cao vừa hình quán ở bề ngang đang có, nên điện thoại hay máy tính cũng thấy đủ 16 bàn, không chừa khoảng tối. Nhãn nằm ngay trên mặt nỉ, không đè lên bàn bên cạnh: mã bàn trong ô màu trạng thái (xanh trống, cam có người chờ, xám đang chơi), dưới là tên người ở bàn, mỗi người một dòng. Bàn trống thì nỉ sáng hơn, có viền vàng.
+
+Dưới hình có **hàng nút 16 bàn** (L1–L8, P1–P8), cùng màu trạng thái với nhãn: bàn xa vẽ nhỏ khó chạm trên điện thoại thì bấm nút, người dùng bàn phím hay trình đọc màn hình cũng chọn được ("Bàn L3, bida lỗ, đang chơi: An và Bình"). Chữ trắng trên nền màu đủ tương phản (từ 4,6:1). Dưới nữa ghi "N bàn trống · N bàn có người chờ · N bàn đang chơi".
+
+**Chạm một bàn** thì mở bảng của bàn đó:
+
+- **bàn trống**: chọn kiểu (bàn lỗ: 8 bi hay 9 bi; bàn phăng: luật và số điểm), ghi tên, bấm **Ngồi bàn này, chờ người vào**;
+- **bàn có người chờ**: thấy trước bàn đánh gì (8 bi, 9 bi; bida 3 bi thì luật và số điểm), bấm **Vào chơi với X**, ván bắt đầu ngay, người chờ đánh trước;
+- **bàn đang chơi**: chỉ xem tên hai người, đánh gì.
+
+Cả 16 bàn đều đang chơi (không bàn trống, không bàn có người chờ) thì ghi **Quán kín bàn** và không bàn nào cho ngồi.
+
+**Trên máy chủ**, mỗi bàn là một dòng `quan/<bàn>` = { ma, kieu, so: 2, ten, choi, thay }; bàn phăng thêm `luat`, `dich`. Phòng chơi vẫn là phòng `bida/<mã>` như chơi qua mạng, thêm khoá `ban`.
+
+**Giữ bàn**:
+
+- **3 phút không đánh**: tới lượt ai mà quá 3 phút không đánh thì máy người kia ghi `duoi/<ghế>` kèm số cú lúc đó. Mọi máy dừng ván đúng sau cú đó (máy nào lỡ chạy quá thì dựng lại); người bị mời ra thua và thôi giữ bàn. Một phút cuối, dòng trạng thái đếm "còn N giây kẻo bị mời khỏi bàn". Người kia cũng đã đi (tắt app, không ai mời giùm) thì 15 giây sau chính máy mình ghi.
+- **Bỏ ngang**: bấm Về quán giữa ván cũng tính như bị mời ra; người còn lại thắng.
+- **Hết ván**: bàn giữ thêm 3 phút cho **Chơi ván nữa** hay **Ở lại bàn, chờ người mới**; không ai bấm gì thì tự nhường. Về quán lúc người kia còn đứng ở bàn thì để bàn lại cho người đó; người đó thấy "X đã về quán." và thôi nút Chơi ván nữa.
+- **Ván nữa**: bàn trỏ sang phòng mới và **giữ chỗ cho người cùng bàn một phút**, cả quán thấy bàn đang chơi nên không ai chen vào. Quá một phút người kia chưa vào thì bàn mở cho cả quán.
+- **Ngồi chờ một mình** quá 5 phút chưa ai vào: tự nhường bàn.
+- **Tắt app, mất mạng**: bàn quá 3 phút không ai ghi "thay" thì coi như trống, ai ngồi cũng được. Máy chỉ ghi "thay" (20 giây một lần) khi bàn còn trỏ về phòng của mình; bàn đã sang phòng khác thì thôi, khỏi giữ bàn hộ người ta.
+- **Hai người cùng vào một ghế**: người sau sang ghế còn trống; hết ghế thì về quán, báo "Bàn vừa đủ người". Quán không cho đứng xem bàn đã vào ván.
+- **Bấm cùng lúc**: một người bấm Ở lại bàn, người kia bấm Chơi ván nữa thì hai người vẫn gặp nhau ở bàn đó. Ở lại bàn mà người kia vừa mời ván nữa thì vào luôn ván mới; Chơi ván nữa mà bàn vừa sang phòng người kia đang chờ thì vào chờ cùng.
+- **Đồng hồ máy chậm**: bàn bỏ quên xét theo giờ "thay" mới nhất trong quán (giờ máy chủ), nên máy có đồng hồ chậm vẫn thấy bàn bỏ quên là bàn trống.
+
+**Luật máy chủ** (`firebase-rules.json`, nhánh `quan`) cùng canh:
+
+- chỉ 16 bàn L1–L8, P1–P8;
+- bàn lỗ chỉ 8 bi, 9 bi; bàn phăng chỉ bida 3 bi, luật 0/1/3 băng, 5/10/15/25 điểm; đúng hai người;
+- giờ "thay" là giờ máy chủ;
+- ghi đè được một bàn khi: bàn trống, quá 3 phút không ai giữ, vẫn đúng phòng đó (người trong phòng cập nhật), hay phòng đó không còn hoặc đã xong;
+- lời mời ra `duoi/<ghế>` chỉ ghi một lần, sau khi ván bắt đầu.
+
+### Ngồi sofa xem bàn
+
+Người dùng hỏi người đứng xem thì làm sao phân biệt được, rồi chốt: "ai ngồi ghế sofa bàn nào thì có thể xem bàn đó, tất cả ngồi ghế sofa đi, rồi trên bàn có mắt xem nếu có người xem", "vẫn là ngồi ở sofa".
+
+**Phân biệt người chơi, người xem** trên hình quán (nhìn từ trên cao, người chỉ vài điểm ảnh, nên dựa vào chỗ đứng, màu áo, cây cơ chứ không dựa vào nét mặt):
+
+- người đang đánh: đứng cạnh bàn, cầm cơ;
+- người chơi chưa tới lượt, hay đang chờ bạn vào: ngồi chỗ đầu sofa, áo màu ghế (cam, xanh);
+- người xem: ngồi ba chỗ sau, áo xám, không cầm cơ;
+- trên mặt nỉ, cạnh mã bàn, có **con mắt kèm số người đang xem**. Hàng nút bàn cũng đọc số đó cho trình đọc màn hình.
+
+**Xem**: chạm bàn đang chơi → **Ngồi sofa xem ván này** (bảng ghi sofa còn mấy chỗ). Vào là thấy ván đang đánh, cú nào cũng lăn như hai máy người chơi; tiêu đề ghi "bạn đang xem". Người xem chỉ xem: không ngắm, không đánh, và hàm đánh cũng chặn ghế không phải của mình. Hết ván, bảng của người xem chỉ có **Về quán**; hai người chơi bấm Chơi ván nữa thì có thêm **Xem ván mới** — sang ngồi sofa chờ ván mới, không giành ghế. Về quán là đứng dậy, nhường chỗ trên sofa.
+
+**Trên máy chủ**: người xem ghi `quan/<bàn>/xem/<id>` = giờ máy chủ, 20 giây một lần, chỉ khi bàn còn trỏ về ván mình đang xem; im quá 60 giây là coi như đã đi. Sofa ba chỗ cho người xem: kín thì thôi nút xem. Luật chỉ cho ghi vào bàn đang có người, id đúng khuôn, giờ phải là giờ máy chủ; ai cũng xoá được (đứng dậy). Ván mới ở bàn đó ghi đè cả dòng của bàn, nên tên người xem mất một lúc rồi tự hiện lại ở nhịp ghi kế tiếp.
+
+**Lỗi tìm ra lúc viết bài kiểm**: máy người xem gọi thẳng hàm đánh (bỏ qua giao diện) thì cú vẫn được ghi lên máy chủ cho người đang tới lượt — máy chủ không biết ai ghi, chỉ biết cú đúng khuôn. Giờ máy nào chỉ đánh được ghế của mình. Thêm: nhịp ghi "thay" hay chỗ trên sofa còn đang đi thì không ghi nữa nếu người đó vừa rời phòng.
+
+### Chỉ còn quán: bỏ tạo phòng
+
+Người dùng: "Bạn bỏ chức năng tạo phòng đi, vì tôi muốn giới hạn 16 bàn này thôi". Bảng Ván mới giờ còn bốn lối: Đấu với máy, Tập một mình, Chơi chung một máy, **Vào quán bida** (mỗi người một máy).
+
+Đã bỏ hẳn, cả mã lẫn CSS:
+
+- Tạo phòng, mời bạn (link mời, mã QR, chép mã);
+- Vào phòng của bạn (nhập mã 6 ký tự);
+- Tìm phòng nhanh, Xem phòng đang chờ (danh sách `sanhbida`);
+- phòng 3–4 người, ghế trống cho máy chơi, nút "Cho máy đánh thay" / "Tự đánh tiếp".
+
+Phần chơi giữ nguyên, vì bàn trong quán dùng đúng nó: ghi cú, đọc lại cú, bỏ qua cú sai, dựng lại khi hai máy ghi cùng một ô, ván nữa, dọn ván.
+
+Máy chủ cũng chặn, không chỉ ẩn nút: luật `bida/<mã>` bắt ván mới phải có khoá `ban` (một trong 16 bàn) và đúng hai ghế; bàn lỗ chỉ 8, 9 bi, bàn phăng chỉ 3 bi. Bỏ nhánh `sanhbida` và khoá `may` (máy chơi thay). App bản cũ còn trong máy ai đó cũng không tạo được phòng riêng nữa.
+
+Mở link phòng riêng cũ (`#bida/MÃ` của phòng không có bàn) thì không vào: về quán, báo "Phòng riêng không còn nữa — chơi qua mạng giờ ở quán bida, 16 bàn". Đang chơi ở quán mà bấm nút **Bàn** (chỗ nút Ván mới) thì thấy hai ghế, luật giữ bàn, và **Về quán (bỏ ngang)**.
+
+### Lỗi tìm ra khi viết bài kiểm quán
+
+- **Bida 3 bi qua mạng lệch máy cả ván.** Đánh một ván 3 bi tới hết qua mạng thì thấy hai máy lệch điểm từ cú thứ sáu. Cú bi vàng chạm bi trắng trước có "bi chạm đầu" là bi 0. Bàn lỗ thì bi 0 là chính bi chủ, không thể có, nên bộ đọc kết quả chặn bi 0. Máy nhận đọc hỏng cú đó rồi bỏ qua, còn máy đánh vẫn tính. Giờ bàn phăng nhận bi 0, bàn lỗ vẫn chặn. Đã thêm bài: mã hoá rồi đọc lại cú này, và đánh tới hết ván qua mạng, sau từng cú so thế bàn, điểm của hai máy, có cả cú bi vàng chạm bi trắng trước.
+- **Máy 3 bi nghĩ lâu** (Khó 3,5–4,8 giây một cú trên máy tính): giờ tìm hai vòng, xem phần máy đánh ở trên.
+- **Kẽ giữ bàn**: hết ván mà hai người đứng yên thì giữ bàn mãi; một người về quán lúc hết ván xoá luôn bàn của người còn đứng đó; lúc hẹn ván nữa người lạ chen vào được; hai người cùng vào một ghế thì người sau kẹt ở "Đang vào bàn…"; theo lời mời ván nữa mà phòng mới không thành thì kẹt ở "Đang vào phòng…". Đã sửa hết, mỗi chỗ một bài kiểm.
+
+**Bài kiểm**: `scripts/test-bida.js` giờ 152 bài, `scripts/test-bida-phong.js` 63 bài (bỏ các bài của phòng riêng, phòng mở, máy chơi thay; bài phần chơi — đánh qua lại khớp từng vị trí bi, cú nâng cơ, cú sai khuôn, sai lượt, hai máy ghi cùng một ô, dọn ván — chuyển sang chạy ở một bàn trong quán). Thêm bài: bảng Ván mới chỉ còn quán; máy chủ chặn ván không thuộc bàn nào, ba ghế, bàn lỗ mà 3 bi, bàn phăng mà 8 bi; link phòng riêng cũ thì về quán. Phần quán có:
+
+- quán mới 16 bàn trống; chạm giữa bàn nào ra đúng bàn đó;
+- ngồi, vào, ván bắt đầu ngay, hai tên lên bàn;
+- hàng nút 16 bàn đọc được tên bàn, trạng thái, tên người; bấm nút mở đúng bàn;
+- luật quán chặn chín kiểu ghi sai;
+- mời ra sau 3 phút; người bị mời thấy "Bạn đã rời bàn"; mời ra chỉ ghi một lần;
+- ở lại bàn; về quán không xoá bàn của người khác;
+- chờ quá 5 phút; quán kín bàn; bàn quá 3 phút coi như trống, cả khi đồng hồ máy chậm 5 phút;
+- bàn phăng cho thấy luật, số điểm trước khi vào;
+- bida 3 bi qua mạng tới hết ván;
+- ván nữa giữ chỗ (người thứ ba không vào được), hết một phút thì mở;
+- chỉ ghi "thay" khi bàn còn là của mình;
+- hai người tranh một ghế;
+- bỏ ngang;
+- hết ván 3 phút tự nhường;
+- hết ván một người về quán thì bàn để lại cho người kia;
+- một người bấm Ở lại bàn, người kia bấm Chơi ván nữa: vẫn gặp nhau ở bàn đó;
+- người kia tắt app thì máy mình tự mời mình ra; người bị mời ra thôi giữ bàn;
+- theo lời mời ván nữa mà phòng mới không thành thì 20 giây sau về quán (trước đây kẹt ở "Đang vào phòng…");
+- ngồi sofa xem (máy thứ tư): có nút xem, vào xem không ngồi ghế, có tên trên sofa, cùng thế bàn từng cú, không đánh được; cả quán thấy số người xem; sofa kín (người im quá 60 giây không tính) thì thôi; bảng hết ván của người xem; xem ván mới không giành ghế lúc hai người tranh ghế; về quán là nhường chỗ; luật sofa chặn bàn trống, id sai, giờ giả.
+
+**Thử phá 19 chỗ** trong phần quán và bida 3 bi qua mạng: bỏ tự mời mình ra, ghi "thay" không hỏi bàn, người bị mời vẫn giữ bàn, hết ván không nhường, ván nữa không giữ chỗ, giữ chỗ không hết hạn, cho đứng xem, về quán xoá bàn, Ở lại bàn không theo lời mời, Chơi ván nữa hỏng thì không vào chờ cùng, theo lời mời bị kẹt, đọc kết quả chặn bi 0, không báo người kia đã về, ghế không đổi, mời ra chậm, chờ 5 phút không nhường, kín bàn vẫn cho ngồi, đồng hồ chậm, link phòng riêng cũ vẫn cho vào. Lần đầu bắt 15. Ba chỗ lọt: cho đứng xem (thêm bài mở link phòng đang chơi), ghế không đổi và chọn ghế ở bảng bàn (hai đoạn làm cùng một việc, nên phá một chỗ thì chỗ kia đỡ; bỏ đoạn thừa). Giờ bắt cả 19. Phần người xem thử phá thêm 6 chỗ (người xem ngồi ghế, đánh được, không nhường sofa, bị đẩy về quán, không đếm người xem, sofa kín vẫn cho vào): bắt cả 6. Một bản chạy không phá làm đối chứng: đạt hết, nên không có bài nào hỏng vì máy chậm.
+
+Đã xem trên trình duyệt cỡ điện thoại (375 px) và máy tính, với dữ liệu quán dựng sẵn: đủ 16 bàn, nhãn đọc được, ghế cạnh bàn, người ngồi chờ, người cầm cơ đứng đánh; chạm bàn hay nút bàn ra đúng bảng của bàn đó; bảng Ván mới chỉ còn bốn lối.
+
+**Còn phải xuất bản luật Firebase** cho phần mới: nhánh `quan` (cả `quan/<bàn>/xem` cho sofa); trong `bida` thêm kiểu 3, `luat`, `dich`, `ban` (ván mới phải có), `duoi`, chỉ hai ghế, bỏ `may`; bỏ nhánh `sanhbida`. Database thật lúc viết: `bida`, `sanhbida` đọc được (bản luật trước đã lên), `quan` trả 401. Chưa xuất bản thì quán báo "Máy chủ chưa cho xem quán", bida 3 bi qua mạng chưa tạo được phòng. Đấu máy, chơi chung, tập một mình chạy được ngay.
 
 ## Ăn gì
 

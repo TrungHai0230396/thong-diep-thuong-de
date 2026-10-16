@@ -1454,6 +1454,23 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .bd-the b{font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bd-the span{min-height:14px;font-size:11px;color:rgba(238,241,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bd-the em{display:flex;gap:2px;margin-top:2px;font-style:normal}
+.bd-bai{display:flex;align-items:center;gap:8px;padding:0 12px 4px}
+.bd-bai[hidden]{display:none}
+.bd-bai p{flex:none;margin:0;max-width:64px;font-size:11.5px;line-height:1.25;color:rgba(238,241,255,.6)}
+.bd-bai div{display:flex;gap:4px;overflow-x:auto}
+.bd-la{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:30px;height:40px;padding:0 3px;border-radius:6px;
+  background:#f6f2e8;color:#1b1b1f;box-shadow:0 1px 3px rgba(0,0,0,.35);line-height:1}
+.bd-la b{font-size:14px;font-weight:700}
+.bd-la i{font-size:12px;font-style:normal}
+.bd-la small{font-size:8.5px;color:#555}
+.bd-la-do{color:#c4261d}
+.bd-quan-cv{display:block;width:100%;height:min(56vh,460px);margin:8px 0 4px;border-radius:14px;background:#15110e;cursor:pointer;touch-action:manipulation}
+.bd-quan-ds{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;margin:6px 0 2px}
+.bd-tin .bd-quan-ds button.bd-quan-o{display:block;width:100%;height:30px;margin:0;padding:0;border:1px solid transparent;border-radius:8px;font-size:12px;font-weight:700;color:#fff;background:#2a2a30}
+.bd-tin .bd-quan-ds button.bd-quan-trong{background:#187a4b;border-color:rgba(255,215,110,.85)}
+.bd-tin .bd-quan-ds button.bd-quan-cho{background:#a8650f}
+.bd-tin .bd-quan-ds button.bd-quan-choi{color:rgba(255,255,255,.7)}
+.bd-xem-bai{width:100%;height:40px;border-radius:10px;border:1px dashed rgba(255,215,110,.55);background:rgba(255,215,110,.08);color:#ffe6a6;font:inherit;font-size:13.5px;cursor:pointer}
 .bd-the.bd-dang{border-color:rgba(255,214,120,.8);background:rgba(255,214,120,.1)}
 .bd-the.bd-dang span{color:#ffe6a6}
 .bd-mini{flex:none;width:10px;height:10px;border-radius:50%;box-shadow:inset -1px -1px 2px rgba(0,0,0,.35),0 0 0 .5px rgba(0,0,0,.4)}
@@ -1470,6 +1487,11 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .bd-xoay-bang[hidden]{display:none}
 .bd-xoay-bang svg{display:block;width:170px;height:170px;margin:0 auto;touch-action:none;cursor:pointer}
 .bd-xoay-chu{margin:8px 0 8px;font-size:14px;color:#ffe6a6}
+.bd-nang{display:flex;flex-direction:column;gap:2px;margin:0 0 10px;font-size:13px;color:rgba(238,241,255,.75);text-align:left}
+.bd-nang span{display:flex;justify-content:space-between;gap:8px}
+.bd-nang b{color:#ffe6a6;font-weight:600}
+.bd-nang input{width:100%;margin:4px 0 0;accent-color:#e9a93a}
+.bd-nang-nho:not(:empty){margin-left:2px;font-size:12px;font-weight:600;color:#ffd77a}
 .bd-xoay-nut{display:flex;gap:8px}
 .bd-xoay-nut button{flex:1;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#eef1ff;font:inherit;font-size:14px;cursor:pointer}
 .bd-xoay-nut .bd-xoay-xong{border:0;background:linear-gradient(#ffd77a,#e9a93a);color:#2a1a00;font-weight:700}
@@ -1511,12 +1533,10 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .bd-tin button.bd-phu{background:rgba(255,255,255,.08);color:#eef1ff;font-weight:500}
 .bd-tin button:disabled{opacity:.42;cursor:default}
 .bd-tin button + .bd-meo{margin-top:12px}
-.bd-o-ten,.bd-o-ma{box-sizing:border-box;width:100%;height:44px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);
+.bd-o-ten{box-sizing:border-box;width:100%;height:44px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.25);
   color:#eef1ff;font:inherit;font-size:16px}
-.bd-o-ma{text-transform:uppercase;letter-spacing:.12em;font-family:ui-monospace,Menlo,monospace}
-.bd-o-ten:focus,.bd-o-ma:focus{outline:none;border-color:#ffd77a}
-.bd-o-ma-to{height:56px;font-size:24px;text-align:center;letter-spacing:.22em}
-.bd-o-link{margin:4px 0 2px;font-size:13px;-webkit-user-select:text;user-select:text}
+.bd-o-ten:focus{outline:none;border-color:#ffd77a}
+.bd-tin .bd-o-chung + .bd-o-chung{margin-top:8px}
 /* ván mới: các lối lớn */
 .bd-tin button.bd-lua{display:flex;align-items:center;gap:14px;width:100%;height:auto;min-height:68px;margin-top:10px;padding:11px 14px;border-radius:16px;
   border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eef1ff;text-align:left;font-weight:400}
@@ -1529,9 +1549,6 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .bd-tin button.bd-lui{display:block;width:auto;height:32px;margin:-6px auto 2px -4px;padding:0 6px;background:none;color:rgba(238,241,255,.7);font-size:14px;font-weight:500}
 .bd-tin button.bd-chu{height:auto;margin-top:14px;padding:6px;background:none;color:rgba(238,241,255,.62);font-size:14px;font-weight:500;text-decoration:underline;text-underline-offset:3px}
 /* phòng chờ: mã to, ghế, mã QR */
-.bd-ma-dong{display:flex;align-items:center;justify-content:center;gap:10px;margin:6px 0 12px}
-.bd-ma-to{font-family:ui-monospace,Menlo,monospace;font-size:30px;font-weight:700;letter-spacing:.16em;color:#fff4d0}
-.bd-tin button.bd-chep-ma{display:inline-block;width:auto;height:32px;margin:0;padding:0 12px;border-radius:999px;background:rgba(255,255,255,.1);color:#eef1ff;font-size:13px;font-weight:600}
 .bd-ghe-hang{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin:4px 0 10px}
 .bd-ghe-hang.bd-ghe-3{grid-template-columns:repeat(3,1fr)}
 .bd-ghe-o{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;padding:10px 6px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
@@ -1539,19 +1556,6 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .bd-ghe-o small{font-size:11px;line-height:1.3;color:rgba(238,241,255,.55);text-align:center}
 .bd-ghe-trong{border-style:dashed;opacity:.7}
 .bd-ghe-minh{border-color:rgba(255,215,120,.6);background:rgba(255,215,120,.1)}
-.bd-qr{width:min(220px,70%);margin:12px auto 4px;padding:6px;border-radius:12px;background:#fff}
-.bd-qr svg{display:block;width:100%;height:auto}
-.bd-tin button.bd-batdau-phong{height:auto;min-height:48px;padding:7px 12px;line-height:1.25}
-.bd-batdau-phong small{display:block;font-size:12.5px;font-weight:500;opacity:.78}
-.bd-hai{display:flex;gap:8px;margin-top:10px}
-.bd-tin .bd-hai button{flex:1;min-width:0;margin-top:0}
-.bd-tin .bd-hai button.bd-chep-link{flex:0 0 38%}
-.bd-ds-phong{display:flex;flex-direction:column;gap:8px;margin:12px 0 6px}
-.bd-tin button.bd-phong-mo{display:flex;flex-direction:column;align-items:flex-start;gap:3px;height:auto;min-height:58px;margin-top:0;padding:10px 14px;
-  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#eef1ff;text-align:left;font-weight:400}
-.bd-tin button.bd-phong-mo:hover{border-color:rgba(255,215,120,.6);background:rgba(255,215,120,.1)}
-.bd-phong-mo b{font-size:16px;font-weight:600;color:#ffe6a6}
-.bd-phong-mo small{font-size:12.5px;color:rgba(238,241,255,.7)}
 @media (max-height:640px){
   .bd-dau{min-height:44px;padding-top:calc(env(safe-area-inset-top,0px) + 6px)}
   .bd-nguoi{padding:0 12px 2px}

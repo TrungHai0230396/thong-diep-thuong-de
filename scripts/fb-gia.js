@@ -5,8 +5,8 @@
    - Luồng sự kiện (Accept: text/event-stream): mở ra là "put" cả cây ở "/", sau đó "put" / "patch" kèm đường dẫn
      tính từ chỗ đang nghe; khoá số liền nhau trả về thành mảng.
    - Luật: chép đúng firebase-rules.json, viết tay cho các đường phòng cờ dùng (chỗ nào khác thì từ chối): coba/<mã> là
-     phòng, sanh/<mã> là danh sách phòng mở (ai cũng đọc được cả danh sách). Bida lỗ (assets/bida.js) cũng vậy: bida/<mã>
-     là phòng, sanhbida/<mã> là danh sách phòng mở.
+     phòng, sanh/<mã> là danh sách phòng mở (ai cũng đọc được cả danh sách). Bida lỗ (assets/bida.js): bida/<mã> là ván
+     ở một bàn, quan/<bàn> là 16 bàn của quán.
    Chạy riêng: node scripts/fb-gia.js [cổng] */
 'use strict';
 const http = require('http');
@@ -122,16 +122,20 @@ function taoMay(cong = 0) {
     return viet.every(k => dung[k](v[k]));
   }
 
-  /* ---------- luật bida (firebase-rules.json, nhánh bida và sanhbida) ----------
-     Phòng: kieu 8 hay 9; so ghế 2 (9 bi được 3, 4); chu, pha (ghế phá) trong số ghế; ghế giành một lần như phòng cờ; máy
-     chơi thay may/P = true; cú đánh cu/n ghi một lần, sau khi bắt đầu, đúng ba khoá P, d (chữ số và dấu phẩy), kq (thêm
-     dấu chấm, hai chấm, chấm phẩy). */
-  const KHOA_BIDA = ['tao', 'chu', 'kieu', 'so', 'kho', 'pha', 'ghe', 'batDau', 'may', 'cu', 'xong', 'tiep'];
+  /* ---------- luật bida (firebase-rules.json, nhánh bida, quan) ----------
+     Ván (phòng của một bàn trong quán): kieu 8, 9 hay 3 (bida 3 bi); phải có ban (bàn lỗ L1–L8 thì 8, 9 bi; bàn phăng P1–P8 thì
+     3 bi); hai ghế; chu, pha (ghế phá) là 0 hay 1; ghế giành một lần như phòng cờ; cú đánh cu/n ghi một lần, sau khi bắt đầu,
+     đúng ba khoá P, d (chữ số và dấu phẩy), kq (thêm dấu chấm, hai chấm, chấm phẩy). Thêm: luat (0, 1, 3 băng), dich (5, 10,
+     15, 25 điểm), duoi/P (mời người ở ghế P ra vì quá 3 phút không đánh: { n số cú lúc đó, luc giờ máy chủ }, ghi một lần,
+     sau khi bắt đầu). Không còn phòng riêng, phòng mở (sanhbida), máy chơi thay (may/P) */
+  const KHOA_BIDA = ['tao', 'chu', 'kieu', 'so', 'kho', 'pha', 'ghe', 'batDau', 'cu', 'xong', 'tiep', 'luat', 'dich', 'ban', 'duoi'];
   function hopLeBida(r, nay) {
     if (!r || typeof r !== 'object' || Object.keys(r).some(k => !KHOA_BIDA.includes(k))) return false;
-    if (r.tao !== nay || !(r.kieu === 8 || r.kieu === 9) || !(r.so === 2 || (r.kieu === 9 && (r.so === 3 || r.so === 4)))) return false;
-    if (!so(r.kho, 0, 2) || !so(r.chu, 0, r.so - 1) || !so(r.pha, 0, r.so - 1) || !r.ghe || typeof r.ghe !== 'object') return false;
-    return Object.keys(r.ghe).every(P => /^[0-3]$/.test(P) && hopLeGhe(r.ghe[P], nay));
+    if (r.tao !== nay || ![8, 9, 3].includes(r.kieu) || r.so !== 2) return false;
+    if (!(typeof r.ban === 'string' && /^[LP][1-8]$/.test(r.ban) && (r.ban[0] === 'P') === (r.kieu === 3))) return false;
+    if (('luat' in r && ![0, 1, 3].includes(r.luat)) || ('dich' in r && ![5, 10, 15, 25].includes(r.dich)) || 'duoi' in r) return false;
+    if (!so(r.kho, 0, 2) || !so(r.chu, 0, 1) || !so(r.pha, 0, 1) || !r.ghe || typeof r.ghe !== 'object') return false;
+    return Object.keys(r.ghe).every(P => /^[01]$/.test(P) && hopLeGhe(r.ghe[P], nay));
   }
   function choGhiBida(ma, k, gt, nay) {
     if (!LA_MA.test(ma)) return false;
@@ -147,14 +151,17 @@ function taoMay(cong = 0) {
       if (a === 'tiep') return !('tiep' in r) && typeof gt === 'string' && LA_MA.test(gt);
       return false;
     }
-    if (a === 'may' && k.length === 2) return /^[0-3]$/.test(b) && (gt == null || gt === true);
+    if (a === 'duoi' && k.length === 2) {
+      return /^[01]$/.test(b) && !(r.duoi && b in r.duoi) && 'batDau' in r && !!gt && typeof gt === 'object' && Object.keys(gt).length === 2 &&
+        typeof gt.n === 'number' && gt.n >= 0 && gt.n <= 9999 && gt.luc === nay;
+    }
     if (a === 'cu' && k.length === 2) {
       if (!/^[0-9]{1,4}$/.test(b) || (r.cu && b in r.cu) || !('batDau' in r) || !gt || typeof gt !== 'object') return false;
       const ks = Object.keys(gt);
-      return ks.length === 3 && ['P', 'd', 'kq'].every(x => ks.includes(x)) && so(gt.P, 0, 3) &&
+      return ks.length === 3 && ['P', 'd', 'kq'].every(x => ks.includes(x)) && so(gt.P, 0, 1) &&
         typeof gt.d === 'string' && gt.d.length <= 80 && /^[-0-9,]+$/.test(gt.d) && typeof gt.kq === 'string' && gt.kq.length <= 400 && /^[-0-9.,:;]+$/.test(gt.kq);
     }
-    if (a === 'ghe' && k.length === 3 && /^[0-3]$/.test(b)) {
+    if (a === 'ghe' && k.length === 3 && /^[01]$/.test(b)) {
       const g = (r.ghe && r.ghe[b]) || {};
       if (c === 'id') return !('id' in g) && !('batDau' in r) && typeof gt === 'string' && /^[a-z0-9]{8,16}$/.test(gt);
       if (c === 'ten') return typeof gt === 'string' && gt.length >= 1 && gt.length <= 20;
@@ -162,15 +169,17 @@ function taoMay(cong = 0) {
     }
     return false;
   }
-  function choGhiSanhBida(ma, v, viet, nay) {
-    if (!LA_MA.test(ma)) return false;
-    if (v == null) return true;
-    const r = lay(['bida', ma]), cu = lay(['sanhbida', ma]), khoa = ['tao', 'ten', 'trong', 'kieu', 'so', 'thay'];
-    if (!r || 'batDau' in r || typeof v !== 'object') return false;
-    if (Object.keys(v).some(k => !khoa.includes(k)) || !khoa.every(k => k in v)) return false;
-    const dung = { tao: (x) => typeof x === 'number' && (cu ? x === cu.tao : x === nay), ten: (x) => typeof x === 'string' && x.length >= 1 && x.length <= 20,
-      trong: (x) => so(x, 1, 3), kieu: (x) => x === 8 || x === 9, so: (x) => so(x, 2, 4), thay: (x) => x === nay };
-    return viet.every(k => dung[k](v[k]));
+  /* quán bida: 16 bàn cố định L1–L8 (lỗ), P1–P8 (phăng; ghi kèm luat, dich), mỗi bàn trỏ tới phòng đang chơi ở đó. Ghi được khi bàn trống, khi quá 3
+     phút không ai giữ (thay cũ), khi vẫn đúng phòng đó (người trong phòng cập nhật), hay khi phòng đó không còn / đã xong */
+  function choGhiQuan(ban, cu, moi, viet, nay) {
+    if (!/^[LP][1-8]$/.test(ban)) return false;
+    const phongCu = cu && typeof cu.ma === 'string' && LA_MA.test(cu.ma) ? lay(['bida', cu.ma]) : null;
+    if (cu && !(cu.thay < nay - 180000 || (moi && moi.ma === cu.ma) || !phongCu || typeof phongCu.xong === 'number')) return false;
+    if (moi == null) return true;
+    if (typeof moi !== 'object' || Object.keys(moi).some(k => !['ma', 'kieu', 'so', 'thay', 'choi', 'ten', 'luat', 'dich', 'xem'].includes(k)) || !['ma', 'kieu', 'so', 'thay'].every(k => k in moi)) return false;
+    const dung = { ma: (x) => typeof x === 'string' && LA_MA.test(x), kieu: (x) => (ban[0] === 'L' ? x === 8 || x === 9 : x === 3), so: (x) => x === 2, thay: (x) => x === nay,
+      choi: (x) => typeof x === 'boolean', luat: (x) => ban[0] === 'P' && [0, 1, 3].includes(x), dich: (x) => ban[0] === 'P' && [5, 10, 15, 25].includes(x), ten: (x) => !!x && typeof x === 'object' && Object.keys(x).every(P => /^[01]$/.test(P) && typeof x[P] === 'string' && x[P].length >= 1 && x[P].length <= 20) };
+    return viet.every(k => dung[k](moi[k]));
   }
 
   function guiSuKien(duongGhi, loai, du) {
@@ -193,7 +202,7 @@ function taoMay(cong = 0) {
     let than = '';
     const tu = (ma, du) => { res.writeHead(ma, Object.assign({ 'Content-Type': 'application/json' }, cors)); res.end(JSON.stringify(du)); };
     const khong = () => { tuChoi++; if (process.env.FB_GIA_KE) console.log('  [từ chối]', req.method, duong, than.slice(0, 120)); tu(401, { error: 'Permission denied' }); };
-    const doc = ((k[0] === 'coba' || k[0] === 'bida') && k.length >= 2 && LA_MA.test(k[1])) || k[0] === 'sanh' || k[0] === 'sanhbida';
+    const doc = ((k[0] === 'coba' || k[0] === 'bida') && k.length >= 2 && LA_MA.test(k[1])) || k[0] === 'sanh' || k[0] === 'quan';
     if (req.method === 'GET') {
       if (!doc) return khong();
       if ((req.headers.accept || '').includes('text/event-stream')) {
@@ -210,17 +219,42 @@ function taoMay(cong = 0) {
     req.on('end', () => {
       let gt = null;
       if (req.method !== 'DELETE') { try { gt = JSON.parse(than); } catch (e) { return tu(400, { error: 'Invalid data' }); } }
-      if ((k[0] === 'sanh' || k[0] === 'sanhbida') && k.length === 2) {
+      if (k[0] === 'sanh' && k.length === 2) {
         const nay = bayGio(), ma = k[1], cu = lay([k[0], ma]);
         let v, viet;
         if (req.method === 'DELETE') { v = null; viet = []; }
         else if (req.method === 'PUT') { v = giaiGio(gt, nay); viet = v && typeof v === 'object' ? Object.keys(v) : []; }
         else if (req.method === 'PATCH') { if (!gt || typeof gt !== 'object') return tu(400, { error: 'Invalid data' }); viet = Object.keys(gt); v = Object.assign({}, cu || {}, giaiGio(gt, nay)); }
         else return tu(405, { error: 'Method not allowed' });
-        if (!(k[0] === 'sanh' ? choGhiSanh : choGhiSanhBida)(ma, v, viet, nay)) return khong();
+        if (!choGhiSanh(ma, v, viet, nay)) return khong();
         dat(k, v);
         guiSuKien(duong, 'put');
         return tu(200, v);
+      }
+      if (k[0] === 'quan' && k.length >= 2) {
+        /* bàn trong quán: tính giá trị mới của cả bàn rồi xét luật (ghi cả bàn, một khoá con, PATCH nhiều khoá "ten/1", hay xoá) */
+        const nay = bayGio(), ban = k[1], cu = lay(['quan', ban]);
+        let moi = cu ? JSON.parse(JSON.stringify(cu)) : null, viet = [];
+        /* người ngồi sofa xem: quan/<bàn>/xem/<id> = giờ máy chủ, ai cũng ghi, xoá được chỗ của mình — chỉ khi bàn đang có */
+        if (k[2] === 'xem') {
+          const v = req.method === 'DELETE' ? null : giaiGio(gt, nay);
+          if (k.length !== 4 || !/^[a-z0-9]{8,16}$/.test(k[3]) || !cu || (v !== null && !(req.method === 'PUT' && v === nay))) return khong();
+          moi.xem = Object.assign({}, moi.xem || {});
+          if (v === null) delete moi.xem[k[3]]; else moi.xem[k[3]] = v;
+          dat(['quan', ban], moi);
+          guiSuKien('quan/' + ban, 'put');
+          return tu(200, v);
+        }
+        const datKhoa = (ks, v) => { moi = moi && typeof moi === 'object' ? moi : {}; let o = moi; for (let i = 0; i < ks.length - 1; i++) { o[ks[i]] = o[ks[i]] && typeof o[ks[i]] === 'object' ? o[ks[i]] : {}; o = o[ks[i]]; } if (v == null) delete o[ks[ks.length - 1]]; else o[ks[ks.length - 1]] = v; if (!viet.includes(ks[0])) viet.push(ks[0]); };
+        if (req.method === 'DELETE' && k.length === 2) moi = null;
+        else if (req.method === 'PUT' && k.length === 2) { moi = giaiGio(gt, nay); viet = moi && typeof moi === 'object' ? Object.keys(moi) : []; }
+        else if (req.method === 'PUT' || req.method === 'DELETE') datKhoa(k.slice(2), req.method === 'DELETE' ? null : giaiGio(gt, nay));
+        else if (req.method === 'PATCH') { if (!gt || typeof gt !== 'object') return tu(400, { error: 'Invalid data' }); for (const x of Object.keys(gt)) datKhoa(k.slice(2).concat(tach(x)), giaiGio(gt[x], nay)); }
+        else return tu(405, { error: 'Method not allowed' });
+        if (!choGhiQuan(ban, cu, moi, viet, nay)) return khong();
+        dat(['quan', ban], moi);
+        guiSuKien('quan/' + ban, 'put');
+        return tu(200, moi);
       }
       if ((k[0] !== 'coba' && k[0] !== 'bida') || k.length < 2) return khong();
       const nay = bayGio(), nh = k[0], ma = k[1], trong = k.slice(2), luat = nh === 'bida' ? choGhiBida : choGhi;
