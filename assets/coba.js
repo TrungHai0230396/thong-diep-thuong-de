@@ -1358,7 +1358,7 @@ function vaoPhong(ma, minh, muonNgoi = -1, tuMo = false) {
   const daLuu = docLuu().phong, mo = minh ? (minh.mo !== undefined ? !!minh.mo : !!(daLuu && daLuu.ma === ma && daLuu.id === minh.id && daLuu.mo)) : false;
   phong = { ma, id: minh ? minh.id : MANG.idMoi(), P: minh ? minh.P : -1, cay: undefined, ke: 0, nhat: [], daGui: null, lech: 0,
     song: false, nhipCuoi: 0, muonNgoi, nghiO: -1, baoLuot: -1, tuMo, choTiep: 0, sanhCu: '', mo, daDang: false, sanhLuc: 0, sanhKhoa: '', tuSanh: false,
-    hop: [], lucNhan: {}, doLech: false, giumO: -1, gapO: -1, hetCu: false, hetMay: {}, dongHo: 0 };
+    hop: [], lucNhan: {}, doLech: false, giumO: -1, gapO: -1, hetCu: false, hetMay: {}, dongHo: 0, suaCD: false };
   if (phong.P >= 0) ghiLuu({ phong: { ma, id: phong.id, P: phong.P, mo: phong.mo || undefined } });
   datDiaChi(ma);
   noiPhong();
@@ -1418,6 +1418,10 @@ function khiPhongDoi(cay) {
   }
   phong.tuMo = false;
   capNhatSanh();
+  /* chủ phòng vừa đổi luật hay đồng hồ (lúc chưa bắt đầu): người khác trong phòng được báo */
+  if (truoc && !cay.batDau && phong.P !== cay.chu && ((truoc.luat || '') !== (cay.luat || '') || (truoc.gio || '') !== (cay.gio || ''))) {
+    bao(`Chủ phòng đổi: ${luatChu(cay)} · ${gioCua(cay) ? gioCua(cay).ten : 'không đếm giờ'}.`);
+  }
   if (!cay.batDau) { veSanh(); return; }
   if (!van || van.cheDo !== 'phong' || van.ma !== phong.ma) { batDauVanPhong(); return; }
   capNhatNguoi();
@@ -1472,14 +1476,36 @@ function veSanh() {
       : `${ban ? `${ban} bạn đã vào, còn ${trong.length} ghế trống. ` : 'Chưa ai vào. '}${phong.mo ? 'Phòng đang mở cho mọi người: ai bấm "Tìm phòng nhanh" hay "Xem phòng đang chờ" cũng vào được; bạn bè vẫn vào bằng link, mã.' : 'Bạn bè mở link, quét mã QR, hay nhập mã ở mục "Vào phòng của bạn".'}`;
     /* chủ phòng đổi phòng riêng ↔ phòng mở lúc nào cũng được (bạn bè không tới thì mở cho người lạ) */
     const nutMo = laChu && trong.length ? `<button type="button" class="cb-chu cb-doi-mo">${phong.mo ? 'Thôi cho người lạ vào' : 'Cho người lạ tìm thấy phòng này'}</button>` : '';
-    html = `<p class="cb-tin-nho">${phong.mo || phong.tuSanh ? 'Phòng mở' : 'Phòng chờ'} · ${luatChu(cay)}${gioNhan(cay)}</p>${dongMa()}${hangGhe(cay, minh)}
+    html = laChu && phong.suaCD ? manDoiCaiDat(cay)
+      : `<p class="cb-tin-nho">${phong.mo || phong.tuSanh ? 'Phòng mở' : 'Phòng chờ'} · ${luatChu(cay)}${gioNhan(cay)}</p>${dongMa()}${hangGhe(cay, minh)}
       <p class="cb-meo">${loi}</p>
       ${batDauChinh ? nutBatDau + nutMoi : nutMoi + nutBatDau}
       ${NUT_XEM_QUAN}
+      ${laChu ? '<button type="button" class="cb-chu cb-doi-cd">Đổi luật, đồng hồ</button>' : ''}
       ${nutMo}
       <button type="button" class="cb-chu cb-roi">Rời phòng</button>`;
   }
   if (html !== phong.sanhCu || tam.querySelector('.cb-tin').hidden) { phong.sanhCu = html; moTin(html); }
+}
+/* chủ phòng đổi luật, đồng hồ lúc chưa bắt đầu. Người dùng: "vào phòng nhanh mà tự tạo ko cho sửa lại time hay luật à" —
+   Tìm phòng nhanh tự tạo phòng theo cài đặt lần trước, phòng tạo tay cũng có khi muốn đổi. Bấm là ghi ngay lên máy chủ
+   (luật Firebase chỉ cho ghi hai ô này khi ván chưa bắt đầu); người trong phòng thấy ngay, có lời báo. */
+const goiYLuat = (luat) => (luat === 'tq' ? 'Giết vua là chiếm cả đạo quân nhà đó, chọn một quân làm <b>tướng</b> (đi như vua). Giết tướng là cướp đạo quân.' : 'Bị loại thì quân hoá đá, vẫn chắn đường.') + ' Còn vua cuối cùng thì thắng.';
+const goiYGio = (g) => (g.nuoc ? 'Hết giờ thì máy đi giùm nước đó.' : 'Hết giờ thì máy chơi thay tới hết ván.');
+function manDoiCaiDat(cay) {
+  const g = gioCua(cay), nut = (ten, nhom, gt, bat) => `<button type="button" class="cb-chon${bat ? ' cb-bat' : ''}" data-${nhom}="${gt}">${ten}</button>`;
+  return `<p class="cb-tin-nho">Phòng ${phong.ma}</p><h2>Đổi luật, đồng hồ</h2>
+    <p class="cb-nhan">Luật</p><div class="cb-hang">${nut('Thường', 'doiluat', 'thuong', cay.luat !== 'tq')}${nut('Tam quốc', 'doiluat', 'tq', cay.luat === 'tq')}</div>
+    <p class="cb-meo cb-trai">${goiYLuat(cay.luat)}</p>
+    <p class="cb-nhan">Đồng hồ</p><div class="cb-hang cb-hang-gio">${nut('Không<small>đếm giờ</small>', 'doigio', 'khong', !g)}${Object.keys(GIO_PHONG).map(k => nut(GIO_PHONG[k].nut, 'doigio', k, cay.gio === k)).join('')}</div>
+    ${g ? `<p class="cb-meo cb-trai">${goiYGio(g)}</p>` : ''}
+    <p class="cb-meo">Người trong phòng thấy ngay. Đổi được tới lúc bấm Bắt đầu.</p>
+    <button type="button" class="cb-xong-cd">Xong</button>`;
+}
+async function doiCaiDat(khoa, gt) {
+  if (!phong || !phong.cay || phong.cay.batDau || phong.P !== phong.cay.chu) return;
+  const ma = phong.ma, r = await MANG.goi(`coba/${ma}/${khoa}`, gt ? 'PUT' : 'DELETE', gt || undefined);
+  if (!r.ok && phong && phong.ma === ma) bao(r.ma === 401 ? 'Ván đã bắt đầu — không đổi được nữa.' : 'Mất mạng, chưa đổi được.');
 }
 /* ---------- phòng mở: ai cũng tìm thấy, vào chơi không cần mã ----------
    Người dùng: "làm tìm phòng trống không có mật khẩu để mọi người tự vô chơi nữa". Phòng riêng vẫn như cũ — mã 6 ký tự như
@@ -1495,14 +1521,18 @@ function capNhatSanh(ep) {
     if (phong.daDang) { phong.daDang = false; phong.sanhKhoa = ''; MANG.goi(`sanh/${ma}`, 'DELETE'); }
     return;
   }
-  const g = gheCua(cay.chu), dong = Object.assign({ ten: String((g && g.ten) || TEN_MAU[cay.chu]).slice(0, 20), trong, thay: MANG.GIO },
-    cay.luat === 'tq' ? { luat: 'tq' } : {}, gioCua(cay) ? { gio: cay.gio } : {});
-  const khoa = `${dong.ten}|${trong}`;
+  /* luật, đồng hồ đổi được lúc chờ: null là xoá khoá đó khỏi dòng (đổi về luật thường, thôi đếm giờ) */
+  const g = gheCua(cay.chu), dong = { ten: String((g && g.ten) || TEN_MAU[cay.chu]).slice(0, 20), trong, thay: MANG.GIO, luat: cay.luat === 'tq' ? 'tq' : null, gio: gioCua(cay) ? cay.gio : null };
+  const khoa = `${dong.ten}|${trong}|${dong.luat}|${dong.gio}`;
   if (!ep && phong.daDang && khoa === phong.sanhKhoa) return;
   phong.daDang = true; phong.sanhKhoa = khoa; phong.sanhLuc = Date.now();
   /* dòng còn đó thì sửa vài khoá; bị dọn mất (hay chưa có) thì ghi lại cả dòng — luật đòi có đủ tao, ten, trong, thay */
   MANG.goi(`sanh/${ma}`, 'PATCH', dong).then(r => {
-    if (!r.ok && r.ma === 401 && phong && phong.ma === ma && phong.daDang) MANG.goi(`sanh/${ma}`, 'PUT', Object.assign({ tao: MANG.GIO }, dong));
+    if (!r.ok && r.ma === 401 && phong && phong.ma === ma && phong.daDang) {
+      const ca = Object.assign({ tao: MANG.GIO }, dong);
+      for (const k of Object.keys(ca)) if (ca[k] === null) delete ca[k];
+      MANG.goi(`sanh/${ma}`, 'PUT', ca);
+    }
   });
 }
 function doiPhongMo() {
@@ -1570,7 +1600,7 @@ async function timNhanh() {
   }
   const c = docLuu();
   await taoPhong({ mau: [0, 1, 2].includes(c.mau) ? c.mau : 0, kho: [0, 1, 2].includes(c.kho) ? c.kho : 1, ten: tenMinh(), luat: c.luat === 'tq' ? 'tq' : 'thuong', mo: true, gio: c.gio });
-  if (phong && phong.mo) bao('Chưa có phòng nào đang chờ — đã tạo phòng mở, chờ người vào.');
+  if (phong && phong.mo) bao(`Chưa có phòng nào đang chờ — đã tạo phòng mở (${c.luat === 'tq' ? 'Luật Tam quốc' : 'Luật thường'} · ${gioCua(c) ? gioCua(c).ten : 'không đếm giờ'}), chờ người vào. Đổi luật, đồng hồ được trong phòng chờ.`);
 }
 function dsPhongHtml() {
   if (!timPhong || !timPhong.xong) return '<p class="cb-meo">Đang tìm phòng…</p>';
@@ -2177,7 +2207,7 @@ function moMan(man) {
   const quan = [0, 2, 1].map(P => nut(P === 0 ? 'Trắng<small>đi trước</small>' : TEN_MAU[P], P, P === mau, 'mau')).join('');
   const muc = KHO.map((k, i) => nut(k.ten, i, i === kho, 'kho')).join('');
   const dongLuat = `<p class="cb-nhan">Luật</p><div class="cb-hang">${nut('Thường', 'thuong', luat === 'thuong', 'luat')}${nut('Tam quốc', 'tq', luat === 'tq', 'luat')}</div>
-    <p class="cb-meo cb-trai">${luat === 'tq' ? 'Giết vua là chiếm cả đạo quân nhà đó, chọn một quân làm <b>tướng</b> (đi như vua). Giết tướng là cướp đạo quân.' : 'Bị loại thì quân hoá đá, vẫn chắn đường.'} Còn vua cuối cùng thì thắng.</p>`;
+    <p class="cb-meo cb-trai">${goiYLuat(luat)}</p>`;
   const lui = '<button type="button" class="cb-lui" data-man="chinh">‹ Quay lại</button>';
   const oTen = (goiY) => `<p class="cb-nhan">Tên của bạn</p><input class="cb-o-ten" maxlength="20" value="${esc(l.ten || '')}" placeholder="${goiY}" autocomplete="nickname">`;
   let html;
@@ -2189,7 +2219,7 @@ function moMan(man) {
   else if (man === 'tao' && MANG) html = `${lui}<p class="cb-tin-nho">Tạo phòng</p><h2>${moCho ? 'Phòng mở cho mọi người' : 'Mời bạn chơi cùng'}</h2>
     ${oTen(moCho ? 'Người khác thấy tên này trong danh sách' : 'Để bạn bè biết là ai')}${dongLuat}
     <p class="cb-nhan">Đồng hồ</p><div class="cb-hang cb-hang-gio">${nut('Không<small>đếm giờ</small>', 'khong', !gio, 'gio')}${Object.keys(GIO_PHONG).map(k => nut(GIO_PHONG[k].nut, k, k === gio, 'gio')).join('')}</div>
-    ${gio ? `<p class="cb-meo cb-trai">${GIO_PHONG[gio].nuoc ? 'Hết giờ thì máy đi giùm nước đó.' : 'Hết giờ thì máy chơi thay tới hết ván.'}</p>` : ''}
+    ${gio ? `<p class="cb-meo cb-trai">${goiYGio(GIO_PHONG[gio])}</p>` : ''}
     <p class="cb-nhan">Ai được vào</p><div class="cb-hang">${nut('Bạn bè có link', 0, !moCho, 'mo')}${nut('Mọi người', 1, moCho, 'mo')}</div>
     <p class="cb-meo cb-trai">${moCho ? 'Ai bấm "Tìm phòng nhanh" hay "Xem phòng đang chờ" cũng vào được, không cần mã.' : 'Chỉ ai có link hay mã mới vào được.'}</p>
     <p class="cb-nhan">Bạn cầm quân</p><div class="cb-hang">${quan}</div>
@@ -2282,6 +2312,10 @@ function bam(e) {
   if ((n = q('[data-phongmo]'))) { amThanh(); vaoPhongMo(n.dataset.phongmo); return; }
   if (q('.cb-tao-mo')) { ghiLuu({ mo: 1 }); moMan('tao'); return; }
   if (q('.cb-doi-mo')) { doiPhongMo(); return; }
+  if (q('.cb-doi-cd')) { if (phong) { phong.suaCD = true; veSanh(); } return; }
+  if (q('.cb-xong-cd')) { if (phong) { phong.suaCD = false; veSanh(); } return; }
+  if ((n = q('[data-doiluat]'))) { const l = n.dataset.doiluat === 'tq' ? 'tq' : null; ghiLuu({ luat: l || 'thuong' }); doiCaiDat('luat', l); return; }
+  if ((n = q('[data-doigio]'))) { const g = gioCua({ gio: n.dataset.doigio }) ? n.dataset.doigio : null; ghiLuu({ gio: g || undefined }); doiCaiDat('gio', g); return; }
   if (q('.cb-vao')) { amThanh(); vaoBangMa(); return; }
   if (q('.cb-batdau-phong')) { amThanh(); batDauPhong(); return; }
   if (q('.cb-moi-ban')) { moiBan(); return; }

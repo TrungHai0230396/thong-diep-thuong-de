@@ -338,7 +338,7 @@ function mayKhach(ten, url) {
        !Binh.C._xem() && Binh.khung().querySelector('.cb-xong').hidden && /Ván bắt đầu rồi/.test(Binh.khung().querySelector('.cb-bao').textContent));
     ok('phòng Tam quốc: máy chủ nhớ luat = tq; cả hai máy vào ván đúng luật Tam quốc', may.lay(`coba/${ma3}/luat`) === 'tq' && [An, Binh].every(m => m.C._van().the.tq === true && m.C._van().luat === 'tq'));
     const r = await fetch(`${url}/coba/${ma3}/luat.json`, { method: 'PUT', body: JSON.stringify('tq') });
-    ok('không ai đổi được luật sau khi tạo phòng', r.status === 401);
+    ok('không ai đổi được luật sau khi bắt đầu ván', r.status === 401);
     /* thế chờ chọn tướng dựng tay: nước phong tướng từ máy chủ được nhận đúng; nước thường lúc đó thì không */
     const t = L.theMoi('tq'); t.o.fill(0); t.nhap = 0; t.vua = [o(0, 'e', 1), -1, o(2, 'e', 1)]; t.song = [1, 0, 1];
     t.o[o(0, 'e', 1)] = 6; t.o[o(2, 'e', 1)] = 2 * 8 + 6; t.o[o(1, 'a', 2)] = 1 * 8 + 1; t.o[o(1, 'b', 1)] = 1 * 8 + 2; t.chu = [0, 0, 2]; t.cho = [{ ai: 0, dao: 1, sau: 0 }]; t.luot = 0;
@@ -534,15 +534,18 @@ function mayKhach(ten, url) {
        new RegExp(`data-phongmo="${ma5}"><b>Phòng của An</b><small>Luật thường · 30 giây/nước · còn 2 ghế`).test(dsTim) &&
        /Đồng hồ: Mỗi lượt 30 giây; hết giờ thì máy đi giùm nước đó, người chơi vẫn chơi tiếp\./.test(Binh.tin()));
     const phongMau = (gio) => ({ tao: { '.sv': 'timestamp' }, chu: 0, kho: 0, ghe: { 0: { id: 'abcdefgh1234', ten: 'A', thay: { '.sv': 'timestamp' } } }, gio });
-    ok('luật: đồng hồ chỉ nhận 4 kiểu, chỉ ghi lúc tạo phòng; dòng danh sách phòng mở cũng chỉ nhận 4 kiểu',
-       await sai('coba/GGGGG2', 'PUT', phongMau('n45')) === 401 && await sai('coba/GGGGG3', 'PUT', phongMau(30)) === 401 && await sai(`coba/${ma5}/gio`, 'PUT', 'v10') === 401 &&
-       await sai(`sanh/${ma5}`, 'PATCH', { gio: 'x' }) === 401 && await sai('coba/GGGGG4', 'PUT', phongMau('v10')) === 200);
+    ok('luật: đồng hồ chỉ nhận 4 kiểu (lúc tạo phòng hay lúc đổi trong phòng chờ); dòng danh sách phòng mở cũng chỉ nhận 4 kiểu',
+       await sai('coba/GGGGG2', 'PUT', phongMau('n45')) === 401 && await sai('coba/GGGGG3', 'PUT', phongMau(30)) === 401 && await sai(`coba/${ma5}/gio`, 'PUT', 'v15') === 401 &&
+       await sai(`sanh/${ma5}`, 'PATCH', { gio: 'x' }) === 401 && await sai('coba/GGGGG4', 'PUT', phongMau('v10')) === 200 && may.lay(`coba/${ma5}/gio`) === 'n30');
     may.gieo('coba/GGGGG4', null);
     Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
     await Binh.C._ngoiGhe(2);
     await doi(() => An.C._phong().cay.ghe && An.C._phong().cay.ghe[2] && /Bắt đầu/.test(An.tin()));
     await An.C._batDauPhong();
     await doi(() => [An, Binh].every(m => m.C._van() && m.C._van().ma === ma5 && m.yen()));
+    ok('luật: bắt đầu ván rồi thì không ai đổi được đồng hồ, luật nữa (kể cả xoá)',
+       await sai(`coba/${ma5}/gio`, 'PUT', 'v10') === 401 && (await fetch(`${url}/coba/${ma5}/gio.json`, { method: 'DELETE' })).status === 401 &&
+       await sai(`coba/${ma5}/luat`, 'PUT', 'tq') === 401 && may.lay(`coba/${ma5}/gio`) === 'n30');
     for (const m of [An, Binh]) m.C._tichGio();
     ok('vào ván: tới lượt An — thẻ Trắng có đồng hồ 0:30 trên cả hai máy; thẻ Đen chưa tới lượt và thẻ Đỏ (máy chơi) thì không có',
        [An, Binh].every(m => /^0:(30|29)$/.test(gioThe(m, 0).textContent) && !gioThe(m, 0).hidden && gioThe(m, 2).hidden && gioThe(m, 1).hidden), gioThe(An, 0).textContent);
@@ -636,6 +639,62 @@ function mayKhach(ten, url) {
        gioThe(Chi, 2).textContent === '4:35' && gioThe(Chi, 1).textContent === '4:58' && Math.abs(Chi.C._conGio(0) - canTrang) < 1500,
        `${gioThe(Chi, 0).textContent} ${gioThe(Chi, 2).textContent} ${gioThe(Chi, 1).textContent}`);
     Chi.C._roiPhong(); may.gieo('coba/HHHHHH', null);
+  }
+
+  console.log('\n— Đổi luật, đồng hồ trong phòng chờ —');
+  {
+    /* Người dùng: "vào phòng nhanh mà tự tạo ko cho sửa lại time hay luật à" — chủ phòng đổi được luật, đồng hồ tới lúc bắt đầu */
+    const gioThe = (m, P) => m.khung().querySelector(`.cb-the[data-p="${P}"]`).querySelector('.cb-gio');
+    const baoCua = (m) => m.khung().querySelector('.cb-bao').textContent;
+    const sai = async (duong, cach, gt) => (await fetch(`${url}/${duong}.json`, { method: cach, body: gt === undefined ? undefined : JSON.stringify(gt) })).status;
+    const luuAn = JSON.parse(An.luu['tdtd.coba']);
+    delete luuAn.gio; luuAn.luat = 'thuong';
+    An.luu['tdtd.coba'] = JSON.stringify(luuAn);
+    An.C._moCaiDat();
+    An.khung().querySelector('.cb-o-ten').value = An.ten;               // ô tên điền sẵn tên đã lưu, như trên máy thật
+    await An.C._timNhanh();                                             // chưa có phòng nào đang chờ: tự tạo
+    await doi(() => An.C._phong() && An.C._phong().cay && may.lay(`sanh/${An.C._phong().ma}`) && /cb-doi-cd/.test(An.tin()));
+    const ma7 = An.C._phong().ma;
+    ok('Tìm phòng nhanh tự tạo phòng: lời báo nói rõ luật, đồng hồ đang dùng và đổi được trong phòng chờ; chủ phòng có nút "Đổi luật, đồng hồ"',
+       /đã tạo phòng mở \(Luật thường · không đếm giờ\), chờ người vào\. Đổi luật, đồng hồ được trong phòng chờ\./.test(baoCua(An)) &&
+       /class="cb-chu cb-doi-cd">Đổi luật, đồng hồ/.test(An.tin()), baoCua(An));
+    Binh.C._vaoPhong(ma7);
+    await doi(() => Binh.C._phong() && Binh.C._phong().cay && /data-ngoi/.test(Binh.tin()));
+    Binh.khung().querySelector('.cb-o-ten').value = Binh.ten;
+    await Binh.C._ngoiGhe(2);
+    await doi(() => /Chờ An bấm Bắt đầu/.test(Binh.tin()));
+    An.bam('.cb-doi-cd');
+    const man = An.tin();
+    ok('chủ phòng bấm "Đổi luật, đồng hồ": luật và đồng hồ đang dùng được chọn sẵn (Thường, Không đếm giờ), đủ năm mức giờ; người khác không có nút đổi',
+       /<h2>Đổi luật, đồng hồ<\/h2>/.test(man) && /cb-bat" data-doiluat="thuong"/.test(man) && /cb-bat" data-doigio="khong"/.test(man) &&
+       ['n30', 'n60', 'v5', 'v10'].every(k => man.includes(`data-doigio="${k}"`)) && !/cb-doi-cd/.test(Binh.tin()));
+    An.bam('[data-doiluat]', { doiluat: 'tq' });
+    await doi(() => may.lay(`coba/${ma7}/luat`) === 'tq');
+    An.bam('[data-doigio]', { doigio: 'n60' });
+    await doi(() => may.lay(`coba/${ma7}/gio`) === 'n60' && (may.lay(`sanh/${ma7}`) || {}).gio === 'n60' && /Luật Tam quốc · 1 phút\/nước/.test(Binh.tin()));
+    ok('chọn Tam quốc, 1 phút: ghi ngay lên máy chủ và dòng danh sách; màn đổi sáng đúng nút; Bình thấy phòng chờ đổi theo, có lời báo; máy An nhớ cho lần sau',
+       (may.lay(`sanh/${ma7}`) || {}).luat === 'tq' && /cb-bat" data-doiluat="tq"/.test(An.tin()) && /cb-bat" data-doigio="n60"/.test(An.tin()) &&
+       /Chủ phòng đổi: Luật Tam quốc · 1 phút\/nước\./.test(baoCua(Binh)) && JSON.parse(An.luu['tdtd.coba']).luat === 'tq' && JSON.parse(An.luu['tdtd.coba']).gio === 'n60',
+       `${JSON.stringify(may.lay(`sanh/${ma7}`))} · ${baoCua(Binh)}`);
+    An.bam('[data-doiluat]', { doiluat: 'thuong' });
+    An.bam('[data-doigio]', { doigio: 'khong' });
+    const dongSach = () => { const d = may.lay(`sanh/${ma7}`); return !!d && !('luat' in d) && !('gio' in d); };
+    await doi(() => !may.lay(`coba/${ma7}/luat`) && !may.lay(`coba/${ma7}/gio`) && dongSach() && /Phòng chờ · Luật thường<\/p>/.test(Binh.tin()));
+    An.bam('.cb-xong-cd');
+    ok('đổi về Thường, Không đếm giờ: hai ô bị xoá khỏi phòng và khỏi dòng danh sách; bấm Xong thì về phòng chờ',
+       !may.lay(`coba/${ma7}/luat`) && !may.lay(`coba/${ma7}/gio`) && dongSach() && /Phòng mở · Luật thường<\/p>/.test(An.tin()) && /cb-doi-cd/.test(An.tin()));
+    ok('luật: không ghi luật cho phòng không có thật, không nhận luật lạ',
+       await sai('coba/JJJJJJ/luat', 'PUT', 'tq') === 401 && await sai(`coba/${ma7}/luat`, 'PUT', 'xx') === 401);
+    An.bam('.cb-doi-cd'); An.bam('[data-doiluat]', { doiluat: 'tq' }); An.bam('[data-doigio]', { doigio: 'v5' });
+    await doi(() => may.lay(`coba/${ma7}/luat`) === 'tq' && may.lay(`coba/${ma7}/gio`) === 'v5');
+    await doi(() => /cb-bat" data-doigio="v5"/.test(An.tin()));
+    An.bam('.cb-xong-cd');
+    await An.C._batDauPhong();
+    await doi(() => [An, Binh].every(m => m.C._van() && m.C._van().ma === ma7 && m.yen()));
+    for (const m of [An, Binh]) m.C._tichGio();
+    ok('bắt đầu: ván chơi đúng luật Tam quốc, đồng hồ 5 phút cả ván; từ đó không đổi được nữa',
+       [An, Binh].every(m => m.C._van().the.tq && /^(5:00|4:59)$/.test(gioThe(m, 0).textContent)) && await sai(`coba/${ma7}/gio`, 'PUT', 'n30') === 401);
+    for (const m of [An, Binh]) m.C._roiPhong();
   }
 
   console.log('\n— Tải lại trang —');

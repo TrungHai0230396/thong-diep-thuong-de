@@ -10,8 +10,8 @@
         "tao": { ".validate": "newData.isNumber() && (data.exists() ? newData.val() === data.val() : newData.val() === now)" },
         "chu": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2" },
         "kho": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 2" },
-        "luat": { ".validate": "newData.val() === 'tq'" },
-        "gio": { ".validate": "newData.isString() && newData.val().matches(/^(n30|n60|v5|v10)$/)" },
+        "luat": { ".write": "!root.child('coba/' + $ma + '/batDau').exists()", ".validate": "newData.val() === 'tq'" },
+        "gio": { ".write": "!root.child('coba/' + $ma + '/batDau').exists()", ".validate": "newData.isString() && newData.val().matches(/^(n30|n60|v5|v10)$/)" },
         "ghe": {
           "$P": {
             ".validate": "$P.matches(/^[012]$/) && newData.hasChild('id')",

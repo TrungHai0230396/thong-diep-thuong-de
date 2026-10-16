@@ -19,7 +19,11 @@ function taoMay(cong = 0) {
 
   const tach = (d) => String(d || '').split('/').filter(Boolean);
   const lay = (k) => k.reduce((c, x) => (c && typeof c === 'object' ? c[x] : undefined), goc);
+  /* Firebase không giữ khoá null: ghi { a: 1, b: null } thì chỉ còn a (PATCH thì null là xoá khoá đó); nhánh rỗng là không có */
+  const boNull = (v) => { if (!v || typeof v !== 'object') return v; const o = {}; for (const x of Object.keys(v)) if (v[x] != null) o[x] = boNull(v[x]); return o; };
   function dat(k, gt) {
+    gt = boNull(gt);
+    if (gt && typeof gt === 'object' && !Object.keys(gt).length) gt = null;
     if (!k.length) { goc = gt == null ? {} : gt; return; }
     let c = goc;
     for (let i = 0; i < k.length - 1; i++) { if (!c[k[i]] || typeof c[k[i]] !== 'object') c[k[i]] = {}; c = c[k[i]]; }
@@ -82,6 +86,8 @@ function taoMay(cong = 0) {
     if (k.length === 1) {
       if (a === 'batDau' || a === 'xong') return !(a in r) && gt === nay;
       if (a === 'tiep') return !('tiep' in r) && typeof gt === 'string' && LA_MA.test(gt);
+      if (a === 'luat') return !('batDau' in r) && (gt == null || gt === 'tq');                  // chủ phòng đổi lúc chờ
+      if (a === 'gio') return !('batDau' in r) && (gt == null || (typeof gt === 'string' && GIO.test(gt)));
       return false;
     }
     if (a === 'may' && k.length === 2) return /^[012]$/.test(b) && (gt == null || gt === 'ho' || gt === 'rua');
@@ -105,6 +111,7 @@ function taoMay(cong = 0) {
   function choGhiSanh(ma, v, viet, nay) {
     if (!LA_MA.test(ma)) return false;
     if (v == null) return true;
+    v = boNull(v); viet = viet.filter(k => v[k] != null);          // khoá null là xoá — Firebase không xét .validate lúc xoá
     const r = lay(['coba', ma]), cu = lay(['sanh', ma]);
     if (!r || 'batDau' in r || typeof v !== 'object') return false;
     for (const k of Object.keys(v)) if (!['tao', 'ten', 'trong', 'luat', 'gio', 'thay'].includes(k)) return false;
