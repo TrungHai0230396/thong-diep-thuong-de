@@ -2135,6 +2135,57 @@ Người dùng: "Làm thêm 1 ngôi sao game bida lỗ đi, muti người chơi 
 
 **Còn phải xuất bản luật Firebase** (nhánh `bida`, `sanhbida` trong `firebase-rules.json`) thì mới chơi qua mạng được trên database thật; đấu với máy, tập một mình chạy được ngay.
 
+## Hôm nay ăn gì
+
+Người dùng: "Tạo 1 ngôi sao ăn gì đi, kiểu như trong văn phòng, hay ở nhà đôi khi không biết ăn gì … bạn phân tích giúp thiết kế ra game đó nha". Ngôi sao hình cái tô với đôi đũa, màu cam ớt, mở thẳng bằng `#an-gi`, trang chia sẻ `hom-nay-an-gi/`. Dữ liệu món và mọi phép tính ở `assets/monan.js` (hàm thuần, chạy được bằng Node), giao diện ở `assets/angi.js`.
+
+**Phân tích trước khi làm: người ta kẹt ở đâu**, và mỗi chỗ kẹt có một thứ đáp lại:
+
+| Chỗ kẹt | App đáp lại |
+|---|---|
+| Hỏi bất chợt thì nghĩ không ra, nghĩ mãi cũng chỉ quanh ba bốn món quen | Đưa sẵn món hợp bữa (theo giờ máy), hợp trời, hợp túi tiền |
+| Nhiều lựa chọn quá thì càng khó chọn | Mỗi vòng chỉ tám món, khác nhóm nhau |
+| Biết rõ mình *không* muốn gì hơn là muốn gì | Lọc "không ăn"; chạm một miếng để bỏ hay đổi món đó |
+| Hôm qua vừa ăn | Món đã chốt thì hai hôm sau vòng quay né |
+| Đi nhóm thì ai cũng "gì cũng được", đưa món nào lại chê món đó | Cả nhóm: chuyền máy, mỗi người tim món thèm, gạch món không muốn; vòng quay quyết, không ai mang tiếng chọn dở |
+| Ở nhà thì khó cả mâm: mặn gì, canh gì, rau gì, chợ mua gì | Nấu ở nhà: ba hàng như máy xèng, khoá món ưng ý rồi quay phần còn lại, ra danh sách đi chợ |
+| Quay ra rồi vẫn lăn tăn | Mẹo tung đồng xu ghi ngay dưới kết quả: "mới nghe tên đã thấy tiếc? Vậy là bụng đang thèm món khác" — quay lại thoải mái; chốt rồi thì có nút tìm quán gần đây |
+
+Vì thế trò là một **vòng quay** chứ không phải một danh sách: ai cũng quen vòng quay may mắn, nhìn là thấy hết tám món đang được cân nhắc (đi nhóm thì cả bàn cùng thấy), và lúc bánh xe chậm dần qua từng miếng là lúc biết mình đang mong món nào.
+
+**Ăn ngoài, gọi về.** Mở ra là vòng tám món của bữa lúc này, tiêu đề hỏi đúng bữa ("Trưa nay ăn gì?", "Khuya rồi, ăn gì?"). Chạm QUAY hay vuốt mạnh vòng tròn: bánh xe quay 3–5 vòng trong 4–5 giây, lá gảy ở đỉnh bật theo từng chốt, có tiếng tách (Web Audio, tắt ở nút góc trái) và rung nhẹ trên Android. Dừng lại thì miếng thắng sáng viền, các miếng khác mờ đi, bảng kết quả trượt lên: tên món, một dòng mô tả, nhãn (món nước, cay, khoảng giá, món miền nào, "hợp trời mưa" khi đúng là đang mưa), rồi **Chốt món này**, **Quay lại**, **Bỏ món, quay tiếp**. Chốt rồi thì có **Tìm quán gần đây** (Google Maps tìm tên món, Maps tự tìm quanh chỗ đang đứng) và **Báo cả nhóm** (bảng chia sẻ của máy: "Trưa nay ăn Bún bò Huế nhé!", link chỉ nằm ở url). Chạm nhẹ một miếng thì hiện thanh **Bỏ khỏi vòng / Đổi món khác**; **Đổi bộ khác** ra tám món mới, cố tránh bộ vừa rồi. Chữ chạy dọc bán kính; lúc vòng đứng yên, miếng nào ở nửa trái thì lật chữ lại cho đọc xuôi.
+
+**Món của tôi** (trong bảng Lọc): gõ quán quen, món gần chỗ làm ("Cơm gà cô Ba"). Mỗi vòng có hai món của bạn trộn với sáu món gợi ý — trừ lúc đang quay món chay, vì app không biết món tự gõ chay hay mặn (bản đầu vẫn trộn, ngày rằm bấm "Quay món chay" mà vòng còn "Cơm gà cô Ba"); có từ hai món trở lên thì bật được **Chỉ quay món của tôi**.
+
+**Cả nhóm.** Chọn số người (2–12) rồi chuyền máy lần lượt: mỗi người thả ♥ vào món mình thèm, gạch ✕ món không muốn (tối đa hai món); xong thì màn "Đưa máy cho người thứ 2 — Tôi là người thứ 2" che phiếu người trước. Món bị ai gạch thì loại — ai cũng có quyền nói "không"; gạch hết sạch thì giữ món bị gạch ít nhất. Món còn lại lên **vòng của nhóm**, miếng to bằng 1 + số tim (số tim ghi dòng nhỏ dưới tên), rồi tự quay. Chỉ còn một món ai cũng chịu thì chốt luôn.
+
+**Nấu ở nhà.** Mâm ba món — mặn, canh, rau — chạy như máy xèng ba hàng, hàng sau dừng sau. Bấm ổ khoá (hay chạm vào ô món) để giữ món ưng ý; **Quay mâm khác** chỉ quay hàng không khoá, và luôn đổi sang món khác. Tiêu đề hỏi bữa chính kế tiếp: sáng, trưa hỏi "Trưa nay nấu gì?", chiều tối hỏi "Tối nay nấu gì?", khuya hỏi "Mai nấu gì?". Ghép mâm có vài luật: canh và rau không trùng thứ rau; mặn và canh cùng một thứ thịt cá thì ít khi; món kho hay ra cùng canh chua cho cân vị; ba **cặp kinh điển** dễ ra hơn và có lời kèm — cá kho tộ với canh chua (miền Nam), thịt kho trứng với canh khổ qua (Tết miền Nam), canh cua rau đay với đậu phụ rán (mùa hè miền Bắc). Mỗi món ghi nấu chừng bao lâu, dưới mâm ghi "nấu song song thì chừng 45 phút là xong". **Đi chợ**: gộp nguyên liệu chính của ba món, bỏ trùng, có ô tích; không ghi gia vị nhà nào cũng có. **Gửi cả nhà**: "Tối nay nấu: …. Đi chợ: …". Lọc: ăn chay, nấu nhanh (mỗi món không quá 30 phút), không ăn thịt cá gì. Mâm thường không có "bản chay" (canh chua chay) khi đã có canh chua cá; món vốn không thịt (đậu phụ rán, rau xào) thì ai cũng ăn.
+
+**Gợi ý theo hoàn cảnh.** Dòng nhỏ dưới thẻ nói app đang tính những gì ("Bữa trưa · trời mưa 25° · không bò · né Cơm tấm"), chạm vào là mở Lọc.
+- **Bữa** theo giờ máy: sáng 4–10 giờ, trưa 10–14, xế chiều 14–17, tối 17–21, khuya 21–4. Món nào có bữa của món đó (bánh cuốn, xôi, cháo sườn buổi sáng; hủ tiếu gõ, ốc, súp cua chiều tối). Đổi bữa trong Lọc.
+- **Mùng 1, ngày rằm** âm lịch (lịch âm của Xem ngày): dải xanh "Rằm tháng 9 âm lịch, nhiều nhà ăn chay — Quay món chay", chỉ cho hôm đó. Ai ăn chay thường xuyên thì bật "Tôi ăn chay".
+- **Trời**, chỉ khi đã có nơi ở: nơi chọn trong Bầu trời đêm (chỉ đọc, không ghi đè), hay bấm "Lấy thời tiết chỗ tôi" trong Lọc. Xin Open-Meteo nhiều nhất một lần mỗi 30 phút, toạ độ làm tròn hai chữ số thập phân như phần dự báo mưa. Mưa (có lượng mưa, hay mã WMO mưa phùn, mưa, mưa rào, dông) thì món nóng hổi lên vòng nhiều hơn (×1,7), món mát ít đi; nắng nóng (từ 33 độ, cảm giác từ 34) thì ngược lại; lạnh (từ 20 độ trở xuống) thì món nóng ×1,8. Không có nơi ở thì chọn trời bằng tay, hay thôi. Trời về tới mà người dùng chưa đụng vào vòng thì vòng dựng lại theo trời; đã quay, đã sửa thì để yên.
+- **Miền** theo nơi ở (Bắc từ Thanh Hoá trở ra, Trung tới Bình Thuận và Tây Nguyên, Nam từ Đồng Nai, TP.HCM trở vào; ngoài Việt Nam thì không đoán), chọn tay được: món gốc miền khác lên vòng ít hơn (×0,55) mà vẫn có — thành phố nào cũng có quán món miền khác.
+- **Túi tiền**: dưới 40k, dưới 80k, thoải mái (từ ngày 25 trong tháng thì kèm "cuối tháng rồi nhỉ"). **Không ăn**: bò, heo, gà, vịt, cá, hải sản, cay, dầu mỡ. **Né món đã chốt hai hôm nay** bật sẵn.
+- Lẩu, ốc, đồ nướng là chuyện ngồi lâu: trưa đi làm ít khi gặp (×0,35), tối đi nhóm thì nhiều hơn.
+- Lọc chặt quá (còn dưới hai món) thì nới dần, thứ ít quan trọng trước — món mới ăn, túi tiền, dầu mỡ, cay — và nói ra đã nới gì. Không bao giờ nới bữa hay chay.
+
+**Chọn tám món**: rút không lặp theo trọng số (món đâu cũng có ×1,6, ít quán ×0,5, nhân với trời, miền, bữa như trên); món cùng nhóm với món vừa rút giảm còn 35%, cùng loại thịt còn 80%, mỗi nhóm (bún; phở, mì, hủ tiếu; cơm; bánh; cháo, xôi; lẩu, ốc; ăn vặt; món nước ngoài) nhiều nhất ba món. Không ăn chay thì "bản chay" thỉnh thoảng mới lên vòng (×0,35), cho đổi vị.
+
+**Vòng quay công bằng mà chuyển động vẫn thật.** Ma sát dω/dt = −a − bω (a = 1,2 của trục và lá gảy, b = 0,55 cản theo vận tốc) có lời giải đóng: ω(t) = (ω0 + a/b)·e^(−bt) − a/b, dừng lúc T = ln(1 + bω0/a)/b, góc đi được S(ω0) = ω0/b − (a/b²)·ln(1 + bω0/a). Bấm QUAY thì **rút món trước**, đúng theo diện tích miếng, chọn chỗ kim dừng trong miếng (chừa 15% mỗi mép cho khỏi lấp lửng), rồi giải ngược ω0 (S tăng ngặt nên chia đôi) để quay thêm 3–5 vòng trọn tới đúng chỗ đó. Mỗi khung hình tính thẳng góc theo thời gian bằng lời giải đóng, nên trang bị ẩn rồi hiện lại thì bánh xe nhảy tới đúng chỗ, không chạy dồn. Vuốt tay thì là vật lý thật theo vận tốc ngón tay (kẹp trong 12–28 rad/s) cộng ±12% như ma sát mỗi lần mỗi khác — vuốt khéo mấy cũng không nhắm được món. Người chọn giảm chuyển động thì ma sát lớn hơn, dừng sau chừng một giây.
+
+**Dữ liệu** là phần biên soạn của app: 95 món ăn ngoài (bún, phở, mì, hủ tiếu, cơm, bánh, cháo, xôi, lẩu, ốc, ăn vặt, món Hàn, Nhật, Âu…; mỗi món một dòng: tên, tên ngắn trên vòng, nhóm, bữa, món nước hay khô, cay, hợp trời mưa hay nắng, dầu mỡ, hợp đi đông, thịt cá có sẵn trong bát mặc định, khoảng giá, miền gốc, độ phổ biến, mô tả một dòng) và 49 món nấu ở nhà (24 mặn, 13 canh, 12 rau; phút nấu, cách nấu, nguyên liệu chính, thứ cần mua). Giá chia ba bậc thô — dưới 40k, 40–80k, trên 80k một người ở quán bình thường trong thành phố, năm 2026 — chỉ để lọc, giao diện ghi "khoảng". Miền gốc ghi theo chỗ món ra đời: bún bò Nam Bộ là món Hà Nội (app ghi luôn "tên Nam Bộ mà quê Hà Nội"), hủ tiếu Nam Vang ghi miền Nam, cơm gà Hải Nam ghi món nước ngoài.
+
+**Lưu đúng một mục** `tdtd.angi`: thẻ đang dùng, lựa chọn lọc, món của tôi, bật tắt tiếng, số người chơi nhóm lần trước, toạ độ làm tròn (chỉ khi bấm "Lấy thời tiết chỗ tôi"), và món đã chốt trong bảy ngày gần đây — mã món và ngày, mỗi món một lần, nhiều nhất 12 món, quá bảy ngày tự xoá, trong Lọc có nút Xoá. Không lưu lượt quay, không lưu phiếu của nhóm.
+
+**Ảnh xem trước** (`icons/og-an-gi-1.jpg`, vẽ trong `scripts/lam-trang-chia-se.py`): vòng quay tám món đúng màu, đúng cách lật chữ của app, kim chỉ vào bún bò Huế.
+
+`scripts/test-angi.js`, 118 bài: dữ liệu (đủ cột, đúng khuôn, mã không trùng, mỗi bữa đủ món và đủ món chay, mỗi loại món nhà đủ món chay và món nấu nhanh, cặp kinh điển trỏ đúng món); hoàn cảnh (ranh giới bữa; mùng 1 và rằm đối chiếu lịch âm của Xem ngày — 10/10/2026, 24/10/2026, Tết 2026, mùng 1 tháng 5 nhuận 2028; đọc thời tiết từng nhóm mã WMO; miền theo 12 toạ độ trong và ngoài nước; né món qua ranh giới tháng, năm); chọn món (600 bộ lọc ngẫu nhiên đều đúng lọc; đa dạng; phở bò lên 32% số vòng sáng, bún thang 9%; trời mưa thêm 0,9 món nóng mỗi vòng; nới lọc đúng thứ tự; không nới chay); vòng quay (lời giải đóng khớp tích phân từng bước 10 µs; giải ngược sai dưới 1e-8; 40.000 lượt quay tám món đều, mỗi món 12,5% ± 0,4%; vòng của nhóm 1:4:1:2 ra đúng theo diện tích; không bao giờ dừng sát mép; vuốt y hệt nhau 20.000 lần vẫn ra đủ tám món); cả nhóm; mâm cơm (2000 mâm đúng loại, không trùng rau, đúng chay, nhanh; khoá thì giữ, không khoá thì đổi; khoá cá kho tộ thì canh chua cá ra gấp đôi); giao diện trên DOM giả (quay tới kết quả, chốt rồi lần sau né, bỏ, đổi, lọc, quay món chay ngày rằm, cả nhóm ba người, mâm cơm có hoạt cảnh, đóng giữa lúc quay, kho lưu hỏng hay bị chặn, xin thời tiết, mất mạng). Chạy được cả Node 16. Thử phá 17 chỗ (bỏ giới hạn ba món một nhóm, bỏ giảm trọng số cùng nhóm, kim dừng sát mép, rút món đều tay, lọc chay hỏng, né món lệch một ngày, mưa phùn không tính là mưa, canh với rau trùng rau, bỏ quyền gạch, mưa không ưu tiên món nóng, lời giải đóng sai dấu, chốt không ghi ngày, vòng không né món mới chốt, khoá không giữ, không chặn gạch quá hai món, cặp kinh điển không ưu tiên, bỏ soi kiểu nội dung khi mất mạng): bắt 16; chỗ cuối không đổi kết quả vì đọc JSON từ trang HTML cũng hỏng như nhau — vẫn giữ để phòng hờ, như phần dự báo mưa.
+
+Đã thử trên trình duyệt cỡ điện thoại và máy tính: quay bằng nút và bằng vuốt, chạm chọn miếng, kết quả, chốt, link tìm quán, lọc (không ăn bò, thêm món của tôi), cả nhóm ba người tới vòng của nhóm, mâm cơm có khoá, đi chợ. Chưa thử trên điện thoại thật: tiếng tách, rung, vuốt bằng ngón tay.
+
+**Chưa làm**: phòng chọn món qua mạng (mỗi người một máy, gửi link vào nhóm Zalo) — cần thêm nhánh luật Firebase như cờ ba người, bida.
+
 ## Cấu trúc
 
 ```
@@ -2205,6 +2256,9 @@ scripts/test-phong.js      96 kiểm thử chơi qua mạng: ba máy chung một
 assets/bida.js             Bida lỗ: bàn 9 feet theo WPA, vật lý trượt–lăn–xoáy (băng Han 2005, chùm bi va mềm Hertz), luật 8 bi, 9 bi, máy đánh ở luồng riêng, giao diện, chơi qua mạng
 scripts/test-bida.js       71 kiểm thử Bida lỗ: số đo WPA, vật lý, lỗ, cú phá, đơn định, mã hoá, luật 8 bi, 9 bi, máy đánh, giao diện
 scripts/test-bida-phong.js 43 kiểm thử Bida lỗ qua mạng: ba máy chung một phòng trên máy chủ giả, máy chơi thay, người vắng, phòng mở
+assets/monan.js            Hôm nay ăn gì: 95 món ăn ngoài, 49 món nấu ở nhà, chọn tám món theo hoàn cảnh, vòng quay (ma sát có lời giải đóng), mâm cơm, gộp phiếu nhóm — hàm thuần
+assets/angi.js             giao diện ngôi sao Hôm nay ăn gì: vòng quay SVG, mâm cơm như máy xèng, cả nhóm chuyền máy, lọc, đi chợ
+scripts/test-angi.js       118 kiểm thử Hôm nay ăn gì: dữ liệu, hoàn cảnh, chọn món, vòng quay công bằng, cả nhóm, mâm cơm, giao diện
 scripts/test-sokoban.js    60 kiểm thử Đẩy thùng sao: luật, bộ giải đối chiếu dò từng bước, bộ tạo, cả 100 màn, giao diện
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -2241,6 +2295,7 @@ node scripts/test-coba.js        # chạy 94 kiểm thử Cờ vua ba người
 node scripts/test-phong.js       # chạy 96 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
 node scripts/test-bida.js        # chạy 71 kiểm thử Bida lỗ
 node scripts/test-bida-phong.js  # chạy 43 kiểm thử Bida lỗ qua mạng (ba máy, máy chủ giả; Node 18 trở lên)
+node scripts/test-angi.js        # chạy 118 kiểm thử Hôm nay ăn gì (chạy được cả Node 16)
 node scripts/test-maqr.js        # chạy 12 kiểm thử mã QR
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
 node scripts/tao-man-sokoban.js tao ung-vien.jsonl 7 [4,5]   # tạo màn liên tục, 7 luồng, ghi mỗi màn một dòng (tuỳ chọn: chỉ số thùng này)

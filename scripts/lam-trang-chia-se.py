@@ -818,6 +818,44 @@ def ve_co_ba(v, tro):
         v.chu((x, y - co * .08), kt, ft(co * 1.02), than, 'mm', vien=1.4, mau_vien=vien)
 
 
+# vòng quay của Hôm nay ăn gì, đúng như assets/angi.js vẽ: tám miếng màu MAU, chữ chạy dọc bán kính, chốt đèn ở ranh
+# giới, kim gảy ở đỉnh chỉ vào miếng đầu, nút QUAY ở giữa che cỡ 30% bán kính
+MAU_AN_GI = ['#f2836b', '#f4c35e', '#9fd38a', '#f3e3c0', '#ea8fb0', '#8fd3c8', '#f6a65a', '#c3b1ea']
+MON_AN_GI = ['Bún bò Huế', 'Cơm tấm', 'Phở bò', 'Bánh mì', 'Bún chả', 'Mì Quảng', 'Hủ tiếu', 'Gỏi cuốn']
+
+
+def ve_an_gi(v, tro):
+    cx, cy, R = 885, 318, 196
+    n = len(MON_AN_GI)
+    v.toa(lambda g: g.tron(cx, cy + 14, R + 20, fill=255), (0, 0, 0), .6, 18)
+    v.tron(cx, cy, R + 19, fill=(43, 26, 17), outline=(255, 200, 150), w=2.5)
+    for i, ten in enumerate(MON_AN_GI):
+        a0 = -90 - 180 / n + i * 360 / n                # miếng 0 nằm giữa đỉnh, dưới kim
+        v.d.pieslice([(cx - R) * S, (cy - R) * S, (cx + R) * S, (cy + R) * S], a0, a0 + 360 / n, fill=hex2(MAU_AN_GI[i]),
+                     outline=(42, 22, 12), width=round(1.5 * S))
+    v.d.pieslice([(cx - R) * S, (cy - R) * S, (cx + R) * S, (cy + R) * S], -90 - 180 / n, -90 + 180 / n,
+                 outline=(255, 246, 234), width=round(4 * S))  # miếng thắng, viền sáng
+    for i, ten in enumerate(MON_AN_GI):                 # chữ: vẽ ngang trên mặt nạ rồi xoay quanh tâm
+        goc = i * 360 / n                               # theo chiều kim đồng hồ từ hướng 12 giờ
+        mat = Image.new('L', v.im.size, 0)
+        if goc <= 180:                                  # nửa phải: đọc từ trục ra mép
+            ImageDraw.Draw(mat).text(((cx + R - 18) * S, cy * S), ten, font=ft(20), fill=255, anchor='rm')
+            mat = mat.rotate(-(goc - 90), center=(cx * S, cy * S), resample=Image.BICUBIC)
+        else:                                           # nửa trái: lật lại, đọc từ mép vào trục (như app lúc vòng đứng yên)
+            ImageDraw.Draw(mat).text(((cx - R + 18) * S, cy * S), ten, font=ft(20), fill=255, anchor='lm')
+            mat = mat.rotate(-(goc - 270), center=(cx * S, cy * S), resample=Image.BICUBIC)
+        v.im.paste(Image.new('RGB', v.im.size, (42, 20, 9)), (0, 0), mat)
+    for i in range(n):
+        a = math.radians(-180 / n + i * 360 / n)
+        v.tron(cx + (R + 10) * math.sin(a), cy - (R + 10) * math.cos(a), 4.2, fill=(255, 226, 184), outline=(80, 40, 10), w=1)
+    v.tron(cx, cy, 60, fill=(240, 147, 90), outline=(247, 211, 156), w=4)
+    v.toa(lambda g: g.tron(cx - 16, cy - 18, 22, fill=255), (255, 224, 181), .5, 10)
+    v.chu((cx, cy + 1), 'QUAY', ft(22), (42, 18, 6), 'mm')
+    v.da_giac([(cx, cy - R + 10), (cx - 17, cy - R - 30), (cx, cy - R - 41), (cx + 17, cy - R - 30)],
+              fill=(255, 217, 163), outline=(90, 47, 18), w=2.5)
+    v.tron(cx, cy - R - 27, 4.2, fill=(90, 47, 18))
+
+
 # ======================================================================================================
 #  BẢNG CÁC TRÒ — tieuDe phải trùng assets/app.js; mô tả là "chú thích" riêng của từng trò
 # ======================================================================================================
@@ -914,6 +952,12 @@ TRO = [
          alt='Bida lỗ: tam giác 15 bi trên bàn nỉ xanh, bi chủ và cơ sắp phá', mo='Mở Bida lỗ',
          # link mời vào phòng (…/bida-lo/?phong=MÃ) thì chuyển thẳng vào phòng đó
          chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#bida' + (m ? '/' + m[1] : ''));"),
+    dict(duong='an-gi', trang='hom-nay-an-gi/', so=1, mau='#ff8657', ve=ve_an_gi,
+         tieuDe='Hôm nay ăn gì?', tieu=('Hôm nay', 'ăn gì?'),
+         dong=['Vòng quay món hợp bữa, hợp trời', 'Ở nhà: quay mâm mặn, canh, rau', 'Cả nhóm cùng chọn, vòng quay quyết'],
+         moTa='Trưa nay ăn gì, tối nay nấu gì? Quay một vòng tám món hợp bữa, hợp trời, hợp túi tiền. Ở nhà thì quay đủ mâm '
+              'mặn, canh, rau kèm danh sách đi chợ. Đi đông thì cả nhóm cùng chọn, không ai phải quyết.',
+         alt='Hôm nay ăn gì: vòng quay tám món, kim chỉ vào bún bò Huế', mo='Mở vòng quay Hôm nay ăn gì'),
 ]
 
 

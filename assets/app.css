@@ -1560,3 +1560,182 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
   .bd-luot{margin-bottom:5px}
   .bd-nut button{height:38px}
 }
+
+/* ---------- hôm nay ăn gì (assets/angi.js) ---------- */
+.angi{position:fixed;inset:0;z-index:30;display:none;color:var(--ink);
+  background:radial-gradient(120% 75% at 50% 0%,#351c10 0%,#1d120c 50%,#0f0a08 100%)}
+.angi.hien{display:block}
+.angi [hidden]{display:none!important}
+.ag-ico{width:17px;height:17px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.ag-dong,.ag-tieng{position:absolute;z-index:8;top:calc(env(safe-area-inset-top,0px) + 14px);width:34px;height:34px;padding:0;
+  border-radius:50%;cursor:pointer;display:grid;place-items:center;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.36);
+  color:var(--ink);font-size:14px;line-height:1;-webkit-tap-highlight-color:transparent}
+.ag-dong{right:16px}
+.ag-tieng{left:16px}
+.ag-dong:hover,.ag-tieng:hover{background:rgba(255,255,255,.12)}
+.ag-tieng[aria-pressed="false"]{color:rgba(244,239,230,.45)}
+.ag-trong{position:absolute;inset:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:calc(env(safe-area-inset-top,0px) + 58px) 18px calc(env(safe-area-inset-bottom,0px) + 28px)}
+.ag-trong>*{max-width:460px;margin-left:auto;margin-right:auto}
+.ag-tieude{margin:0 auto 12px;text-align:center;font-family:"Cormorant Garamond",Georgia,serif;font-size:32px;line-height:1.15;font-weight:600;color:#ffc59e}
+.ag-the{display:flex;gap:4px;padding:4px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);margin-bottom:8px}
+.ag-the button{flex:1;min-width:0;padding:9px 6px;border-radius:10px;border:0;background:transparent;color:rgba(244,239,230,.62);
+  font:inherit;font-size:14px;white-space:nowrap;cursor:pointer}
+.ag-the button[aria-selected="true"]{background:rgba(255,134,87,.2);color:#ffd2b3}
+.ag-bc{display:block;width:100%;margin:0 auto 4px;padding:6px 4px;border:0;background:none;color:rgba(244,239,230,.55);
+  font:inherit;font-size:12.5px;line-height:1.55;text-align:center;cursor:pointer}
+.ag-bc b{color:#ffb98f;font-weight:500;white-space:nowrap}
+.ag-ram{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 10px;margin:2px auto 6px;padding:8px 12px;border-radius:12px;
+  background:rgba(159,211,138,.09);border:1px solid rgba(159,211,138,.28);font-size:13px;line-height:1.5;color:rgba(232,245,226,.85);text-align:center}
+.ag-ram button{padding:5px 12px;border-radius:999px;border:1px solid rgba(159,211,138,.55);background:rgba(159,211,138,.14);color:#d9f2cf;
+  font:inherit;font-size:12.5px;cursor:pointer}
+.ag-nhom-dau{margin:4px auto 2px;font-size:12.5px;line-height:1.5;text-align:center;color:#ffc9d4}
+.ag-chu-nut{padding:0;margin-left:6px;border:0;background:none;color:#ffb98f;font:inherit;font-size:inherit;
+  text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+/* vòng quay: SVG vẽ bánh xe, nút QUAY là nút HTML nằm đè giữa (che vừa trục 46/350 của viewBox) */
+.ag-vong{position:relative;width:min(100%,340px);width:min(100%,340px,calc(100dvh - 330px));min-width:240px;aspect-ratio:1;margin:6px auto 0;
+  touch-action:none;-webkit-user-select:none;user-select:none}
+.ag-banh{display:block;width:100%;height:100%;overflow:visible;filter:drop-shadow(0 10px 22px rgba(0,0,0,.5))}
+.ag-vanh{fill:#2b1a11;stroke:rgba(255,200,150,.42);stroke-width:2}
+.ag-mieng{stroke:rgba(42,22,12,.55);stroke-width:1.2;transition:opacity .25s}
+.ag-mieng.mo,.ag-chu.mo{opacity:.38}
+.ag-mieng.chon,.ag-mieng.thang{stroke:#fff6ea;stroke-width:4}
+.ag-chu{fill:#2a1409;font-family:"Be Vietnam Pro",system-ui,sans-serif;font-weight:500;text-anchor:end;dominant-baseline:central;
+  pointer-events:none;transition:opacity .25s}
+.ag-chu.lat{text-anchor:start}
+.ag-den{fill:#ffe2b8;stroke:rgba(80,40,10,.5);stroke-width:1}
+.ag-kim path{fill:#ffd9a3;stroke:#5a2f12;stroke-width:2;stroke-linejoin:round}
+.ag-kim circle{fill:#5a2f12}
+.ag-quay{position:absolute;left:50%;top:50%;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);padding:0;border-radius:50%;cursor:pointer;
+  border:3px solid #f7d39c;background:radial-gradient(circle at 35% 30%,#ffe0b5,#f0935a 55%,#b9542a);color:#2a1206;
+  font:inherit;font-weight:700;font-size:clamp(13px,4vw,16px);letter-spacing:.1em;
+  box-shadow:0 4px 14px rgba(0,0,0,.5),inset 0 -3px 6px rgba(0,0,0,.2);-webkit-tap-highlight-color:transparent}
+.ag-quay:active{transform:translate(-50%,-50%) scale(.96)}
+.ag-quay:disabled{cursor:default;filter:saturate(.7) brightness(.9)}
+.ag-quay:focus-visible{outline:2px solid #fff1e0;outline-offset:3px}
+.ag-goi{min-height:20px;margin:10px auto 6px;font-size:12.5px;line-height:1.55;text-align:center;color:rgba(244,239,230,.55)}
+.ag-goi:empty{margin:4px auto}
+.ag-o-chon{margin:4px auto 8px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}
+.ag-o-chon p{margin:0 0 8px;font-size:13px;line-height:1.55;color:rgba(244,239,230,.72)}
+.ag-o-chon b{color:#fff1e0;font-weight:500}
+.ag-o-nut{display:flex;gap:6px}
+.ag-o-nut button{flex:1;min-height:38px;padding:0 10px;border-radius:10px;border:1px solid rgba(255,190,140,.35);background:rgba(255,134,87,.1);
+  color:#ffd2b3;font:inherit;font-size:13px;cursor:pointer}
+.ag-o-nut button[data-viec="bo-chon"]{flex:0 0 38px;padding:0;border-color:rgba(255,255,255,.14);background:transparent;color:rgba(244,239,230,.6)}
+.ag-hang{display:flex;gap:8px;margin:8px auto 0}
+.ag-hang button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.045);color:rgba(244,239,230,.82);font:inherit;font-size:12.5px;cursor:pointer}
+.ag-hang button:hover{background:rgba(255,255,255,.09)}
+.ag-hang .ag-ico{width:19px;height:19px;color:#ffb98f}
+/* kết quả, bảng lọc: trượt lên từ đáy, trong khung của trò */
+.ag-kq-nen,.ag-bang-nen{position:absolute;inset:0;z-index:10;background:rgba(12,7,4,.58)}
+.ag-kq,.ag-bang{position:absolute;left:0;right:0;bottom:0;z-index:11;box-sizing:border-box;max-width:500px;margin:0 auto;
+  border-radius:22px 22px 0 0;border:1px solid rgba(255,190,140,.24);border-bottom:0;background:linear-gradient(170deg,#3b2317,#1e130d);
+  box-shadow:0 -14px 40px rgba(0,0,0,.45);animation:up .3s cubic-bezier(.2,.8,.3,1) both}
+.ag-kq{padding:20px 20px calc(env(safe-area-inset-bottom,0px) + 18px);text-align:center}
+.ag-bang{max-height:88%;overflow-y:auto;overscroll-behavior:contain;padding:18px 18px calc(env(safe-area-inset-bottom,0px) + 18px)}
+.ag-kq-nhan{margin:0;font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,197,158,.72)}
+.ag-kq-ten{margin:6px 0 8px;font-family:"Cormorant Garamond",Georgia,serif;font-size:38px;line-height:1.08;font-weight:600;color:#fff1e0;font-variant-numeric:lining-nums}
+.ag-kq-mo{margin:0 auto 10px;max-width:380px;font-size:14px;line-height:1.6;color:rgba(244,239,230,.75)}
+.ag-tag{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin:0 0 16px}
+.ag-tag span{padding:4px 10px;border-radius:999px;font-size:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);color:rgba(244,239,230,.78)}
+.ag-nut-chinh{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:50px;margin:0;padding:0 16px;box-sizing:border-box;
+  border:0;border-radius:14px;background:linear-gradient(#ffbe91,#ef7c49);color:#2a1206;font:inherit;font-size:16px;font-weight:700;
+  text-decoration:none;cursor:pointer}
+.ag-nut-chinh:disabled{opacity:.55;cursor:default}
+.ag-nut-chinh .ag-ico{width:19px;height:19px}
+.ag-hai{display:flex;gap:8px;margin-top:8px}
+.ag-hai>*{flex:1;min-width:0}
+.ag-nut-phu{display:flex;align-items:center;justify-content:center;gap:6px;min-height:46px;padding:0 10px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff1e0;font:inherit;font-size:14px;cursor:pointer}
+.ag-nut-phu:hover{background:rgba(255,255,255,.1)}
+.ag-meo{margin:12px auto 0;max-width:360px;font-size:12px;line-height:1.55;color:rgba(244,239,230,.45)}
+.ag-phao{position:absolute;left:50%;top:70px;width:0;height:0;pointer-events:none}
+.ag-phao i{position:absolute;width:8px;height:12px;border-radius:2px;animation:ag-bung 1.2s cubic-bezier(.15,.7,.3,1) forwards}
+@keyframes ag-bung{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--x),calc(var(--y) + 120px)) rotate(var(--q));opacity:0}}
+/* nấu ở nhà: ba hàng như máy xèng */
+.ag-mam{display:flex;flex-direction:column;gap:12px;margin:8px 0 12px}
+.ag-cot{display:grid;grid-template-columns:1fr 50px;grid-template-rows:auto 64px;column-gap:8px;row-gap:5px}
+.ag-cot-ten{grid-column:1/-1;margin:0 0 0 4px;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,197,158,.65)}
+.ag-o{position:relative;height:64px;overflow:hidden;border-radius:14px;cursor:pointer;border:1px solid rgba(255,190,140,.22);
+  background:linear-gradient(#140c08,#2b1a11 26%,#2b1a11 74%,#140c08);
+  box-shadow:inset 0 10px 12px -8px rgba(0,0,0,.7),inset 0 -10px 12px -8px rgba(0,0,0,.7)}
+.ag-dai{position:absolute;left:0;right:0;top:0;will-change:transform}
+.ag-muc{height:64px;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;min-width:0;padding:0 16px}
+.ag-muc b{font-size:17px;font-weight:500;line-height:1.3;color:#fff1e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ag-muc i{font-style:normal;font-size:12px;color:rgba(244,239,230,.48)}
+.ag-khoa{height:64px;padding:0;border-radius:14px;display:grid;place-items:center;cursor:pointer;
+  border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:rgba(244,239,230,.55)}
+.ag-khoa .ag-ico{width:21px;height:21px}
+.ag-khoa[aria-pressed="true"]{border-color:rgba(255,185,138,.75);background:rgba(255,134,87,.18);color:#ffd2b3}
+.ag-cot.khoa .ag-o{border-color:rgba(255,185,138,.7)}
+.ag-cap{margin:0 0 6px;padding:9px 12px;border-radius:12px;background:rgba(244,195,94,.08);border:1px solid rgba(244,195,94,.25);
+  font-size:13px;line-height:1.55;color:#f6dfae}
+.ag-gio{margin:0 0 12px;font-size:12.5px;color:rgba(244,239,230,.5);text-align:center}
+.ag-ghi{margin:10px 0 0;font-size:12px;line-height:1.6;color:rgba(244,239,230,.45)}
+.ag-giua{text-align:center}
+.ag-an{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* bảng lọc, cả nhóm, đi chợ */
+.ag-bang h3{margin:0 0 14px;text-align:center;font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;font-weight:600;color:#ffc59e;
+  font-variant-numeric:lining-nums}
+.ag-muc-loc{margin:0 0 14px}
+.ag-muc-loc>p{margin:0 0 8px;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,239,230,.5)}
+.ag-muc-loc>p i{font-style:normal;text-transform:none;letter-spacing:0;color:rgba(244,239,230,.4)}
+.ag-chips{display:flex;flex-wrap:wrap;gap:6px}
+.ag-chips button,.ag-lay-vt{min-height:34px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);
+  color:rgba(244,239,230,.8);font:inherit;font-size:13px;cursor:pointer}
+.ag-chips button[aria-pressed="true"]{border-color:rgba(255,185,138,.8);background:rgba(255,134,87,.2);color:#ffe0c9}
+.ag-khong button[aria-pressed="true"]{border-color:rgba(240,120,110,.75);background:rgba(240,120,110,.16);color:#ffc9c2;
+  text-decoration:line-through;text-decoration-thickness:1.5px}
+.ag-lay-vt{display:inline-flex;align-items:center;gap:5px;border-style:dashed;color:#ffb98f}
+.ag-lay-vt .ag-ico{width:15px;height:15px}
+.ag-cac-cong{display:flex;flex-direction:column;gap:8px;margin:4px 0 12px}
+.ag-cong{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:44px;padding:8px 12px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);color:rgba(244,239,230,.86);font:inherit;font-size:14px;text-align:left;cursor:pointer}
+.ag-cong i{flex:none;position:relative;width:40px;height:23px;border-radius:999px;background:rgba(255,255,255,.18);transition:background .2s}
+.ag-cong i::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff1e0;transition:transform .2s}
+.ag-cong[aria-pressed="true"] i{background:#ef7c49}
+.ag-cong[aria-pressed="true"] i::after{transform:translateX(17px)}
+.ag-them{display:flex;gap:6px;margin-bottom:8px}
+.ag-them input{flex:1;min-width:0;height:42px;padding:0 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);
+  color:var(--ink);font:inherit;font-size:16px}
+.ag-them input:focus{outline:none;border-color:rgba(255,185,138,.7)}
+.ag-them button{flex:none;padding:0 16px;border-radius:12px;border:1px solid rgba(255,185,138,.5);background:rgba(255,134,87,.16);color:#ffd2b3;
+  font:inherit;font-size:14px;cursor:pointer}
+.ag-rieng{margin-bottom:8px}
+.ag-rieng button span{opacity:.6;margin-left:2px}
+.ag-loi{margin:0 0 10px;font-size:13.5px;line-height:1.65;color:rgba(244,239,230,.72)}
+.ag-dem{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 16px;font-size:14px;color:rgba(244,239,230,.75)}
+.ag-dem button{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff1e0;
+  font:inherit;font-size:20px;cursor:pointer}
+.ag-dem b{min-width:30px;text-align:center;font-size:26px;font-weight:600;color:#fff1e0}
+.ag-phieu{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 14px}
+.ag-pm{display:flex;flex-direction:column;justify-content:space-between;gap:8px;padding:10px;border-radius:14px;
+  border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04)}
+.ag-pm b{font-size:14px;font-weight:500;line-height:1.3;color:#fff1e0}
+.ag-pm span{display:flex;gap:6px}
+.ag-pm span button{flex:1;height:38px;border-radius:10px;border:1px solid rgba(255,255,255,.14);background:transparent;color:rgba(244,239,230,.6);
+  font:inherit;font-size:15px;cursor:pointer}
+.ag-pm .ag-tim[aria-pressed="true"]{background:rgba(234,143,176,.25);border-color:rgba(234,143,176,.8);color:#ffd0df}
+.ag-pm .ag-gach[aria-pressed="true"]{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.5);color:#fff}
+.ag-pm.co-tim{border-color:rgba(234,143,176,.55)}
+.ag-pm.bi-gach b{text-decoration:line-through;opacity:.5}
+.ag-chuyen{padding:16px 0 6px;text-align:center}
+.ag-chuyen-so{display:grid;place-items:center;width:76px;height:76px;margin:0 auto 4px;border-radius:50%;
+  font-family:"Cormorant Garamond",Georgia,serif;font-size:44px;font-weight:600;color:#2a1206;font-variant-numeric:lining-nums;background:radial-gradient(circle at 35% 30%,#ffe0b5,#f0935a 60%,#b9542a)}
+.ag-tong{list-style:none;margin:0 0 10px;padding:0}
+.ag-tong li{display:flex;justify-content:space-between;gap:10px;padding:9px 2px;border-bottom:1px solid rgba(255,255,255,.07);font-size:14px}
+.ag-tong li b{font-weight:500;color:#fff1e0}
+.ag-tong li span{flex:none;color:#ffc9d4}
+.ag-tong li.loai b{text-decoration:line-through;opacity:.45}
+.ag-tong li.loai span{color:rgba(244,239,230,.4)}
+.ag-cho{list-style:none;margin:0 0 6px;padding:0}
+.ag-cho li label{display:flex;align-items:center;gap:12px;min-height:44px;padding:0 4px;border-bottom:1px solid rgba(255,255,255,.07);font-size:15px;cursor:pointer}
+.ag-cho input{width:20px;height:20px;accent-color:#ef7c49;color-scheme:dark}
+.ag-cho input:checked+span{text-decoration:line-through;opacity:.5}
+.ag-bang>.ag-nut-chinh{margin-top:14px}
+.ag-bao{position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);z-index:20;transform:translateX(-50%);box-sizing:border-box;
+  width:max-content;max-width:calc(100% - 48px);margin:0;padding:10px 16px;border-radius:12px;background:rgba(22,13,8,.94);
+  border:1px solid rgba(255,190,140,.3);color:#ffe3cf;font-size:13.5px;line-height:1.45;text-align:center;pointer-events:none}
+@media (prefers-reduced-motion:reduce){.ag-kq,.ag-bang{animation:none}.ag-mieng,.ag-chu{transition:none}}
+@media (max-width:359px){.ag-hang button{font-size:11.5px}.ag-tieude{font-size:28px}}
