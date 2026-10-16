@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Bàn bida tặng anh Biển. Người dùng: "cho tôi 1 đường dẫn mới, ko tạo sao nha — bida-anh-bien, lấy hình trên làm
+     background tặng anh Biển cho vui, chế thêm được gì thì chế cho vui". Không phải một ngôi sao (trang chính không có lối
+     vào), nên trang tự nạp trò Bida lỗ (assets/bida.js) với một chủ đề riêng — TDTD_BIDA_CHU_DE bên dưới: tên người chơi,
+     máy đối thủ là hải sản cho hợp "Biển", nỉ xám và bi chủ chấm đen như bàn trong ảnh, ảnh in mờ lên nỉ, lời trêu chơi
+     chữ biển, pháo giấy khi thắng, link mời về chính trang này. Ảnh xem trước: scripts/lam-qua-bida.py.
+     Trang có ảnh người thật nên không cho máy tìm kiếm lập chỉ mục (robots noindex); ai có link thì mở được. -->
+<script>
+  /* Vercel trả trang này cả ở …/bida-anh-bien (thiếu dấu /): khi đó đường dẫn tương đối đi lạc lên gốc trang
+     (anh-bien.jpg thành /anh-bien.jpg, không có ảnh). Thêm dấu / ngay từ đầu. */
+  if (!/\/$/.test(location.pathname)) location.replace(location.pathname + '/' + location.search + location.hash);
+</script>
+<title>Bàn bida của anh Biển</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Quà tặng anh Biển: bida lỗ 8 bi, 9 bi trên bàn nỉ xám in hình anh Biển. Đấu với Ghẹ, Cua, Mực hay rủ nhau chơi qua mạng.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Bàn bida của anh Biển">
+<meta property="og:description" content="Quà tặng anh Biển: bida lỗ 8 bi, 9 bi trên bàn nỉ xám in hình anh Biển. Đấu với Ghẹ, Cua, Mực hay rủ nhau chơi qua mạng.">
+<meta property="og:url" content="https://thong-diep-thuong-de.vercel.app/bida-anh-bien/">
+<meta property="og:locale" content="vi_VN">
+<meta property="og:image" content="https://thong-diep-thuong-de.vercel.app/bida-anh-bien/og-1.jpg">
+<meta property="og:image:secure_url" content="https://thong-diep-thuong-de.vercel.app/bida-anh-bien/og-1.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Anh Biển cúi người ngắm cú đánh trên bàn bida nỉ xám">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://thong-diep-thuong-de.vercel.app/bida-anh-bien/og-1.jpg">
+<meta name="theme-color" content="#121417">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Be+Vietnam+Pro:wght@300;400;500&display=swap&subset=vietnamese" rel="stylesheet">
+<link rel="stylesheet" href="../assets/app.css">
+<style>
+  /* ảnh anh Biển làm nền, phủ tối cho chữ và bàn dễ nhìn; bảng, lời báo đổi sang xám cho hợp nỉ xám */
+  body{background:#121417}
+  .bida{background:linear-gradient(rgba(14,16,19,.74),rgba(14,16,19,.9)),url(anh-bien.jpg) center 30%/cover no-repeat #121417}
+  .bida .xn-dong{display:none}
+  .bida .bd-dau{padding-right:16px}
+  .bida .bd-tin{background:rgba(8,9,11,.66)}
+  .bida .bd-tin-trong{background:linear-gradient(rgba(44,48,55,.97),rgba(26,29,34,.97))}
+  .bida .bd-bao,.bida .bd-xoay-bang{background:rgba(26,29,34,.95)}
+  .bd-chao{margin:-6px -4px 12px}
+  .bd-chao img{display:block;width:100%;max-height:32vh;object-fit:cover;object-position:50% 32%;border-radius:14px;box-shadow:0 10px 26px rgba(0,0,0,.45)}
+</style>
+</head>
+<body>
+<noscript><p style="color:#eee;font:16px system-ui;padding:24px">Bật JavaScript để chơi bida với anh Biển.</p></noscript>
+<script>
+  self.TDTD_BIDA_CHU_DE = {
+    ten: 'Anh Biển', goi: 'anh Biển', tieuDe: 'Bàn bida của anh Biển',
+    may: ['Ghẹ', 'Cua', 'Mực'],
+    ni: ['#a3a9ae', '#757b81'], bang: ['#9da3a9', '#878d93', '#60666c'], vienBang: 'rgba(238,242,246,.45)',
+    anhNi: 'anh-bien.jpg', anhNiMo: 0.22, anhNiCat: [0, 0.04, 1, 0.74],
+    chamBiChu: [30, 30, 32],
+    link: true,
+    loi: {
+      vao: ['Biển lặng, bi vào!', 'Sóng đưa bi về lỗ!', 'Chuẩn như ảnh!', 'Thần cơ vùng biển ra tay!', 'Cú này đáng đăng Facebook.', 'Êm như gió biển, vào gọn!'],
+      chuoi: ['Biển dậy sóng — vào liền mấy cú rồi!', 'Sóng lừng! Không ai cản nổi anh Biển.', 'Thuỷ triều lên, bi cứ thế mà vào!'],
+      tam: ['Ối, bi chủ đi tắm biển rồi!', 'Bi chủ nhảy xuống biển bơi mất rồi!'],
+      loi: ['Biển gợn sóng chút thôi, ván còn dài.', 'Sóng hơi mạnh tay rồi anh ơi.'],
+      truot: ['Sóng hơi lớn, lần sau vào!', 'Gió ngược chút thôi.', 'Bi còn mải ngắm biển.', 'Suýt nữa thì vào!'],
+      thang: ['Vua bida vùng biển! 🏆', 'Biển cả bao la, chiến thắng cũng bao la!', 'Đối thủ xin hàng vô điều kiện!'],
+      thua: ['Thua ván này, ván sau sóng lại lên!', 'Biển còn rộng, ván sau gỡ!'],
+    },
+  };
+</script>
+<script src="../assets/phong.js"></script>
+<script src="../assets/maqr.js"></script>
+<script src="../assets/bida.js"></script>
+<script>
+  /* link mời …/bida-anh-bien/?phong=MÃ: vào thẳng phòng đó, ở lại trang này */
+  (function () {
+    var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search);
+    if (m) history.replaceState(null, '', location.pathname + '#bida/' + m[1]);
+    self.TDTD_BIDA.mo();
+  })();
+</script>
+</body>
+</html>

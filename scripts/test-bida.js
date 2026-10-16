@@ -366,5 +366,55 @@ console.log('\n— Giao diện —');
   B.dong();
 }
 
+console.log('\n— Bàn tặng anh Biển (bida-anh-bien/) —');
+{
+  /* Người dùng: "cho tôi 1 đường dẫn mới, ko tạo sao nha — bida-anh-bien, lấy hình trên làm background tặng anh Biển cho
+     vui". Trang đặt self.TDTD_BIDA_CHU_DE rồi nạp bida.js; trang chính không đặt gì nên phải y như cũ. */
+  const trang = fs.readFileSync(path.join(goc, 'bida-anh-bien', 'index.html'), 'utf8');
+  const cauHinh = /self\.TDTD_BIDA_CHU_DE = (\{[\s\S]*?\n  \});/.exec(trang), dat = trang.indexOf('self.TDTD_BIDA_CHU_DE = ');
+  const the_ = ['phong', 'maqr', 'bida'].map(t => trang.indexOf(`<script src="../assets/${t}.js"></script>`));
+  ok('trang bida-anh-bien/ có thật, không cho máy tìm kiếm lập chỉ mục, đặt chủ đề trước rồi mới nạp phong.js, maqr.js, bida.js',
+    !!cauHinh && /<meta name="robots" content="noindex, nofollow">/.test(trang) && dat > 0 && the_[0] > dat && the_[1] > the_[0] && the_[2] > the_[1]);
+  /* Vercel trả trang ở cả …/bida-anh-bien lẫn …/bida-anh-bien/ (không chuyển): thiếu dấu / thì anh-bien.jpg đi lạc lên gốc */
+  const thuChuyen = (p) => { let di = null; new Function('location', /<script>([\s\S]*?)<\/script>/.exec(trang)[1])({ pathname: p, search: '?phong=ABCDEF', hash: '', replace: (u) => { di = u; } }); return di; };
+  ok('link thiếu dấu / (…/bida-anh-bien?phong=MÃ) thì chuyển sang …/bida-anh-bien/?phong=MÃ; đủ dấu / rồi thì thôi',
+    thuChuyen('/bida-anh-bien') === '/bida-anh-bien/?phong=ABCDEF' && thuChuyen('/bida-anh-bien/') === null);
+  ok('không thêm ngôi sao nào cho trang này (trang chính không có lối vào)', !/bida-anh-bien/.test(fs.readFileSync(path.join(goc, 'assets', 'app.js'), 'utf8')));
+  const kichJpg = (f) => { const b = fs.readFileSync(f); for (let i = 2; i < b.length - 9;) { const m = b[i + 1], l = b.readUInt16BE(i + 2); if (m >= 0xC0 && m <= 0xC3) return [b.readUInt16BE(i + 7), b.readUInt16BE(i + 5), b.length]; i += 2 + l; } return [0, 0, b.length]; };
+  const og = kichJpg(path.join(goc, 'bida-anh-bien', 'og-1.jpg')), nen = kichJpg(path.join(goc, 'bida-anh-bien', 'anh-bien.jpg'));
+  ok('ảnh xem trước 1200×630 dưới 300 KB, khớp thẻ og:image; ảnh nền có thật', og[0] === 1200 && og[1] === 630 && og[2] < 300000 &&
+    trang.includes('content="https://thong-diep-thuong-de.vercel.app/bida-anh-bien/og-1.jpg"') && nen[0] > 0, og.join('×'));
+  const cd = global.TDTD_BIDA_CHU_DE = new Function(`return ${cauHinh[1]};`)();
+  const khung = document.body.children.find(c => c.className === 'bida'), tin = khung.querySelector('.bd-tin');
+  const loiBao = () => khung.querySelector('.bd-bao').textContent, coCau = (chu, ds) => ds.some(c => chu.includes(c));
+  B._vanMoi({ che: 'may', kieu: 9, soMay: 3, kho: 1 });
+  const v = B._van();
+  ok('chủ đề: người chơi là "Anh Biển", máy là Ghẹ, Cua, Mực; lượt ghi "Lượt anh Biển"', v.nguoi.map(x => x.ten).join() === 'Anh Biển,Ghẹ,Cua,Mực' && /^Lượt anh Biển/.test(B._chuLuot()), B._chuLuot());
+  ok('link mời về chính trang tặng (…/bida-anh-bien/?phong=MÃ), không về trang bida chung', B._linkMoi('ABCDEF') === location.origin + location.pathname + '?phong=ABCDEF');
+  B._baoKetQua({ P: 0, loi: 'cai', vao: [], tiep: false, ket: false }, 0);
+  ok('anh Biển rơi bi chủ: lời báo lỗi kèm câu trêu "bi chủ đi tắm biển"', /^Lỗi: /.test(loiBao()) && coCau(loiBao(), cd.loi.tam), loiBao());
+  for (const s of [1, 2, 3]) B._baoKetQua({ P: 0, loi: '', vao: [s], tiep: true, ket: false }, 0);
+  ok('anh Biển vào liền ba cú: câu "sóng" riêng cho chuỗi', coCau(loiBao(), cd.loi.chuoi), loiBao());
+  B._baoKetQua({ P: 1, loi: '', vao: [4], tiep: true, ket: false }, 1);
+  ok('cú của máy (Ghẹ) không kèm câu trêu', loiBao() === 'Vào bi 4.', loiBao());
+  /* thắng: pháo giấy trước, bảng hết ván sau — bắt hẹn giờ lại để khỏi chờ thật */
+  const hen = [], henCu = global.setTimeout;
+  global.setTimeout = (f, ms) => { hen.push({ f, ms }); return 0; };
+  v.the.thang = 0; v.the.lyDo = '9dung'; v.hetVan = false;
+  try { B._denLuot(); } finally { global.setTimeout = henCu; }
+  const anTruoc = tin.hidden, cho = hen.some(h => h.ms >= 1500);
+  hen.forEach(h => h.f());
+  const bang = tin.querySelector('.bd-tin-trong').innerHTML;
+  ok('anh Biển thắng: pháo giấy rơi trên bàn, hơn giây sau mới hiện bảng "Anh Biển thắng!" kèm câu mừng',
+    !!B._phao() && anTruoc && cho && !tin.hidden && bang.includes('Anh Biển thắng!') && coCau(bang, cd.loi.thang), bang.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').slice(0, 100));
+  ok('dòng trạng thái lúc hết ván: "Hết ván — anh Biển thắng."', B._chuLuot() === 'Hết ván — anh Biển thắng.', B._chuLuot());
+  delete global.TDTD_BIDA_CHU_DE;
+  B._vanMoi({ che: 'may', kieu: 8, kho: 1 });
+  B._baoKetQua({ P: 0, loi: '', vao: [2], tiep: true, ket: false }, 0);
+  ok('trang chính (không chủ đề): vẫn "Bạn" và Sóc, không câu trêu, link mời về bida-lo/',
+    B._van().nguoi.map(x => x.ten).join() === 'Bạn,Sóc' && loiBao() === 'Vào bi 2.' && /\/bida-lo\/\?phong=ABCDEF$/.test(B._linkMoi('ABCDEF')), loiBao());
+  B.dong();
+}
+
 console.log(`\n${pass} đạt, ${fail} hỏng`);
 process.exit(fail ? 1 : 0);
