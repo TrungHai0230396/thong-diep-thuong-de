@@ -2394,7 +2394,7 @@ Người dùng: "Quán bida cho to full đi đừng làm popup, khi chọn bàn 
 
 **Bài kiểm**: `scripts/test-bida.js` 161 bài (thêm đánh đôi: đội theo ghế, nhóm bi chung, bi 8 của cả đội, điểm 3 bi theo đội, khai cuộc ghế 3, 4); `scripts/test-bida-phong.js` 89 bài (thêm: chủ bàn từ chối rồi đồng ý, người không phải chủ bàn không duyệt được, bàn 9 bi ba người tới lúc hai người bỏ ngang, chơi ván nữa ba người được duyệt sẵn, đánh đôi bốn máy chọn ghế không theo thứ tự, đánh thay khi bạn cùng đội về, mời người đánh thay ra, đội thắng cả hai cùng thắng, bida bài mỗi máy một tay bài, sofa còn 2 chỗ khi bàn ba người, quán phủ kín và bảng bàn đè lên quán); `scripts/test-sao.js` 285 bài. Lần này chưa thử phá: người dùng bảo bớt thử để đẩy lên cho nhanh.
 
-**Luật Firebase mới chưa xuất bản** (lúc viết): `bida/<mã>` thêm `so` 2–4, `doi`, `la`, kiểu 52, `xin`, `duyet`, ghế 0–3, ghế chỉ giành được khi đã được duyệt; `quan/<bàn>` thêm kiểu 52, `so` 2–4, `doi`, `la`. Chưa xuất bản thì bàn hai người vẫn chơi như cũ (không có bước duyệt), còn bàn 3–4 người, đánh đôi, bida bài, ván nữa ở quán bị máy chủ chặn.
+**Luật Firebase** của phần này đã xuất bản (sau commit `3683576`, bản trên máy chủ khớp từng ký tự với `firebase-rules.json`): `bida/<mã>` thêm `so` 2–4, `doi`, `la`, kiểu 52, `xin`, `duyet`, ghế 0–3, ghế chỉ giành được khi đã được duyệt; `quan/<bàn>` thêm kiểu 52, `so` 2–4, `doi`, `la`. Trước khi xuất bản, máy chủ còn luật cũ thì bàn hai người vẫn chơi như cũ (không có bước duyệt) — đường lui đó giữ lại phòng khi luật bị đặt lại.
 
 ## Ăn gì
 
