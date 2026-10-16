@@ -1966,6 +1966,16 @@ Người dùng: "thêm 1 nút tìm phòng nhanh đi".
 
 `scripts/test-phong.js` thêm 4 bài (giờ 73): bảng Ván mới và màn danh sách có nút, không chữ nào còn gọi tên cũ; bấm tìm nhanh thì bỏ qua dòng của phòng đã đủ người, vào phòng còn 1 ghế chứ không vào phòng còn 2 ghế, ngồi đúng ghế trống còn lại với tên mình; vào đủ ba người thì phòng thôi hiện, người vào thấy "Phòng mở"; không còn phòng thì tự tạo phòng mở, có trong danh sách, có báo. Thử phá 5 chỗ (đảo thứ tự ưu tiên phòng, bỏ tự tạo phòng, bỏ dấu "phòng mở" sau khi vào, bỏ nút trên bảng Ván mới, đổi một câu về tên cũ) — bắt cả 5. Đã thử trên database thật với hai thẻ khác địa chỉ: thẻ thứ nhất bấm tìm nhanh lúc chưa có phòng nào → tự tạo phòng mở, có trong danh sách (còn 2 ghế); thẻ thứ hai gõ tên rồi bấm tìm nhanh → vào đúng phòng đó, ngồi ghế Đen, dòng danh sách còn 1 ghế, chủ phòng thấy tên người vào; chủ phòng rời thì dòng mất.
 
+### Nút chép link, nút đóng bấm được cả lúc bảng Ván mới đang mở
+
+Người dùng: "khi ở cờ vua, chưa vô ván thì không bấm chia sẻ link được vì lúc nào cũng có popup". Bảng của trò (`.cb-tin`, z-index 9) phủ cả khung, nằm trên hàng nút của app — Cài app, chép link, ✕ (z-index 8). Lúc chưa vào ván thì bảng Ván mới luôn mở, nên không chép được link — cả nút ✕ cũng không bấm được (trên iPhone đã cài app thì không thoát ra được, trừ khi vào ván).
+
+- Ba nút đó giờ nằm trên bảng (z-index 10), sáng rõ trên lớp mờ.
+- Bảng chừa hàng nút ở trên: cách mép trên 58 px cộng phần tai thỏ (nút cách mép 14 px, cao 34 px). Bảng cao tối đa vừa chỗ còn lại, dài thì cuộn trong bảng — trước đây cao 88vh nên bảng dài có thể lên sát mép trên.
+- Chỉ sửa ở cờ ba người. Các trò khác chỉ hiện bảng lúc chọn bài hay thắng bài, bảng có nút ✕ riêng để đóng.
+
+`scripts/test-coba.js` thêm 1 bài (giờ 94): nút nằm trên bảng, bảng chừa đủ hàng nút (đọc vị trí và cỡ nút ngay trong CSS), bảng cao không quá chỗ còn lại. Thử phá 5 chỗ (bỏ nâng nút, nút ngang bảng, bảng không chừa hàng nút, chừa thiếu, bảng cao lại 88vh) — bắt cả 5. Đã thử trong trình duyệt ở cỡ điện thoại 375×812: bấm ngay tâm từng nút thì trúng nút; bấm nút chép link lúc bảng Ván mới đang mở thì gửi đúng link `…/co-vua-ba-nguoi/`, bảng vẫn mở; bảng Ván mới bắt đầu ở 120 px, Tạo phòng ở 81 px, Cách chơi (dài, cuộn) ở 58 px — đều dưới hàng nút (kết thúc ở 48 px).
+
 ## Cấu trúc
 
 ```
@@ -2026,7 +2036,7 @@ assets/sokoban.js          Đẩy thùng sao (Sokoban): luật đi đẩy, bộ 
 assets/mansoko.js          100 màn của Đẩy thùng sao (ký hiệu XSB), mỗi màn có số lần đẩy ít nhất và một lời giải, sinh bởi scripts/tao-man-sokoban.js
 scripts/tao-man-sokoban.js tạo màn theo Taylor & Parberry 2011 (17 mẫu phòng, đặt ổ, chơi ngược), chạy song song nhiều luồng, chọn 100 màn
 assets/coba.js             Cờ vua ba người: bàn lục giác 96 ô (bằng sáng chế Zubrin), luật, máy nghĩ (Best-Reply Search, hoang tưởng) ở luồng riêng, giao diện
-scripts/test-coba.js       93 kiểm thử cờ ba người: hình học bàn, luật thường và Tam quốc, máy nghĩ, giao diện, mũi tên nước đi, xem cách đi từng quân, quân đã mất
+scripts/test-coba.js       94 kiểm thử cờ ba người: hình học bàn, luật thường và Tam quốc, máy nghĩ, giao diện, mũi tên nước đi, xem cách đi từng quân, quân đã mất
 assets/phong.js            chơi qua mạng: đọc ghi Firebase Realtime Database bằng REST và luồng sự kiện, không thư viện
 assets/maqr.js             mã QR tự vẽ cho phòng chờ (ISO/IEC 18004, kiểu byte, mức M, phiên bản 1–6), không thư viện
 scripts/test-maqr.js       12 kiểm thử mã QR: số liệu chuẩn, đọc ngược bằng bộ đọc riêng, sát sức chứa, 300 chữ ngẫu nhiên
@@ -2065,7 +2075,7 @@ node scripts/test-ngu.js         # chạy 53 kiểm thử nhạc ngủ
 node scripts/test-luanxa.js      # chạy 101 kiểm thử thiền luân xa
 node scripts/test-laptrinh.js    # chạy 57 kiểm thử Robot thắp sao (cả 100 bài)
 node scripts/tim-loi-giai-gon.js 1 100 60   # tìm cách giải gọn hơn lời giải mẫu (lâu: tới 60 giây mỗi bài)
-node scripts/test-coba.js        # chạy 93 kiểm thử Cờ vua ba người
+node scripts/test-coba.js        # chạy 94 kiểm thử Cờ vua ba người
 node scripts/test-phong.js       # chạy 73 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
 node scripts/test-maqr.js        # chạy 12 kiểm thử mã QR
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)

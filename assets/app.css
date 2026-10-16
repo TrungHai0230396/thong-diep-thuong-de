@@ -1333,9 +1333,14 @@ a.cai-nut{text-align:center;text-decoration:none;box-sizing:border-box}
 .cb-xem button{flex:1;min-width:0;height:40px;padding:0 2px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);
   color:#eef1ff;font:inherit;font-size:13.5px;cursor:pointer}
 .cb-xem button.cb-bat{border-color:#ffd77a;background:rgba(255,215,120,.18);color:#ffe6a6;font-weight:600}
-.cb-tin{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,5,18,.72)}
+/* Bảng của trò phủ cả khung, mà lúc chưa vào ván bảng Ván mới lúc nào cũng mở — trước đây nó đè lên hàng nút của app nên
+   không bấm được chép link, cả nút đóng (người dùng: "chưa vô ván thì không bấm chia sẻ link được vì lúc nào cũng có
+   popup"). Giờ ba nút đóng, chép link, Cài app nằm trên bảng; bảng chừa hàng nút ở trên (nút cao 34 px, cách mép 14 px). */
+.coba .xn-dong,.coba .nut-link,.coba .nut-cai{z-index:10}
+.cb-tin{position:absolute;inset:0;z-index:9;display:flex;align-items:center;justify-content:center;
+  padding:calc(env(safe-area-inset-top,0px) + 58px) 20px calc(env(safe-area-inset-bottom,0px) + 20px);background:rgba(6,5,18,.72)}
 .cb-tin[hidden]{display:none}
-.cb-tin-trong{width:100%;max-width:420px;max-height:88vh;overflow:auto;padding:22px 20px;border-radius:20px;background:linear-gradient(#22204a,#17153a);
+.cb-tin-trong{width:100%;max-width:420px;max-height:100%;overflow:auto;padding:22px 20px;border-radius:20px;background:linear-gradient(#22204a,#17153a);
   border:1px solid rgba(255,255,255,.12);box-shadow:0 20px 50px rgba(0,0,0,.5);text-align:center}
 .cb-tin h2{margin:4px 0 12px;font-family:"Cormorant Garamond",Georgia,serif;font-size:26px;color:#ffe2a0}
 .cb-tin p{margin:0 0 10px;font-size:14.5px;line-height:1.55;color:rgba(238,241,255,.88);text-align:left}

@@ -511,6 +511,14 @@ console.log('\n— Gắn vào app —');
   ok('index.html nạp coba.js trước app.js; sw.js cất sẵn để chơi khi mất mạng', html.indexOf('src="assets/coba.js"') > 0 && html.indexOf('src="assets/coba.js"') < html.indexOf('src="assets/app.js"') && sw.includes("'assets/coba.js'"));
   ok('có ngôi sao trên trang chính, mở bằng #co-ba-nguoi', /id: 'sao-coba'[\s\S]*?duong: 'co-ba-nguoi', khung: '\.coba', mun: 'TDTD_COBA'/.test(app) && /\n  coba: +'M/.test(app));
   ok('có kiểu dáng cho khung trò', css.includes('.coba{') && css.includes('.coba.hien{display:flex}'));
+  /* người dùng: "khi ở cờ vua, chưa vô ván thì không bấm chia sẻ link được vì lúc nào cũng có popup" — bảng Ván mới phủ cả
+     khung, từng nằm trên hàng nút đóng / chép link / Cài app của app */
+  const zIndex = (khoa) => { const i = css.indexOf(khoa + '{'), m = i >= 0 && css.slice(i).match(/^[^}]*?z-index:(\d+)/); return m ? +m[1] : NaN; };
+  const [, tren, cao] = (css.match(/\.xn-dong\{[^}]*?top:calc\(env\(safe-area-inset-top,0px\) \+ (\d+)px\)[^}]*?;height:(\d+)px/) || []).map(Number);
+  const chua = +(css.match(/\.cb-tin\{[^}]*?padding:calc\(env\(safe-area-inset-top,0px\) \+ (\d+)px\)/) || [])[1];
+  ok('nút đóng, chép link, Cài app nằm trên bảng Ván mới, bấm được lúc chưa vào ván; bảng chừa hàng nút ở trên, không đè lên nút',
+     zIndex('.coba .xn-dong,.coba .nut-link,.coba .nut-cai') > zIndex('.cb-tin') && chua >= tren + cao && /\.cb-tin-trong\{[^}]*?max-height:100%/.test(css),
+     `nút ${zIndex('.coba .xn-dong,.coba .nut-link,.coba .nut-cai')} / bảng ${zIndex('.cb-tin')}, chừa ${chua} / hàng nút tới ${tren + cao}`);
   const src = fs.readFileSync(path.join(goc, 'assets', 'coba.js'), 'utf8');
   ok('máy nghĩ chạy ở luồng riêng dựng từ chính mã lõi, không tải tệp nào thêm', /new Worker\(URL\.createObjectURL\(new Blob/.test(src) && /LOI\.toString\(\)/.test(src));
 }
