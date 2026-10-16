@@ -59,9 +59,11 @@ function dungKhung() {
   cv.addEventListener('pointerup', thoiNhanh);
   cv.addEventListener('pointercancel', thoiNhanh);
   cv.addEventListener('pointerleave', thoiNhanh);
-  addEventListener('resize', doCo);
+  addEventListener('resize', doiCo);
 }
 
+/* Đo khung rồi dựng canvas theo cỡ đó. Chỉ lo canvas: rải lá là việc của lúc mở hồ (raiLa),
+   còn hồ đang nuôi lúc trang đổi cỡ là việc của doiCo. */
 function doCo() {
   if (!cv) return;
   DPR = Math.min(devicePixelRatio || 1, 2);
@@ -72,7 +74,43 @@ function doCo() {
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR);
   cv.style.width = W + 'px'; cv.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  // rải lá cho thưa ra, không đè nhau, để nhìn rõ ếch nhảy từ lá này sang lá kia
+}
+
+/* Trang đổi cỡ: xoay máy, kéo cửa sổ, thanh địa chỉ co giãn. Bản trước gắn thẳng doCo vào đây,
+   mà doCo hồi đó rải lại năm lá rồi đặt đàn ếch về bốn con: hồ đang có 36 con, khung xem đổi từ
+   360×640 sang 1024×768 là còn 4. Giờ hồ giữ nguyên, chỉ co giãn toạ độ theo khung mới rồi kéo vào
+   trong khung. Lá giữ cỡ bằng pixel như lúc rải; cỡ ếch thì tính lại như con mới nở, kẻo cùng một
+   hồ mà con to con nhỏ. */
+function doiCo() {
+  const W0 = W, H0 = H;
+  doCo();
+  if (!(W0 > 0 && H0 > 0) || (W === W0 && H === H0)) return;
+  const kx = W / W0, ky = H / H0;
+  const gx = (x, a = 0, b = W) => Math.max(a, Math.min(b, x * kx));
+  const gy = (y, a = 0, b = H) => Math.max(a, Math.min(b, y * ky));
+  for (const l of la) {                                 // lá thì kéo vào trong mép hồ, chỗ troiLa đẩy vào
+    const y = l.y;
+    l.x = gx(l.x, W * .06, W * .94); l.y = gy(l.y, H * .1, H * .94);
+    if (l.yVe !== undefined) l.yVe += l.y - y;          // đang nhún lệch bao nhiêu thì giữ bấy nhiêu
+  }
+  for (const e of ech) {
+    e.s = CO_ECH();
+    const l = la[e.la];
+    if (e.nhay) {                                       // đang bay: dời cả chỗ rời chân lẫn chỗ đáp
+      e.x0 = gx(e.x0); e.y0 = gy(e.y0);
+      if (l) { e.x1 = l.x + e.dx; e.y1 = yLa(l) + e.dy; }   // chỗ đậu đã chọn trên lá dời theo lá
+      else { e.x1 = gx(e.x1); e.y1 = gy(e.y1); }
+      const p = Math.min(1, e.t / e.doi);
+      e.x = e.x0 + (e.x1 - e.x0) * p; e.y = e.y0 + (e.y1 - e.y0) * p;
+      if (Math.hypot(e.x1 - e.x0, e.y1 - e.y0) > 1) e.goc = Math.atan2(e.y1 - e.y0, e.x1 - e.x0);
+    } else if (l && nguoi(e)) { e.x = l.x + e.dx; e.y = yLa(l) + e.dy; }   // ngồi trên lá thì theo lá
+    else { e.x = gx(e.x); e.y = gy(e.y); }
+  }
+  for (const ds of [song, trung, nong, ca, bo]) for (const o of ds) { o.x = gx(o.x); o.y = gy(o.y); }
+}
+
+/* Mở hồ: rải lá cho thưa ra, không đè nhau, để nhìn rõ ếch nhảy từ lá này sang lá kia */
+function raiLa() {
   la = [];
   for (let n = 0; n < 5; n++) {
     const rMax = n === 0 ? rnd(44, 50) : R_LA();        // chắc chắn có một lá đủ rộng cho cả đàn
@@ -84,7 +122,6 @@ function doCo() {
       if (!de || thu === 39) { la.push(l); break; }
     }
   }
-  datEch();
 }
 
 /* Mỗi gợn sóng mang theo loại tiếng của nó: 'nuoc' là chạm nước thật, 'dap' là đạp chân rời lá,
@@ -346,6 +383,7 @@ const SO_ECH = 4;
 
 const yLa = (l) => l.yVe ?? l.y;
 const nguoi = (e) => !e.nhay && !e.boi && e.tan === null;   // đang ngồi trên lá, không bay không bơi không tan
+const CO_ECH = () => Math.max(18, Math.min(28, Math.min(W, H) * .066));   // cỡ ếch theo khung, con nào cũng vậy
 const DOI_SONG = () => rnd(210000, 360000);             // sống được 3,5–6 phút thì già, mỗi con một số riêng
 const CHU_KY = () => rnd(35000, 60000);                 // 35–60 giây một lần xét chuyện đẻ
 const MUC_BO = () => rnd(.35, 1.9);                     // hồ có mùa nhiều mùa ít con trùng
@@ -365,7 +403,7 @@ const suc = (l) => l.r < 22 ? 1                          // mầm mới nhú ch�
 function datEch() {
   ech = [];
   if (!la.length) return;
-  const s = Math.max(18, Math.min(28, Math.min(W, H) * .066));
+  const s = CO_ECH();
   const thu = la.map((_, i) => i).sort(() => Math.random() - .5);   // mở lên thì mỗi con một lá
   for (let n = 0; n < Math.min(SO_ECH, la.length); n++) {
     const i = thu[n], l = la[i], a = rnd(0, 6.284), b = rnd(0, l.r * .3);
@@ -1086,7 +1124,7 @@ function veNong(t) {
 
 function thanhEch(n) {
   ech.push({ la: -1, dich: laConCho(-1, n.x, n.y), dx: 0, dy: 0, x: n.x, y: n.y, goc: n.huong,
-             s: Math.max(18, Math.min(28, Math.min(W, H) * .066)),
+             s: CO_ECH(),
              doiSong: DOI_SONG(), tuoi: 0, tan: null, chuKy: CHU_KY(), tChuKy: 0, nl: .45,
              nhay: false, boi: true, tDap: 0, t: 0, doi: 0, cung: 0,
              x0: 0, y0: 0, x1: 0, y1: 0, nghi: 0, nhamMat: 0, tuNhay: rnd(5000, 15000),
@@ -1562,7 +1600,7 @@ function mo() {
   dungKhung();
   document.body.classList.add('khoa-cuon');
   tam.classList.add('hien');
-  doCo();
+  doCo(); raiLa(); datEch();
   song = []; tMua = 900;
   bo = []; trung = []; nong = []; ca = []; tCa = rnd(20000, 45000);
   damBo = rnd(1, 2.5); tKhach = KHACH(); soKhach = 0;

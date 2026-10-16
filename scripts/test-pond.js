@@ -41,7 +41,11 @@ const than = nut('body');
 global.document = { body: than, hidden: false, documentElement: nut(),
                     createElement: () => nut(), querySelector: () => null, addEventListener() {} };
 global.self = global; global.window = global;
-global.addEventListener = () => {};
+/* Giữ lại các hàm pond.js gắn vào cửa sổ (đổi cỡ, phím, ẩn tab) để bài kiểm tự gọi như trình duyệt
+   gọi. Bản trước nuốt mất hết, nên không bài nào chạm tới đường đổi cỡ trang — lỗi đổi cỡ xoá cả
+   hồ nằm ở đó mà không bài nào thấy. */
+const ngheCuaSo = {};
+global.addEventListener = (ten, f) => { (ngheCuaSo[ten] = ngheCuaSo[ten] || []).push(f); };
 global.localStorage = { getItem: () => null, setItem() {}, removeItem() {} };
 global.requestAnimationFrame = () => 1;
 global.cancelAnimationFrame = () => {};
@@ -372,6 +376,85 @@ console.log('\n— Lá bắt đầu tàn thì không con nào lên nữa —');
   const e = HO._ech()[0];
   ok('đang bay thì lá đích bắt đầu tàn: chạm chân xuống là phóng đi', ngoiTren(D) === 0 && (e.boi || e.la !== D),
      `${ngoiTren(D)} con ngồi trên lá đang tàn`);
+}
+
+console.log('\n— Đổi cỡ trang không xoá hồ —');
+/* Thấy tận mắt: hồ đang có 36 con, khung xem đổi cỡ 360×640 → 1024×768 là còn 4, lá rải lại từ đầu.
+   Sự kiện resize gọi thẳng doCo, mà doCo hồi đó rải năm lá mới rồi đặt đàn ếch về bốn con. Ở đây đổi
+   cỡ thẻ bọc giả rồi gọi đúng hàm pond.js gắn vào resize, như trình duyệt gọi: một lần to ra và ngang
+   hơn, một lần nhỏ lại. Chiều nhỏ lại mới lộ chỗ quên co giãn, vì toạ độ cũ nằm ngoài khung mới. */
+{
+  const ho = () => than.children.find(c => c.className === 'ho');      // thẻ bọc pond.js dựng lúc mở hồ lần đầu
+  const doiCo = (w, h) => { Object.assign(ho(), { clientWidth: w, clientHeight: h }); (ngheCuaSo.resize || []).forEach(f => f()); };
+  const trong = (x, y, le = 0) => { const { W, H } = HO._debug(); return x >= -le && x <= W + le && y >= -le && y <= H + le; };
+  /* Con ngồi trên lá thì ở đâu là do lá: lá sát mép thì con ngồi phía ngoài thò ra khỏi khung được
+     vài pixel, chuyện thường. Nên con ngồi thì đòi nằm trên lá của nó; con đang bay thì chỗ đáp cũng
+     là một chỗ trên lá, cho thò ra 60 px; còn lại đòi nằm trong khung. */
+  const ngoaiKhung = () => {
+    const la = HO._la(), loi = [];
+    la.forEach((l, i) => { if (!trong(l.x, l.y)) loi.push(`lá#${i} ở (${l.x}, ${l.y})`); });
+    HO._ech().forEach((e, i) => {
+      const l = la[e.la];
+      const dung = e.nhay ? trong(e.x, e.y, 60)
+        : !e.boi && e.tan === null && l ? Math.abs(e.x - l.x) <= l.r && Math.abs(e.y - l.yVe) <= l.r
+        : trong(e.x, e.y);
+      if (!dung) loi.push(`ếch #${i} ở (${e.x}, ${e.y})${l ? `, lá#${e.la} ở (${l.x}, ${l.yVe})` : ''}`);
+    });
+    for (const [ten, ds] of [['nòng nọc', HO._nong()], ['cá', HO._ca()], ['bọ', HO._bo()]])
+      ds.forEach((o, i) => { if (!trong(o.x, o.y)) loi.push(`${ten} #${i} ở (${o.x}, ${o.y})`); });
+    return loi;
+  };
+  /* Một con đang bay lúc đổi cỡ: chạm vào con ngồi xa mép trái nhất, nó giật mình phóng sang lá gần
+     nhất. Chọn con xa mép trái để lúc khung nhỏ lại, chỗ rời chân mà quên co giãn thì nằm ngoài khung. */
+  const choBay = () => {
+    const ngoi = HO._ech().map((e, i) => ({ ...e, i })).filter(e => !e.nhay && !e.boi && e.tan === null && e.la >= 0);
+    for (const e of ngoi.sort((a, b) => b.x - a.x)) { HO._cham(e.x, e.y); if (HO._ech()[e.i].nhay) return e.i; }
+    return -1;
+  };
+  const kep = (v, a, b) => Math.max(a, Math.min(b, v));
+  const doiVaKiem = (w, h) => {
+    HO._themBo(HO._debug().W * .9, HO._debug().H * .5);   // con bọ sát mép phải: thu nhỏ khung mà quên nó là nó lọt ra ngoài
+    const bay = choBay(); chay(1 / 30, 33);           // bay được một khung rồi mới đổi cỡ
+    const truoc = HO._debug(), viTri = HO._la().map(l => [l.x / truoc.W, l.y / truoc.H]);
+    doiCo(w, h);
+    const sau = HO._debug(), la = HO._la(), nhan = `${truoc.W}×${truoc.H} → ${w}×${h}`;
+    ok(`${nhan}: còn nguyên đàn ếch và lá`, sau.ech === truoc.ech && sau.la === truoc.la,
+       `ếch ${truoc.ech} → ${sau.ech}, lá ${truoc.la} → ${sau.la}`);
+    const khac = ['nong', 'trung', 'ca', 'bo'];
+    ok(`${nhan}: nòng nọc, trứng, cá, bọ cũng còn nguyên`, khac.every(k => sau[k] === truoc[k]),
+       khac.map(k => `${k} ${truoc[k]} → ${sau[k]}`).join(', '));
+    /* Lá ở đúng chỗ tương đối cũ trong khung mới; lá nào đang dạt ra ngoài mép hồ thì được kéo vào mép. */
+    const lech = la.length !== viTri.length ? Infinity : Math.max(...la.map((l, i) => Math.max(
+      Math.abs(l.x - kep(viTri[i][0], .06, .94) * w), Math.abs(l.y - kep(viTri[i][1], .1, .94) * h))));
+    ok(`${nhan}: lá giãn theo khung, giữ chỗ tương đối`, sau.W === w && sau.H === h && lech <= 3,
+       `khung ${sau.W}×${sau.H}, lá lệch nhiều nhất ${lech.toFixed(1)} px`);
+    const ngoai = ngoaiKhung();
+    ok(`${nhan}: mọi con và mọi lá nằm trong khung mới`, !ngoai.length, ngoai.slice(0, 3).join('; '));
+    const conBay = () => HO._ech()[bay] || {};
+    let loiBay = bay < 0 ? 'không dựng được con đang bay' : !conBay().nhay ? 'con đang bay bị đặt lại' : '';
+    for (let k = 1; !loiBay && k <= 60 && conBay().nhay; k++) {
+      chay(1 / 30, 33);
+      const e = conBay();
+      if (e.nhay && !trong(e.x, e.y, 60)) loiBay = `khung thứ ${k} sau khi đổi cỡ nó ở (${e.x}, ${e.y})`;
+    }
+    if (!loiBay && conBay().nhay) loiBay = 'bay hai giây chưa đáp';
+    ok(`${nhan}: con đang bay bay tiếp trong khung rồi đáp`, !loiBay, loiBay);
+    soatBatBien(`${nhan}: bất biến sau khi đổi cỡ`);
+  };
+  HO.mo(); chay(3);
+  HO._themEch(190, 400, 30); HO._themNong(120, 560, 6); HO._themCa(300, 640); HO._themBo(60, 200);
+  chay(15);
+  doiVaKiem(1024, 768);
+  doiVaKiem(360, 640);
+  chay(30);
+  soatBatBien('nửa phút sau khi đổi cỡ, hồ vẫn chạy đúng');
+  /* Thẻ bọc đang ẩn thì cỡ bằng 0: lấy tạm cỡ cửa sổ (380×720 trong bộ giả). Cũng là trả khung giả
+     về cỡ cũ cho các bài sau. */
+  doiCo(0, 0);
+  const d0 = HO._debug(), ngoai0 = ngoaiKhung();
+  ok('thẻ bọc cỡ 0 lúc đổi cỡ thì lấy tạm cỡ cửa sổ', d0.W === 380 && d0.H === 720 && !ngoai0.length,
+     `khung ${d0.W}×${d0.H}${ngoai0.length ? ', ' + ngoai0.slice(0, 2).join('; ') : ''}`);
+  Object.assign(ho(), { clientWidth: 380, clientHeight: 720 });
 }
 
 console.log('\n— Chạy dài một tiếng —');
