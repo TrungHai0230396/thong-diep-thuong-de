@@ -1,7 +1,7 @@
-/* Hôm nay ăn gì — dữ liệu món và phần tính toán. Hàm THUẦN: không DOM, không mạng; kiểm bằng Node
+/* Ăn gì — dữ liệu món và phần tính toán. Hàm THUẦN: không DOM, không mạng; kiểm bằng Node
    (scripts/test-angi.js). Giao diện ở assets/angi.js.
 
-   Vì sao người ta kẹt ở câu "ăn gì", và app đáp lại ra sao (README, mục Hôm nay ăn gì):
+   Vì sao người ta kẹt ở câu "ăn gì", và app đáp lại ra sao (README, mục Ăn gì):
    - Hỏi bất chợt thì không nhớ ra món nào → app đưa sẵn món hợp bữa, hợp trời, hợp túi tiền.
    - Nhiều lựa chọn quá thì càng khó chọn → mỗi vòng chỉ tám món, khác nhóm nhau.
    - Biết rõ mình KHÔNG muốn gì hơn là muốn gì → lọc "không ăn", gạch món, né món đã ăn mấy hôm nay.

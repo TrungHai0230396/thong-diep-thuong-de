@@ -1,4 +1,4 @@
-/* Kiểm thử Hôm nay ăn gì: node scripts/test-angi.js
+/* Kiểm thử Ăn gì: node scripts/test-angi.js
    Dữ liệu món (đủ cột, đúng khuôn, mỗi bữa đủ món, đủ món chay); hoàn cảnh (bữa theo giờ, mùng 1 và rằm theo lịch âm
    của Xem ngày, đọc thời tiết Open-Meteo, miền theo toạ độ, né món mới chốt); chọn tám món (đúng lọc, đa dạng, món phổ
    biến ra nhiều hơn, trời mưa thì món nóng, nới lọc khi chặt quá, không bao giờ nới chay); vòng quay (lời giải đóng khớp

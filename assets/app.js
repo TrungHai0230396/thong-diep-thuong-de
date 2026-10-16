@@ -17,6 +17,8 @@ const { ymd, cardFor, newSeed } = self.TDTD;
      tenApp (trò có trang thì phải có): tên dưới biểu tượng khi cài app từ trò này — ngắn, dưới biểu tượng iPhone chỉ
        hiện chừng 12 chữ; xem datTenGoiY(), scripts/lam-ke-khai.py
      nutCai (không bắt buộc): trò có nút "Cài app" riêng — người vào thẳng từ link không thấy trang chính; xem themNutCaiApp()
+     diaChiTrang (không bắt buộc, trò có trang): lúc trò mở, thanh địa chỉ là trang riêng (…/an-gi/) chứ không là
+       …/#an-gi, nên chép link từ thanh địa chỉ cũng ra tên và chú thích của trò; xem datDiaChiTrang()
    Bỏ một ngôi sao thì xoá dòng của nó, hoặc thêm bat: false.
    Các sao tự rải ngẫu nhiên, không bao giờ đè lên nhau, cũng không đè chữ.
    ───────────────────────────────────────────────────────────── */
@@ -69,8 +71,8 @@ const SAO = [
     duong: 'co-ba-nguoi', khung: '.coba', mun: 'TDTD_COBA', tieuDe: 'Cờ vua ba người', tenApp: 'Cờ ba người', trang: 'co-vua-ba-nguoi/', nutCai: true },
   { id: 'sao-bida', mau: '#a6e07c', hinh: 'bida', nhan: 'Bida lỗ: 8 bi và 9 bi, đấu với máy hay mỗi người một máy qua mạng',
     duong: 'bida', khung: '.bida', mun: 'TDTD_BIDA', tieuDe: 'Bida lỗ — 8 bi, 9 bi', tenApp: 'Bida lỗ', trang: 'bida-lo/', nutCai: true },
-  { id: 'sao-angi', mau: '#ff8657', hinh: 'to', nhan: 'Hôm nay ăn gì: vòng quay món ăn hợp bữa, hợp trời; ở nhà thì quay mâm mặn, canh, rau',
-    duong: 'an-gi', khung: '.angi', mun: 'TDTD_ANGI', tieuDe: 'Hôm nay ăn gì?', tenApp: 'Ăn gì', trang: 'hom-nay-an-gi/', nutCai: true },
+  { id: 'sao-angi', mau: '#ff8657', hinh: 'to', nhan: 'Ăn gì: vòng quay món ăn hợp bữa, hợp trời; ở nhà thì quay mâm mặn, canh, rau',
+    duong: 'an-gi', khung: '.angi', mun: 'TDTD_ANGI', tieuDe: 'Ăn gì?', tenApp: 'Ăn gì', trang: 'an-gi/', nutCai: true, diaChiTrang: true },
 ];
 
 
@@ -326,7 +328,7 @@ function vaoTroDaCai() {
    origin + pathname, bỏ mất trò đang mở. Trò có trang riêng thì dùng trang riêng (/luyen-phat-am/), vì link mở
    bằng Chrome (intent://…#Intent;…) không mang được phần sau dấu # của mình. */
 function linkCaiApp() {
-  return saoDangMo ? linkTro(saoDangMo) : location.origin + location.pathname;
+  return saoDangMo ? linkTro(saoDangMo) : location.origin + GOC_APP;
 }
 
 /* Bấm Cài app: nút trên thanh trên cùng, nút trong trò, mục ? → Cài app vào điện thoại. Chrome có hộp cài thì cài luôn
@@ -437,9 +439,29 @@ let NUT_SAO = [], saoDangMo = null, dangTheoDoi = null;
 /* Mỗi trò một địa chỉ riêng, gửi cho ai là họ mở thẳng vào trò đó.
    Dùng phần sau dấu thăng nên không cần máy chủ định tuyến, và nút Back
    của điện thoại đóng trò lại thay vì thoát hẳn khỏi app. */
-const boDau = () => {
-  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+/* Thư mục của app (chỗ có index.html). index.html gắn thẻ <base> về đây ngay lúc mở trang, khi địa chỉ còn là trang
+   chủ, nên trò khai diaChiTrang đổi thanh địa chỉ sang trang riêng (/an-gi/) thì mọi đường dẫn tương đối (assets/…,
+   icons/…, data/…) vẫn tính từ thư mục app. */
+const GOC_APP = (() => { try { return new URL('.', document.baseURI).pathname; } catch (e) { return location.pathname.replace(/[^/]*$/, ''); } })();
+const troTheoTrang = () => {
+  const p = location.pathname;
+  return SAO.find(x => x.diaChiTrang && x.trang && (p === GOC_APP + x.trang || p + '/' === GOC_APP + x.trang)) || null;
 };
+function boDau() {
+  if (troTheoTrang()) history.replaceState(null, '', GOC_APP + location.search);
+  else if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+}
+/* Trò khai diaChiTrang: thanh địa chỉ là trang riêng của trò, không có dấu #. Người dùng: "bỏ # đi để khi copy link nó
+   ra chú thích" — phần sau # không bao giờ được gửi lên máy chủ, nên chép …/#an-gi từ thanh địa chỉ (hay bấm chia sẻ
+   của trình duyệt) thì Zalo, Facebook chỉ thấy trang chủ. Trang riêng thì có tên, chú thích, ảnh của trò; mở nó ra là
+   chuyển về /#an-gi rồi tới đây đổi lại thành /an-gi/. Mở từ ngôi sao thì thêm một bước (Back là đóng trò, như #); mở
+   bằng link (#an-gi từ trang riêng, link cũ, app mở với ?tro) thì thay luôn, khỏi thêm bước Back. */
+function datDiaChiTrang(s) {
+  const dich = GOC_APP + s.trang;
+  if (location.pathname === dich && !location.hash) return;
+  if (location.hash || location.pathname === dich) history.replaceState(null, '', dich + location.search);
+  else history.pushState(null, '', dich + location.search);
+}
 
 const TEN_GOC = document.title;
 
@@ -450,7 +472,8 @@ function moSao(s) {
   saoDangMo = s;
   m.mo();
   if (s.tieuDe) document.title = s.tieuDe;          // tên thẻ trình duyệt, và tên khi chia sẻ bằng nút của trình duyệt
-  if (location.hash.slice(1).split('/')[0] !== s.duong) location.hash = s.duong;   // #co-ba-nguoi/MÃ: phần sau / là của trò
+  if (s.diaChiTrang && s.trang) datDiaChiTrang(s);
+  else if (location.hash.slice(1).split('/')[0] !== s.duong) location.hash = s.duong;   // #co-ba-nguoi/MÃ: phần sau / là của trò
   themNutChepLink(s);
   themNutCaiApp(s);
   datKeKhai(s.duong);                                // cài app lúc này thì mở app là vào thẳng trò này
@@ -509,8 +532,7 @@ function themNutChepLink(s) {
    trò. Bản đầu chia sẻ /phat-am/ — Telegram đã lưu bản xem trước sai của địa chỉ đó (xem phat-am/index.html), nên
    đổi sang địa chỉ mới chưa bị lưu; /phat-am/ vẫn giữ, đã sửa, cho những link đã gửi đi. */
 function linkTro(s) {
-  return s.trang ? location.origin + location.pathname.replace(/[^/]*$/, '') + s.trang
-                 : location.origin + location.pathname + '#' + s.duong;
+  return location.origin + GOC_APP + (s.trang ? s.trang : '#' + s.duong);   // GOC_APP: đang ở /an-gi/ thì vẫn tính từ thư mục app
 }
 
 /* Nút "Cài app" trong trò có nutCai (mọi trò). Người vào từ link đi thẳng vào trò, không thấy thanh trên cùng của
@@ -551,7 +573,7 @@ function chepTay(chu, xong) {
 /* Địa chỉ đổi: do người dùng bấm Back, dán link mới, hay mở từ link gửi tới. */
 function theoDiaChi() {
   const d = location.hash.slice(1).split('/')[0];          // phần sau dấu / (mã phòng cờ) để trò tự đọc
-  const s = SAO.find(x => x.duong === d);
+  const s = troTheoTrang() || SAO.find(x => x.duong === d);
   if (s) { if (saoDangMo !== s) moSao(s); }
   else if (saoDangMo) dongSao(true);
 }

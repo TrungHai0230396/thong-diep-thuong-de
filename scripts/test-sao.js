@@ -227,10 +227,10 @@ console.log('\n— Chia sẻ link một trò —');
      tiếng Anh đừng hiện tên "Thông Điệp Của Thượng Đế". Chạy thẳng hai hàm linkTro, chepLink cắt ra từ app.js. */
   const cat = (ten) => { const a = nguon.indexOf(`function ${ten}(`); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
   const goi = [];
-  const chay = new Function('location', 'navigator', 'toast', 'chepTay', 'TEN_GOC',
+  const chay = new Function('location', 'navigator', 'toast', 'chepTay', 'TEN_GOC', 'GOC_APP',
     `${cat('linkTro')}\n${cat('chepLink')}\nreturn { linkTro, chepLink };`)(
     { origin: 'https://x.vercel.app', pathname: '/' }, { share: (o) => { goi.push(o); return Promise.resolve(); } },
-    () => {}, () => {}, 'Thông Điệp Của Thượng Đế');
+    () => {}, () => {}, 'Thông Điệp Của Thượng Đế', '/');
   const dsSao = [...khoiSao.matchAll(/\{ id: '([^']+)'[\s\S]*?\}/g)].map(m => {
     const k = m[0], lay = (t) => ((k.match(new RegExp(`${t}:\\s*'([^']*)'`)) || [])[1]);
     return { id: lay('id'), nhan: lay('nhan'), duong: lay('duong'), tieuDe: lay('tieuDe'), trang: lay('trang') };
@@ -257,7 +257,8 @@ console.log('\n— Chia sẻ link một trò —');
     /* Không thẻ meta làm mới trang: Telegram đi theo nó về trang chủ và hiện tên app (người dùng gửi ảnh).
        Tắt JavaScript thì còn link bấm tay. */
     ok(`${sao.trang}: người mở được chuyển vào #${sao.duong} bằng JavaScript; không có thẻ refresh cho trình đọc link đi theo`,
-       html.includes(`location.replace('../#${sao.duong}'`) && !/http-equiv/i.test(html) && html.includes(`href="../#${sao.duong}"`));
+       (html.includes(`location.replace('../#${sao.duong}'`) || html.includes(`location.replace('../' + location.search + '#${sao.duong}'`))
+       && !/http-equiv/i.test(html) && html.includes(`href="../#${sao.duong}"`));
     ok(`${sao.trang}: og:url trỏ đúng chính trang này`, html.includes(`property="og:url" content="https://thong-diep-thuong-de.vercel.app/${sao.trang}"`));
     const moTa = (html.match(/name="description" content="([^"]*)"/) || [])[1] || '';
     const ogMoTa = (html.match(/property="og:description" content="([^"]*)"/) || [])[1];
@@ -309,8 +310,8 @@ console.log('\n— Bảng cài app: link đưa ra Safari, Chrome giữ đúng tr
   /* Người dùng báo: mở link phát âm trong Zalo, bấm Mở bằng Safari thì Safari ra trang chính, mất phần tiếng Anh. */
   const cat = (ten) => { const a = nguon.indexOf(`function ${ten}(`); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
   const CA = require('../assets/caiapp.js');
-  const tao = (sao) => new Function('location', 'saoDangMo', `${cat('linkTro')}\n${cat('linkCaiApp')}\nreturn linkCaiApp();`)(
-    { origin: 'https://thong-diep-thuong-de.vercel.app', pathname: '/' }, sao);
+  const tao = (sao) => new Function('location', 'saoDangMo', 'GOC_APP', `${cat('linkTro')}\n${cat('linkCaiApp')}\nreturn linkCaiApp();`)(
+    { origin: 'https://thong-diep-thuong-de.vercel.app', pathname: '/' }, sao, '/');
   const pa = { duong: 'phat-am', trang: 'luyen-phat-am/' }, hd = { duong: 'tha-den' };
   ok('đang ở trò phát âm: link là trang riêng /luyen-phat-am/', tao(pa) === 'https://thong-diep-thuong-de.vercel.app/luyen-phat-am/', tao(pa));
   ok('Mở bằng Safari giữ nguyên trang phát âm', CA.linkSafari(tao(pa)) === 'x-safari-https://thong-diep-thuong-de.vercel.app/luyen-phat-am/');
@@ -541,6 +542,54 @@ console.log('\n— Cài app từ trò nào thì mở app là vào thẳng trò �
   ch.datKeKhai(null);
   ok('Chrome: manifest đổi (vào trò, về trang chủ) thì bỏ hộp cài đang cất — hộp đó Chrome đã bỏ; manifest không đổi thì giữ',
      ch.boHop === 2 && sauVao === 1 && vaoLai === 1, `${sauVao}, ${vaoLai}, ${ch.boHop}`);
+}
+
+console.log('\n— Trò khai diaChiTrang: thanh địa chỉ là trang riêng, không dấu # —');
+{
+  /* Người dùng: "bỏ # đi để khi copy link nó ra chú thích". Chép …/#an-gi từ thanh địa chỉ thì Zalo chỉ thấy trang chủ
+     (phần sau # không bao giờ gửi lên máy chủ); trò khai diaChiTrang thì lúc đang mở, thanh địa chỉ là chính trang riêng. */
+  const cat = (ten) => { const a = nguon.indexOf(`function ${ten}(`); return nguon.slice(a, nguon.indexOf('\n}\n', a) + 2); };
+  const catHang = (ten) => { const a = nguon.indexOf(`const ${ten} = `); return nguon.slice(a, nguon.indexOf('\n};\n', a) + 4); };
+  const dsTrang = [...khoiSao.matchAll(/\{ id: '([^']+)'[\s\S]*?\}/g)].map(m => m[0]).filter(k => /diaChiTrang: true/.test(k))
+    .map(k => ({ duong: (k.match(/duong: '([^']+)'/) || [])[1], trang: (k.match(/trang: '([^']+)'/) || [])[1] }));
+  ok('có trò khai diaChiTrang, trò nào cũng có trang riêng', dsTrang.length >= 1 && dsTrang.every(t => t.trang), dsTrang.map(t => t.duong).join(', '));
+  function trinh(url) {                            // trình duyệt giả: thanh địa chỉ và lịch sử
+    const u = new URL(url), loc = { pathname: u.pathname, search: u.search, hash: u.hash }, ls = { day: 0, thay: 0 };
+    const di = (d) => { const v = new URL(d, 'https://x.vercel.app' + loc.pathname); Object.assign(loc, { pathname: v.pathname, search: v.search, hash: v.hash }); };
+    const history = { pushState: (a, b, d) => { ls.day++; di(d); }, replaceState: (a, b, d) => { ls.thay++; di(d); } };
+    const SAO = dsTrang.map(t => ({ ...t, diaChiTrang: true })).concat([{ duong: 'ho-sen', trang: 'ho-sen/' }]);
+    const f = new Function('location', 'history', 'SAO', 'GOC_APP',
+      `${catHang('troTheoTrang')}\n${cat('boDau')}\n${cat('datDiaChiTrang')}\nreturn { troTheoTrang, boDau, datDiaChiTrang };`)(loc, history, SAO, '/');
+    return { ...f, loc, ls, SAO, diaChi: () => loc.pathname + loc.search + loc.hash };
+  }
+  const t = dsTrang[0], a = trinh('https://x.vercel.app/');
+  a.datDiaChiTrang(a.SAO[0]);
+  ok(`mở ${t.duong} từ ngôi sao: thanh địa chỉ là /${t.trang}, thêm một bước để Back là đóng trò`, a.diaChi() === '/' + t.trang && a.ls.day === 1 && a.ls.thay === 0, a.diaChi());
+  const thieuGach = (() => { a.loc.pathname = '/' + t.trang.replace(/\/$/, ''); const r = a.troTheoTrang(); a.loc.pathname = '/' + t.trang; return r; })();
+  ok('đang ở trang riêng thì nhận ra trò theo đường dẫn, cả khi thiếu dấu / cuối', a.troTheoTrang() === a.SAO[0] && thieuGach === a.SAO[0]);
+  a.boDau();
+  ok('đóng trò: về trang chủ, không còn đường dẫn của trò', a.diaChi() === '/' && a.troTheoTrang() === null, a.diaChi());
+  const b = trinh(`https://x.vercel.app/?tro=${t.duong}&ngay=2026-12-25#${t.duong}`);
+  b.datDiaChiTrang(b.SAO[0]);
+  ok('mở từ trang chia sẻ (về /#trò, giữ ?tro, ?ngay): thay địa chỉ luôn, không thêm bước Back',
+     b.diaChi() === `/${t.trang}?tro=${t.duong}&ngay=2026-12-25` && b.ls.day === 0 && b.ls.thay === 1, b.diaChi());
+  b.datDiaChiTrang(b.SAO[0]);
+  ok('gọi lại lúc địa chỉ đã đúng: không đụng tới lịch sử', b.ls.day === 0 && b.ls.thay === 1);
+  const c = trinh('https://x.vercel.app/#ho-sen');
+  ok('trò không khai diaChiTrang vẫn theo #; đóng thì bỏ #', c.troTheoTrang() === null && (c.boDau(), c.diaChi() === '/'));
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  const viTriBase = html.indexOf("createElement('base')"), viTriDuong = html.search(/(href|src)="(?!https?:)[^"#]/);
+  ok('index.html gắn thẻ <base> về thư mục app, trước mọi đường dẫn tương đối', viTriBase > 0 && viTriBase < viTriDuong
+     && html.includes("b.href = location.pathname.replace(/[^\\/]*$/, '')"), `${viTriBase} / ${viTriDuong}`);
+  ok('app.js tính GOC_APP theo thẻ <base>; link trò tính từ GOC_APP chứ không từ thanh địa chỉ',
+     /const GOC_APP = [^\n]*document\.baseURI/.test(nguon) && /function linkTro\(s\) \{\s*return location\.origin \+ GOC_APP/.test(nguon)
+     && /function linkCaiApp\(\) \{\s*return saoDangMo \? linkTro\(saoDangMo\) : location\.origin \+ GOC_APP;/.test(nguon));
+  const sw = fs.readFileSync(path.join(__dirname, '..', 'sw.js'), 'utf8');
+  ok('sw.js cất sẵn trang riêng của các trò đó: mất mạng mà tải lại ở trang riêng thì vẫn vào được app', dsTrang.every(x => sw.includes(`'${x.trang}'`)));
+  for (const x of dsTrang) {
+    const trang = fs.readFileSync(path.join(__dirname, '..', x.trang, 'index.html'), 'utf8');
+    ok(`${x.trang}: chuyển vào app giữ nguyên ?tro, ?ngay`, trang.includes(`location.replace('../' + location.search + '#${x.duong}')`));
+  }
 }
 
 console.log('\n— Mọi #id mà app.js cần phải có trong index.html —');

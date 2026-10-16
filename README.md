@@ -2135,9 +2135,9 @@ Người dùng: "Làm thêm 1 ngôi sao game bida lỗ đi, muti người chơi 
 
 **Còn phải xuất bản luật Firebase** (nhánh `bida`, `sanhbida` trong `firebase-rules.json`) thì mới chơi qua mạng được trên database thật; đấu với máy, tập một mình chạy được ngay.
 
-## Hôm nay ăn gì
+## Ăn gì
 
-Người dùng: "Tạo 1 ngôi sao ăn gì đi, kiểu như trong văn phòng, hay ở nhà đôi khi không biết ăn gì … bạn phân tích giúp thiết kế ra game đó nha". Ngôi sao hình cái tô với đôi đũa, màu cam ớt, mở thẳng bằng `#an-gi`, trang chia sẻ `hom-nay-an-gi/`. Dữ liệu món và mọi phép tính ở `assets/monan.js` (hàm thuần, chạy được bằng Node), giao diện ở `assets/angi.js`.
+Người dùng: "Tạo 1 ngôi sao ăn gì đi, kiểu như trong văn phòng, hay ở nhà đôi khi không biết ăn gì … bạn phân tích giúp thiết kế ra game đó nha". Ngôi sao hình cái tô với đôi đũa, màu cam ớt, tên **Ăn gì?**, địa chỉ `…/an-gi/` (không có dấu #, xem dưới). Bản đầu tên "Hôm nay ăn gì?", trang `hom-nay-an-gi/`; người dùng: "đổi tên lại là ăn gì đi cho nó chung chung". Trang cũ vẫn giữ, y hệt trang mới, cho những link đã gửi đi. Dữ liệu món và mọi phép tính ở `assets/monan.js` (hàm thuần, chạy được bằng Node), giao diện ở `assets/angi.js`.
 
 **Phân tích trước khi làm: người ta kẹt ở đâu**, và mỗi chỗ kẹt có một thứ đáp lại:
 
@@ -2178,7 +2178,14 @@ Vì thế trò là một **vòng quay** chứ không phải một danh sách: ai
 
 **Lưu đúng một mục** `tdtd.angi`: thẻ đang dùng, lựa chọn lọc, món của tôi, bật tắt tiếng, số người chơi nhóm lần trước, toạ độ làm tròn (chỉ khi bấm "Lấy thời tiết chỗ tôi"), và món đã chốt trong bảy ngày gần đây — mã món và ngày, mỗi món một lần, nhiều nhất 12 món, quá bảy ngày tự xoá, trong Lọc có nút Xoá. Không lưu lượt quay, không lưu phiếu của nhóm.
 
-**Ảnh xem trước** (`icons/og-an-gi-1.jpg`, vẽ trong `scripts/lam-trang-chia-se.py`): vòng quay tám món đúng màu, đúng cách lật chữ của app, kim chỉ vào bún bò Huế.
+**Ảnh xem trước** (`icons/og-an-gi-2.jpg`, vẽ trong `scripts/lam-trang-chia-se.py`): "Ăn gì? — vòng quay món ăn" bên trái, vòng quay tám món đúng màu, đúng cách lật chữ của app, kim chỉ vào bún bò Huế.
+
+**Địa chỉ không có dấu #.** Người dùng: "bỏ # đi để khi copy link nó ra chú thích". Mọi trò khác mở bằng `…/#trò`; phần sau # không bao giờ được gửi lên máy chủ, nên chép link từ thanh địa chỉ (hay bấm chia sẻ của trình duyệt) rồi dán vào Zalo, Facebook thì chỉ hiện trang chủ — nút 🔗 trong trò thì vốn đã đưa link trang riêng. Trò này khai `diaChiTrang: true` trong `SAO`: lúc đang mở, thanh địa chỉ là chính trang riêng `…/an-gi/` (có tên, chú thích, ảnh của trò), chép ở đâu cũng ra đúng chú thích.
+- Mở từ ngôi sao: `pushState` sang `/an-gi/`, Back là đóng trò như trước. Mở bằng link: trang `an-gi/` chuyển về `/?…#an-gi` (giữ `?tro`, `?ngay`) rồi app thay luôn thành `/an-gi/`, không thêm bước Back. Đóng trò thì về `/`. Back, Forward qua lại thì `theoDiaChi` nhận trò theo đường dẫn trước, theo # sau.
+- Thanh địa chỉ đổi thì đường dẫn tương đối (`assets/…`, `icons/…`, `data/…`, manifest) sẽ tính từ `/an-gi/` mà hỏng, nên `index.html` gắn thẻ `<base>` về thư mục app ngay lúc mở trang (lúc đó địa chỉ luôn là trang chủ), trước mọi thẻ có đường dẫn; `app.js` tính `GOC_APP` theo thẻ đó, link trò, link cài app tính từ `GOC_APP` chứ không từ thanh địa chỉ.
+- Tải lại ở `/an-gi/` thì máy chủ trả trang riêng, trang đó chuyển vào app như link gửi tới; `sw.js` cất sẵn `an-gi/` nên mất mạng mà tải lại vẫn vào được.
+- iPhone: "Thêm vào MH chính" lưu `/an-gi/?tro=an-gi`, mở ra đi qua trang riêng rồi vào thẳng trò. Android, máy tính: manifest `an-gi/app.webmanifest` như mọi trò.
+- Các trò khác chưa đổi (cờ, bida còn mã phòng sau dấu #); muốn trò nào cũng vậy thì thêm `diaChiTrang: true` và đường dẫn trang riêng của nó vào `SHELL` của `sw.js`.
 
 `scripts/test-angi.js`, 118 bài: dữ liệu (đủ cột, đúng khuôn, mã không trùng, mỗi bữa đủ món và đủ món chay, mỗi loại món nhà đủ món chay và món nấu nhanh, cặp kinh điển trỏ đúng món); hoàn cảnh (ranh giới bữa; mùng 1 và rằm đối chiếu lịch âm của Xem ngày — 10/10/2026, 24/10/2026, Tết 2026, mùng 1 tháng 5 nhuận 2028; đọc thời tiết từng nhóm mã WMO; miền theo 12 toạ độ trong và ngoài nước; né món qua ranh giới tháng, năm); chọn món (600 bộ lọc ngẫu nhiên đều đúng lọc; đa dạng; phở bò lên 32% số vòng sáng, bún thang 9%; trời mưa thêm 0,9 món nóng mỗi vòng; nới lọc đúng thứ tự; không nới chay); vòng quay (lời giải đóng khớp tích phân từng bước 10 µs; giải ngược sai dưới 1e-8; 40.000 lượt quay tám món đều, mỗi món 12,5% ± 0,4%; vòng của nhóm 1:4:1:2 ra đúng theo diện tích; không bao giờ dừng sát mép; vuốt y hệt nhau 20.000 lần vẫn ra đủ tám món); cả nhóm; mâm cơm (2000 mâm đúng loại, không trùng rau, đúng chay, nhanh; khoá thì giữ, không khoá thì đổi; khoá cá kho tộ thì canh chua cá ra gấp đôi); giao diện trên DOM giả (quay tới kết quả, chốt rồi lần sau né, bỏ, đổi, lọc, quay món chay ngày rằm, cả nhóm ba người, mâm cơm có hoạt cảnh, đóng giữa lúc quay, kho lưu hỏng hay bị chặn, xin thời tiết, mất mạng). Chạy được cả Node 16. Thử phá 17 chỗ (bỏ giới hạn ba món một nhóm, bỏ giảm trọng số cùng nhóm, kim dừng sát mép, rút món đều tay, lọc chay hỏng, né món lệch một ngày, mưa phùn không tính là mưa, canh với rau trùng rau, bỏ quyền gạch, mưa không ưu tiên món nóng, lời giải đóng sai dấu, chốt không ghi ngày, vòng không né món mới chốt, khoá không giữ, không chặn gạch quá hai món, cặp kinh điển không ưu tiên, bỏ soi kiểu nội dung khi mất mạng): bắt 16; chỗ cuối không đổi kết quả vì đọc JSON từ trang HTML cũng hỏng như nhau — vẫn giữ để phòng hờ, như phần dự báo mưa.
 
@@ -2256,9 +2263,9 @@ scripts/test-phong.js      96 kiểm thử chơi qua mạng: ba máy chung một
 assets/bida.js             Bida lỗ: bàn 9 feet theo WPA, vật lý trượt–lăn–xoáy (băng Han 2005, chùm bi va mềm Hertz), luật 8 bi, 9 bi, máy đánh ở luồng riêng, giao diện, chơi qua mạng
 scripts/test-bida.js       71 kiểm thử Bida lỗ: số đo WPA, vật lý, lỗ, cú phá, đơn định, mã hoá, luật 8 bi, 9 bi, máy đánh, giao diện
 scripts/test-bida-phong.js 43 kiểm thử Bida lỗ qua mạng: ba máy chung một phòng trên máy chủ giả, máy chơi thay, người vắng, phòng mở
-assets/monan.js            Hôm nay ăn gì: 95 món ăn ngoài, 49 món nấu ở nhà, chọn tám món theo hoàn cảnh, vòng quay (ma sát có lời giải đóng), mâm cơm, gộp phiếu nhóm — hàm thuần
-assets/angi.js             giao diện ngôi sao Hôm nay ăn gì: vòng quay SVG, mâm cơm như máy xèng, cả nhóm chuyền máy, lọc, đi chợ
-scripts/test-angi.js       118 kiểm thử Hôm nay ăn gì: dữ liệu, hoàn cảnh, chọn món, vòng quay công bằng, cả nhóm, mâm cơm, giao diện
+assets/monan.js            Ăn gì: 95 món ăn ngoài, 49 món nấu ở nhà, chọn tám món theo hoàn cảnh, vòng quay (ma sát có lời giải đóng), mâm cơm, gộp phiếu nhóm — hàm thuần
+assets/angi.js             giao diện ngôi sao Ăn gì: vòng quay SVG, mâm cơm như máy xèng, cả nhóm chuyền máy, lọc, đi chợ
+scripts/test-angi.js       118 kiểm thử Ăn gì: dữ liệu, hoàn cảnh, chọn món, vòng quay công bằng, cả nhóm, mâm cơm, giao diện
 scripts/test-sokoban.js    60 kiểm thử Đẩy thùng sao: luật, bộ giải đối chiếu dò từng bước, bộ tạo, cả 100 màn, giao diện
 assets/nghe.js             so khớp câu nói với phương án máy nghe ra: hàm thuần, trò phát âm dùng
 scripts/test-nghe.js       17 kiểm thử bộ so khớp, chạy trên scripts/cau-mau-nghe.json
@@ -2295,7 +2302,7 @@ node scripts/test-coba.js        # chạy 94 kiểm thử Cờ vua ba người
 node scripts/test-phong.js       # chạy 96 kiểm thử chơi qua mạng (ba máy, máy chủ giả)
 node scripts/test-bida.js        # chạy 71 kiểm thử Bida lỗ
 node scripts/test-bida-phong.js  # chạy 43 kiểm thử Bida lỗ qua mạng (ba máy, máy chủ giả; Node 18 trở lên)
-node scripts/test-angi.js        # chạy 118 kiểm thử Hôm nay ăn gì (chạy được cả Node 16)
+node scripts/test-angi.js        # chạy 118 kiểm thử Ăn gì (chạy được cả Node 16)
 node scripts/test-maqr.js        # chạy 12 kiểm thử mã QR
 node scripts/test-sokoban.js     # chạy 60 kiểm thử Đẩy thùng sao (giải lại cả 100 màn, chừng nửa phút)
 node scripts/tao-man-sokoban.js tao ung-vien.jsonl 7 [4,5]   # tạo màn liên tục, 7 luồng, ghi mỗi màn một dòng (tuỳ chọn: chỉ số thùng này)

@@ -818,7 +818,7 @@ def ve_co_ba(v, tro):
         v.chu((x, y - co * .08), kt, ft(co * 1.02), than, 'mm', vien=1.4, mau_vien=vien)
 
 
-# vòng quay của Hôm nay ăn gì, đúng như assets/angi.js vẽ: tám miếng màu MAU, chữ chạy dọc bán kính, chốt đèn ở ranh
+# vòng quay của Ăn gì, đúng như assets/angi.js vẽ: tám miếng màu MAU, chữ chạy dọc bán kính, chốt đèn ở ranh
 # giới, kim gảy ở đỉnh chỉ vào miếng đầu, nút QUAY ở giữa che cỡ 30% bán kính
 MAU_AN_GI = ['#f2836b', '#f4c35e', '#9fd38a', '#f3e3c0', '#ea8fb0', '#8fd3c8', '#f6a65a', '#c3b1ea']
 MON_AN_GI = ['Bún bò Huế', 'Cơm tấm', 'Phở bò', 'Bánh mì', 'Bún chả', 'Mì Quảng', 'Hủ tiếu', 'Gỏi cuốn']
@@ -952,12 +952,14 @@ TRO = [
          alt='Bida lỗ: tam giác 15 bi trên bàn nỉ xanh, bi chủ và cơ sắp phá', mo='Mở Bida lỗ',
          # link mời vào phòng (…/bida-lo/?phong=MÃ) thì chuyển thẳng vào phòng đó
          chuyen="var m = /[?&]phong=([A-HJ-NP-Z2-9]{6})/.exec(location.search); location.replace('../#bida' + (m ? '/' + m[1] : ''));"),
-    dict(duong='an-gi', trang='hom-nay-an-gi/', so=1, mau='#ff8657', ve=ve_an_gi,
-         tieuDe='Hôm nay ăn gì?', tieu=('Hôm nay', 'ăn gì?'),
-         dong=['Vòng quay món hợp bữa, hợp trời', 'Ở nhà: quay mâm mặn, canh, rau', 'Cả nhóm cùng chọn, vòng quay quyết'],
+    dict(duong='an-gi', trang='an-gi/', so=2, mau='#ff8657', ve=ve_an_gi,
+         tieuDe='Ăn gì?', tieu=('Ăn gì?', 'vòng quay món ăn'),
+         dong=['Tám món hợp bữa, hợp trời, túi tiền', 'Ở nhà: quay mâm mặn, canh, rau', 'Cả nhóm cùng chọn, vòng quay quyết'],
          moTa='Trưa nay ăn gì, tối nay nấu gì? Quay một vòng tám món hợp bữa, hợp trời, hợp túi tiền. Ở nhà thì quay đủ mâm '
               'mặn, canh, rau kèm danh sách đi chợ. Đi đông thì cả nhóm cùng chọn, không ai phải quyết.',
-         alt='Hôm nay ăn gì: vòng quay tám món, kim chỉ vào bún bò Huế', mo='Mở vòng quay Hôm nay ăn gì'),
+         alt='Ăn gì: vòng quay tám món, kim chỉ vào bún bò Huế', mo='Mở vòng quay Ăn gì',
+         # trò này để thanh địa chỉ là chính trang riêng (diaChiTrang trong app.js): giữ ?tro, ?ngay khi chuyển vào app
+         chuyen="location.replace('../' + location.search + '#an-gi');"),
 ]
 
 

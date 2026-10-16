@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!-- Thẻ <base> về thư mục của app, gắn lúc mở trang (khi đó địa chỉ luôn là trang chủ): trò khai diaChiTrang đổi thanh
+     địa chỉ sang trang riêng của trò (/an-gi/) cho chép link ra đúng chú thích, mà assets/…, icons/…, data/… vẫn phải
+     tính từ đây. Đặt trước mọi thẻ có đường dẫn. Xem datDiaChiTrang trong assets/app.js. -->
+<script>(function () {
+  var b = document.createElement('base'); b.href = location.pathname.replace(/[^\/]*$/, ''); document.head.appendChild(b);
+})();</script>
 <title>Thông Điệp Của Thượng Đế</title>
 <meta name="description" content="Mỗi ngày một thông điệp. Nhận rồi thì để nó đi.">
 <meta name="theme-color" content="#0d0b1a">

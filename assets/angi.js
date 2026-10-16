@@ -1,4 +1,4 @@
-/* Hôm nay ăn gì — giao diện ngôi sao. Dữ liệu món và mọi phép tính (chọn món, vòng quay, mâm cơm, gộp phiếu nhóm)
+/* Ăn gì — giao diện ngôi sao. Dữ liệu món và mọi phép tính (chọn món, vòng quay, mâm cơm, gộp phiếu nhóm)
    nằm ở assets/monan.js, hàm thuần có bài kiểm (scripts/test-angi.js).
 
    Hai thẻ:
@@ -485,12 +485,13 @@ function phaoGiay() {
 /* ---------- chia sẻ ---------- */
 
 function linkTrang() {
-  try { return location.origin + location.pathname.replace(/[^/]*$/, '') + 'hom-nay-an-gi/'; } catch (e) { return ''; }
+  /* tính từ thư mục app (thẻ <base>), không từ thanh địa chỉ: lúc này thanh địa chỉ đang là chính /an-gi/ */
+  try { return new URL('an-gi/', document.baseURI || location.href).href; } catch (e) { return ''; }
 }
 /* Link CHỈ nằm ở url, chữ đi kèm không chứa link (Zalo, Tin nhắn dán ra hai link liền nhau — xem README). */
 function chiaSe(chu) {
   const url = linkTrang();
-  if (coNav() && navigator.share) { navigator.share({ title: 'Hôm nay ăn gì?', text: chu, url }).catch(() => {}); return; }
+  if (coNav() && navigator.share) { navigator.share({ title: 'Ăn gì?', text: chu, url }).catch(() => {}); return; }
   chep(chu + (url ? '\n' + url : ''), 'Đã chép, dán vào nhóm chat nhé');
 }
 function chep(chu, loi) {
@@ -945,7 +946,7 @@ function dungKhung() {
     <button class="ag-dong" type="button" aria-label="Đóng">✕</button>
     <button class="ag-tieng" type="button" aria-label="Tắt tiếng"></button>
     <div class="ag-trong">
-      <h2 class="ag-tieude">Hôm nay ăn gì?</h2>
+      <h2 class="ag-tieude">Ăn gì?</h2>
       <div class="ag-the" role="tablist" aria-label="Ăn ở đâu">
         <button type="button" role="tab" data-tab="ngoai">Ăn ngoài · gọi về</button>
         <button type="button" role="tab" data-tab="nha">Nấu ở nhà</button>
