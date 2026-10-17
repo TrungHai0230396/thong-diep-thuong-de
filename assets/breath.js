@@ -171,13 +171,49 @@ function ketThuc() {
   tam.querySelector('.ht-vong').textContent = `đã xong ${kieu.toiDaVong} vòng`;
 }
 
-function vong(t) {
+/* Pin, giật ("sao mở app nhanh hết pin", "sửa hết lag"): vẽ lại cả màn mỗi khung hình — máy 120 Hz là 120 lần mỗi
+   giây — kể cả lúc không có gì đổi là thứ ngốn pin nhất. Đang chạm, vừa chạm hay bấm phím trong 3 giây, hay có gì
+   đang chạy thì vẽ tối đa 60 lần mỗi giây; đang thở thì 30 lần (vòng tròn nở, co chậm); chưa bấm thở thì 4 lần. */
+const NGHI_MS = 3000, NHIP_TROI = 33, NHIP_NGHI = 250;
+let veLuc = -1e9, thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0, nhipVe = 15, daNghe = false;
+function chayDuoc() { return !!(tam && tam.classList.contains('hien')); }
+function danhThuc(e) {
+  if (e && e.type === 'pointerdown') dangCham = true;
+  else if (e && (e.type === 'pointerup' || e.type === 'pointercancel')) dangCham = false;
+  moiThuc = true; nhipVe = 15;
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
+  if (!raf && chayDuoc()) raf = requestAnimationFrame(vong);
+}
+function ngheThuc() {                                   // gắn một lần, lúc khung đã dựng
+  if (daNghe || !tam) return;
+  daNghe = true;
+  ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'wheel'].forEach(k => tam.addEventListener(k, danhThuc, true));
+  addEventListener('keydown', danhThuc, true); addEventListener('resize', danhThuc);
+}
+function boKhung(t) {                                   // chưa tới nhịp vẽ: hẹn khung sau, khỏi vẽ
+  if (t - veLuc >= nhipVe - 1) { veLuc = t; return false; }
   raf = requestAnimationFrame(vong);
+  return true;
+}
+function henVe(t, muc) {                                // muc 2: có gì đang chạy; 1: cảnh trôi chậm; 0: đứng yên
+  if (muc === 2 || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
+  if (t - thucLuc < NGHI_MS) nhipVe = 15;
+  else if (muc === 1) nhipVe = NHIP_TROI;
+  else {
+    if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && chayDuoc()) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+    return;
+  }
+  raf = requestAnimationFrame(vong);
+}
+function vong(t) {
+  raf = 0;
+  if (!tam || !tam.classList.contains('hien') || boKhung(t)) return;
   buoc(t);
+  henVe(t, chay ? 1 : 0);
 }
 
 function buoc(t) {
-  const dt = Math.max(0, Math.min(34, t - tTruoc)); tTruoc = t;
+  const dt = Math.max(0, Math.min(60, t - tTruoc)); tTruoc = t;   // 60: vẽ 30 khung mỗi giây mà nhịp thở vẫn đúng giây
   if (chay) troi += dt;
 
   const R = Math.min(W, H) * .30, cx = W / 2, cy = H / 2;
@@ -242,12 +278,13 @@ function mo() {
   doCo();
   veChon();
   tTruoc = performance.now();
-  if (!raf) raf = requestAnimationFrame(vong);
+  ngheThuc(); danhThuc();
 }
 
 function dong() {
   chay = false;
   if (raf) { cancelAnimationFrame(raf); raf = null; }
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
   if (tam) tam.classList.remove('hien');
   document.body.classList.remove('khoa-cuon');
 }

@@ -129,7 +129,7 @@ function batDau() {
   tam.querySelector('.game-het').hidden = true;
   veHud();
   tTruoc = performance.now();
-  if (!raf) raf = requestAnimationFrame(vong);
+  ngheThuc(); danhThuc();
 }
 
 function het() {
@@ -148,12 +148,13 @@ function mo() {
   tam.querySelector('.game-mo').hidden = false;
   tam.querySelector('.game-het').hidden = true;
   veHud();
-  if (!raf) raf = requestAnimationFrame(vong);
+  ngheThuc(); danhThuc();
 }
 
 function dong() {
   dangChay = false;
   if (raf) { cancelAnimationFrame(raf); raf = null; }
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
   if (tam) tam.classList.remove('hien');
   document.body.classList.remove('khoa-cuon');
 }
@@ -347,9 +348,44 @@ function veDao() {
 }
 
 /* ---------- vòng lặp ---------- */
-function vong(t) {
+/* Pin, giật ("sao mở app nhanh hết pin", "sửa hết lag"): vẽ lại cả màn mỗi khung hình — máy 120 Hz là 120 lần mỗi
+   giây — kể cả lúc không có gì đổi là thứ ngốn pin nhất. Đang chạm, vừa chạm hay bấm phím trong 3 giây, hay có gì
+   đang chạy thì vẽ tối đa 60 lần mỗi giây; màn chờ, màn hết ván thì 4 lần. */
+const NGHI_MS = 3000, NHIP_NGHI = 250;
+let veLuc = -1e9, thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0, nhipVe = 15, daNghe = false;
+function chayDuoc() { return !!(tam && tam.classList.contains('hien')); }
+function danhThuc(e) {
+  if (e && e.type === 'pointerdown') dangCham = true;
+  else if (e && (e.type === 'pointerup' || e.type === 'pointercancel')) dangCham = false;
+  moiThuc = true; nhipVe = 15;
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
+  if (!raf && chayDuoc()) raf = requestAnimationFrame(vong);
+}
+function ngheThuc() {                                   // gắn một lần, lúc khung đã dựng
+  if (daNghe || !tam) return;
+  daNghe = true;
+  ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'wheel'].forEach(k => tam.addEventListener(k, danhThuc, true));
+  addEventListener('keydown', danhThuc, true); addEventListener('resize', danhThuc);
+}
+function boKhung(t) {                                   // chưa tới nhịp vẽ: hẹn khung sau, khỏi vẽ
+  if (t - veLuc >= nhipVe - 1) { veLuc = t; return false; }
   raf = requestAnimationFrame(vong);
+  return true;
+}
+function henVe(t, muc) {                                // muc 2: có gì đang chạy; 0: đứng yên
+  if (muc === 2 || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
+  if (t - thucLuc < NGHI_MS) nhipVe = 15;
+  else {
+    if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && chayDuoc()) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+    return;
+  }
+  raf = requestAnimationFrame(vong);
+}
+function vong(t) {
+  raf = 0;
+  if (!tam || !tam.classList.contains('hien') || boKhung(t)) return;
   buoc(t);
+  henVe(t, (dangChay && !ketThuc) || trai.length || hoa.length || nua.length || hat.length || vet.length || rung > 0 || chop > 0 ? 2 : 0);
 }
 
 function buoc(t) {

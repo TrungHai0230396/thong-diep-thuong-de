@@ -190,7 +190,7 @@ const app = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.js'), 'utf
 ok('không phải ngôi sao riêng (người dùng muốn nó nằm trong phần xem Mặt Trăng, Mặt Trời)', !/TDTD_TOANCANH/.test(app));
 ok('nút "Hiệu ứng toàn cảnh" chỉ hiện khi đang Nhìn từ vũ trụ', /class="td-toancanh" type="button" hidden>Hiệu ứng toàn cảnh</.test(ns) &&
    /q\('\.td-toancanh'\)\.hidden = !bat \|\| !self\.TDTD_TOANCANH;/.test(ns));
-ok('mở hành trình thì dừng vòng vẽ của Trời đêm, đóng thì chạy lại', /function moToanCanh\(\) \{[\s\S]{0,200}cancelAnimationFrame\(raf\); raf = null;[\s\S]{0,200}khiDong: \(\) => \{[\s\S]{0,120}requestAnimationFrame\(vong\)/.test(ns));
+ok('mở hành trình thì dừng vòng vẽ của Trời đêm, đóng thì chạy lại', /function moToanCanh\(\) \{[\s\S]{0,200}cancelAnimationFrame\(raf\); raf = null;[\s\S]{0,200}khiDong: \(\) => \{[\s\S]{0,120}(requestAnimationFrame\(vong\)|danhThuc\(\))/.test(ns));
 ok('đóng Trời đêm thì đóng luôn hành trình', /function dong\(\) \{\s*if \(self\.TDTD_TOANCANH && self\.TDTD_TOANCANH\.dangMo\(\)\) self\.TDTD_TOANCANH\.dong\(\);/.test(ns));
 const css = fs.readFileSync(path.join(__dirname, '..', 'assets', 'app.css'), 'utf8');
 const z = (lop) => +((css.match(new RegExp(`\\.${lop}\\{[^}]*z-index:(\\d+)`)) || [])[1] || 0);

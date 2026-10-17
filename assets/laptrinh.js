@@ -436,30 +436,40 @@ function viTriRobot(t) {
   }
   return { x: b.x0, y: b.y0, z: zMat(b.h0) + Math.sin(p * Math.PI) * .08, hg: goc_(b.huong), den: b.ok ? Math.sin(p * Math.PI) : 0, sai: b.ok ? 0 : Math.sin(p * Math.PI) };
 }
-/* Pin ("Chơi game á dễ nhanh hết pin, vd bida, đẩy thùng"): vẽ lại cả khung 60 lần mỗi giây trong lúc bàn đứng yên là
-   thứ ngốn pin nhất. Có gì đang chạy, đang chạm, hay vừa chạm, bấm phím trong 3 giây thì vẽ đủ nhịp; còn lại chỉ vẽ 4
-   lần mỗi giây — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư giây. */
+/* Pin, giật ("sao mở app nhanh hết pin", "sửa hết lag"): vẽ lại cả màn mỗi khung hình — máy 120 Hz là 120 lần mỗi
+   giây — kể cả lúc không có gì đổi là thứ ngốn pin nhất. Đang chạm, vừa chạm hay bấm phím trong 3 giây, hay có gì
+   đang chạy thì vẽ tối đa 60 lần mỗi giây; bàn đứng yên thì 4 lần — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư giây. */
 const NGHI_MS = 3000, NHIP_NGHI = 250;
-let thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0;
+let veLuc = -1e9, thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0, nhipVe = 15;
+function chayDuoc() { return !!(tam && tam.classList.contains('hien')); }
 function danhThuc(e) {
   if (e && e.type === 'pointerdown') dangCham = true;
   else if (e && (e.type === 'pointerup' || e.type === 'pointercancel')) dangCham = false;
-  moiThuc = true;
+  moiThuc = true; nhipVe = 15;
   if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
-  if (!raf && tam && tam.classList.contains('hien')) raf = requestAnimationFrame(vong);
+  if (!raf && chayDuoc()) raf = requestAnimationFrame(vong);
 }
-function henVe(t, banRon) {
-  if (banRon || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
-  if (t - thucLuc < NGHI_MS) raf = requestAnimationFrame(vong);
-  else if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && tam && tam.classList.contains('hien')) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+function boKhung(t) {                                   // chưa tới nhịp vẽ: hẹn khung sau, khỏi vẽ
+  if (t - veLuc >= nhipVe - 1) { veLuc = t; return false; }
+  raf = requestAnimationFrame(vong);
+  return true;
+}
+function henVe(t, muc) {                                // muc 2: có gì đang chạy; 0: đứng yên
+  if (muc === 2 || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
+  if (t - thucLuc < NGHI_MS) nhipVe = 15;
+  else {
+    if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && chayDuoc()) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+    return;
+  }
+  raf = requestAnimationFrame(vong);
 }
 function vong(t) {
   raf = 0;
-  if (!tam || !tam.classList.contains('hien')) return;
+  if (!tam || !tam.classList.contains('hien') || boKhung(t)) return;
   if (Math.abs(gocDen - goc) > .001) goc += (gocDen - goc) * .18; else goc = gocDen;
   if (dangChay && ve) buocTiep(t);
   veCanh(t);
-  henVe(t, dangChay || goc !== gocDen);
+  henVe(t, dangChay || goc !== gocDen ? 2 : 0);
 }
 function datLai() {                                                       // robot về chỗ xuất phát, sao tắt hết
   ban = banBai(bai);

@@ -2512,6 +2512,17 @@ Người dùng: "sao mở app nhanh hết pin điện thoại vậy", "Chơi gam
   nhịp; còn lại 4 lần mỗi giây — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư
   giây; chỗ bắt đầu cú đánh, máy ngắm gọi `danhThuc` nên không trễ. Đo trên trình duyệt: mở trò ~60 khung/giây, để
   yên 3 giây còn 4, chạm là về lại 60.
+- Người dùng: "làm game đánh cờ vua luôn… sửa hết lag á chứ ko phải làm mới". Cùng cách đó cho mọi trò còn vẽ
+  liên tục, và trần 60 khung mỗi giây (máy 120 Hz trước vẽ 120 lần): **Cờ vua ba người** đứng yên 4 lần mỗi giây, vua
+  đang bị chiếu hay chờ chọn tướng (vầng sáng nhịp nhịp) 30 lần; **Hộp thở** đang thở 30 lần, chưa thở 4 lần;
+  **Mùa Chín** màn chờ 4 lần; **Nối sao** lúc tự nối thì đủ nhịp, xong rồi 15 lần (sao lấp lánh rất chậm); **Hoa
+  đăng**, **Hồ sen**, **Bầu trời đêm** 30 lần (đều tính chuyển động theo thời gian thật nên vẽ thưa vẫn đúng tốc độ;
+  hoa đăng trước thả đèn nền theo số khung, giờ theo thời gian; hồ đang chạy bù thời gian, trời đang xoay theo cảm
+  biến thì đủ nhịp); **Thiền luân xa**, **Nhạc ngủ**, **khẩu hình** của Phát âm 30 lần. Bida bỏ độ nét 2,5 lần, còn
+  2 như mọi trò (bớt 36% điểm ảnh mỗi khung trên iPhone). Vòng quay Ăn gì, Buôn lậu, Toàn cảnh tự dừng khi xong nên
+  để nguyên. Đo trên trình duyệt (rAF giả 60 Hz, đếm khung có vẽ): đứng yên 7 khung trong 2 giây ở cờ ba người, Mùa
+  Chín, hộp thở, bida, đẩy thùng, lập trình; 56 ở hoa đăng, hồ sen, trời đêm; nối sao 14 mỗi giây sau khi nối xong;
+  chạm là về 60.
 
 ## Cấu trúc
 

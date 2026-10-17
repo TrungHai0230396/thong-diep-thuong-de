@@ -840,6 +840,7 @@ function veDuongDo(duong, t) {                                       // báo ngu
   ctx.restore();
 }
 function veCanh(t) {
+  coNhip = false;
   if (!ctx) return;
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   veNen();
@@ -861,6 +862,7 @@ function veCanh(t) {
   if (chon >= 0) toO(chon, chonXem ? 'rgba(205,150,255,.42)' : 'rgba(120,200,255,.45)');
   const nguoiXem = nhaNhin();
   const bao = nguoiXem >= 0 && the.song[nguoiXem] && the.thang < 0 ? L.aiChieu(the, nguoiXem) : [];
+  coNhip = bao.length > 0 || !!(the.cho && the.cho.length);
   if (bao.length) {
     const c = the.vua[nguoiXem], [x, y] = tamO(c), r = coO(c) * (1.1 + .15 * Math.sin(t / 160));
     const g = ctx.createRadialGradient(x, y, 0, x, y, r * 1.4);
@@ -2341,9 +2343,43 @@ function bam(e) {
   if (q('.cb-xemtiep')) { van.xemTiep = true; tatTin(); denLuot(); return; }
   if ((n = q('[data-phong]'))) { const m = Object.assign({}, phongCho, { phong: +n.dataset.phong }); phongCho = null; tatTin(); diNuoc(m, van.the.luot); return; }
 }
+/* Pin, giật ("sao mở app nhanh hết pin", "sửa hết lag"): vẽ lại cả màn mỗi khung hình — máy 120 Hz là 120 lần mỗi
+   giây — kể cả lúc không có gì đổi là thứ ngốn pin nhất. Đang chạm, vừa chạm hay bấm phím trong 3 giây, hay có gì
+   đang chạy thì vẽ tối đa 60 lần mỗi giây; bàn đứng yên thì 4 lần — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư giây; vua đang bị chiếu hay đang chờ chọn tướng (vầng sáng nhịp nhịp) thì 30 lần. */
+const NGHI_MS = 3000, NHIP_TROI = 33, NHIP_NGHI = 250;
+let veLuc = -1e9, thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0, nhipVe = 15, daNghe = false, coNhip = false;
+function chayDuoc() { return !!(tam && tam.classList.contains('hien')); }
+function danhThuc(e) {
+  if (e && e.type === 'pointerdown') dangCham = true;
+  else if (e && (e.type === 'pointerup' || e.type === 'pointercancel')) dangCham = false;
+  moiThuc = true; nhipVe = 15;
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
+  if (!raf && chayDuoc()) raf = requestAnimationFrame(vong);
+}
+function ngheThuc() {                                   // gắn một lần, lúc khung đã dựng
+  if (daNghe || !tam) return;
+  daNghe = true;
+  ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'wheel'].forEach(k => tam.addEventListener(k, danhThuc, true));
+  addEventListener('keydown', danhThuc, true); addEventListener('resize', danhThuc);
+}
+function boKhung(t) {                                   // chưa tới nhịp vẽ: hẹn khung sau, khỏi vẽ
+  if (t - veLuc >= nhipVe - 1) { veLuc = t; return false; }
+  raf = requestAnimationFrame(vong);
+  return true;
+}
+function henVe(t, muc) {                                // muc 2: có gì đang chạy; 1: cảnh trôi chậm; 0: đứng yên
+  if (muc === 2 || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
+  if (t - thucLuc < NGHI_MS) nhipVe = 15;
+  else if (muc === 1) nhipVe = NHIP_TROI;
+  else {
+    if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && chayDuoc()) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+    return;
+  }
+  raf = requestAnimationFrame(vong);
+}
 function vong(t) {
   raf = 0;
-  if (!tam || !tam.classList.contains('hien')) return;
+  if (!tam || !tam.classList.contains('hien') || boKhung(t)) return;
   if (Math.abs(xoayDen - xoay) > .002) xoay += (xoayDen - xoay) * .12; else xoay = xoayDen;
   veCanh(t);
   /* bạn bị loại khi đấu với máy: hỏi xem tiếp hay ván mới (một lần) */
@@ -2352,7 +2388,7 @@ function vong(t) {
     moTin(`<p class="cb-tin-nho">Bạn bị loại</p><h2>Vua của bạn đã mất</h2><p>${van.the.tq ? 'Cả đạo quân của bạn về tay người giết.' : 'Quân của bạn hoá đá.'} Hai máy vẫn đấu tiếp tới khi còn một vua.</p>
       <button type="button" class="cb-xemtiep">Xem hai máy đấu tiếp</button><button type="button" class="cb-phu cb-lai">Ván mới</button>`);
   }
-  raf = requestAnimationFrame(vong);
+  henVe(t, hoat || demo || xem || xoay !== xoayDen || (van && van.loe && t - van.loe.t0 < 1400) ? 2 : coNhip ? 1 : 0);
 }
 function mo() {
   dungKhung();
@@ -2370,13 +2406,14 @@ function mo() {
     if (!docLuu().h) { ghiLuu({ h: 1 }); moHuongDan(); }
     else moCaiDat();
   }
-  if (!raf) raf = requestAnimationFrame(vong);
+  ngheThuc(); danhThuc();
 }
 function dong() {
   tatXem();
   tatTimPhong();
   dungLuong();
   if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
   if (am && am.state === 'running') am.suspend();
   if (tam) tam.classList.remove('hien');
   document.body.classList.remove('khoa-cuon');

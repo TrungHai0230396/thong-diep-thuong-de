@@ -781,6 +781,7 @@ function chayHinh(svgs, khung) {
   let t0 = null, pha = 0, truoc = 0;
   const buoc = (nay) => {
     if (!svg.isConnected) { quay = null; return; }
+    if (nay - truoc < 32) { quay = requestAnimationFrame(buoc); return; }   // 30 khung mỗi giây là đủ; máy 120 Hz khỏi vẽ 120 lần (pin, "sửa hết lag")
     if (t0 === null) t0 = nay;
     const dt = Math.min(.05, (nay - truoc) / 1000 || 0); truoc = nay;
     pha += dt * .8;

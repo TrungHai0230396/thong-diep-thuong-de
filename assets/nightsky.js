@@ -1048,8 +1048,47 @@ const huongChu = (h) => TAM_HUONG[Math.round(((h % 360) + 360) % 360 / 45) % 8].
 
 /* ---------- vòng chạy ---------- */
 
-function vong(t) {
+/* Pin, giật ("sao mở app nhanh hết pin", "sửa hết lag"): vẽ lại cả màn mỗi khung hình — máy 120 Hz là 120 lần mỗi
+   giây — kể cả lúc không có gì đổi là thứ ngốn pin nhất. Đang chạm, vừa chạm hay bấm phím trong 3 giây, hay có gì
+   đang chạy thì vẽ tối đa 60 lần mỗi giây; còn lại 30 lần — trời quay chậm, sao lấp lánh. Đang xoay theo máy (cảm biến) là đang chạy. */
+const NGHI_MS = 3000, NHIP_TROI = 33, NHIP_NGHI = 250;
+let veLuc = -1e9, thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0, nhipVe = 15, daNghe = false, tcMo = false;
+function chayDuoc() { return !tcMo && !!(tam && tam.classList.contains('hien')); }
+function danhThuc(e) {
+  if (e && e.type === 'pointerdown') dangCham = true;
+  else if (e && (e.type === 'pointerup' || e.type === 'pointercancel')) dangCham = false;
+  moiThuc = true; nhipVe = 15;
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
+  if (!raf && chayDuoc()) raf = requestAnimationFrame(vong);
+}
+function ngheThuc() {                                   // gắn một lần, lúc khung đã dựng
+  if (daNghe || !tam) return;
+  daNghe = true;
+  ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'wheel'].forEach(k => tam.addEventListener(k, danhThuc, true));
+  addEventListener('keydown', danhThuc, true); addEventListener('resize', danhThuc);
+}
+function boKhung(t) {                                   // chưa tới nhịp vẽ: hẹn khung sau, khỏi vẽ
+  if (t - veLuc >= nhipVe - 1) { veLuc = t; return false; }
   raf = requestAnimationFrame(vong);
+  return true;
+}
+function henVe(t, muc) {                                // muc 2: có gì đang chạy; 1: cảnh trôi chậm; 0: đứng yên
+  if (muc === 2 || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
+  if (t - thucLuc < NGHI_MS) nhipVe = 15;
+  else if (muc === 1) nhipVe = NHIP_TROI;
+  else {
+    if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && chayDuoc()) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+    return;
+  }
+  raf = requestAnimationFrame(vong);
+}
+function vong(t) {
+  raf = 0;
+  if (!tam || !tam.classList.contains('hien') || boKhung(t)) return;
+  buocTroi(t);
+  henVe(t, theoMay || ngam || quanTinh || keo ? 2 : 1);
+}
+function buocTroi(t) {
   const dt = vong.tr && t ? Math.min(50, Math.max(0, t - vong.tr)) : 16.7;
   vong.tr = t;
   const luc = Date.now();
@@ -1232,8 +1271,10 @@ function doiVuTru(bat = !vuTru) {
 function moToanCanh() {
   const TC = self.TDTD_TOANCANH;
   if (!TC) return;
+  tcMo = true;                     // chạm, phím, đổi cỡ lúc này không gọi vòng vẽ trời dậy
   if (raf) { cancelAnimationFrame(raf); raf = null; }
-  TC.mo({ khiDong: () => { if (tam && tam.classList.contains('hien') && !raf) raf = requestAnimationFrame(vong); } });
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
+  TC.mo({ khiDong: () => { tcMo = false; danhThuc(); } });
 }
 
 /* Góc nhìn 12°–110°: hẹp nhất cỡ ống nhòm, rộng nhất cỡ mắt người. Lệch khỏi mặc định thì hiện
@@ -1404,7 +1445,7 @@ function mo() {
   const b = bauTroi(Date.now());
   huongNhin = b.trang.cao > 5 ? b.trang.huong : b.troi.cao > 5 ? b.troi.huong : 180;
   caoNhin = Math.max(15, Math.min(60, b.trang.cao > 5 ? b.trang.cao : b.troi.cao > 5 ? b.troi.cao : 25));
-  if (!raf) raf = requestAnimationFrame(vong);
+  ngheThuc(); danhThuc();
   /* Chưa chọn nơi thì hỏi ngay, không lặng lẽ lấy TP.HCM. Không tự bật định vị: chỉ hỏi vị trí
      khi người dùng bấm nút. Bấm "Để sau" thì lần mở sau hỏi lại. */
   if (!daChon) moBangChonNoi();
@@ -1414,6 +1455,8 @@ function mo() {
 function dong() {
   if (self.TDTD_TOANCANH && self.TDTD_TOANCANH.dangMo()) self.TDTD_TOANCANH.dong();
   if (raf) { cancelAnimationFrame(raf); raf = null; }
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
+  tcMo = false;
   if (vuTru && tam) doiVuTru(false);
   theoMay = false; mucMay = null; quanTinh = null; loc = null;
   if (tam) {                               // mở lại màn thì nút không còn ghi "Đang xoay theo máy" nữa

@@ -400,9 +400,12 @@ function veDem(ep) {
 
 function chay() {
   cancelAnimationFrame(khung);
-  const buoc = () => {
+  let truoc = -1e9;
+  const buoc = (nay) => {
     if (!tam || !tam.classList.contains('hien') || !['phat', 'tat', 'dung'].includes(trangThai)) return;
     if (typeof document !== 'undefined' && document.hidden) return;   // trang ẩn thì thôi vẽ; hiện lại sẽ chạy tiếp
+    if (nay - truoc < 32) { khung = requestAnimationFrame(buoc); return; }   // 30 khung mỗi giây là đủ mượt; máy 120 Hz khỏi vẽ 120 lần (pin, "sửa hết lag")
+    truoc = nay;
     veDem(false);
     khung = requestAnimationFrame(buoc);
   };

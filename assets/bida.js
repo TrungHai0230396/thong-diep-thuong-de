@@ -1304,7 +1304,7 @@ let coTieng = true, am = null, baoHen = 0;
 function doCo() {
   if (!tam || !cv) return;
   const k = canh.getBoundingClientRect();
-  DPR = Math.min(self.devicePixelRatio || 1, 2.5); W = Math.max(240, k.width || 360); H = Math.max(240, k.height || 520);
+  DPR = Math.min(self.devicePixelRatio || 1, 2); W = Math.max(240, k.width || 360); H = Math.max(240, k.height || 520);
   cv.width = Math.round(W * DPR); cv.height = Math.round(H * DPR); cv.style.width = W + 'px'; cv.style.height = H + 'px';
   /* bàn dọc hay ngang: chiều nào cho bàn to hơn (khung gần vuông — như có dải bài bida bài — thì vẫn dọc nếu dọc to hơn) */
   const dai = L.DAI + 2 * VIEN, rong = L.RONG + 2 * VIEN, rongCho = W - TRAI - PHAI - 2 * LE;
@@ -2694,7 +2694,7 @@ function veQuan() {
   }
   for (const x of [-7.3, 7.3]) for (const y of [0, CAO_TUONG]) { const [px, py] = tho(x, y, Z_TUONG); x0 = Math.min(x0, px); x1 = Math.max(x1, px); y0 = Math.min(y0, py); y1 = Math.max(y1, py); }   // tường sau, ảnh treo
   /* hình quán co vừa cả bề ngang lẫn bề cao của lớp quán, giữa theo bề ngang, sát trên (bảng hiện từ dưới lên khỏi che hết) */
-  const le = 12, tren = 16, w = cv.clientWidth || 340, h = cv.clientHeight || 300, dpr = Math.min(self.devicePixelRatio || 1, 2.5);
+  const le = 12, tren = 16, w = cv.clientWidth || 340, h = cv.clientHeight || 300, dpr = Math.min(self.devicePixelRatio || 1, 2);
   if (cv.width !== Math.round(w * dpr)) cv.width = Math.round(w * dpr);
   if (cv.height !== Math.round(h * dpr)) cv.height = Math.round(h * dpr);
   const g = cv.getContext('2d');
@@ -3476,31 +3476,41 @@ function dungKhung() {
   addEventListener('resize', () => { if (quanHien()) veQuan(); });
   if (typeof ResizeObserver === 'function') new ResizeObserver(() => { if (quanHien()) veQuan(); }).observe(tam.querySelector('.bd-quan-khung'));
 }
-/* Pin ("Chơi game á dễ nhanh hết pin, vd bida, đẩy thùng"): vẽ lại cả khung 60 lần mỗi giây trong lúc bàn đứng yên là
-   thứ ngốn pin nhất. Có gì đang chạy, đang chạm, hay vừa chạm, bấm phím trong 3 giây thì vẽ đủ nhịp; còn lại chỉ vẽ 4
-   lần mỗi giây — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư giây. */
+/* Pin, giật ("sao mở app nhanh hết pin", "sửa hết lag"): vẽ lại cả màn mỗi khung hình — máy 120 Hz là 120 lần mỗi
+   giây — kể cả lúc không có gì đổi là thứ ngốn pin nhất. Đang chạm, vừa chạm hay bấm phím trong 3 giây, hay có gì
+   đang chạy thì vẽ tối đa 60 lần mỗi giây; bàn đứng yên thì 4 lần — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư giây. */
 const NGHI_MS = 3000, NHIP_NGHI = 250;
-let thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0;
+let veLuc = -1e9, thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0, nhipVe = 15;
+function chayDuoc() { return !!(tam && tam.classList.contains('hien')); }
 function danhThuc(e) {
   if (e && e.type === 'pointerdown') dangCham = true;
   else if (e && (e.type === 'pointerup' || e.type === 'pointercancel')) dangCham = false;
-  moiThuc = true;
+  moiThuc = true; nhipVe = 15;
   if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
-  if (!raf && tam && tam.classList.contains('hien')) raf = requestAnimationFrame(vong);
+  if (!raf && chayDuoc()) raf = requestAnimationFrame(vong);
 }
-function henVe(t, banRon) {
-  if (banRon || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
-  if (t - thucLuc < NGHI_MS) raf = requestAnimationFrame(vong);
-  else if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && tam && tam.classList.contains('hien')) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+function boKhung(t) {                                   // chưa tới nhịp vẽ: hẹn khung sau, khỏi vẽ
+  if (t - veLuc >= nhipVe - 1) { veLuc = t; return false; }
+  raf = requestAnimationFrame(vong);
+  return true;
+}
+function henVe(t, muc) {                                // muc 2: có gì đang chạy; 0: đứng yên
+  if (muc === 2 || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
+  if (t - thucLuc < NGHI_MS) nhipVe = 15;
+  else {
+    if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && chayDuoc()) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+    return;
+  }
+  raf = requestAnimationFrame(vong);
 }
 function vong(t) {
   raf = 0;
-  if (!tam || !tam.classList.contains('hien')) return;
+  if (!tam || !tam.classList.contains('hien') || boKhung(t)) return;
   if (dang) chayHoat(t);
   if (mayNgam && t - mayNgam.t0 >= mayNgam.lau) { const f = mayNgam.xong; mayNgam = null; f(); }
   capNhatDuDoan();
   veCanh(t);
-  henVe(t, dang || mayNgam);
+  henVe(t, dang || mayNgam ? 2 : 0);
 }
 function mo() {
   dungKhung();
