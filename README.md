@@ -2499,6 +2499,20 @@ Người dùng: "Các trò chơi bạn xóa # hết đi, để copy có ghi chú
 
 Đã thử trên trình duyệt (bản chỉ có phần này, trên một máy chủ riêng): cả 17 trò mở từ ngôi sao thì thanh địa chỉ là trang riêng, thêm đúng một bước, đóng thì về `/`; Back đóng trò; mở `…/bida-lo/?tro=bida&ngay=2026-12-25` vào bida, địa chỉ giữ nguyên; mở `…/co-vua-ba-nguoi/?phong=ZZZZZZ` thì cờ đọc mã, báo không thấy phòng, địa chỉ bỏ `?phong`; vào phòng thì địa chỉ thành `…/co-vua-ba-nguoi/?phong=MÃ`, bấm ✕ về `/`; tải lại ở `…/luyen-phat-am/?tro=phat-am` vẫn vào phát âm; link cũ `…/#xem-ngay` thành `…/xem-ngay-tot-xau/`; không lỗi console, không tệp nào tải nhầm thư mục. **Chưa thử**: iPhone thật (Thêm vào MH chính lúc đang ở trang riêng), app đã cài trên Android, service worker thật (khung Browser không đăng ký được — mới chạy `sw.js` với kho giả), Zalo, Facebook đọc link chép từ thanh địa chỉ (trang riêng, thẻ og thì đã dùng từ trước cho nút 🔗).
 
+## Pin: trang chủ và trò không vẽ khi đứng yên
+
+Người dùng: "sao mở app nhanh hết pin điện thoại vậy", "Chơi game á dễ nhanh hết pin, vd bida, đẩy thùng".
+
+- Trang chủ có 19 hiệu ứng chạy mãi (sao lấp lánh, tia sáng quay, hào quang lá bài), kể cả lúc đang mở trò phủ kín
+  màn hình. Hào quang trước đổi `box-shadow` mỗi khung hình — vẽ lại cả lá 60 lần mỗi giây; giờ là một lớp
+  `.card-shell::before` chỉ đổi opacity. Đang mở trò (`body.khoa-cuon`) hay để yên trang 12 giây (`body.nghi`, app.js)
+  thì cả 19 hiệu ứng dừng; chạm, cuộn, bấm phím là chạy lại. Lá đã lật thì tia sáng (mặt sau, đã khuất) không quay.
+- Bida, đẩy thùng, lập trình vẽ lại cả bàn mỗi khung hình dù bàn đứng yên. Giờ (`danhThuc` / `henVe` trong từng tệp):
+  có gì đang chạy (bi lăn, máy ngắm, robot đi, xoay bàn), đang chạm, hay vừa chạm, bấm phím trong 3 giây thì vẽ đủ
+  nhịp; còn lại 4 lần mỗi giây — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư
+  giây; chỗ bắt đầu cú đánh, máy ngắm gọi `danhThuc` nên không trễ. Đo trên trình duyệt: mở trò ~60 khung/giây, để
+  yên 3 giây còn 4, chạm là về lại 60.
+
 ## Cấu trúc
 
 ```

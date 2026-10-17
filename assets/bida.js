@@ -1821,6 +1821,7 @@ function danhCu(cu0, P) {
 }
 function batDauHoat(viTri, cu, kq, P) {
   dang = { mp: L.moPhong(viTri, cu), cu, kq, P, t: 0, du: 0, nhanh: 1, soSk: 0, roi: [], bay: [], x0: viTri[cu.ca || 0][0], y0: viTri[cu.ca || 0][1], goc: Math.atan2(cu.dy, cu.dx), cuMo: 1 };
+  danhThuc();
   ngam.luc = 0; ngam.keo = null; ngam.du = null; ngam.duKhoa = '';
   tiengCo(cu.v);
   capNhatChu();
@@ -2093,6 +2094,7 @@ function batNgamMay(cu, P, lau, xong) {
   while (goc0 - goc1 > Math.PI) goc0 -= 2 * Math.PI;
   while (goc1 - goc0 > Math.PI) goc0 += 2 * Math.PI;
   mayNgam = { cu, P, goc0, goc1, luc: Math.sqrt(Math.max(0, (cu.v - 0.2) / (L.VMAX - 0.2))), t0: bay(), lau, xong, c };
+  danhThuc();
   ngam.goc = goc1;
   capNhatChu();
 }
@@ -3446,6 +3448,8 @@ function dungKhung() {
   });
   tam.addEventListener('input', (e) => { if (e.target && e.target.classList && e.target.classList.contains('bd-nang-o')) datNang(+e.target.value); });
   cv.addEventListener('pointerdown', chamXuong);
+  ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'wheel'].forEach(k => tam.addEventListener(k, danhThuc, true));
+  addEventListener('keydown', danhThuc, true); addEventListener('resize', danhThuc);
   cv.addEventListener('pointermove', chamKeo);
   cv.addEventListener('pointerup', chamLen);
   cv.addEventListener('pointercancel', () => { ngam.keo = null; });
@@ -3472,6 +3476,23 @@ function dungKhung() {
   addEventListener('resize', () => { if (quanHien()) veQuan(); });
   if (typeof ResizeObserver === 'function') new ResizeObserver(() => { if (quanHien()) veQuan(); }).observe(tam.querySelector('.bd-quan-khung'));
 }
+/* Pin ("Chơi game á dễ nhanh hết pin, vd bida, đẩy thùng"): vẽ lại cả khung 60 lần mỗi giây trong lúc bàn đứng yên là
+   thứ ngốn pin nhất. Có gì đang chạy, đang chạm, hay vừa chạm, bấm phím trong 3 giây thì vẽ đủ nhịp; còn lại chỉ vẽ 4
+   lần mỗi giây — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư giây. */
+const NGHI_MS = 3000, NHIP_NGHI = 250;
+let thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0;
+function danhThuc(e) {
+  if (e && e.type === 'pointerdown') dangCham = true;
+  else if (e && (e.type === 'pointerup' || e.type === 'pointercancel')) dangCham = false;
+  moiThuc = true;
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
+  if (!raf && tam && tam.classList.contains('hien')) raf = requestAnimationFrame(vong);
+}
+function henVe(t, banRon) {
+  if (banRon || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
+  if (t - thucLuc < NGHI_MS) raf = requestAnimationFrame(vong);
+  else if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && tam && tam.classList.contains('hien')) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+}
 function vong(t) {
   raf = 0;
   if (!tam || !tam.classList.contains('hien')) return;
@@ -3479,7 +3500,7 @@ function vong(t) {
   if (mayNgam && t - mayNgam.t0 >= mayNgam.lau) { const f = mayNgam.xong; mayNgam = null; f(); }
   capNhatDuDoan();
   veCanh(t);
-  raf = requestAnimationFrame(vong);
+  henVe(t, dang || mayNgam);
 }
 function mo() {
   dungKhung();
@@ -3501,12 +3522,13 @@ function mo() {
     else moCaiDat();
   }
   capNhatChu();
-  if (!raf) raf = requestAnimationFrame(vong);
+  danhThuc();
 }
 function dong() {
   dungLuong();
   tatQuan();
   if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
   if (am && am.state === 'running') am.suspend();
   if (tam) tam.classList.remove('hien');
   if (typeof document !== 'undefined') document.body.classList.remove('khoa-cuon');

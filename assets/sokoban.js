@@ -588,6 +588,23 @@ function viTri(t) {
   return { robot, thung };
 }
 const bay = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+/* Pin ("Chơi game á dễ nhanh hết pin, vd bida, đẩy thùng"): vẽ lại cả khung 60 lần mỗi giây trong lúc bàn đứng yên là
+   thứ ngốn pin nhất. Có gì đang chạy, đang chạm, hay vừa chạm, bấm phím trong 3 giây thì vẽ đủ nhịp; còn lại chỉ vẽ 4
+   lần mỗi giây — thứ đổi không qua tay mình (máy, bạn qua mạng) vẫn hiện, chậm nhất một phần tư giây. */
+const NGHI_MS = 3000, NHIP_NGHI = 250;
+let thucLuc = -1e9, moiThuc = false, dangCham = false, henNghi = 0;
+function danhThuc(e) {
+  if (e && e.type === 'pointerdown') dangCham = true;
+  else if (e && (e.type === 'pointerup' || e.type === 'pointercancel')) dangCham = false;
+  moiThuc = true;
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
+  if (!raf && tam && tam.classList.contains('hien')) raf = requestAnimationFrame(vong);
+}
+function henVe(t, banRon) {
+  if (banRon || moiThuc || dangCham) { moiThuc = false; thucLuc = t; }
+  if (t - thucLuc < NGHI_MS) raf = requestAnimationFrame(vong);
+  else if (!henNghi) henNghi = setTimeout(() => { henNghi = 0; if (!raf && tam && tam.classList.contains('hien')) raf = requestAnimationFrame(vong); }, NHIP_NGHI);
+}
 function vong(t) {
   raf = 0;
   if (!tam || !tam.classList.contains('hien')) return;
@@ -596,7 +613,7 @@ function vong(t) {
   if (!dang && hang.length && !thang) thucHien(hang.shift(), t, hang.length > 0);
   if (the) the.thung.forEach((o, k) => { const muc = M.dich.includes(o) ? 1 : 0; sang[k] += (muc - sang[k]) * .14; });
   veCanh(t);
-  raf = requestAnimationFrame(vong);
+  henVe(t, dang || (hang.length && !thang) || goc !== gocDen);
 }
 /* bấm một hướng (đã đổi sang hướng trên bản đồ) */
 function lam(d) {
@@ -862,6 +879,8 @@ function dungKhung() {
   cv.addEventListener('pointerup', chamLen);
   cv.addEventListener('pointercancel', () => { cham = null; });
   tam.addEventListener('pointerdown', batDauGiu);
+  ['pointerdown', 'pointermove', 'pointerup', 'pointercancel', 'wheel'].forEach(k => tam.addEventListener(k, danhThuc, true));
+  addEventListener('keydown', danhThuc, true); addEventListener('resize', danhThuc);
   addEventListener('pointerup', dungGiu);
   addEventListener('pointercancel', dungGiu);
   addEventListener('blur', dungGiu);
@@ -1031,12 +1050,13 @@ function mo() {
   tam.classList.add('hien');
   doCo();
   if (MAN.length) moMan(manMo());
-  if (!raf) raf = requestAnimationFrame(vong);
+  danhThuc();
 }
 function dong() {
   dungGiu(); cham = null; hang = [];
   if (am && am.state === 'running') am.suspend();
   if (raf) { cancelAnimationFrame(raf); raf = 0; }
+  if (henNghi) { clearTimeout(henNghi); henNghi = 0; }
   if (tam) tam.classList.remove('hien');
   document.body.classList.remove('khoa-cuon');
 }

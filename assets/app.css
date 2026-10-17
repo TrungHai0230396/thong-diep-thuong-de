@@ -61,8 +61,15 @@ main{position:relative;z-index:1;padding:0 18px calc(40px + var(--safe-b));max-w
 .back-word.small{font-size:10.5px;fill-opacity:.5;letter-spacing:.14em}
 .ray-set{transform-origin:100px 126px;animation:spin 44s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.card:not(.is-flipped) .back{animation:breathe 5.5s ease-in-out infinite}
-@keyframes breathe{0%,100%{box-shadow:var(--shadow),0 0 0 rgba(232,195,122,0)}50%{box-shadow:var(--shadow),0 0 34px rgba(232,195,122,.22)}}
+/* Hào quang thở bằng opacity của một lớp riêng: đổi box-shadow mỗi khung hình là vẽ lại cả lá 60 lần mỗi giây, tốn pin */
+.card-shell::before{content:"";position:absolute;inset:0;border-radius:var(--radius);box-shadow:0 0 34px rgba(232,195,122,.22);
+  opacity:0;pointer-events:none;animation:breathe 5.5s ease-in-out infinite}
+.card-shell:has(.card.is-flipped)::before{animation:none}
+@keyframes breathe{50%{opacity:1}}
+/* Pin ("sao mở app nhanh hết pin điện thoại vậy"): sao lấp lánh, tia sáng, hào quang chạy mãi thì máy không được nghỉ.
+   Đang mở trò (khoa-cuon) hay để yên trang một lúc (nghi, app.js) thì dừng; lá đã lật thì tia sáng khuất, khỏi quay. */
+body.khoa-cuon .ray-set,body.khoa-cuon .star.is-placed,body.khoa-cuon .card-shell::before,
+body.nghi .ray-set,body.nghi .star.is-placed,body.nghi .card-shell::before,.card.is-flipped .ray-set{animation-play-state:paused}
 
 .front{transform:rotateY(180deg);background:linear-gradient(168deg,#1d1740 0%,#151030 60%,#100d24 100%);
   border:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;
@@ -171,6 +178,7 @@ textarea:focus{outline:1px solid var(--gold-deep)}
 
 @media (prefers-reduced-motion:reduce){
   *{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .card-shell::before{animation:none}
 }
 
 /* ---------- màn hình phủ kín dùng chung cho các ngôi sao ---------- */

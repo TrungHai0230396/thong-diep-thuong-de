@@ -696,6 +696,16 @@ async function init() {
   today = nowDate();
   revealed = !PREVIEW && readDay() === today;   // đã nhận hôm nay thì hiện lại luôn
   stars(); render();
+  /* Pin: để yên trang 12 giây thì dừng sao lấp lánh, tia sáng, hào quang (app.css body.nghi); chạm, cuộn, bấm phím là
+     chạy lại ("sao mở app nhanh hết pin điện thoại vậy") */
+  let henNghi = 0;
+  const thucTrang = () => {
+    document.body.classList.remove('nghi');
+    clearTimeout(henNghi);
+    henNghi = setTimeout(() => document.body.classList.add('nghi'), 12000);
+  };
+  ['pointerdown', 'keydown', 'scroll', 'wheel'].forEach(k => addEventListener(k, thucTrang, { passive: true, capture: true }));
+  thucTrang();
 
   $('#card').onclick = reveal;
   $('#card').onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); reveal(); } };
