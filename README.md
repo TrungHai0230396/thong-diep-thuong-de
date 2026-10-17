@@ -2258,6 +2258,12 @@ Bản đầu thử mọi hướng × mọi lực × mọi xoáy: mức Khó ch�
 
 Lúc máy nghĩ, dòng trạng thái ghi "Sóc đang ngắm…".
 
+**Chấm ngắm của bàn phăng** — người dùng: "mấy dấu . trắng ở mép bàn sai với thực tế đúng ko". Đúng: bàn phăng dùng lại
+cách đặt chấm của bàn lỗ — cạnh dài 6 chấm, bỏ trống chỗ giữa (chỗ đó ở bàn lỗ là lỗ giữa). Bàn phăng không có lỗ nên cạnh
+dài đủ 7 chấm cách nhau 1/8, cạnh ngắn 3 chấm cách 1/4, tất cả 20 — đúng lưới 8 × 4 ô mà hệ thống điểm của bida 3 băng
+dựa vào. Bàn lỗ giữ nguyên 6 + 6 + 3 + 3 = 18 chấm như WPA. Sửa cả bàn đang chơi lẫn bàn nhỏ trong quán; `test-bida.js`
+thêm một bài (thử phá: trả bàn phăng về 6 chấm thì bài đó hỏng).
+
 ### Quán bida: 16 bàn, giữ bàn
 
 Người dùng: "Cái chỗ vào phòng cho là có 8 bàn bida 3 bi, 8 bàn bi da lỗ như 1 quán thực tế á, làm 3d / full hết thì ko cho vô nữa / tính toán cách giữ bàn vd sao 3p ko đánh là bị kích ra để người khác vô".

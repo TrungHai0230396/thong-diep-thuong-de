@@ -558,6 +558,9 @@ console.log('\n— Giao diện —');
   B._vanMoi({ che: 'may', kieu: 9, soMay: 3, kho: 0 });
   ok('9 bi với ba máy: bốn ghế, ba máy Sóc, Cú, Cáo', B._van().so === 4 && B._van().nguoi.slice(1).map(x => x.ten).join() === 'Sóc,Cú,Cáo');
   const nguon = fs.readFileSync(path.join(goc, 'assets', 'bida.js'), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
+  /* người dùng: "mấy dấu . trắng ở mép bàn sai với thực tế" — bàn phăng không có lỗ giữa nên cạnh dài có chấm giữa */
+  ok('chấm ngắm: bàn lỗ cạnh dài 6 chấm (bỏ chỗ lỗ giữa), bàn phăng 7 chấm — cả bàn chơi lẫn bàn trong quán',
+     /L\.PHANG \? \[1, 2, 3, 4, 5, 6, 7\] : \[1, 2, 3, 5, 6, 7\]/.test(nguon) && /phang \? \[-0\.75, -0\.5, -0\.25, 0, 0\.25, 0\.5, 0\.75\] : \[-0\.75, -0\.5, -0\.25, 0\.25, 0\.5, 0\.75\]/.test(nguon));
   ok('không chữ nào nhắc Firebase hiện ra cho người chơi (chỉ có trong ghi chú)', !/firebase/i.test(nguon.replace(/TDTD_PHONG|sanhbida|bida\//g, '')));
   /* người dùng: "những lúc ko thấy số, ko biết bi số mấy luôn" */
   B._vanMoi({ che: 'may', kieu: 9, soMay: 1, kho: 1 });

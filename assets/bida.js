@@ -1381,10 +1381,13 @@ function veBanTinh() {
   for (const lo of L.LO) for (const h of lo.ham) {
     g.beginPath(); g.moveTo(h.ax, h.ay); g.lineTo(h.bx, h.by); g.lineWidth = 2 * px; g.strokeStyle = 'rgba(0,0,0,.55)'; g.stroke();
   }
-  /* chấm ngắm trên khung: mỗi cạnh dài 6 chấm (cách 1/8), cạnh ngắn 3 chấm */
+  /* chấm ngắm trên khung, cách nhau 1/8 cạnh dài, 1/4 cạnh ngắn. Bàn lỗ: cạnh dài 6 chấm (chỗ giữa là lỗ giữa), cạnh ngắn
+     3 — 18 chấm như WPA. Bàn phăng không có lỗ giữa nên cạnh dài đủ 7 chấm, tất cả 20 (hệ thống điểm của bida 3 băng
+     chia bàn 8 × 4 ô). Người dùng: "mấy dấu . trắng ở mép bàn sai với thực tế" — bản trước bàn phăng cũng bỏ trống chỗ
+     giữa như bàn lỗ. */
   const cham = (x, y) => { g.beginPath(); g.moveTo(x, y + 0.009); g.lineTo(x + 0.006, y); g.lineTo(x, y - 0.009); g.lineTo(x - 0.006, y); g.closePath(); g.fillStyle = '#efe6cf'; g.fill(); };
   const xa = B + (V - B) / 2;
-  for (const i of [1, 2, 3, 5, 6, 7]) { cham(D_ * i / 8, -xa); cham(D_ * i / 8, R_ + xa); }
+  for (const i of L.PHANG ? [1, 2, 3, 4, 5, 6, 7] : [1, 2, 3, 5, 6, 7]) { cham(D_ * i / 8, -xa); cham(D_ * i / 8, R_ + xa); }
   for (const j of [1, 2, 3]) { cham(-xa, R_ * j / 4); cham(D_ + xa, R_ * j / 4); }
   /* chấm chân bàn, chấm đầu bàn */
   for (const [x, y] of [L.CHAM_CHAN, [L.KE_DAU, R_ / 2]]) { g.beginPath(); g.arc(x, y, 0.006, 0, 6.2832); g.fillStyle = 'rgba(255,255,255,.35)'; g.fill(); }
@@ -2828,7 +2831,7 @@ function veBanQuan(g, chieu, ban) {
   to(ni, vn);                                                                              // nỉ, sáng ở giữa dưới đèn
   g.fillStyle = 'rgba(246,232,196,.85)';                                                   // chấm ngắm trên khung
   const chamR = Math.max(0.6, mdv * 0.016), cham = (x, z) => { const p = chieu(cx + x, Y + 0.006, cz + z); g.beginPath(); g.arc(p[0], p[1], chamR, 0, 6.2832); g.fill(); };
-  for (const t of [-0.75, -0.5, -0.25, 0.25, 0.5, 0.75]) { cham(-(hx - 0.065), t * (hz - 0.13)); cham(hx - 0.065, t * (hz - 0.13)); }
+  for (const t of phang ? [-0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75] : [-0.75, -0.5, -0.25, 0.25, 0.5, 0.75]) { cham(-(hx - 0.065), t * (hz - 0.13)); cham(hx - 0.065, t * (hz - 0.13)); }   // bàn phăng có chấm giữa
   for (const t of [-0.5, 0, 0.5]) { cham(t * (hx - 0.13), -(hz - 0.065)); cham(t * (hx - 0.13), hz - 0.065); }
   if (!phang) for (const [x, z] of [[-1, -1], [1, -1], [-1, 0], [1, 0], [-1, 1], [1, 1]]) {
     const p = chieu(cx + x * (hx - 0.13), Y + 0.01, cz + z * (hz - 0.13)), rl = Math.max(1.8, mdv * 0.055);
